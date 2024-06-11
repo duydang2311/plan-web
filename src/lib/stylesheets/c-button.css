@@ -1,0 +1,32 @@
+.c-button {
+	width: 100%;
+	padding: theme('size[2]') theme('size[2]');
+	font-weight: 500;
+	border: none;
+	border-radius: theme('borderRadius.DEFAULT');
+	transition:
+		background-color 75ms ease-in-out,
+		box-shadow 100ms ease-in-out;
+}
+
+.c-button--primary {
+	color: theme('colors.gray[50]');
+	background-color: theme('colors.primary[500]');
+
+	&:hover {
+		background-color: theme('colors.primary[600]');
+	}
+
+	&:active {
+		background-color: theme('colors.primary[700]');
+	}
+
+	&:disabled {
+		color: theme('colors.primary[400]');
+		background-color: theme('colors.primary[200]');
+	}
+
+	&:focus-visible {
+		@apply ring ring-primary ring-offset-1 outline-none;
+	}
+}

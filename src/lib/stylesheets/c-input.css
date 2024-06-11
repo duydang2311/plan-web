@@ -1,0 +1,14 @@
+.c-input {
+	width: 100%;
+	padding: theme('size[2]') theme('size[1]');
+	border: theme('borderWidth.DEFAULT') solid theme('colors.gray[300]');
+	border-radius: theme('borderRadius.DEFAULT');
+	outline: none;
+	transition:
+		border-color 100ms ease-in-out,
+		box-shadow 100ms ease-in-out;
+
+	&:focus-visible {
+		@apply ring ring-gray-300 ring-offset-1;
+	}
+}

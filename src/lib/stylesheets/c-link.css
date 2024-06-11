@@ -1,0 +1,21 @@
+.c-link {
+	color: theme('colors.blue[500]');
+	text-decoration: none;
+	transition:
+		color 75ms ease-in-out,
+		box-shadow 100ms ease-in-out;
+	border-radius: theme('borderRadius.DEFAULT');
+
+	&:hover {
+		color: theme('colors.blue[600]');
+		text-decoration: underline;
+	}
+
+	&:active {
+		color: theme('colors.blue[400]');
+	}
+
+	&:focus-visible {
+		@apply ring ring-current outline-none;
+	}
+}
