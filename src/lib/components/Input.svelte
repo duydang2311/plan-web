@@ -2,9 +2,16 @@
 	import clsx from 'clsx';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLInputAttributes {}
+	type Props = HTMLInputAttributes;
 
 	let { value = $bindable(), ...props }: Props = $props();
+	let element: HTMLInputElement;
+
+	$effect(() => {
+		if (props['aria-invalid']) {
+			element.focus();
+		}
+	});
 </script>
 
-<input {...props} bind:value class={clsx('c-input', props.class)} />
+<input bind:this={element} {...props} bind:value class={clsx('c-input', props.class)} />

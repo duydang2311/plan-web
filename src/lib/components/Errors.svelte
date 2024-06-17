@@ -3,19 +3,23 @@
 
 	interface Props {
 		errors?: string[];
+		errorMap?: Record<string, string>;
+		class?: string;
 	}
-	const { errors = [] }: Props = $props();
+	const { errors = [], errorMap, ...props }: Props = $props();
 </script>
 
 {#if errors?.length}
 	<ol
 		class={clsx(
 			'm-0 p-0 text-red-500 text-sm font-medium',
-			errors.length === 1 ? 'list-none' : 'list-inside'
+			errors.length === 1 ? 'list-none' : 'list-inside',
+			props.class
 		)}
 	>
 		{#each errors as error}
-			<li><em>{error}</em></li>
+			{@const message = errorMap?.[error] ?? error}
+			<li><em>{message}{!message.endsWith('.') && '.'}</em></li>
 		{/each}
 	</ol>
 {/if}
