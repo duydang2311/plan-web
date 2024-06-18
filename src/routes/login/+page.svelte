@@ -11,7 +11,8 @@
 
 	const errorMap = {
 		root: {
-			unknown: 'An unknown error has occurred on server'
+			unknown: 'An unknown error has occurred on server',
+			404: 'Could not connect to server'
 		},
 		email: {
 			required: 'Enter an email address',

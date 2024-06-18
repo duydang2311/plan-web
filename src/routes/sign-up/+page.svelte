@@ -24,7 +24,8 @@
 
 	const errorMap = {
 		root: {
-			unknown: 'An unknown error has occurred on server'
+			unknown: 'An unknown error has occurred on server',
+			404: 'Could not connect to server'
 		},
 		email: {
 			required: 'Enter an email address',
@@ -67,7 +68,6 @@
 						class="space-y-6 w-full max-w-[40ch] mx-auto"
 						use:enhance={(e) => {
 							const validated = clientValidate(Object.fromEntries(e.formData.entries()));
-							console.log(validated);
 							if (!validated.ok) {
 								form = { errors: validated.errors };
 								e.cancel();

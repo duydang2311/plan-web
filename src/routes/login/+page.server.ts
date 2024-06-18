@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { Effect, Either, pipe } from 'effect';
-import { ValidationError } from '~/lib/models/errors';
+import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClientTag } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import type { Actions } from './$types';
@@ -70,7 +70,11 @@ function signInEffect(email: string, password: string) {
 		const apiClient = yield* ApiClientTag;
 		const response = yield* apiClient.post('tokens/authenticate', { body: { email, password } });
 		if (!response.ok) {
-			const json = yield* Effect.promise(() => response.json<unknown>());
+			// const json = yield* Effect.promise(() => response.json<unknown>());
+			const json = yield* Effect.tryPromise({
+				try: () => response.json<unknown>(),
+				catch: () => new ApiError({ code: response.status + '' })
+			});
 			const problem = yield* pipe(validateProblemDetailsEffect(json));
 			yield* Effect.fail(new ValidationError({ errors: flattenProblemDetails(problem) }));
 		}

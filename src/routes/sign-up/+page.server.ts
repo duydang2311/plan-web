@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import { timingSafeEqual } from 'crypto';
 import { Effect, Either, pipe } from 'effect';
-import { ValidationError } from '~/lib/models/errors';
+import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClientTag } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { extend } from '~/lib/utils/validation';
@@ -34,7 +34,6 @@ export const actions = {
 							const validated = yield* Effect.promise(() =>
 								serverValidate(Object.fromEntries(form.entries()))
 							);
-							console.log(validated);
 							if (!validated.ok) {
 								return yield* Effect.fail(fail(400, { errors: validated.errors }));
 							}
@@ -71,7 +70,10 @@ function signUpEffect(email: string, password: string) {
 			body: { email, password, verificationUrl: env.VERIFICATION_URL }
 		});
 		if (!response.ok) {
-			const json = yield* Effect.promise(() => response.json());
+			const json = yield* Effect.tryPromise({
+				try: () => response.json(),
+				catch: () => new ApiError({ code: response.status + '' })
+			});
 			const problem = yield* validateProblemDetailsEffect(json);
 			yield* Effect.fail(
 				new ValidationError({
