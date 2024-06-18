@@ -4,10 +4,7 @@ import { timingSafeEqual } from 'crypto';
 import { Effect, Either, pipe } from 'effect';
 import { ValidationError } from '~/lib/models/errors';
 import { ApiClientTag } from '~/lib/services/api_client.server';
-import {
-	flattenProblemDetailsErrors,
-	parseProblemDetailsEffect
-} from '~/lib/utils/problem_details';
+import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { extend } from '~/lib/utils/validation';
 import type { Actions } from './$types';
 import { validate } from './utils';
@@ -28,7 +25,6 @@ const serverValidate = extend(validate, async (input, { error }) => {
 
 export const actions = {
 	default: async ({ request, locals: { appLive } }) => {
-		console.log('wtf');
 		return pipe(
 			await Effect.runPromise(
 				Effect.either(
@@ -76,10 +72,10 @@ function signUpEffect(email: string, password: string) {
 		});
 		if (!response.ok) {
 			const json = yield* Effect.promise(() => response.json());
-			const problem = yield* parseProblemDetailsEffect(json);
+			const problem = yield* validateProblemDetailsEffect(json);
 			yield* Effect.fail(
 				new ValidationError({
-					errors: flattenProblemDetailsErrors(problem.errors)
+					errors: flattenProblemDetails(problem)
 				})
 			);
 		}

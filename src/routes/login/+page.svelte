@@ -1,53 +1,107 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
 	import Button from '~/lib/components/Button.svelte';
 	import Errors from '~/lib/components/Errors.svelte';
 	import Input from '~/lib/components/Input.svelte';
 	import Label from '~/lib/components/Label.svelte';
 	import Link from '~/lib/components/Link.svelte';
-	import Logo from '~/lib/components/Logo.svelte';
-	import type { ActionData, PageData } from './$types';
+	import LogoType from '~/lib/components/LogoType.svelte';
+	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
+	import { validate } from './utils';
 
-	const { data, form: action }: { data: PageData; form: ActionData } = $props();
-	const { form, enhance, errors, constraints } = superForm(data.form);
-	const rootErrors = $derived(action?.errors);
+	const errorMap = {
+		root: {
+			unknown: 'An unknown error has occurred on server'
+		},
+		email: {
+			required: 'Enter an email address',
+			email: 'Enter a valid email address'
+		},
+		password: {
+			required: 'Enter a password',
+			string: 'Enter a password',
+			invalid_credentials: 'The email address or password could not be verified'
+		}
+	};
+
+	let { form }: { form: ActionData } = $props();
+	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
+
+	let status = $state<'submitting' | null>(null);
 </script>
 
-<main class="w-full flex flex-col items-center p-8 mt-24">
-	<Logo class="size-24 mb-4 text-gray-200" />
-	<h1 class="text-center text-balance text-gray-500 mb-8">Sign in to your account</h1>
-	<form method="post" class="space-y-8 w-full max-w-[40ch]" use:enhance>
-		<Errors errors={rootErrors} />
-		<div class="space-y-1">
-			<Label for="email" class="block">Email address</Label>
-			<Input
-				type="email"
-				id="email"
-				name="email"
-				autofocus
-				aria-invalid={$errors.email ? 'true' : undefined}
-				bind:value={$form.email}
-				{...$constraints.email}
-			/>
-			<Errors errors={$errors.email} />
-		</div>
-		<div class="space-y-1">
-			<div class="flex justify-between flex-wrap gap-2">
-				<Label for="password" class="block">Password</Label>
-				<Link href="https://ark-ui.com/react/docs/components/clipboard" class="ml-auto text-sm">
-					Forgot password?
-				</Link>
+<main class="flex justify-center p-8 items-center mt-8">
+	<div class="w-full max-w-[70ch]">
+		<LogoType class="h-24 mx-auto" />
+		<h1 class="text-center mb-8 mt-8">Sign in</h1>
+		<form
+			method="post"
+			class="space-y-6 w-full max-w-[40ch] mx-auto"
+			use:enhance={(e) => {
+				const validated = validate(Object.fromEntries(e.formData.entries()));
+				if (!validated.ok) {
+					form = { errors: validated.errors };
+					e.cancel();
+					return;
+				}
+
+				form = null;
+				status = 'submitting';
+				return async ({ update }) => {
+					status = null;
+					await update();
+				};
+			}}
+		>
+			<Errors errors={errors['root']} errorMap={errorMap.root} class="text-center" />
+			<div class="space-y-1">
+				<Label for="email" class="block">Email address</Label>
+				<Input
+					type="email"
+					id="email"
+					name="email"
+					autofocus
+					required
+					aria-invalid={errors['email'] ? 'true' : undefined}
+				/>
+				<Errors
+					errors={errors['email']?.filter((x) => x !== 'invalid_credentials')}
+					errorMap={errorMap.email}
+				/>
 			</div>
-			<Input
-				type="password"
-				id="password"
-				name="password"
-				aria-invalid={$errors.password ? 'true' : undefined}
-				bind:value={$form.password}
-				{...$constraints.password}
-			/>
-			<Errors errors={$errors.password} />
+			<div class="space-y-1">
+				<div class="flex justify-between flex-wrap gap-2">
+					<Label for="password" class="block">Password</Label>
+					<Link href="https://ark-ui.com/react/docs/components/clipboard" class="ml-auto text-sm">
+						Forgot password?
+					</Link>
+				</div>
+				<Input
+					type="password"
+					id="password"
+					name="password"
+					autofocus
+					required
+					aria-invalid={errors['password'] ? 'true' : undefined}
+				/>
+				<Errors errors={errors['password']} errorMap={errorMap.password} />
+			</div>
+			<Button disabled={status === 'submitting'}>
+				{#if status === 'submitting'}
+					Loading...
+				{:else}
+					Sign in
+				{/if}
+			</Button>
+		</form>
+		<div class="mt-8 space-y-4 text-center w-fit mx-auto">
+			<hr class="w-full text-base-border" />
+			<p>
+				<small>
+					New user?
+					<Link href="/sign-up">Sign up</Link>.
+				</small>
+			</p>
 		</div>
-		<Button>Login</Button>
-	</form>
+	</div>
 </main>

@@ -1,15 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
-import Vine from '@vinejs/vine';
 import { Effect, Either, pipe } from 'effect';
-import { superValidate } from 'sveltekit-superforms';
-import { vine } from 'sveltekit-superforms/adapters';
 import { ValidationError } from '~/lib/models/errors';
 import { ApiClientTag } from '~/lib/services/api_client.server';
-import {
-	flattenProblemDetailsErrors,
-	parseProblemDetailsEffect
-} from '~/lib/utils/problem_details';
-import type { Actions, PageServerLoad } from './$types';
+import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
+import type { Actions } from './$types';
+import { validate } from './utils';
 
 interface SignInResponse {
 	accessToken: string;
@@ -18,21 +13,6 @@ interface SignInResponse {
 	refreshTokenMaxAge: number;
 }
 
-const schema = Vine.object({
-	email: Vine.string().email(),
-	password: Vine.string()
-});
-
-const defaults = {
-	email: '',
-	password: ''
-};
-
-export const load: PageServerLoad = async () => {
-	const form = await superValidate(vine(schema, { defaults }));
-	return { form };
-};
-
 export const actions = {
 	default: async ({ request, cookies, locals: { appLive } }) => {
 		return pipe(
@@ -40,19 +20,20 @@ export const actions = {
 				Effect.either(
 					pipe(
 						Effect.gen(function* () {
-							const form = yield* Effect.promise(() =>
-								superValidate(request, vine(schema, { defaults }))
+							const form = yield* Effect.promise(() => request.formData());
+							const validated = yield* Effect.sync(() =>
+								validate(Object.fromEntries(form.entries()))
 							);
-							if (!form.valid) {
-								yield* Effect.fail(fail(400, { form, errors: undefined }));
+							if (!validated.ok) {
+								return yield* Effect.fail(fail(400, { errors: validated.errors }));
 							}
 							return yield* pipe(
-								signInEffect(form.data.email, form.data.password),
+								signInEffect(validated.data.email, validated.data.password),
 								Effect.catchTag('ApiError', (e) =>
-									Effect.fail(fail(400, { form, errors: [e.code] }))
+									Effect.fail(fail(400, { errors: { root: [e.code] } }))
 								),
 								Effect.catchTag('ValidationError', (e) =>
-									Effect.fail(fail(400, { form: { ...form, errors: e.errors }, errors: undefined }))
+									Effect.fail(fail(400, { errors: e.errors }))
 								)
 							);
 						}),
@@ -89,13 +70,9 @@ function signInEffect(email: string, password: string) {
 		const apiClient = yield* ApiClientTag;
 		const response = yield* apiClient.post('tokens/authenticate', { body: { email, password } });
 		if (!response.ok) {
-			const json = yield* Effect.promise(() => response.json());
-			const problem = yield* parseProblemDetailsEffect(json);
-			yield* Effect.fail(
-				new ValidationError({
-					errors: flattenProblemDetailsErrors(problem.errors)
-				})
-			);
+			const json = yield* Effect.promise(() => response.json<unknown>());
+			const problem = yield* pipe(validateProblemDetailsEffect(json));
+			yield* Effect.fail(new ValidationError({ errors: flattenProblemDetails(problem) }));
 		}
 		return yield* Effect.promise(() => response.json<SignInResponse>());
 	});
