@@ -5,6 +5,8 @@ import type { ApiClientTag } from './lib/services/api_client.server';
 
 // for information about these interfaces
 declare global {
+	type MaybePromise<T> = T | PromiseLike<T>;
+
 	namespace App {
 		// interface Error {}
 		interface Locals {

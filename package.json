@@ -17,6 +17,7 @@
     "@sveltejs/adapter-node": "^5.1.1",
     "@sveltejs/kit": "^2.5.16",
     "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/eslint": "^8.56.10",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^20.14.2",

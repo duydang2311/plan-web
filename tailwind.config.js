@@ -1,3 +1,5 @@
+import Typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ['./src/**/*.{html,svelte}'],
@@ -32,11 +34,42 @@ export default {
 					fg: 'oklch(var(--theme-base-fg-tw) / <alpha-value>)',
 					border: 'oklch(var(--theme-base-border-tw) / <alpha-value>)'
 				}
-			}
+			},
+			typography: () => ({
+				DEFAULT: {
+					css: {
+						h1: {
+							fontSize: 'var(--font-size-h1)'
+						},
+						h2: {
+							fontSize: 'var(--font-size-h2)'
+						},
+						h3: {
+							fontSize: 'var(--font-size-h3)'
+						},
+						h4: {
+							fontSize: 'var(--font-size-h4)'
+						},
+						h5: {
+							fontSize: 'var(--font-size-h5)'
+						},
+						h6: {
+							fontSize: 'var(--font-size-h6)'
+						},
+						a: {
+							textDecoration: 'inherit'
+						},
+						'--tw-prose-headings': 'var(--color-fg-1)',
+						'--tw-prose-body': 'var(--theme-base-fg)',
+						'--tw-prose-links': 'var(--theme-base-fg)',
+						'--tw-prose-hr': 'var(--theme-base-border)'
+					}
+				}
+			})
 		}
 	},
 	corePlugins: {
 		preflight: false
 	},
-	plugins: []
+	plugins: [Typography]
 };

@@ -2,7 +2,7 @@
 	import clsx from 'clsx';
 	import type { HTMLLabelAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLLabelAttributes {}
+	type Props = HTMLLabelAttributes;
 
 	const { children, ...props }: Props = $props();
 </script>

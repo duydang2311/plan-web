@@ -1,18 +1,27 @@
+@layer base {
+	:root {
+		--theme-link-fg: var(--theme-base-fg);
+		--theme-link-fg-hover: var(--color-fg-1);
+		--theme-link-fg-active: var(--color-fg-3);
+	}
+}
+
 .c-link {
-	color: theme('colors.blue[500]');
+	color: var(--theme-link-fg);
 	text-decoration: none;
 	transition:
 		color 75ms ease-in-out,
 		box-shadow 100ms ease-in-out;
 	border-radius: theme('borderRadius.DEFAULT');
+	font-weight: 500;
 
 	&:hover {
-		color: theme('colors.blue[600]');
+		color: var(--theme-link-fg-hover);
 		text-decoration: underline;
 	}
 
 	&:active {
-		color: theme('colors.blue[400]');
+		color: var(--theme-link-fg-active);
 	}
 
 	&:focus-visible {

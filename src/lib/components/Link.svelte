@@ -2,7 +2,7 @@
 	import clsx from 'clsx';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLAnchorAttributes {}
+	type Props = HTMLAnchorAttributes;
 
 	const { children, ...props }: Props = $props();
 </script>

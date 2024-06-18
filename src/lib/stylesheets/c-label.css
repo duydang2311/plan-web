@@ -1,5 +1,11 @@
+@layer base {
+	:root {
+		--theme-label-fg: var(--color-fg-3);
+	}
+}
+
 .c-label {
-	color: theme('colors.gray.600');
+	color: var(--theme-label-fg);
 	font-weight: 500;
 	font-size: var(--font-size-sm);
 }

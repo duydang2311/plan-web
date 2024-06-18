@@ -61,6 +61,7 @@
 	h5,
 	h6 {
 		font-family: var(--font-family-display);
+		font-weight: bold;
 	}
 
 	h6 {
@@ -89,5 +90,14 @@
 
 	small {
 		font-size: var(--font-size-sm);
+	}
+
+	.transition-enforcement {
+		display: grid;
+	}
+
+	.transition-enforcement > * {
+		grid-column: 1/2;
+		grid-row: 1/2;
 	}
 }

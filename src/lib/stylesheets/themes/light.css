@@ -1,9 +1,19 @@
 @layer base {
 	:root {
+		--color-fg-tw-1: 12.25% 0 118.64;
+		--color-fg-tw-2: 24.25% 0 118.64;
+		--color-fg-tw-3: 48.25% 0 118.64;
+
+		--color-fg-1: oklch(var(--color-fg-tw-1));
+		--color-fg-2: oklch(var(--color-fg-tw-2));
+		--color-fg-3: oklch(var(--color-fg-tw-3));
+	}
+
+	:root {
 		--theme-base-1-tw: 99% 0 116.2;
 		--theme-base-2-tw: 99.91% 0 118.64;
-		--theme-base-fg-tw: 20.25% 0 118.64;
-		--theme-base-border-tw: 89.66% 0 118.64;
+		--theme-base-fg-tw: var(--color-fg-tw-2);
+		--theme-base-border-tw: 88% 0 118.64;
 
 		--theme-base-1: oklch(var(--theme-base-1-tw));
 		--theme-base-2: oklch(var(--theme-base-2-tw));
