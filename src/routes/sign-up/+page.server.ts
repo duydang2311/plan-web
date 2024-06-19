@@ -11,7 +11,7 @@ import { decode, validate } from './utils';
 
 const serverValidate = extend(validate, (input, { error }) => {
 	if (
-		input.password.length === input.passwordConfirmation.length &&
+		input.password.length !== input.passwordConfirmation.length ||
 		!timingSafeEqual(Buffer.from(input.password), Buffer.from(input.passwordConfirmation))
 	) {
 		error('password', 'confirmed');

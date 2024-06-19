@@ -1,31 +1,26 @@
 @layer base {
-	:root {
-		--l-step: 0.05;
+	:root[data-theme='dark'] {
+		--l-step: -0.05;
 
-		--color-fg-1: oklch(14.25% 0.0027 286.09);
-		--color-fg-2: oklch(from var(--color-fg-1) calc(l + 0.14) c h);
-		--color-fg-3: oklch(from var(--color-fg-1) calc(l + 0.32) c h);
+		--color-fg-1: oklch(98.11% 0.0013 286.37);
+		--color-fg-2: oklch(from var(--color-fg-1) calc(l - 0.1) c h);
+		--color-fg-3: oklch(from var(--color-fg-1) calc(l - 0.2) c h);
 
 		--color-fg: oklch(98.11% 0.0013 286.37);
 		--color-bg: oklch(19.02% 0.0015 286.28);
 		--color-brand: oklch(70.11% 0.1673 288.9);
 		--color-negative: oklch(70.65% 0.1875 16.21);
 		--color-positive: oklch(67.05% 0.2256 142.04);
-
-		--color-bg: oklch(98.2% 0.0013 286.37);
-		--color-brand: oklch(48.32% 0.2931 274.22);
-		--color-negative: oklch(47.07% 0.1897 22.17);
-		--color-positive: oklch(43.42% 0.1461 142.04);
 	}
 
-	:root {
-		--theme-base-1: var(--color-bg);
-		--theme-base-2: oklch(from var(--color-bg) calc(l - 0.03) c h);
-		--theme-base-3: oklch(from var(--color-bg) calc(l - 0.1) c h);
+	:root[data-theme='dark'] {
+		--theme-base-1: oklch(from var(--color-bg) calc(l + 0.02) c h);
+		--theme-base-2: var(--color-bg);
+		--theme-base-3: oklch(from var(--color-bg) calc(l + 0.2) c h);
 		--theme-base-fg-1: var(--color-fg-1);
 		--theme-base-fg-2: var(--color-fg-2);
 		--theme-base-fg-3: var(--color-fg-3);
-		--theme-base-border: oklch(from var(--color-bg) calc(l - 0.1) c h);
+		--theme-base-border: oklch(from var(--color-bg) calc(l + 0.1) c h);
 
 		--theme-primary-1: var(--color-brand);
 		--theme-primary-2: oklch(from var(--color-brand) calc(l + var(--l-step)) c h);

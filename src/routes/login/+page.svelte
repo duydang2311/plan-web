@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Button from '~/lib/components/Button.svelte';
 	import Errors from '~/lib/components/Errors.svelte';
 	import Input from '~/lib/components/Input.svelte';
@@ -6,8 +7,9 @@
 	import Link from '~/lib/components/Link.svelte';
 	import LogoType from '~/lib/components/LogoType.svelte';
 	import type { ActionData } from './$types';
-	import { enhance } from '$app/forms';
 	import { validate } from './utils';
+	import type { ValidationResult } from '~/lib/utils/validation';
+	import { hasProperty } from '~/lib/utils/commons';
 
 	const errorMap = {
 		root: {
@@ -16,7 +18,8 @@
 		},
 		email: {
 			required: 'Enter an email address',
-			email: 'Enter a valid email address'
+			email: 'Enter a valid email address',
+			email_not_found: 'The email address has not been registered'
 		},
 		password: {
 			required: 'Enter a password',
@@ -26,22 +29,38 @@
 	};
 
 	let { form }: { form: ActionData } = $props();
-	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
-
+	let validation = $state<ValidationResult>();
+	let fields = $state({
+		email: '',
+		password: ''
+	});
 	let status = $state<'submitting' | null>(null);
+
+	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-<main class="flex min-h-screen h-full justify-center items-center">
-	<div class="w-full max-w-[70ch]">
+<main class="px-8 py-16">
+	<div class="w-full mx-auto">
 		<LogoType class="h-24 mx-auto" />
 		<h1 class="text-center mb-8 mt-8">Sign in</h1>
 		<form
 			method="post"
 			class="space-y-6 w-full max-w-[40ch] mx-auto"
+			oninput={() => (validation = validate(fields))}
+			onchange={() => {
+				if (!validation) return;
+				if (validation.ok) {
+					form = null;
+					return;
+				}
+				form = {
+					errors: Object.fromEntries(
+						Object.entries(validation.errors).filter(([k]) => hasProperty(fields, k) && fields[k])
+					)
+				};
+			}}
 			use:enhance={(e) => {
-				const validated = validate(Object.fromEntries(e.formData.entries()));
-				if (!validated.ok) {
-					form = { errors: validated.errors };
+				if (!validation?.ok) {
 					e.cancel();
 					return;
 				}
@@ -63,7 +82,10 @@
 					name="email"
 					autofocus
 					required
-					aria-invalid={errors['email'] ? 'true' : undefined}
+					aria-invalid={errors['email']?.filter((x) => x !== 'invalid_credentials').length
+						? 'true'
+						: undefined}
+					bind:value={fields.email}
 				/>
 				<Errors
 					errors={errors['email']?.filter((x) => x !== 'invalid_credentials')}
@@ -84,16 +106,11 @@
 					autofocus
 					required
 					aria-invalid={errors['password'] ? 'true' : undefined}
+					bind:value={fields.password}
 				/>
 				<Errors errors={errors['password']} errorMap={errorMap.password} />
 			</div>
-			<Button disabled={status === 'submitting'}>
-				{#if status === 'submitting'}
-					Loading...
-				{:else}
-					Sign in
-				{/if}
-			</Button>
+			<Button disabled={status === 'submitting' || (validation && !validation.ok)}>Sign in</Button>
 		</form>
 		<div class="mt-8 space-y-4 text-center w-fit mx-auto">
 			<hr class="w-full text-base-border" />

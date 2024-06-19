@@ -30,11 +30,16 @@ export default {
 					3: 'oklch(from var(--theme-positive-3) l c h / <alpha-value>)'
 				},
 				base: {
-					1: 'oklch(var(--theme-base-1-lch) / <alpha-value>)',
-					2: 'oklch(var(--theme-base-2-lch) / <alpha-value>)',
-					'fg-1': 'oklch(var(--theme-base-fg-1-lch) / <alpha-value>)',
-					'fg-2': 'oklch(var(--theme-base-fg-2-lch) / <alpha-value>)',
-					border: 'oklch(var(--theme-base-border-lch) / <alpha-value>)'
+					// 1: 'oklch(var(--theme-base-1-lch) / <alpha-value>)',
+					// 2: 'oklch(var(--theme-base-2-lch) / <alpha-value>)',
+					// 'fg-1': 'oklch(var(--theme-base-fg-1-lch) / <alpha-value>)',
+					// 'fg-2': 'oklch(var(--theme-base-fg-2-lch) / <alpha-value>)',
+					// border: 'oklch(var(--theme-base-border-lch) / <alpha-value>)'
+					1: 'oklch(from var(--theme-base-1) l c h / <alpha-value>)',
+					2: 'oklch(from var(--theme-base-2) l c h / <alpha-value>)',
+					'fg-1': 'oklch(from var(--theme-base-fg-1) l c h / <alpha-value>)',
+					'fg-2': 'oklch(from var(--theme-base-fg-2) l c h / <alpha-value>)',
+					border: 'oklch(from var(--theme-base-border) l c h / <alpha-value>)'
 				}
 			},
 			typography: () => ({

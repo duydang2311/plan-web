@@ -6,6 +6,10 @@
 		--c-input-border-focus: var(--theme-primary-3);
 	}
 
+	:root[data-theme='dark'] {
+		--c-input-border-hover: oklch(from var(--c-input-border) calc(l + 0.08) c h);
+	}
+
 	.c-input {
 		width: 100%;
 		padding: theme('size[2]') theme('size[2]');

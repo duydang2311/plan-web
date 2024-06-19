@@ -1,6 +1,12 @@
 @layer base {
 	:root {
-		--c-button-bg-disabled: oklch(from var(--theme-primary-1) calc(l + 0.5) 0 h);
+		--c-button-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
+		--c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
+	}
+
+	:root[data-theme='dark'] {
+		--c-button-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
+		--c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
 	}
 }
 
@@ -29,11 +35,12 @@
 	}
 
 	&:disabled {
-		color: var(--theme-primary-fg-3);
+		color: var(--c-button-text-disabled);
 		background-color: var(--c-button-bg-disabled);
 	}
 
 	&:focus-visible {
-		@apply ring ring-primary-3 ring-offset-1 outline-none;
+		outline: none;
+		@apply ring ring-primary-3 ring-offset-1 ring-offset-base-1 outline-none;
 	}
 }

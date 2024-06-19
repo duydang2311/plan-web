@@ -13,7 +13,7 @@ interface ValidateFail {
 	errors: Record<string, string[]>;
 }
 
-export type ValidationResult<T> = ValidateOk<T> | ValidateFail;
+export type ValidationResult<T = unknown> = ValidateOk<T> | ValidateFail;
 type Validator<T> = (input: unknown) => ValidationResult<T>;
 type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
 

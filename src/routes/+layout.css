@@ -5,6 +5,7 @@
 
 @import '~/lib/stylesheets/tw-base.css';
 @import '~/lib/stylesheets/themes/light.css';
+@import '~/lib/stylesheets/themes/dark.css';
 
 @import '~/lib/stylesheets/c-input.css';
 @import '~/lib/stylesheets/c-button.css';

@@ -20,7 +20,7 @@
 	import { extend, type ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData } from './$types';
 	import Success from './Success.svelte';
-	import { decode, validate } from './utils';
+	import { validate } from './utils';
 
 	const errorMap = {
 		root: {
@@ -45,7 +45,12 @@
 
 	let { form }: { form: ActionData } = $props();
 	let status = $state<'submitting' | null>(null);
-	let validation = $state<ValidationResult<unknown>>();
+	let validation = $state<ValidationResult>();
+	let fields = $state({
+		email: '',
+		password: '',
+		passwordConfirmation: ''
+	});
 
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
@@ -69,20 +74,19 @@
 					<form
 						method="post"
 						class="space-y-6 w-full max-w-[40ch] mx-auto"
-						oninput={({ currentTarget }) => {
-							validation = clientValidate(decode(new FormData(currentTarget)));
+						oninput={() => {
+							validation = clientValidate(fields);
 						}}
-						onchange={({ currentTarget }) => {
+						onchange={() => {
 							if (!validation) return;
 							if (validation.ok) {
 								form = null;
 								return;
 							}
-							const input = decode(new FormData(currentTarget));
 							form = {
 								errors: Object.fromEntries(
 									Object.entries(validation.errors).filter(
-										([k]) => hasProperty(input, k) && input[k]
+										([k]) => hasProperty(fields, k) && fields[k]
 									)
 								)
 							};
@@ -110,7 +114,8 @@
 								name="email"
 								autofocus
 								required
-								aria-invalid={!!errors['email']}
+								aria-invalid={errors['email'] ? true : undefined}
+								bind:value={fields.email}
 							/>
 							<Errors errors={errors['email']} errorMap={errorMap.email} />
 						</div>
@@ -121,7 +126,8 @@
 								id="password"
 								name="password"
 								required
-								aria-invalid={!!errors['password']}
+								aria-invalid={errors['password'] ? true : undefined}
+								bind:value={fields.password}
 							/>
 							<Errors errors={errors['password']} errorMap={errorMap.password} />
 						</div>
@@ -132,7 +138,8 @@
 								id="passwordConfirmation"
 								name="passwordConfirmation"
 								required
-								aria-invalid={!!errors['passwordConfirmation']}
+								aria-invalid={errors['passwordConfirmation'] ? true : undefined}
+								bind:value={fields.passwordConfirmation}
 							/>
 							<Errors
 								errors={errors['passwordConfirmation']}
@@ -140,11 +147,7 @@
 							/>
 						</div>
 						<Button disabled={(validation && !validation.ok) || status === 'submitting'}>
-							{#if status === 'submitting'}
-								Loading...
-							{:else}
-								Sign up
-							{/if}
+							Sign up
 						</Button>
 					</form>
 					<div class="mt-8 space-y-4 text-center">
