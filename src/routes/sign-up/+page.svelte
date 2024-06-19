@@ -150,14 +150,14 @@
 							Sign up
 						</Button>
 					</form>
-					<div class="mt-8 space-y-4 text-center">
+					<div class="mt-8 space-y-4 text-center w-fit mx-auto">
 						<p>
 							<small>
 								By signing up, you agree to our <Link href="#">Terms of Service</Link><br />
 								and <Link href="#">Data Processing Agreement</Link>.
 							</small>
 						</p>
-						<hr class="w-4 text-base-border mx-auto" />
+						<hr class="w-full text-base-border mx-auto" />
 						<p>
 							<small>
 								Already have an account?

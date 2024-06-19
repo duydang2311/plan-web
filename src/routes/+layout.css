@@ -1,11 +1,12 @@
+@import '~/lib/stylesheets/themes/light.css' (prefers-color-scheme: light);
+@import '~/lib/stylesheets/themes/dark.css' (prefers-color-scheme: dark);
+
 @import '~/lib/assets/fonts/Inter/font-face.css';
 @import '~/lib/stylesheets/preflight.css';
 @import 'sanitize.css/reduce-motion.css';
 @import 'sanitize.css/assets.css';
 
 @import '~/lib/stylesheets/tw-base.css';
-@import '~/lib/stylesheets/themes/light.css';
-@import '~/lib/stylesheets/themes/dark.css';
 
 @import '~/lib/stylesheets/c-input.css';
 @import '~/lib/stylesheets/c-button.css';
@@ -30,6 +31,8 @@
 		--font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
 		--font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
 		--font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+
+		color-scheme: light dark;
 		font-size: 100%;
 		line-height: 1.5;
 		font-synthesis: none;
@@ -53,6 +56,7 @@
 		font-size: var(--font-size-p);
 		background-color: theme('colors.base[1]');
 		color: theme('colors.base[fg-2]');
+		transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
 	}
 
 	h1,

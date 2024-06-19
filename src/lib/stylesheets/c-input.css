@@ -18,8 +18,10 @@
 		background-color: var(--c-input-bg);
 		outline: none;
 		transition:
-			border-color 75ms ease-in-out,
-			box-shadow 75ms ease-out;
+			color 100ms ease-in-out,
+			background-color 100ms ease-in-out,
+			border-color 100ms ease-in-out,
+			box-shadow 100ms ease-out;
 		box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 
 		&[aria-invalid='true'] {
