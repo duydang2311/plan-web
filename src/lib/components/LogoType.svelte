@@ -8,7 +8,10 @@
 	const { ...props }: Props = $props();
 </script>
 
-<div {...props} class={clsx('select-none flex items-center w-fit gap-2', props.class)}>
+<div
+	{...props}
+	class={clsx('select-none flex items-center w-fit gap-2 text-base-fg-1', props.class)}
+>
 	<Logo class="h-full w-auto" />
 	<p class="font-display font-bold text-h1 tracking-tighter">plan</p>
 </div>

@@ -1,8 +1,7 @@
 <script lang="ts" context="module">
 	const clientValidate = extend(validate, (input, { error }) => {
 		if (input.password !== input.passwordConfirmation) {
-			error('password', 'confirmed');
-			error('passwordConfirmation', 'confirmed');
+			return error('passwordConfirmation', 'confirmed');
 		}
 	});
 </script>
@@ -10,17 +9,18 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { circInOut } from 'svelte/easing';
-	import { scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import Button from '~/lib/components/Button.svelte';
 	import Errors from '~/lib/components/Errors.svelte';
 	import Input from '~/lib/components/Input.svelte';
 	import Label from '~/lib/components/Label.svelte';
 	import Link from '~/lib/components/Link.svelte';
 	import LogoType from '~/lib/components/LogoType.svelte';
+	import { hasProperty } from '~/lib/utils/commons';
+	import { extend, type ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData } from './$types';
 	import Success from './Success.svelte';
-	import { validate } from './utils';
-	import { extend } from '~/lib/utils/validation';
+	import { decode, validate } from './utils';
 
 	const errorMap = {
 		root: {
@@ -29,7 +29,8 @@
 		},
 		email: {
 			required: 'Enter an email address',
-			email: 'Enter a valid email address'
+			email: 'Enter a valid email address',
+			duplicated_email: 'The email address has already been used'
 		},
 		password: {
 			required: 'Enter a password',
@@ -44,32 +45,50 @@
 
 	let { form }: { form: ActionData } = $props();
 	let status = $state<'submitting' | null>(null);
+	let validation = $state<ValidationResult<unknown>>();
+
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-<main class="flex justify-center p-8 items-center mt-8">
-	<div class="w-full max-w-[70ch]">
+<main class="px-8 py-16">
+	<div class="w-full mx-auto">
 		<LogoType class="h-24 mx-auto" />
-		<div class="transition-enforcement">
-			{#if form?.success}
+		<div class="transition-enforcement justify-center overflow-hidden">
+			{#if form?.email}
 				<div
-					transition:scale={{ start: 1.04, duration: 600, easing: circInOut }}
+					in:fly={{ y: '15%', duration: 800, easing: circInOut }}
 					class="mt-8 text-center text-balance prose"
 				>
 					<Success email={form.email} />
 				</div>
 			{:else}
-				<div transition:scale={{ start: 0.98, easing: circInOut }} class="mt-8">
+				<div out:fly={{ y: '-10%', duration: 800, easing: circInOut }} class="mt-8">
 					<h1 class="text-center mb-8">Create an account</h1>
 					<p class="text-center text-balance">Fill in the form to create a new account.</p>
 					<hr class="text-base-border/40 max-w-[40ch] mt-2 mb-8 mx-auto" />
 					<form
 						method="post"
 						class="space-y-6 w-full max-w-[40ch] mx-auto"
+						oninput={({ currentTarget }) => {
+							validation = clientValidate(decode(new FormData(currentTarget)));
+						}}
+						onchange={({ currentTarget }) => {
+							if (!validation) return;
+							if (validation.ok) {
+								form = null;
+								return;
+							}
+							const input = decode(new FormData(currentTarget));
+							form = {
+								errors: Object.fromEntries(
+									Object.entries(validation.errors).filter(
+										([k]) => hasProperty(input, k) && input[k]
+									)
+								)
+							};
+						}}
 						use:enhance={(e) => {
-							const validated = clientValidate(Object.fromEntries(e.formData.entries()));
-							if (!validated.ok) {
-								form = { errors: validated.errors };
+							if (!validation?.ok) {
 								e.cancel();
 								return;
 							}
@@ -120,7 +139,7 @@
 								errorMap={errorMap.passwordConfirmation}
 							/>
 						</div>
-						<Button disabled={status === 'submitting'}>
+						<Button disabled={(validation && !validation.ok) || status === 'submitting'}>
 							{#if status === 'submitting'}
 								Loading...
 							{:else}

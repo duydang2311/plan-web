@@ -13,9 +13,9 @@ interface ValidateFail {
 	errors: Record<string, string[]>;
 }
 
-type ValidatorReturn<T> = ValidateOk<T> | ValidateFail;
-type Validator<T> = (input: unknown) => ValidatorReturn<T>;
-type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidatorReturn<T>>;
+export type ValidationResult<T> = ValidateOk<T> | ValidateFail;
+type Validator<T> = (input: unknown) => ValidationResult<T>;
+type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
 
 type ValidateFunction<T> = (input: T, props: ValidatorProps) => void;
 type AsyncValidateFunction<T> = (input: T, props: ValidatorProps) => PromiseLike<void>;
@@ -49,7 +49,7 @@ export function extend<T, TNew = T>(
 ): Validator<TNew> | AsyncValidator<TNew> {
 	return ((input: unknown) => {
 		const ret = validator(input);
-		if (isPromiseLike<ValidatorReturn<T>>(ret)) {
+		if (isPromiseLike<ValidationResult<T>>(ret)) {
 			return ret.then((validated) =>
 				validated.ok ? validateInternal<T, TNew>(validated.data, validate) : validated
 			);
@@ -73,7 +73,7 @@ function isPromiseLike<T>(input: unknown): input is PromiseLike<T> {
 function validateInternal<TIn, TOut = TIn>(
 	input: TIn,
 	validate: ValidateFunction<TIn> | AsyncValidateFunction<TIn>
-): MaybePromise<ValidatorReturn<TOut>> {
+): MaybePromise<ValidationResult<TOut>> {
 	const errors: Record<string, string[]> = {};
 	const ret = validate(input, {
 		error: (name: string, code: string) => addError(errors, name, code)

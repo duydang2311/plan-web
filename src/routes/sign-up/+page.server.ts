@@ -7,17 +7,13 @@ import { ApiClientTag } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { extend } from '~/lib/utils/validation';
 import type { Actions } from './$types';
-import { validate } from './utils';
+import { decode, validate } from './utils';
 
-const serverValidate = extend(validate, async (input, { error }) => {
-	if (input.password.length !== input.passwordConfirmation.length) {
-		await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
-		error('password', 'confirmed');
-		error('passwordConfirmation', 'confirmed');
-		return;
-	}
-
-	if (!timingSafeEqual(Buffer.from(input.password), Buffer.from(input.passwordConfirmation))) {
+const serverValidate = extend(validate, (input, { error }) => {
+	if (
+		input.password.length === input.passwordConfirmation.length &&
+		!timingSafeEqual(Buffer.from(input.password), Buffer.from(input.passwordConfirmation))
+	) {
 		error('password', 'confirmed');
 		error('passwordConfirmation', 'confirmed');
 	}
@@ -30,15 +26,13 @@ export const actions = {
 				Effect.either(
 					pipe(
 						Effect.gen(function* () {
-							const form = yield* Effect.promise(() => request.formData());
-							const validated = yield* Effect.promise(() =>
-								serverValidate(Object.fromEntries(form.entries()))
-							);
-							if (!validated.ok) {
-								return yield* Effect.fail(fail(400, { errors: validated.errors }));
+							const formData = yield* Effect.promise(() => request.formData());
+							const validation = yield* Effect.succeed(serverValidate(decode(formData)));
+							if (!validation.ok) {
+								return yield* Effect.fail(fail(400, { errors: validation.errors }));
 							}
 							return yield* pipe(
-								signUpEffect(validated.data.email, validated.data.password),
+								signUpEffect(validation.data.email, validation.data.password),
 								Effect.catchTag('ApiError', (e) =>
 									Effect.fail(
 										fail(400, {
@@ -47,7 +41,11 @@ export const actions = {
 									)
 								),
 								Effect.catchTag('ValidationError', (e) =>
-									Effect.fail(fail(400, { errors: e.errors }))
+									Effect.fail(
+										fail(400, {
+											errors: e.errors
+										})
+									)
 								)
 							);
 						}),
@@ -57,7 +55,7 @@ export const actions = {
 			),
 			Either.match({
 				onLeft: (l) => l,
-				onRight: (r) => ({ success: true, email: r })
+				onRight: (r) => ({ email: r })
 			})
 		);
 	}
