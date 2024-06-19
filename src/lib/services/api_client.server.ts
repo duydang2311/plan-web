@@ -58,7 +58,6 @@ export class HttpApiClient implements ApiClient {
 
 	private _buildUrl(path: string, query?: RequestRecord) {
 		const url = `${this._options.baseUrl}/${trim(path, '/')}/${this._options.version}`;
-		console.log('url is', url);
 		if (query) {
 			return `${url}?${Object.entries(query)
 				.map((k, v) => `${k}=${v}`)
