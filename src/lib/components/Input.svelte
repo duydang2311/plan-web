@@ -8,7 +8,7 @@
 	let element: HTMLInputElement;
 
 	$effect(() => {
-		if (props['aria-invalid']) {
+		if (!element.hasFocus && props['aria-invalid']) {
 			element.focus();
 		}
 	});

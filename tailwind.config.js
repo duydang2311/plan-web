@@ -15,24 +15,26 @@ export default {
 			},
 			colors: {
 				primary: {
-					50: '#F0F7FF',
-					100: '#DCEBFF',
-					200: '#B8D8FE',
-					300: '#86BCFE',
-					400: '#499AFD',
-					500: '#0265DC',
-					600: '#025CCA',
-					700: '#0250B1',
-					800: '#014393',
-					900: '#012E65',
-					950: '#011938',
-					DEFAULT: '#0265DC'
+					1: 'oklch(from var(--theme-primary-1) l c h / <alpha-value>)',
+					2: 'oklch(from var(--theme-primary-2) l c h / <alpha-value>)',
+					3: 'oklch(from var(--theme-primary-3) l c h / <alpha-value>)'
+				},
+				negative: {
+					1: 'oklch(from var(--theme-negative-1) l c h / <alpha-value>)',
+					2: 'oklch(from var(--theme-negative-2) l c h / <alpha-value>)',
+					3: 'oklch(from var(--theme-negative-3) l c h / <alpha-value>)'
+				},
+				positive: {
+					1: 'oklch(from var(--theme-positive-1) l c h / <alpha-value>)',
+					2: 'oklch(from var(--theme-positive-2) l c h / <alpha-value>)',
+					3: 'oklch(from var(--theme-positive-3) l c h / <alpha-value>)'
 				},
 				base: {
-					1: 'oklch(var(--theme-base-1-tw) / <alpha-value>)',
-					2: 'oklch(var(--theme-base-2-tw) / <alpha-value>)',
-					fg: 'oklch(var(--theme-base-fg-tw) / <alpha-value>)',
-					border: 'oklch(var(--theme-base-border-tw) / <alpha-value>)'
+					1: 'oklch(var(--theme-base-1-lch) / <alpha-value>)',
+					2: 'oklch(var(--theme-base-2-lch) / <alpha-value>)',
+					'fg-1': 'oklch(var(--theme-base-fg-1-lch) / <alpha-value>)',
+					'fg-2': 'oklch(var(--theme-base-fg-2-lch) / <alpha-value>)',
+					border: 'oklch(var(--theme-base-border-lch) / <alpha-value>)'
 				}
 			},
 			typography: () => ({
@@ -59,9 +61,9 @@ export default {
 						a: {
 							textDecoration: 'inherit'
 						},
-						'--tw-prose-headings': 'var(--color-fg-1)',
-						'--tw-prose-body': 'var(--theme-base-fg)',
-						'--tw-prose-links': 'var(--theme-base-fg)',
+						'--tw-prose-headings': 'var(--theme-base-fg-1)',
+						'--tw-prose-body': 'var(--theme-base-fg-2)',
+						'--tw-prose-links': 'var(--theme-base-fg-3)',
 						'--tw-prose-hr': 'var(--theme-base-border)'
 					}
 				}

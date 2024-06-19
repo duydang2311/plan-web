@@ -1,23 +1,49 @@
 @layer base {
 	:root {
-		--color-fg-tw-1: 12.25% 0 118.64;
-		--color-fg-tw-2: 24.25% 0 118.64;
-		--color-fg-tw-3: 48.25% 0 118.64;
+		--l-step: 0.05;
+		--color-fg-lch-1: 14.25% 0.0027 286.09;
+		--color-fg-lch-2: 28.92% 0.0013 286.2;
+		--color-fg-lch-3: 46.39% 0.0013 286.31;
 
-		--color-fg-1: oklch(var(--color-fg-tw-1));
-		--color-fg-2: oklch(var(--color-fg-tw-2));
-		--color-fg-3: oklch(var(--color-fg-tw-3));
+		--color-fg-1: oklch(var(--color-fg-lch-1));
+		--color-fg-2: oklch(var(--color-fg-lch-2));
+		--color-fg-3: oklch(var(--color-fg-lch-3));
+
+		--color-bg: oklch(98.2% 0.0013 286.37);
+		--color-brand: oklch(48.32% 0.2931 274.22);
+		--color-negative: oklch(47.07% 0.1897 22.17);
+		--color-positive: oklch(43.42% 0.1461 142.04);
 	}
 
 	:root {
-		--theme-base-1-tw: 99% 0 116.2;
-		--theme-base-2-tw: 99.91% 0 118.64;
-		--theme-base-fg-tw: var(--color-fg-tw-2);
-		--theme-base-border-tw: 88% 0 118.64;
+		--theme-base-1-lch: 99.67% 0.0013 286.38;
+		--theme-base-2-lch: 96.74% 0.0013 286.37;
+		--theme-base-3-lch: 99.91% 0 118.64;
+		--theme-base-fg-1-lch: var(--color-fg-lch-1);
+		--theme-base-fg-2-lch: var(--color-fg-lch-2);
+		--theme-base-fg-3-lch: var(--color-fg-lch-3);
+		--theme-base-border-lch: 87.22% 0.0013 286.37;
 
-		--theme-base-1: oklch(var(--theme-base-1-tw));
-		--theme-base-2: oklch(var(--theme-base-2-tw));
-		--theme-base-fg: oklch(var(--theme-base-fg-tw));
-		--theme-base-border: oklch(var(--theme-base-border-tw));
+		--theme-base-1: oklch(var(--theme-base-1-lch));
+		--theme-base-2: oklch(var(--theme-base-2-lch));
+		--theme-base-fg-1: oklch(var(--theme-base-fg-1-lch));
+		--theme-base-fg-2: oklch(var(--theme-base-fg-2-lch));
+		--theme-base-fg-3: oklch(var(--theme-base-fg-3-lch));
+		--theme-base-border: oklch(var(--theme-base-border-lch));
+
+		--theme-primary-1: var(--color-brand);
+		--theme-primary-2: oklch(from var(--color-brand) calc(l + var(--l-step)) c h);
+		--theme-primary-3: oklch(from var(--color-brand) calc(l + var(--l-step) * 2) c h);
+		--theme-primary-fg-1: var(--color-bg);
+		--theme-primary-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
+		--theme-primary-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+
+		--theme-negative-1: var(--color-negative);
+		--theme-negative-2: oklch(from var(--color-negative) calc(l + var(--l-step)) c h);
+		--theme-negative-3: oklch(from var(--color-negative) calc(l + var(--l-step) * 2) c h);
+
+		--theme-positive-1: var(--color-positive);
+		--theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
+		--theme-positive-3: oklch(from var(--color-positive) calc(l + var(--l-step) * 2) c h);
 	}
 }

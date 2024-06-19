@@ -1,21 +1,31 @@
 @layer base {
 	:root {
-		--c-input-bg: var(--theme-base-2);
+		--c-input-bg: var(--theme-base-1);
 		--c-input-border: var(--theme-base-border);
+		--c-input-border-hover: oklch(from var(--c-input-border) calc(l - 0.08) c h);
+		--c-input-border-focus: var(--theme-primary-3);
 	}
 
 	.c-input {
 		width: 100%;
-		padding: theme('size[2]') theme('size[1]');
+		padding: theme('size[2]') theme('size[2]');
 		border: theme('borderWidth.DEFAULT') solid var(--c-input-border);
-		border-radius: theme('borderRadius.DEFAULT');
+		border-radius: theme('borderRadius.md');
 		background-color: var(--c-input-bg);
 		outline: none;
 		transition:
-			border-color 100ms ease-in-out,
-			box-shadow 100ms ease-in-out;
+			border-color 75ms ease-in-out,
+			box-shadow 75ms ease-out;
+		box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+
+		&:hover {
+			border-color: var(--c-input-border-hover);
+		}
 		&:focus-visible {
-			@apply ring ring-base-border ring-offset-1;
+			border-color: var(--c-input-border-focus);
+			box-shadow:
+				0 0 0 1px var(--c-input-border-focus),
+				0 3px 2px rgb(0 0 0 / 0.05);
 		}
 	}
 }

@@ -1,32 +1,39 @@
+@layer base {
+	:root {
+		--c-button-bg-disabled: oklch(from var(--theme-primary-1) calc(l + 0.5) 0 h);
+	}
+}
+
 .c-button {
 	width: 100%;
 	padding: theme('size[2]') theme('size[2]');
 	font-weight: 500;
 	border: none;
-	border-radius: theme('borderRadius.DEFAULT');
+	border-radius: theme('borderRadius.md');
 	transition:
 		background-color 75ms ease-in-out,
-		box-shadow 100ms ease-in-out;
+		box-shadow 100ms ease-out;
+	box-shadow: 0 1px 1px rgb(0 0 0 / 0.05);
 }
 
 .c-button--primary {
-	color: theme('colors.gray[50]');
-	background-color: theme('colors.primary[500]');
+	color: var(--theme-primary-fg-1);
+	background-color: var(--theme-primary-1);
 
 	&:hover {
-		background-color: theme('colors.primary[600]');
+		background-color: var(--theme-primary-2);
 	}
 
 	&:active {
-		background-color: theme('colors.primary[700]');
+		background-color: var(--theme-primary-3);
 	}
 
 	&:disabled {
-		color: theme('colors.primary[400]');
-		background-color: theme('colors.primary[200]');
+		color: var(--theme-primary-fg-3);
+		background-color: var(--c-button-bg-disabled);
 	}
 
 	&:focus-visible {
-		@apply ring ring-primary ring-offset-1 outline-none;
+		@apply ring ring-primary-3 ring-offset-1 outline-none;
 	}
 }

@@ -31,7 +31,7 @@
 	let status = $state<'submitting' | null>(null);
 </script>
 
-<main class="flex justify-center p-8 items-center mt-8">
+<main class="flex min-h-screen h-full justify-center items-center">
 	<div class="w-full max-w-[70ch]">
 		<LogoType class="h-24 mx-auto" />
 		<h1 class="text-center mb-8 mt-8">Sign in</h1>

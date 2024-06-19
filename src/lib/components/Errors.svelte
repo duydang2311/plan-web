@@ -12,7 +12,7 @@
 {#if errors?.length}
 	<ol
 		class={clsx(
-			'm-0 p-0 text-red-500 text-sm font-medium',
+			'm-0 p-0 text-negative-1 text-sm font-medium',
 			errors.length === 1 ? 'list-none' : 'list-inside',
 			props.class
 		)}

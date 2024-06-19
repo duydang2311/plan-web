@@ -51,7 +51,7 @@
 		font-family: var(--font-family-body);
 		font-size: var(--font-size-p);
 		background-color: theme('colors.base[1]');
-		color: theme('colors.base[fg]');
+		color: theme('colors.base[fg-2]');
 	}
 
 	h1,
@@ -60,6 +60,7 @@
 	h4,
 	h5,
 	h6 {
+		color: theme('colors.base[fg-1]');
 		font-family: var(--font-family-display);
 		font-weight: bold;
 	}
