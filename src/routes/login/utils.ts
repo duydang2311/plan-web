@@ -24,3 +24,10 @@ export const validate = validator<{
 		return error('password', 'required');
 	}
 });
+
+export function decode(formData: FormData) {
+	return {
+		email: formData.get<string>('email'),
+		password: formData.get<string>('password')
+	};
+}

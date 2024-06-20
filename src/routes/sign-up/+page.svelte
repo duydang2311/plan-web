@@ -8,6 +8,7 @@
 
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { Record } from 'effect';
 	import { circInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	import Button from '~/lib/components/Button.svelte';
@@ -20,7 +21,7 @@
 	import { extend, type ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData } from './$types';
 	import Success from './Success.svelte';
-	import { validate } from './utils';
+	import { decode, validate } from './utils';
 
 	const errorMap = {
 		root: {
@@ -45,12 +46,7 @@
 
 	let { form }: { form: ActionData } = $props();
 	let status = $state<'submitting' | null>(null);
-	let validation = $state<ValidationResult>();
-	let fields = $state({
-		email: '',
-		password: '',
-		passwordConfirmation: ''
-	});
+	let validation: ValidationResult | undefined;
 
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
@@ -74,22 +70,18 @@
 					<form
 						method="post"
 						class="space-y-6 w-full max-w-[40ch] mx-auto"
-						oninput={() => {
-							validation = clientValidate(fields);
-						}}
-						onchange={() => {
-							if (!validation) return;
-							if (validation.ok) {
-								form = null;
-								return;
-							}
-							form = {
-								errors: Object.fromEntries(
-									Object.entries(validation.errors).filter(
-										([k]) => hasProperty(fields, k) && fields[k]
-									)
-								)
-							};
+						onchange={({ currentTarget }) => {
+							const input = decode(new FormData(currentTarget));
+							validation = clientValidate(input);
+
+							form = validation.ok
+								? null
+								: {
+										errors: Record.filter(
+											validation.errors,
+											(_, k) => hasProperty(input, k) && !!input[k]
+										)
+									};
 						}}
 						use:enhance={(e) => {
 							if (!validation?.ok) {
@@ -97,7 +89,6 @@
 								return;
 							}
 
-							form = null;
 							status = 'submitting';
 							return async ({ update }) => {
 								status = null;
@@ -115,7 +106,6 @@
 								autofocus
 								required
 								aria-invalid={errors['email'] ? true : undefined}
-								bind:value={fields.email}
 							/>
 							<Errors errors={errors['email']} errorMap={errorMap.email} />
 						</div>
@@ -127,7 +117,6 @@
 								name="password"
 								required
 								aria-invalid={errors['password'] ? true : undefined}
-								bind:value={fields.password}
 							/>
 							<Errors errors={errors['password']} errorMap={errorMap.password} />
 						</div>
@@ -139,16 +128,13 @@
 								name="passwordConfirmation"
 								required
 								aria-invalid={errors['passwordConfirmation'] ? true : undefined}
-								bind:value={fields.passwordConfirmation}
 							/>
 							<Errors
 								errors={errors['passwordConfirmation']}
 								errorMap={errorMap.passwordConfirmation}
 							/>
 						</div>
-						<Button disabled={(validation && !validation.ok) || status === 'submitting'}>
-							Sign up
-						</Button>
+						<Button disabled={status === 'submitting'}>Sign up</Button>
 					</form>
 					<div class="mt-8 space-y-4 text-center w-fit mx-auto">
 						<p>

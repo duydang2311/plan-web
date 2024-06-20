@@ -20,6 +20,11 @@ declare global {
 	interface Body {
 		json<T = unknown>(): Promise<T>;
 	}
+
+	interface FormData {
+		get<T = FormDataEntryValue>(name: string): T | null;
+		getAll<T = FormDataEntryValue>(name: string): T[];
+	}
 }
 
 export {};

@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { Record } from 'effect';
 	import Button from '~/lib/components/Button.svelte';
 	import Errors from '~/lib/components/Errors.svelte';
 	import Input from '~/lib/components/Input.svelte';
 	import Label from '~/lib/components/Label.svelte';
 	import Link from '~/lib/components/Link.svelte';
 	import LogoType from '~/lib/components/LogoType.svelte';
-	import type { ActionData } from './$types';
-	import { validate } from './utils';
-	import type { ValidationResult } from '~/lib/utils/validation';
 	import { hasProperty } from '~/lib/utils/commons';
+	import type { ValidationResult } from '~/lib/utils/validation';
+	import type { ActionData } from './$types';
+	import { decode, validate } from './utils';
 
 	const errorMap = {
 		root: {
@@ -29,12 +30,12 @@
 	};
 
 	let { form }: { form: ActionData } = $props();
-	let validation = $state<ValidationResult>();
 	let fields = $state({
 		email: '',
 		password: ''
 	});
 	let status = $state<'submitting' | null>(null);
+	let validation: ValidationResult | undefined;
 
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
@@ -46,18 +47,17 @@
 		<form
 			method="post"
 			class="space-y-6 w-full max-w-[40ch] mx-auto"
-			oninput={() => (validation = validate(fields))}
-			onchange={() => {
-				if (!validation) return;
-				if (validation.ok) {
-					form = null;
-					return;
-				}
-				form = {
-					errors: Object.fromEntries(
-						Object.entries(validation.errors).filter(([k]) => hasProperty(fields, k) && fields[k])
-					)
-				};
+			onchange={({ currentTarget }) => {
+				const input = decode(new FormData(currentTarget));
+				validation = validate(input);
+				form = validation.ok
+					? null
+					: {
+							errors: Record.filter(
+								validation.errors,
+								(_, k) => hasProperty(input, k) && !!input[k]
+							)
+						};
 			}}
 			use:enhance={(e) => {
 				if (!validation?.ok) {
@@ -65,7 +65,6 @@
 					return;
 				}
 
-				form = null;
 				status = 'submitting';
 				return async ({ update }) => {
 					status = null;
@@ -110,7 +109,7 @@
 				/>
 				<Errors errors={errors['password']} errorMap={errorMap.password} />
 			</div>
-			<Button disabled={status === 'submitting' || (validation && !validation.ok)}>Sign in</Button>
+			<Button disabled={status === 'submitting'}>Sign in</Button>
 		</form>
 		<div class="mt-8 space-y-4 text-center w-fit mx-auto">
 			<hr class="w-full text-base-border" />

@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import { timingSafeEqual } from 'crypto';
-import { Effect, Either, pipe } from 'effect';
+import { Effect, Either, Schedule, pipe } from 'effect';
 import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClientTag } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
@@ -23,35 +23,38 @@ export const actions = {
 	default: async ({ request, locals: { appLive } }) => {
 		return pipe(
 			await Effect.runPromise(
-				Effect.either(
-					pipe(
-						Effect.gen(function* () {
-							const formData = yield* Effect.promise(() => request.formData());
-							const validation = yield* Effect.succeed(serverValidate(decode(formData)));
-							if (!validation.ok) {
-								return yield* Effect.fail(fail(400, { errors: validation.errors }));
-							}
-							return yield* pipe(
-								signUpEffect(validation.data.email, validation.data.password),
-								Effect.catchTag('ApiError', (e) =>
-									Effect.fail(
-										fail(400, {
-											errors: { root: [e.code] }
-										})
-									)
-								),
-								Effect.catchTag('ValidationError', (e) =>
-									Effect.fail(
-										fail(400, {
-											errors: e.errors
-										})
-									)
+				Effect.gen(function* ($) {
+					const formData = yield* Effect.promise(() => request.formData());
+					const validation = serverValidate(decode(formData));
+					if (!validation.ok) {
+						return yield* Effect.fail(fail(400, { errors: validation.errors }));
+					}
+
+					return yield* Effect.either(
+						$(
+							signUpEffect(validation.data.email, validation.data.password),
+							Effect.catchTag('ApiError', (e) =>
+								Effect.fail(
+									fail(400, {
+										errors: { root: [e.code] }
+									})
 								)
-							);
-						}),
-						Effect.provide(appLive)
-					)
-				)
+							),
+							Effect.catchTag('ValidationError', (e) =>
+								Effect.fail(
+									fail(400, {
+										errors: e.errors
+									})
+								)
+							),
+							Effect.provide(appLive),
+							Effect.retry({
+								schedule: Schedule.addDelay(Schedule.recurs(3), () => '2 seconds'),
+								while: (e) => 'root' in e.data.errors && e.data.errors.root.includes('unknown')
+							})
+						)
+					);
+				})
 			),
 			Either.match({
 				onLeft: (l) => l,
@@ -73,7 +76,7 @@ function signUpEffect(email: string, password: string) {
 				catch: () => new ApiError({ code: response.status + '' })
 			});
 			const problem = yield* validateProblemDetailsEffect(json);
-			yield* Effect.fail(
+			return yield* Effect.fail(
 				new ValidationError({
 					errors: flattenProblemDetails(problem)
 				})
