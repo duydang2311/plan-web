@@ -2,6 +2,7 @@
 
 import type { Layer } from 'effect';
 import type { ApiClientTag } from './lib/services/api_client.server';
+import 'unplugin-icons/types/svelte';
 
 // for information about these interfaces
 declare global {

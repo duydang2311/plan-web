@@ -56,7 +56,9 @@
 		font-size: var(--font-size-p);
 		background-color: theme('colors.base[1]');
 		color: theme('colors.base[fg-2]');
-		transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+		transition:
+			color 100ms ease-in-out,
+			background-color 100ms ease-in-out;
 	}
 
 	h1,
