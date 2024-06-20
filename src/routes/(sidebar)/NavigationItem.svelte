@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-	import clsx from 'clsx';
 	import { circInOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 
@@ -7,6 +6,7 @@
 </script>
 
 <script lang="ts">
+	import clsx from 'clsx';
 	import type { IconName } from '~/lib/components/Icon.svelte';
 	import Icon from '~/lib/components/Icon.svelte';
 
@@ -37,8 +37,8 @@
 		<span>{label}</span>
 		{#if isActive}
 			<div
-				in:receive={{ key: 'aside-active-nav-item' }}
-				out:send={{ key: 'aside-active-nav-item' }}
+				in:receive={{ key: 'active' }}
+				out:send={{ key: 'active' }}
 				class="absolute inset-y-2 -left-4 bg-base-fg-1 w-0.5"
 			></div>
 		{/if}

@@ -17,7 +17,7 @@
 </script>
 
 <ul class="font-medium group">
-	{#each items as { href, icon, activeIcon, label }}
+	{#each items as { href, icon, activeIcon, label } (href)}
 		<NavigationItem {href} isActive={pathname.startsWith(href)} {icon} {activeIcon} {label} />
 	{/each}
 </ul>
