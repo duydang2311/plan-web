@@ -1,3 +1,4 @@
+import plugin from 'tailwindcss/plugin';
 import Typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
@@ -78,5 +79,10 @@ export default {
 	corePlugins: {
 		preflight: false
 	},
-	plugins: [Typography]
+	plugins: [
+		Typography,
+		plugin(({ addComponents }) => {
+			addComponents({ '.transition-enforcement': {} });
+		})
+	]
 };
