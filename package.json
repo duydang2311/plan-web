@@ -28,6 +28,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.40.0",
     "globals": "^15.6.0",
+    "gsap": "^3.12.5",
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",
     "prettier-plugin-svelte": "^3.2.4",

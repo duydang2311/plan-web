@@ -1,14 +1,8 @@
-<script lang="ts" context="module">
-	import { circInOut } from 'svelte/easing';
-	import { crossfade } from 'svelte/transition';
-
-	const [send, receive] = crossfade({ duration: 400, easing: circInOut });
-</script>
-
 <script lang="ts">
 	import clsx from 'clsx';
 	import type { IconName } from '~/lib/components/Icon.svelte';
 	import Icon from '~/lib/components/Icon.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		href: string;
@@ -16,9 +10,10 @@
 		activeIcon: IconName;
 		label: string;
 		isActive: boolean;
+		children: Snippet;
 	}
 
-	const { href, icon, activeIcon, label, isActive }: Props = $props();
+	const { href, icon, activeIcon, label, isActive, children }: Props = $props();
 </script>
 
 <li class="relative">
@@ -35,12 +30,6 @@
 			<Icon name={icon} />
 		{/if}
 		<span>{label}</span>
-		{#if isActive}
-			<div
-				in:receive={{ key: 'active' }}
-				out:send={{ key: 'active' }}
-				class="absolute inset-y-2 -left-4 bg-base-fg-1 w-0.5"
-			></div>
-		{/if}
+		{@render children()}
 	</a>
 </li>

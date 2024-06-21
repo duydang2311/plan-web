@@ -1,7 +1,11 @@
 <script lang="ts">
+	import { beforeNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import type { IconName } from '~/lib/components/Icon.svelte';
 	import NavigationItem from './NavigationItem.svelte';
-	import { page } from '$app/stores';
+	import gsap from 'gsap';
+	import Flip from 'gsap/dist/Flip';
+	import { browser } from '$app/environment';
 
 	interface Props {
 		items: {
@@ -14,10 +18,36 @@
 
 	const { items }: Props = $props();
 	const pathname = $derived($page.url.pathname);
+	let activeBar = $state<HTMLDivElement>();
+
+	if (browser) {
+		gsap.registerPlugin(Flip);
+	}
+
+	beforeNavigate(({ willUnload, complete }) => {
+		if (!activeBar || willUnload) return;
+		const state = Flip.getState(activeBar);
+		complete.then(() => {
+			Flip.from(state, {
+				targets: activeBar,
+				duration: 0.4,
+				ease: 'power3.inOut'
+			});
+		});
+	});
 </script>
 
 <ul class="font-medium group">
 	{#each items as { href, icon, activeIcon, label } (href)}
-		<NavigationItem {href} isActive={pathname.startsWith(href)} {icon} {activeIcon} {label} />
+		{@const isActive = pathname.startsWith(href)}
+		<NavigationItem {href} {isActive} {icon} {activeIcon} {label}>
+			{#if isActive}
+				<div
+					bind:this={activeBar}
+					class="active-bar absolute inset-y-2 -left-4 bg-base-fg-1 w-0.5"
+					data-flip-id="active-bar"
+				></div>
+			{/if}
+		</NavigationItem>
 	{/each}
 </ul>
