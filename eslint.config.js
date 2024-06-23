@@ -9,11 +9,6 @@ import globals from 'globals';
 export default [
 	js.configs.recommended,
 	...ts.configs.strict,
-	{
-		rules: {
-			'@typescript-eslint/no-invalid-void-type': 'off'
-		}
-	},
 	...ts.configs.stylistic,
 	...svelte.configs['flat/recommended'],
 	prettier,
@@ -50,6 +45,13 @@ export default [
 				parser: ts.parser,
 				extraFileExtensions: ['.svelte']
 			}
+		}
+	},
+	{
+		rules: {
+			'@typescript-eslint/no-invalid-void-type': 'off',
+			'no-empty-function': 'off',
+			'@typescript-eslint/no-empty-function': 'off'
 		}
 	},
 	{
