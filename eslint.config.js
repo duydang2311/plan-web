@@ -9,8 +9,12 @@ import globals from 'globals';
 export default [
 	js.configs.recommended,
 	...ts.configs.strict,
+	{
+		rules: {
+			'@typescript-eslint/no-invalid-void-type': 'off'
+		}
+	},
 	...ts.configs.stylistic,
-	{},
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
