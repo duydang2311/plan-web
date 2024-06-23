@@ -20,12 +20,6 @@
 					icon: 'home',
 					activeIcon: 'home-solid',
 					label: 'Home'
-				},
-				{
-					href: '/test',
-					icon: 'home',
-					activeIcon: 'home-solid',
-					label: 'Home'
 				}
 			]}
 		/>
