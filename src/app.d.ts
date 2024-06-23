@@ -27,5 +27,3 @@ declare global {
 		getAll<T = FormDataEntryValue>(name: string): T[];
 	}
 }
-
-export {};
