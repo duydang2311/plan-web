@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import gsap from 'gsap';
 	import Flip from 'gsap/dist/Flip';
+	import { tick } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	if (browser) {
@@ -21,27 +22,35 @@
 	let div = $state<HTMLDivElement>();
 	let flipState: Flip.FlipState | undefined = undefined;
 
-	$effect(() => {
+	$effect.pre(() => {
 		if (!div) return;
 
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		on;
 
 		if (flipState) {
-			const timeline = Flip.from(flipState, {
-				targets: div,
-				duration: 0.15,
-				ease: 'power1.inOut',
-				prune: true,
-				onComplete: () => {
-					if (!div) return;
-					flipState = Flip.getState(div, { simple: true });
-				}
+			let timeline: gsap.core.Timeline;
+			tick().then(() => {
+				if (!flipState) return;
+				timeline = Flip.from(flipState, {
+					targets: div,
+					duration: 0.15,
+					prune: true,
+					ease: 'power1.inOut',
+					onComplete: () => {
+						if (!div) return;
+						flipState = Flip.getState(div, { simple: true });
+					}
+				});
 			});
 			return () => {
-				timeline.kill();
+				timeline?.kill();
 			};
 		} else {
+			tick().then(() => {
+				if (!div) return;
+				flipState = Flip.getState(div, { simple: true });
+			});
 			flipState = Flip.getState(div, { simple: true });
 		}
 	});
