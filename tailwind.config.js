@@ -12,7 +12,17 @@ export default {
 			},
 			fontSize: {
 				h1: 'var(--font-size-h1)',
-				sm: 'var(--font-size-sm)'
+				h2: 'var(--font-size-h2)',
+				h3: 'var(--font-size-h3)',
+				h4: 'var(--font-size-h4)',
+				h5: 'var(--font-size-h5)',
+				h6: 'var(--font-size-h6)',
+				sm: 'var(--font-size-sm)',
+				title: 'var(--font-size-title)'
+			},
+			maxWidth: {
+				'paragraph-sm': '50ch',
+				'paragraph-lg': '70ch'
 			},
 			colors: {
 				primary: {

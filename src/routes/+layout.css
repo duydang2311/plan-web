@@ -24,16 +24,17 @@
 		--font-family-body: Inter, var(--font-family-base);
 		--typo-scale: 1.2;
 		--font-size-sm: calc(var(--font-size-p) / var(--typo-scale));
-		--font-size-p: 1rem;
+		--font-size-p: 0.9375rem;
 		--font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
 		--font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
 		--font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
 		--font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
 		--font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
 		--font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+		--font-size-title: var(--font-size-h5);
 
 		color-scheme: light dark;
-		font-size: 100%;
+		font-size: inherit;
 		line-height: 1.5;
 		font-synthesis: none;
 		text-rendering: optimizeLegibility;

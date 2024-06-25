@@ -14,7 +14,8 @@
 
 	const errorMap = {
 		root: {
-			unknown: 'An unknown error has occurred on server',
+			fetch: 'Could not issue the request',
+			500: 'An unknown error has occurred on server',
 			404: 'Could not connect to server'
 		},
 		email: {

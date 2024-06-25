@@ -27,6 +27,7 @@ export const authenticateOrRefresh = (cookies: Cookies) =>
 					sameSite: 'strict',
 					maxAge: result.accessTokenMaxAge
 				});
+				return yield* Effect.void;
 			}
 			return yield* Effect.fail<void>(void 0);
 		}

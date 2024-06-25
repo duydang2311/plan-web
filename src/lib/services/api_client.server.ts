@@ -88,7 +88,7 @@ function catchError(e: unknown) {
 		return e;
 	}
 	if (e instanceof Error) {
-		return new ApiError({ code: 'unknown', message: e.message, cause: e.cause, stack: e.stack });
+		return new ApiError({ code: 'fetch', message: e.message, cause: e.cause, stack: e.stack });
 	}
-	return new ApiError({ code: 'unknown', message: e?.toString(), cause: e });
+	return new ApiError({ code: 'fetch', message: e?.toString(), cause: e });
 }

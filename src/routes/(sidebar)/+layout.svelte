@@ -7,8 +7,8 @@
 </script>
 
 <div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 p-2 pl-0">
-	<aside class="items-stretch w-60 px-4 py-2 space-y-4 text-sm">
-		<div class="select-none flex items-center gap-2 font-bold text-base-fg-1 text-base">
+	<aside class="items-stretch w-60 px-4 py-2 space-y-4">
+		<div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
 			<Logo class="h-8 w-auto" />
 			<p>plan</p>
 		</div>

@@ -11,12 +11,15 @@
 	const { errors = [], errorMap, ...props }: Props = $props();
 </script>
 
-<Flippable on={errors.length} aria-hidden={errors.length === 0 ? true : undefined}>
+<Flippable
+	on={errors.length}
+	aria-hidden={errors.length === 0 ? true : undefined}
+	class={props.class}
+>
 	<ol
 		class={clsx(
 			'm-0 p-0 text-negative-1 text-sm font-medium list-none',
-			errors.length === 1 ? 'list-none' : 'list-inside',
-			props.class
+			errors.length === 1 ? 'list-none' : 'list-inside'
 		)}
 	>
 		{#each errors as error}

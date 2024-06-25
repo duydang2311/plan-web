@@ -12,6 +12,9 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			appLive: Layer.Layer<ApiClientTag>;
+			user: {
+				id: string;
+			};
 		}
 		// interface PageData {}
 		// interface PageState {}
