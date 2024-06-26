@@ -1,8 +1,9 @@
-import type { Handle } from '@sveltejs/kit';
-import { Layer } from 'effect';
-import { ApiClientTag, HttpApiClient } from './lib/services/api_client.server';
 import { env } from '$env/dynamic/private';
+import { redirect, type Handle } from '@sveltejs/kit';
+import { Effect, Layer } from 'effect';
 import jwt from 'jsonwebtoken';
+import { ApiClientTag, HttpApiClient } from './lib/services/api_client.server';
+import { refresh } from './lib/utils/auth.server';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -17,24 +18,34 @@ const apiClient = new HttpApiClient({
 const { verify } = jwt;
 const ApiLive = Layer.succeed(ApiClientTag, apiClient);
 const AppLive = ApiLive;
-const certBuffer = Buffer.from(env.JWT_PUBLIC_KEY.replace('\\n', '\n'));
+const certBuffer = Buffer.from(env.JWT_PUBLIC_KEY.replaceAll('\\n', '\n'));
 
-export const handle: Handle = async ({ event, resolve }) => {
-	if (event.route.id?.includes('(auth)')) {
-		const accessToken = event.cookies.get('access_token');
+export const handle: Handle = async ({ event, event: { locals, route, cookies }, resolve }) => {
+	locals.appLive = AppLive;
+	if (route.id?.includes('(auth)')) {
+		let accessToken = cookies.get('access_token');
+		if (!accessToken) {
+			await Effect.runPromiseExit(
+				Effect.gen(function* () {
+					const result = yield* Effect.provide(refresh(cookies), locals.appLive);
+					accessToken = result.accessToken;
+				})
+			);
+		}
 		if (accessToken) {
 			await new Promise<void>((resolve) => {
-				verify(accessToken, certBuffer, { algorithms: ['RS512'] }, (err, decoded) => {
+				verify(accessToken!, certBuffer, { algorithms: ['RS512'] }, (err, decoded) => {
 					if (err || typeof decoded?.sub !== 'string') {
-						event.cookies.delete('access_token', { path: '/' });
+						cookies.delete('access_token', { path: '/' });
 					} else {
-						event.locals.user = { id: decoded.sub };
+						locals.user = { id: decoded.sub };
 					}
 					resolve();
 				});
 			});
+		} else {
+			return redirect(302, '/login');
 		}
 	}
-	event.locals.appLive = AppLive;
 	return resolve(event);
 };
