@@ -51,7 +51,8 @@ export default [
 		rules: {
 			'@typescript-eslint/no-invalid-void-type': 'off',
 			'no-empty-function': 'off',
-			'@typescript-eslint/no-empty-function': 'off'
+			'@typescript-eslint/no-empty-function': 'off',
+			'@typescript-eslint/no-non-null-assertion': 'off'
 		}
 	},
 	{
