@@ -24,7 +24,7 @@
 	>
 		{#each errors as error}
 			{@const message = errorMap?.[error] ?? error}
-			<li><em>{message}{!message.endsWith('.') && '.'}</em></li>
+			<li><em>{message}{!message.endsWith('.') ? '.' : undefined}</em></li>
 		{/each}
 	</ol>
 </Flippable>
