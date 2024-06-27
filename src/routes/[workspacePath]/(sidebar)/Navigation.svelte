@@ -37,7 +37,7 @@
 	});
 </script>
 
-<ul class="font-medium group text-sm">
+<ul class="font-medium group">
 	{#each items as { href, icon, activeIcon, label } (href)}
 		{@const isActive = pathname.startsWith(href)}
 		<NavigationItem {href} {isActive} {icon} {activeIcon} {label}>

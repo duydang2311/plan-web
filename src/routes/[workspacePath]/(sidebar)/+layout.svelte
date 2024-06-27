@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Logo from '~/lib/components/Logo.svelte';
 	import Navigation from './Navigation.svelte';
+	import { page } from '$app/stores';
 
 	const { children }: { children: Snippet } = $props();
 </script>
@@ -16,7 +17,7 @@
 		<Navigation
 			items={[
 				{
-					href: '/app',
+					href: `/${$page.params['workspacePath']}`,
 					icon: 'home',
 					activeIcon: 'home-solid',
 					label: 'Home'
