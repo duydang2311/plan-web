@@ -1,17 +1,22 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { Layer } from 'effect';
-import type { ApiClientTag } from './lib/services/api_client.server';
+import type { Layer } from 'effect/Layer';
+import type { ManagedRuntime } from 'effect/ManagedRuntime';
 import 'unplugin-icons/types/svelte';
+import type { ApiClientTag } from './lib/services/api_client.server';
 
 // for information about these interfaces
 declare global {
 	type MaybePromise<T> = T | PromiseLike<T>;
 
 	namespace App {
-		// interface Error {}
+		interface Error {
+			code: string;
+		}
+
 		interface Locals {
-			appLive: Layer.Layer<ApiClientTag>;
+			runtime: ManagedRuntime<ApiClientTag, never>;
+			appLive: Layer<ApiClientTag>;
 			user: {
 				id: string;
 			};
