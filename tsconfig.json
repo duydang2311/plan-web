@@ -13,6 +13,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		"strictNullChecks": true,
 		"isolatedModules": true,
 		"verbatimModuleSyntax": true,
 		"noFallthroughCasesInSwitch": true,
