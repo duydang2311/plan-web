@@ -4,12 +4,12 @@ import { ApiError } from '~/lib/models/errors';
 type RequestRecord = Record<string, number | string | boolean>;
 type RequestArray = (boolean | string | number | RequestRecord)[];
 
-interface ApiClientOptions {
+export interface ApiClientOptions {
 	baseUrl: string;
 	version: string;
 }
 
-interface ApiClientFetchRequestInit extends Omit<RequestInit, 'body'> {
+export interface ApiClientFetchRequestInit extends Omit<RequestInit, 'body'> {
 	query?: RequestRecord;
 	body?: RequestInit['body'] | RequestRecord | RequestArray;
 }
@@ -18,6 +18,7 @@ export interface ApiClient {
 	fetch(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 	get(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 	post(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
+	head(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 }
 
 export class ApiClientTag extends Context.Tag('ApiClient')<ApiClientTag, ApiClient>() {}
@@ -56,11 +57,18 @@ export class HttpApiClient implements ApiClient {
 		return this.fetch(path, { method: 'post', ...init });
 	}
 
+	head(
+		path: string,
+		init?: ApiClientFetchRequestInit | undefined
+	): Effect.Effect<Response, ApiError> {
+		return this.fetch(path, { method: 'head', ...init });
+	}
+
 	private _buildUrl(path: string, query?: RequestRecord) {
 		const url = `${this._options.baseUrl}/${trim(path, '/')}/${this._options.version}`;
 		if (query) {
 			return `${url}?${Object.entries(query)
-				.map((k, v) => `${k}=${v}`)
+				.map(([k, v]) => `${k}=${v}`)
 				.join('&')}`;
 		}
 		return url;
