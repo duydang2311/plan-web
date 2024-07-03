@@ -21,20 +21,30 @@
 	const { on, children, ...props }: Props = $props();
 	let flipState: Flip.FlipState | undefined = undefined;
 
-	$effect.pre(async () => {
+	$effect.pre(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		on;
 
 		flipState = Flip.getState(`#flippable-${id}`, { simple: true });
 
-		await tick();
+		let tl: gsap.core.Timeline | undefined;
 
-		Flip.from(flipState, {
-			targets: `#flippable-${id}`,
-			duration: 0.15,
-			prune: true,
-			ease: 'power1.inOut'
+		tick().then(() => {
+			if (!flipState) {
+				return;
+			}
+
+			tl = Flip.from(flipState, {
+				targets: `#flippable-${id}`,
+				duration: 0.15,
+				prune: true,
+				ease: 'power1.inOut'
+			});
 		});
+
+		return () => {
+			tl?.revert();
+		};
 	});
 </script>
 
