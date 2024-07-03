@@ -19,44 +19,26 @@
 
 	const id = ++counter;
 	const { on, children, ...props }: Props = $props();
-	let div = $state<HTMLDivElement>();
 	let flipState: Flip.FlipState | undefined = undefined;
 
-	$effect.pre(() => {
-		if (!div) return;
-
+	$effect.pre(async () => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		on;
 
-		if (flipState) {
-			let timeline: gsap.core.Timeline;
-			tick().then(() => {
-				if (!flipState) return;
-				timeline = Flip.from(flipState, {
-					targets: div,
-					duration: 0.15,
-					prune: true,
-					ease: 'power1.inOut',
-					onComplete: () => {
-						if (!div) return;
-						flipState = Flip.getState(div, { simple: true });
-					}
-				});
-			});
-			return () => {
-				timeline?.kill();
-			};
-		} else {
-			tick().then(() => {
-				if (!div) return;
-				flipState = Flip.getState(div, { simple: true });
-			});
-			flipState = Flip.getState(div, { simple: true });
-		}
+		flipState = Flip.getState(`#flippable-${id}`, { simple: true });
+
+		await tick();
+
+		Flip.from(flipState, {
+			targets: `#flippable-${id}`,
+			duration: 0.15,
+			prune: true,
+			ease: 'power1.inOut'
+		});
 	});
 </script>
 
-<div bind:this={div} data-flip-id={id} {...props}>
+<div id="flippable-{id}" data-flip-id={id} {...props}>
 	{#if children}
 		{@render children()}
 	{/if}
