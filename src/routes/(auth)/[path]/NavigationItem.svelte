@@ -24,11 +24,18 @@
 			isActive && 'font-bold group-[:not(:hover)]:bg-base-fg-1/5 text-base-fg-1'
 		)}
 	>
-		{#if isActive}
-			<Icon name={activeIcon} />
-		{:else}
-			<Icon name={icon} />
-		{/if}
+		<div class="transition-enforcement">
+			<Icon
+				name={activeIcon}
+				class={clsx('transition-opacity ease-in-out duration-200', !isActive && 'opacity-0')}
+				aria-hidden={!isActive}
+			/>
+			<Icon
+				name={icon}
+				class={clsx('transition-opacity ease-in-out duration-200', isActive && 'opacity-0')}
+				aria-hidden={isActive}
+			/>
+		</div>
 		<span>{label}</span>
 		{@render children()}
 	</a>

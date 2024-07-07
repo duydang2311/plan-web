@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async ({ params, locals: { runtime } }) =>
 		Effect.gen(function* () {
 			const apiClient = yield* ApiClientTag;
 			const response = yield* apiClient.head('workspaces', {
-				query: { path: params.workspacePath }
+				query: { path: params.path }
 			});
 			if (!response.ok) {
 				return yield* Effect.fail<void>(void 0);

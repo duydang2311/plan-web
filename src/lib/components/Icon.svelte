@@ -1,12 +1,16 @@
 <script lang="ts" context="module">
 	import Home from '~icons/heroicons/home';
 	import HomeSolid from '~icons/heroicons/home-solid';
+	import UserGroup from '~icons/heroicons/user-group-solid';
+	import UserGroupOutline from '~icons/heroicons/user-group';
 
 	export type IconName = keyof typeof icons;
 
 	const icons = {
 		home: Home,
-		'home-solid': HomeSolid
+		'home-solid': HomeSolid,
+		'user-group': UserGroup,
+		'user-group-outline': UserGroupOutline
 	} as const;
 </script>
 

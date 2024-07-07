@@ -17,10 +17,16 @@
 		<Navigation
 			items={[
 				{
-					href: `/${$page.params['workspacePath']}`,
+					href: `/${$page.params['path']}`,
 					icon: 'home',
 					activeIcon: 'home-solid',
 					label: 'Home'
+				},
+				{
+					href: `/${$page.params['path']}/teams`,
+					icon: 'user-group-outline',
+					activeIcon: 'user-group',
+					label: 'Teams'
 				}
 			]}
 		/>

@@ -39,7 +39,7 @@
 
 <ul class="font-medium group text-sm">
 	{#each items as { href, icon, activeIcon, label } (href)}
-		{@const isActive = pathname.startsWith(href)}
+		{@const isActive = pathname.endsWith(href)}
 		<NavigationItem {href} {isActive} {icon} {activeIcon} {label}>
 			{#if isActive}
 				<div
