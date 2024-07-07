@@ -13,11 +13,13 @@
 	}
 
 	onMount(() => {
-		const media = window.matchMedia('(prefers-color-scheme: dark)');
-		media.addEventListener('change', onColorSchemePreferenceChange);
-		return () => {
-			media.removeEventListener('change', onColorSchemePreferenceChange);
-		};
+		if (localStorage.getItem('theme') === 'system') {
+			const media = window.matchMedia('(prefers-color-scheme: dark)');
+			media.addEventListener('change', onColorSchemePreferenceChange);
+			return () => {
+				media.removeEventListener('change', onColorSchemePreferenceChange);
+			};
+		}
 	});
 </script>
 

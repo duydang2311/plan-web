@@ -1,5 +1,5 @@
-@import '~/lib/stylesheets/themes/light.css' (prefers-color-scheme: light);
-@import '~/lib/stylesheets/themes/dark.css' (prefers-color-scheme: dark);
+@import '~/lib/stylesheets/themes/light.css';
+@import '~/lib/stylesheets/themes/dark.css';
 
 @import '~/lib/assets/fonts/Inter/font-face.css';
 @import '~/lib/stylesheets/preflight.css';
