@@ -2,8 +2,8 @@
 	--l-step: -0.05;
 
 	--color-fg-1: oklch(98.11% 0.0013 286.37);
-	--color-fg-2: oklch(from var(--color-fg-1) calc(l - 0.1) c h);
-	--color-fg-3: oklch(from var(--color-fg-1) calc(l - 0.2) c h);
+	--color-fg-2: oklch(from var(--color-fg-1) calc(l - 0.15) c h);
+	--color-fg-3: oklch(from var(--color-fg-1) calc(l - 0.25) c h);
 
 	--color-bg: oklch(19.02% 0.0015 286.28);
 	--color-brand: oklch(70.11% 0.1673 288.9);
