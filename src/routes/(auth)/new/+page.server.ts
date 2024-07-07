@@ -1,23 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { ApiClientTag } from '~/lib/services/api_client.server';
-import { authenticateOrRefresh } from '~/lib/utils/auth.server';
 import { flattenProblemDetails, type ProblemDetails } from '~/lib/utils/problem_details';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import { decode, validate } from './utils';
 
-export const load: PageServerLoad = async ({ cookies, locals: { appLive } }) => {
-	const exit = await Effect.runPromiseExit(
-		authenticateOrRefresh(cookies).pipe(Effect.provide(appLive))
-	);
-	if (Exit.isFailure(exit)) {
-		redirect(302, '/login');
-	}
-};
-
 export const actions: Actions = {
-	default: async ({ request, cookies, locals: { appLive } }) => {
-		const exit = await Effect.runPromiseExit(
+	default: async ({ request, cookies, locals: { runtime } }) => {
+		const exit = await runtime.runPromiseExit(
 			Effect.gen(function* ($) {
 				const formData = yield* Effect.promise(() => request.formData());
 				const validation = validate(decode(formData));
@@ -51,8 +41,7 @@ export const actions: Actions = {
 							);
 						}
 						return yield* Effect.fail(fail(500, { errors: { root: [response.status + ''] } }));
-					}),
-					Effect.provide(appLive)
+					})
 				);
 			})
 		);

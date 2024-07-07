@@ -40,7 +40,7 @@
 </script>
 
 <main
-	class="max-w-paragraph-sm lg:max-w-paragraph-lg flex flex-col mx-auto justify-center min-h-screen h-full space-y-4"
+	class="max-w-paragraph-sm lg:max-w-paragraph-lg flex flex-col mx-auto justify-center min-h-screen h-full space-y-4 p-8"
 >
 	<p class="text-title font-medium text-center">Create a new workspace</p>
 	<p class="text-center text-balance">
