@@ -31,9 +31,7 @@
 			]}
 		/>
 	</aside>
-	<main class="bg-base-1 grow rounded-md border border-base-border shadow-sm p-16">
-		<div class="max-w-6xl mx-auto">
-			{@render children()}
-		</div>
-	</main>
+	<div class="bg-base-1 grow rounded-md border border-base-border shadow-sm">
+		{@render children()}
+	</div>
 </div>
