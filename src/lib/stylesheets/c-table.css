@@ -1,0 +1,39 @@
+@layer base {
+	:root {
+		--theme-table-border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
+		--theme-table-hover: color-mix(in oklch, var(--theme-base-border) 20%, var(--theme-base-1));
+	}
+}
+
+.c-table {
+	table-layout: auto;
+	width: 100%;
+	text-align: left;
+
+	& tr {
+		border-bottom: 1px solid var(--theme-table-border);
+	}
+}
+
+.c-table--row {
+	table-layout: auto;
+	width: 100%;
+	text-align: left;
+
+	& > * {
+		padding: theme('padding[4]') theme('padding[2]');
+	}
+
+	& > :first-child {
+		padding-inline-start: theme('padding[8]');
+	}
+
+	& > :last-child {
+		padding-inline-end: theme('padding[8]');
+	}
+}
+
+tbody > tr:hover {
+	transition: background-color 50ms ease-in-out;
+	background-color: var(--theme-table-hover);
+}

@@ -3,6 +3,8 @@
 	import HomeSolid from '~icons/heroicons/home-solid';
 	import UserGroup from '~icons/heroicons/user-group-solid';
 	import UserGroupOutline from '~icons/heroicons/user-group';
+	import Plus from '~icons/heroicons/plus-20-solid';
+	import XMark from '~icons/heroicons/x-mark-20-solid';
 
 	export type IconName = keyof typeof icons;
 
@@ -10,7 +12,9 @@
 		home: Home,
 		'home-solid': HomeSolid,
 		'user-group': UserGroup,
-		'user-group-outline': UserGroupOutline
+		'user-group-outline': UserGroupOutline,
+		plus: Plus,
+		'x-mark': XMark
 	} as const;
 </script>
 

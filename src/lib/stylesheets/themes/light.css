@@ -14,7 +14,7 @@
 :root {
 	--theme-base-1: var(--color-bg);
 	--theme-base-2: oklch(from var(--color-bg) calc(l - 0.015) c h);
-	--theme-base-3: oklch(from var(--color-bg) calc(l - 0.1) c h);
+	--theme-base-3: oklch(from var(--color-bg) calc(l - 0.04) c h);
 	--theme-base-fg-1: var(--color-fg-1);
 	--theme-base-fg-2: var(--color-fg-2);
 	--theme-base-fg-3: var(--color-fg-3);

@@ -22,7 +22,11 @@ declare global {
 			};
 		}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			teams?: {
+				new: Record<string, unknown>;
+			};
+		}
 		// interface Platform {}
 	}
 

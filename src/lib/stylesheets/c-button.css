@@ -2,17 +2,24 @@
 	:root {
 		--c-button-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
 		--c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
+
+		--c-button-base-bg: var(--theme-base-1);
+		--c-button-base-bg-hover: var(--theme-base-2);
+		--c-button-base-bg-active: var(--theme-base-3);
 	}
 
 	:root[data-theme='dark'] {
 		--c-button-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
 		--c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
+
+		--c-button-base-bg: color-mix(in oklch, var(--theme-base-1) 99%, var(--theme-base-fg-1));
+		--c-button-base-bg-hover: color-mix(in oklch, var(--theme-base-2) 94%, var(--theme-base-fg-1));
 	}
 }
 
 .c-button {
 	width: 100%;
-	padding: theme('size[2]') theme('size[2]');
+	padding: theme('size[2]') theme('size[4]');
 	font-weight: 500;
 	border: none;
 	border-radius: theme('borderRadius.md');
@@ -44,4 +51,36 @@
 		outline: none;
 		@apply ring ring-primary-3 ring-offset-1 ring-offset-base-1 outline-none;
 	}
+}
+
+.c-button--base {
+	color: var(--theme-base-fg-1);
+	background-color: var(--c-button-base-bg);
+
+	&:hover {
+		background-color: var(--c-button-base-bg-hover);
+	}
+
+	&:active {
+		background-color: var(--c-button-base-bg-active);
+	}
+
+	&:disabled {
+		color: var(--c-button-text-disabled);
+		background-color: var(--c-button-bg-disabled);
+	}
+
+	&:focus-visible {
+		outline: none;
+		@apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
+	}
+
+	&.c-button--outline {
+		border: 1px solid var(--theme-base-border);
+	}
+}
+
+.c-button--sm {
+	font-size: theme('fontSize[sm]');
+	padding-block: theme('padding[0.5]');
 }

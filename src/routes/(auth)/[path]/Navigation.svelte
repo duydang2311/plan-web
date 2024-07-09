@@ -17,7 +17,7 @@
 	}
 
 	const { items }: Props = $props();
-	const pathname = $derived($page.url.pathname);
+	const pathname = $derived($page.url.pathname.split('/', 3).join('/'));
 	let activeBar = $state<HTMLDivElement>();
 
 	if (browser) {
