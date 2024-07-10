@@ -34,12 +34,8 @@ export const actions: Actions = {
 				Effect.catchTags({
 					ApiError: (e) =>
 						Effect.fail(fail(500, { errors: { root: [e.code] } as Record<string, string[]> })),
-					UnknownException: (e) => {
-						console.log(e);
-						return Effect.fail(
-							fail(500, { errors: { root: ['unknown'] } as Record<string, string[]> })
-						);
-					}
+					UnknownException: () =>
+						Effect.fail(fail(500, { errors: { root: ['unknown'] } as Record<string, string[]> }))
 				})
 			)
 		);
@@ -47,6 +43,6 @@ export const actions: Actions = {
 		if (Exit.isFailure(exit)) {
 			return exit.cause.pipe(Cause.failureOption, Option.getOrNull);
 		}
-		return redirect(302, `${params.path}/teams/${exit.value.identifier}`);
+		return redirect(302, `/${params.path}/teams/${exit.value.identifier}`);
 	}
 };
