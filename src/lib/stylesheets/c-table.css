@@ -37,3 +37,8 @@ tbody > tr:hover {
 	transition: background-color 50ms ease-in-out;
 	background-color: var(--theme-table-hover);
 }
+
+th {
+	font-weight: 700;
+	font-size: var(--font-size-sm);
+}
