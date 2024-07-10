@@ -9,6 +9,7 @@
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import { validate } from './utils';
 	import type { ActionData } from './$types';
+	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 
 	const errorMap = {
 		root: {
@@ -38,8 +39,9 @@
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-{JSON.stringify(form)}
 <main class="max-w-paragraph-lg mx-auto p-8 space-y-8">
+	<Breadcrumb />
+
 	<div>
 		<h2 class="mb-2">Create a new team</h2>
 		<p class="mb-8">Create a new team to manage separate cycles, workflows and notifications.</p>

@@ -14,6 +14,7 @@
 	import Table from '~/lib/components/Table.svelte';
 	import { flyAndScale } from '~/lib/utils/transition';
 	import type { RouteParams } from './$types';
+	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 
 	const open = writable(false);
 
@@ -88,7 +89,7 @@
 
 <main class="divide-y divide-base-border">
 	<div class="flex gap-4 justify-between items-center px-8 py-2">
-		<p>Teams</p>
+		<Breadcrumb />
 		<Button
 			as="link"
 			href="teams/new"

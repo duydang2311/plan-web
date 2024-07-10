@@ -5,6 +5,7 @@
 	import UserGroupOutline from '~icons/heroicons/user-group';
 	import Plus from '~icons/heroicons/plus-20-solid';
 	import XMark from '~icons/heroicons/x-mark-20-solid';
+	import ChevronRight from '~icons/heroicons/chevron-right-20-solid';
 
 	export type IconName = keyof typeof icons;
 
@@ -14,7 +15,8 @@
 		'user-group': UserGroup,
 		'user-group-outline': UserGroupOutline,
 		plus: Plus,
-		'x-mark': XMark
+		'x-mark': XMark,
+		'chevron-right': ChevronRight
 	} as const;
 </script>
 
