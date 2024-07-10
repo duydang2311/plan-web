@@ -89,7 +89,7 @@
 
 <main class="divide-y divide-base-border">
 	<div class="flex gap-4 justify-between items-center px-8 py-2">
-		<Breadcrumb />
+		<p>Filter</p>
 		<Button
 			as="link"
 			href="teams/new"
@@ -105,9 +105,6 @@
 			<Icon name="plus" />
 			Add team
 		</Button>
-	</div>
-	<div class="flex gap-4 justify-between items-center px-8 py-2">
-		<p>Filter</p>
 	</div>
 	<Table>
 		<thead>

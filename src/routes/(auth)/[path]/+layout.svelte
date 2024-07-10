@@ -3,6 +3,7 @@
 	import Logo from '~/lib/components/Logo.svelte';
 	import Navigation from './Navigation.svelte';
 	import { page } from '$app/stores';
+	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 
 	const { children }: { children: Snippet } = $props();
 </script>
@@ -32,6 +33,7 @@
 		/>
 	</aside>
 	<div class="bg-base-1 grow rounded-md border border-base-border shadow-sm">
+		<Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
 		{@render children()}
 	</div>
 </div>
