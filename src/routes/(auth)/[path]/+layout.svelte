@@ -25,8 +25,8 @@
 				},
 				{
 					href: `/${$page.params['path']}/teams`,
-					icon: 'user-group-outline',
-					activeIcon: 'user-group',
+					icon: 'users',
+					activeIcon: 'users-solid',
 					label: 'Teams'
 				}
 			]}

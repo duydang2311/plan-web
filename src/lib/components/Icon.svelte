@@ -12,8 +12,8 @@
 	const icons = {
 		home: Home,
 		'home-solid': HomeSolid,
-		'user-group': UserGroup,
-		'user-group-outline': UserGroupOutline,
+		users: UserGroupOutline,
+		'users-solid': UserGroup,
 		plus: Plus,
 		'x-mark': XMark,
 		'chevron-right': ChevronRight
