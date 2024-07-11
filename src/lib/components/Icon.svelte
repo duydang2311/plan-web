@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-	import Home from '~icons/heroicons/home';
-	import HomeSolid from '~icons/heroicons/home-solid';
+	import Home from '~icons/ph/house-bold';
+	import HomeSolid from '~icons/ph/house-fill';
 	import UserGroup from '~icons/heroicons/user-group-solid';
 	import UserGroupOutline from '~icons/heroicons/user-group';
 	import Plus from '~icons/heroicons/plus-20-solid';
