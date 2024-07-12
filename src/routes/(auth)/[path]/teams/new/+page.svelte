@@ -8,7 +8,7 @@
 	import { hasProperty } from '~/lib/utils/commons';
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import { validate } from './utils';
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	const errorMap = {
 		root: {
@@ -26,7 +26,7 @@
 		}
 	};
 
-	let { form }: { form: ActionData } = $props();
+	let { form, data }: { form: ActionData; data: PageData } = $props();
 	let fields = $state({
 		name: '',
 		identifier: ''
@@ -71,6 +71,7 @@
 			};
 		}}
 	>
+		<input type="hidden" name="workspaceId" value={data.workspace.id} />
 		<div class="flex gap-4 flex-wrap">
 			<fieldset class="space-y-1 grow">
 				<Label for="name">Team name</Label>

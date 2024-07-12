@@ -18,11 +18,10 @@ export const actions: Actions = {
 					}
 
 					const api = yield* ApiClientTag;
-					const response = yield* api.post('aa8bc41a-ae12-4d23-b197-e17277700bb2/teams', {
+					const response = yield* api.post(`teams`, {
 						body: validation.data
 					});
 					if (!response.ok) {
-						console.log(response);
 						const json = yield* Effect.tryPromise(() => response.json<unknown>());
 						const problem = yield* validateProblemDetailsEffect(json);
 						return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
