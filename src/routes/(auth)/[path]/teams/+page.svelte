@@ -14,7 +14,6 @@
 	import Table from '~/lib/components/Table.svelte';
 	import { flyAndScale } from '~/lib/utils/transition';
 	import type { RouteParams } from './$types';
-	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 
 	const open = writable(false);
 
