@@ -9,6 +9,7 @@
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import { validate } from './utils';
 	import type { ActionData, PageData } from './$types';
+	import { page } from '$app/stores';
 
 	const errorMap = {
 		root: {
@@ -28,6 +29,7 @@
 
 	let { form, data }: { form: ActionData; data: PageData } = $props();
 	let fields = $state({
+		workspaceId: data.workspace.id,
 		name: '',
 		identifier: ''
 	});
@@ -47,6 +49,7 @@
 
 	<form
 		method="post"
+		action="/{$page.params['path']}/teams/new"
 		class="space-y-2"
 		onchange={() => {
 			validation = validate(fields);
@@ -71,7 +74,7 @@
 			};
 		}}
 	>
-		<input type="hidden" name="workspaceId" value={data.workspace.id} />
+		<input type="hidden" name="workspaceId" value={fields.workspaceId} />
 		<div class="flex gap-4 flex-wrap">
 			<fieldset class="space-y-1 grow">
 				<Label for="name">Team name</Label>

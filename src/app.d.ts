@@ -24,11 +24,7 @@ declare global {
 		interface PageData {
 			routes?: { breadcrumb: boolean; meta: { title: string; href: string } }[];
 		}
-		interface PageState {
-			teams?: {
-				new: Record<string, unknown>;
-			};
-		}
+		// interface PageState { }
 		// interface Platform {}
 	}
 
