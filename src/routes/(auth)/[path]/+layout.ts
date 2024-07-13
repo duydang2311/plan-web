@@ -1,6 +1,6 @@
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = ({ data }) => {
+export const load: LayoutLoad = ({ data, params }) => {
 	return {
 		...data,
 		routes: [
@@ -8,7 +8,7 @@ export const load: LayoutLoad = ({ data }) => {
 				breadcrumb: true,
 				meta: {
 					title: data.workspace.name,
-					href: `/${data.workspace.name}`
+					href: `/${params.path}`
 				}
 			}
 		]
