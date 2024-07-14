@@ -46,6 +46,7 @@
 			href="?{state[1].toString()}"
 			class="group flex items-center gap-2"
 			data-sveltekit-preload-data="tap"
+			data-sveltekit-noscroll
 		>
 			{@render children?.()}
 			<div class="transition-enforcement">

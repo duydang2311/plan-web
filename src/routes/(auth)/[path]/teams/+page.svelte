@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { Array, pipe } from 'effect';
 	import { DateTime } from 'luxon';
 	import { orderBy } from 'natural-orderby';
@@ -11,6 +11,7 @@
 	import Th from '~/lib/components/Th.svelte';
 	import type { PageData } from './$types';
 	import { paginatedList } from '~/lib/models/paginatedList';
+	import Pagination from '~/lib/components/Pagination.svelte';
 
 	const { data }: { data: PageData } = $props();
 	const orders = $derived.by(() => {
@@ -43,6 +44,8 @@
 				),
 				orders.map(([, x]) => x)
 			),
+			size: data.teams.size,
+			offset: data.teams.offset,
 			totalCount: data.teams.totalCount
 		});
 	});
@@ -96,10 +99,16 @@
 				{/if}
 			</tbody>
 		</Table>
-		<div class="px-8 py-4">
+		<div class="flex justify-between items-center px-8 py-4">
 			<span class="text-base-fg-3 text-sm font-bold">
-				Displaying {data.teams.items.length} out of {data.teams.totalCount} teams.
+				Displaying {data.teams.offset + 1} - {data.teams.offset + data.teams.items.length} out of {data
+					.teams.totalCount} teams.
 			</span>
+			<Pagination
+				size={data.teams.size}
+				totalCount={data.teams.totalCount}
+				page={Number($page.url.searchParams.get('page') ?? '1')}
+			/>
 		</div>
 	</div>
 </main>

@@ -5,6 +5,7 @@
 	import UserGroupOutline from '~icons/heroicons/user-group';
 	import Plus from '~icons/heroicons/plus-20-solid';
 	import XMark from '~icons/heroicons/x-mark-20-solid';
+	import ChevronLeft from '~icons/heroicons/chevron-left-20-solid';
 	import ChevronRight from '~icons/heroicons/chevron-right-20-solid';
 	import ArrowUp from '~icons/heroicons/arrow-up-20-solid';
 	import ArrowDown from '~icons/heroicons/arrow-down-20-solid';
@@ -19,6 +20,7 @@
 		'users-solid': UserGroup,
 		plus: Plus,
 		'x-mark': XMark,
+		'chevron-left': ChevronLeft,
 		'chevron-right': ChevronRight,
 		'arrow-up': ArrowUp,
 		'arrow-down': ArrowDown,
