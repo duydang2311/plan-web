@@ -26,6 +26,7 @@
     "gsap": "^3.12.5",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
+    "natural-orderby": "^3.0.2",
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",
     "prettier-plugin-svelte": "^3.2.5",
