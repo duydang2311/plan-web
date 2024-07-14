@@ -1,7 +1,7 @@
-import { Context, Effect } from 'effect';
+import { Array, Context, Effect } from 'effect';
 import { ApiError } from '~/lib/models/errors';
 
-type RequestRecord = Record<string, number | string | boolean>;
+type RequestRecord = Record<string, number | string | boolean | null | undefined>;
 type RequestArray = (boolean | string | number | RequestRecord)[];
 
 export interface ApiClientOptions {
@@ -68,6 +68,7 @@ export class HttpApiClient implements ApiClient {
 		const url = `${this._options.baseUrl}/${trim(path, '/')}/${this._options.version}`;
 		if (query) {
 			return `${url}?${Object.entries(query)
+				.filter(([, v]) => v)
 				.map(([k, v]) => `${k}=${v}`)
 				.join('&')}`;
 		}
