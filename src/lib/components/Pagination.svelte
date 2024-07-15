@@ -93,7 +93,7 @@
 				data-sveltekit-noscroll
 				href="{search}page={pageNumber - 1}"
 				class={clsx(
-					'block px-4 h-full content-center rounded-full',
+					'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
 					pageNumber === 1 ? 'pointer-events-none text-base-fg-3/40' : 'hover:bg-base-3'
 				)}
 			>
@@ -110,7 +110,7 @@
 				data-sveltekit-noscroll
 				href="{search}page={pageNumber + 1}"
 				class={clsx(
-					'block px-4 h-full content-center rounded-full',
+					'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
 					pageNumber === totalPages ? 'pointer-events-none text-base-fg-3/40' : 'hover:bg-base-3'
 				)}
 			>
