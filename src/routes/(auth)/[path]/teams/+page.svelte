@@ -17,6 +17,7 @@
 	import { watch } from '~/lib/models/watchable';
 	import { mapMaybePromise } from '~/lib/utils/promise';
 	import type { PageData } from './$types';
+	import Link from '~/lib/components/Link.svelte';
 
 	const { data }: { data: PageData } = $props();
 	let teamList = $state(data.teamList);
@@ -105,7 +106,6 @@
 				<Row class="*:py-2">
 					<Th sortable name="name">Name</Th>
 					<Th sortable name="identifier">Identifier</Th>
-					<th>Members</th>
 					<Th sortable name="createdTime">Created</Th>
 					<Th sortable name="updatedTime">Updated</Th>
 				</Row>
@@ -119,9 +119,8 @@
 					{#if items.length}
 						{#each items as { createdTime, updatedTime, name, identifier }}
 							<Row>
-								<td>{name}</td>
+								<td><Link href="teams/{identifier}">{name}</Link></td>
 								<td>{identifier}</td>
-								<td>4</td>
 								<td>
 									{DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
 								</td>
