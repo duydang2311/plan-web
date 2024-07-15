@@ -5,7 +5,7 @@ import { error } from '@sveltejs/kit';
 
 const pathIdMap = new Map<string, string>();
 
-export const load: LayoutServerLoad = async ({ params, locals: { runtime } }) => {
+export const load: LayoutServerLoad = async ({ params, locals: { runtime }, url }) => {
 	const exit = await runtime.runPromiseExit(
 		Effect.gen(function* () {
 			const apiClient = yield* ApiClientTag;
@@ -35,6 +35,7 @@ export const load: LayoutServerLoad = async ({ params, locals: { runtime } }) =>
 		return error(404, { message: 'Workspace does not exist', code: 'workspace_not_found' });
 	}
 	return {
-		workspace: exit.value
+		workspace: exit.value,
+		pathname: url.pathname
 	};
 };

@@ -72,7 +72,7 @@
 	});
 </script>
 
-<main class="divide-y divide-base-border flex flex-col">
+<main class="divide-y divide-base-border h-full flex flex-col">
 	<div class="flex gap-4 justify-between items-center px-8 py-2">
 		<p>Filter</p>
 		<Button

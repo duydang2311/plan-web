@@ -1,11 +1,28 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import Logo from '~/lib/components/Logo.svelte';
-	import Navigation from './Navigation.svelte';
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
+	import { blur, fade, fly, scale } from 'svelte/transition';
 	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
+	import Logo from '~/lib/components/Logo.svelte';
+	import type { LayoutData } from './$types';
+	import Navigation from './Navigation.svelte';
+	import {
+		circIn,
+		circInOut,
+		circOut,
+		cubicIn,
+		cubicInOut,
+		cubicOut,
+		quadIn,
+		quadInOut,
+		quadOut,
+		sineIn,
+		sineInOut,
+		sineOut
+	} from 'svelte/easing';
+	import { flyAndScale } from '~/lib/utils/transition';
 
-	const { children }: { children: Snippet } = $props();
+	const { children, data }: { children: Snippet; data: LayoutData } = $props();
 </script>
 
 <svelte:head>
@@ -42,6 +59,15 @@
 		class="bg-base-1 grow rounded-md border border-base-border shadow-sm grid grid-rows-[auto_1fr]"
 	>
 		<Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
-		{@render children()}
+		<div class="transition-enforcement overflow-hidden">
+			{#key data.pathname.split('/', 3).join('')}
+				<div
+					in:fly={{ duration: 200, x: -4, easing: sineIn }}
+					out:fly={{ duration: 200, x: 2, easing: sineOut }}
+				>
+					{@render children()}
+				</div>
+			{/key}
+		</div>
 	</div>
 </div>
