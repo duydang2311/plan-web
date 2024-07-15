@@ -1,19 +1,27 @@
 <script lang="ts">
 	import { navigating, page } from '$app/stores';
+	import clsx from 'clsx';
 	import { Array, pipe } from 'effect';
 	import { DateTime } from 'luxon';
 	import { orderBy } from 'natural-orderby';
-	import { untrack } from 'svelte';
+	import { backInOut, circInOut } from 'svelte/easing';
+	import { fade, scale } from 'svelte/transition';
 	import Button from '~/lib/components/Button.svelte';
 	import Icon from '~/lib/components/Icon.svelte';
+	import Pagination from '~/lib/components/Pagination.svelte';
 	import Row from '~/lib/components/Row.svelte';
+	import Spinner from '~/lib/components/Spinner.svelte';
 	import Table from '~/lib/components/Table.svelte';
 	import Th from '~/lib/components/Th.svelte';
-	import type { PageData } from './$types';
 	import { paginatedList } from '~/lib/models/paginatedList';
-	import Pagination from '~/lib/components/Pagination.svelte';
+	import { watch } from '~/lib/models/watchable';
+	import { mapMaybePromise } from '~/lib/utils/promise';
+	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
+	let teamList = $state(data.teamList);
+	let status = $state<'pending' | 'pending-long'>();
+
 	const orders = $derived.by(() => {
 		const order = $navigating?.to?.url.searchParams.get('order');
 		if (!order) return null;
@@ -32,22 +40,34 @@
 			)
 		);
 	});
-	const sortedTeams = $derived.by(() => {
-		if (!orders) return data.teams;
-		return paginatedList({
-			items: orderBy(
-				untrack(() => data.teams.items),
-				orders.map(
-					([x]) =>
-						(v) =>
-							v[x]
+
+	const sorted = $derived.by(() => {
+		if (!orders) return teamList;
+		return mapMaybePromise(teamList, (teams) =>
+			paginatedList({
+				items: orderBy(
+					teams.items,
+					orders.map(
+						([x]) =>
+							(v) =>
+								v[x]
+					),
+					orders.map(([, x]) => x)
 				),
-				orders.map(([, x]) => x)
-			),
-			size: data.teams.size,
-			offset: data.teams.offset,
-			totalCount: data.teams.totalCount
-		});
+				size: teams.size,
+				offset: teams.offset,
+				totalCount: teams.totalCount
+			})
+		);
+	});
+
+	$effect(() => {
+		if (data.teamList instanceof Promise) {
+			status = 'pending';
+			watch(data.teamList.then((v) => (teamList = v)))
+				.after('1 second', () => (status = 'pending-long'))
+				.finally(() => (status = undefined));
+		}
 	});
 </script>
 
@@ -66,7 +86,20 @@
 			Add team
 		</Button>
 	</div>
-	<div class="flex flex-col justify-between grow">
+	<div class="relative flex flex-col justify-between grow">
+		{#if status === 'pending-long'}
+			<div
+				transition:fade={{ easing: circInOut }}
+				class="fixed backdrop-blur-sm z-50 inset-0 bg-black/10"
+			>
+				<div
+					transition:scale={{ easing: backInOut }}
+					class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+				>
+					<Spinner class="w-8 h-8 text-primary-1" />
+				</div>
+			</div>
+		{/if}
 		<Table>
 			<thead>
 				<Row class="*:py-2">
@@ -77,38 +110,41 @@
 					<Th sortable name="updatedTime">Updated</Th>
 				</Row>
 			</thead>
-			<tbody>
-				{#if sortedTeams.items.length}
-					{#each sortedTeams.items as { createdTime, updatedTime, name, identifier }}
-						<Row>
-							<td>{name}</td>
-							<td>{identifier}</td>
-							<td>4</td>
-							<td>
-								{DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
-							</td>
-							<td>
-								{DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATETIME_SHORT)}
-							</td>
-						</Row>
-					{/each}
-				{:else}
+			<tbody class={clsx(status === 'pending' && 'animate-pulse')}>
+				{#await sorted}
 					<Row>
-						<td colspan="5">No active teams yet.</td>
+						<td colspan="5">Loading teams...</td>
 					</Row>
-				{/if}
+				{:then { items }}
+					{#if items.length}
+						{#each items as { createdTime, updatedTime, name, identifier }}
+							<Row>
+								<td>{name}</td>
+								<td>{identifier}</td>
+								<td>4</td>
+								<td>
+									{DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
+								</td>
+								<td>
+									{DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATETIME_SHORT)}
+								</td>
+							</Row>
+						{/each}
+					{:else}
+						<Row>
+							<td colspan="5">No active teams yet.</td>
+						</Row>
+					{/if}
+				{/await}
 			</tbody>
 		</Table>
-		<div class="flex justify-between items-center px-8 py-4">
-			<span class="text-base-fg-3 text-sm font-bold">
-				Displaying {data.teams.offset + 1} - {data.teams.offset + data.teams.items.length} out of {data
-					.teams.totalCount} teams.
-			</span>
-			<Pagination
-				size={data.teams.size}
-				totalCount={data.teams.totalCount}
-				page={Number($page.url.searchParams.get('page') ?? '1')}
-			/>
-		</div>
+		{#await teamList then { items, size, offset, totalCount }}
+			<div class="flex justify-between items-center px-8 py-4">
+				<span class="text-base-fg-3 text-sm font-bold">
+					Displaying {offset + 1} - {offset + items.length} out of {totalCount} teams.
+				</span>
+				<Pagination {size} {totalCount} page={Number($page.url.searchParams.get('page') ?? '1')} />
+			</div>
+		{/await}
 	</div>
 </main>
