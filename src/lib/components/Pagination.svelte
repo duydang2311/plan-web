@@ -24,11 +24,13 @@
 		return '?';
 	});
 	const pageNumbers = $derived.by(() => {
-		let start = pageNumber - 1;
+		const mid = (totalPages - 1) / 2;
+		let bias = pageNumber > mid ? 1 : 0;
+		let start = pageNumber - 1 - (pageNumber > mid ? 1 : 0);
 		while (start <= 1) {
 			++start;
 		}
-		let end = start + 2;
+		let end = start + 2 + bias + (pageNumber <= mid ? 1 : 0);
 		while (end >= totalPages) {
 			if (start > 2) {
 				--start;
@@ -38,6 +40,7 @@
 		if (end < start) {
 			return [];
 		}
+
 		return new Array(end - start + 1).fill(0).map((_, i) => start + i);
 	});
 
