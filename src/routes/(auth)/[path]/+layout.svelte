@@ -1,26 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Snippet } from 'svelte';
-	import { blur, fade, fly, scale } from 'svelte/transition';
+	import { sineIn, sineOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 	import Logo from '~/lib/components/Logo.svelte';
 	import type { LayoutData } from './$types';
 	import Navigation from './Navigation.svelte';
-	import {
-		circIn,
-		circInOut,
-		circOut,
-		cubicIn,
-		cubicInOut,
-		cubicOut,
-		quadIn,
-		quadInOut,
-		quadOut,
-		sineIn,
-		sineInOut,
-		sineOut
-	} from 'svelte/easing';
-	import { flyAndScale } from '~/lib/utils/transition';
 
 	const { children, data }: { children: Snippet; data: LayoutData } = $props();
 </script>
