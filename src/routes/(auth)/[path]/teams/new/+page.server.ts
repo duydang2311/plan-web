@@ -27,8 +27,9 @@ export const actions: Actions = {
 						return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
 					}
 
-					const data = yield* Effect.tryPromise(() => response.json<{ id: string }>());
-					return yield* Effect.succeed({ ...data, identifier: input.identifier });
+					return yield* Effect.tryPromise(() =>
+						response.json<{ id: string; idenfitier: string }>()
+					);
 				}),
 				Effect.catchTags({
 					ApiError: (e) =>
@@ -42,6 +43,6 @@ export const actions: Actions = {
 		if (Exit.isFailure(exit)) {
 			return exit.cause.pipe(Cause.failureOption, Option.getOrNull);
 		}
-		return redirect(302, `/${params.path}/teams/${exit.value.identifier}`);
+		return redirect(302, `/${params.path}/teams/${exit.value.idenfitier}`);
 	}
 };
