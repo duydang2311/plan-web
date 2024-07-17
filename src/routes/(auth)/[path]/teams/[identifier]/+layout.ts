@@ -3,6 +3,7 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = async ({ data, parent }) => {
 	const parentData = await parent();
 	return {
+		team: data.team,
 		routes: [
 			...parentData.routes,
 			{
