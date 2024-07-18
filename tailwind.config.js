@@ -1,8 +1,9 @@
 import plugin from 'tailwindcss/plugin';
 import Typography from '@tailwindcss/typography';
+import { withAnimations } from 'animated-tailwindcss';
 
 /** @type {import('tailwindcss').Config} */
-export default {
+export default withAnimations({
 	content: ['./src/**/*.{html,svelte}'],
 	theme: {
 		extend: {
@@ -76,6 +77,7 @@ export default {
 						},
 						'--tw-prose-headings': 'var(--theme-base-fg-1)',
 						'--tw-prose-body': 'var(--theme-base-fg-2)',
+						'--tw-prose-bold': 'var(--theme-base-fg-2)',
 						'--tw-prose-links': 'var(--theme-base-fg-3)',
 						'--tw-prose-hr': 'var(--theme-base-border)'
 					}
@@ -92,4 +94,4 @@ export default {
 			addComponents({ '.transition-enforcement': {} });
 		})
 	]
-};
+});

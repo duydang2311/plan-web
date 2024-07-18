@@ -17,14 +17,14 @@ export const load: LayoutServerLoad = async ({
 			let response: Response;
 			if (id) {
 				response = yield* apiClient.get(`teams/${id}`, {
-					query: { select: 'new(Id, Name)' }
+					query: { select: 'new(Id, Identifier, Name)' }
 				});
 			} else {
 				const data = yield* Effect.promise(() => parent());
 				response = yield* apiClient.get(
 					`workspaces/${data.workspace.id}/teams/identifier/${identifier}`,
 					{
-						query: { select: 'new(Id, Name)' }
+						query: { select: 'new(Id, Identifier, Name)' }
 					}
 				);
 			}
@@ -33,7 +33,9 @@ export const load: LayoutServerLoad = async ({
 				return yield* Effect.fail<void>(void 0);
 			}
 
-			const json = yield* Effect.promise<{ id: string; name: string }>(() => response.json());
+			const json = yield* Effect.promise<{ id: string; identifier: string; name: string }>(() =>
+				response.json()
+			);
 			if (!id) {
 				identifierIdMap.set(identifier, json.id);
 			}

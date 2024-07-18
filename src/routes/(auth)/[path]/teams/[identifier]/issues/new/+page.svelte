@@ -10,6 +10,8 @@
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData, PageData } from './$types';
 	import { validate } from './utils';
+	import Tiptap from '~/lib/components/Tiptap.svelte';
+	import { Editor } from '@tiptap/core';
 
 	const errorMap = {
 		root: {
@@ -36,11 +38,12 @@
 	});
 	let status = $state<'submitting' | null>(null);
 	let validation: ValidationResult | undefined;
+	let editor = $state<Editor>();
 
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-<main class="max-w-paragraph-lg mx-auto p-8 space-y-8">
+<main class="max-w-screen-lg mx-auto p-8 space-y-8">
 	<div>
 		<h2>Create a new issue</h2>
 		<p class="mb-4">Create a new issue to manage separate cycles, workflows and notifications.</p>
@@ -51,7 +54,7 @@
 		method="post"
 		class="space-y-4"
 		onchange={() => {
-			validation = validate(fields);
+			validation = validate({ ...fields, description: editor!.getHTML() });
 			form = validation.ok
 				? null
 				: {
@@ -65,6 +68,11 @@
 			if (!validation?.ok) {
 				e.cancel();
 				return;
+			}
+
+			const desc = editor!.getHTML();
+			if (desc) {
+				e.formData.set('description', desc);
 			}
 			status = 'submitting';
 			return async ({ update }) => {
@@ -87,7 +95,12 @@
 		</fieldset>
 		<fieldset class="space-y-1 grow">
 			<Label for="description">Issue description (optional)</Label>
-			<TextArea id="description" name="description" rows={8} bind:value={fields.description} />
+			<noscript>
+				<TextArea id="description" name="description" rows={8} bind:value={fields.description} />
+			</noscript>
+			<div>
+				<Tiptap bind:editor placeholder="Add more detail to the issue..." class="h-96" />
+			</div>
 			<Errors errors={errors['description']} errorMap={errorMap.description} />
 		</fieldset>
 		<Button variant="primary" class="!mt-4 w-fit" disabled={status === 'submitting'}>

@@ -1,0 +1,45 @@
+@layer base {
+	:root {
+		--c-input-border: color-mix(in oklch, var(--theme-base-border) 90%, var(--theme-base-fg-1));
+		--c-input-border-hover: oklch(from var(--c-input-border) calc(l - 0.08) c h);
+		--c-input-border-focus: var(--theme-primary-3);
+	}
+
+	:root[data-theme='dark'] {
+		--c-input-border-hover: oklch(from var(--c-input-border) calc(l + 0.08) c h);
+	}
+
+	.c-tiptap--textarea {
+		overflow: auto;
+		padding: theme('padding[2]') theme('padding[4]') theme('padding[4]') theme('padding[4]');
+		word-break: break-word;
+		border: 1px solid transparent;
+		transition:
+			box-shadow 100ms ease-in-out,
+			border-color 100ms ease-in-out;
+		box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+
+		&:focus-within {
+			border-color: var(--theme-primary-3);
+			@apply focus-within:ring-1 focus-within:ring-primary-3;
+		}
+	}
+
+	.c-tiptap--button {
+		padding: theme('padding[1.5]');
+		border-radius: theme('borderRadius[DEFAULT]');
+		transition:
+			background-color 100ms ease-in-out,
+			color 100ms ease-in-out;
+		color: color-mix(in oklch, var(--theme-base-fg-3) 90%, var(--theme-base-1));
+
+		&:hover {
+			background-color: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
+		}
+
+		&.active {
+			color: var(--theme-base-fg-1);
+			background-color: color-mix(in oklch, var(--theme-base-border) 80%, var(--theme-base-1));
+		}
+	}
+}

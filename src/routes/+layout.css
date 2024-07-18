@@ -13,6 +13,7 @@
 @import '~/lib/stylesheets/c-link.css';
 @import '~/lib/stylesheets/c-label.css';
 @import '~/lib/stylesheets/c-table.css';
+@import '~/lib/stylesheets/c-tiptap.css';
 
 @import '~/lib/stylesheets/tw-components.css';
 @import '~/lib/stylesheets/tw-utilities.css';
@@ -114,4 +115,12 @@
 	hr {
 		border-color: var(--theme-base-border);
 	}
+}
+
+p.is-editor-empty:first-child::before {
+	color: theme('colors.base[fg-1]/0.4');
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
 }

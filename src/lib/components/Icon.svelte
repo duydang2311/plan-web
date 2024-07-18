@@ -10,6 +10,17 @@
 	import ArrowUp from '~icons/heroicons/arrow-up-20-solid';
 	import ArrowDown from '~icons/heroicons/arrow-down-20-solid';
 	import ArrowsUpDown from '~icons/heroicons/arrows-up-down-20-solid';
+	import H1 from '~icons/lucide/heading-1';
+	import H2 from '~icons/lucide/heading-2';
+	import H3 from '~icons/lucide/heading-3';
+	import H4 from '~icons/lucide/heading-4';
+	import H5 from '~icons/lucide/heading-5';
+	import H6 from '~icons/lucide/heading-6';
+	import Bold from '~icons/lucide/bold';
+	import Italic from '~icons/lucide/italic';
+	import StrikeThrough from '~icons/lucide/strikethrough';
+	import Underline from '~icons/lucide/underline';
+	import Quotes from '~icons/lucide/quote';
 
 	export type IconName = keyof typeof icons;
 
@@ -24,7 +35,18 @@
 		'chevron-right': ChevronRight,
 		'arrow-up': ArrowUp,
 		'arrow-down': ArrowDown,
-		'arrows-up-down': ArrowsUpDown
+		'arrows-up-down': ArrowsUpDown,
+		h1: H1,
+		h2: H2,
+		h3: H3,
+		h4: H4,
+		h5: H5,
+		h6: H6,
+		bold: Bold,
+		italic: Italic,
+		'strike-through': StrikeThrough,
+		underline: Underline,
+		quotes: Quotes
 	} as const;
 </script>
 
@@ -40,5 +62,5 @@
 
 <svelte:component this={icons[name]} {...props} />
 <!-- {#await icons[name]().then((v) => v.default) then icon}
-	<svelte:component this={icon} {...props} />
+    <svelte:component this={icon} {...props} />
 {/await} -->
