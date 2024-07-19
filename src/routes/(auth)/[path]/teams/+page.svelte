@@ -117,9 +117,9 @@
 					</Row>
 				{:then { items }}
 					{#if items.length}
-						{#each items as { createdTime, updatedTime, name, identifier }}
+						{#each items as { id, createdTime, updatedTime, name, identifier }}
 							<Row>
-								<td><Link href="teams/{identifier}">{name}</Link></td>
+								<td><Link href="/{$page.params['path']}/issues?teamId={id}">{name}</Link></td>
 								<td>{identifier}</td>
 								<td>
 									{DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
