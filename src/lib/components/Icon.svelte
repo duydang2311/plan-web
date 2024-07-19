@@ -21,6 +21,8 @@
 	import StrikeThrough from '~icons/lucide/strikethrough';
 	import Underline from '~icons/lucide/underline';
 	import Quotes from '~icons/lucide/quote';
+	import Files from '~icons/ph/files-fill';
+	import FilesOutline from '~icons/ph/files';
 
 	export type IconName = keyof typeof icons;
 
@@ -46,7 +48,9 @@
 		italic: Italic,
 		'strike-through': StrikeThrough,
 		underline: Underline,
-		quotes: Quotes
+		quotes: Quotes,
+		issues: Files,
+		'issues-outline': FilesOutline
 	} as const;
 </script>
 
@@ -61,6 +65,3 @@
 </script>
 
 <svelte:component this={icons[name]} {...props} />
-<!-- {#await icons[name]().then((v) => v.default) then icon}
-    <svelte:component this={icon} {...props} />
-{/await} -->
