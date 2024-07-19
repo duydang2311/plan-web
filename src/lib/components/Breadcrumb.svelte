@@ -3,7 +3,7 @@
 	import clsx from 'clsx';
 	import { cubicInOut } from 'svelte/easing';
 	import type { HTMLOlAttributes } from 'svelte/elements';
-	import { fly } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import Icon from './Icon.svelte';
 	import Link from './Link.svelte';
 
@@ -18,11 +18,11 @@
 			{@const notFirst = i !== 0}
 			{@const isLast = i === $page.data.routes.length - 1}
 			<li
-				class="flex items-center gap-2 text-base-fg-3"
-				transition:fly={{ duration: 200, x: '-0.2rem', easing: cubicInOut }}
+				class="flex items-center text-base-fg-3 overflow-hidden text-nowrap"
+				transition:slide={{ axis: 'x', duration: 200, easing: cubicInOut }}
 			>
 				{#if notFirst}
-					<Icon name="chevron-right" class={isLast ? 'text-base-fg-1' : undefined} />
+					<Icon name="chevron-right" class={clsx('mr-2', isLast ? 'text-base-fg-1' : undefined)} />
 				{/if}
 				{#if isLast}
 					<span class="text-base-fg-1 font-bold">
