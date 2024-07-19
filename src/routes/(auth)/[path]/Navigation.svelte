@@ -25,21 +25,29 @@
 	}
 
 	beforeNavigate(({ willUnload, complete }) => {
-		if (!activeBar || willUnload) return;
-		const state = Flip.getState(activeBar);
-		complete.then(() => {
-			Flip.from(state, {
-				targets: activeBar,
-				duration: 0.4,
-				ease: 'power3.inOut'
+		if (willUnload) return;
+		if (activeBar) {
+			const state = Flip.getState(activeBar, { simple: true });
+			complete.then(() => {
+				if (activeBar) {
+					Flip.from(state, {
+						targets: activeBar,
+						duration: 0.4,
+						ease: 'power3.inOut'
+					});
+				}
 			});
-		});
+		} else {
+			complete.then(() => {
+				gsap.from(activeBar!, { opacity: 0, scaleY: 0, duration: 0.2, ease: 'power2.inOut' });
+			});
+		}
 	});
 </script>
 
 <ul class="font-medium group text-sm">
 	{#each items as { href, icon, activeIcon, label } (href)}
-		{@const isActive = pathname.endsWith(href)}
+		{@const isActive = pathname === href}
 		<NavigationItem {href} {isActive} {icon} {activeIcon} {label}>
 			{#if isActive}
 				<div
