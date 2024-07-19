@@ -16,7 +16,17 @@ export function queryParams<T extends Record<string, unknown>>(
 				value = value === 'true' ? true : false;
 			}
 			obj[k] = value as T[Extract<keyof T, string>];
+		} else if (obj[k] == null) {
+			// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+			delete obj[k];
 		}
 	}
 	return obj;
+}
+
+export function paginatedQuery<T extends { page: number; size: number }>(queryParams: T) {
+	return {
+		...queryParams,
+		offset: (queryParams.page - 1) * queryParams.size
+	};
 }
