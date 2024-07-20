@@ -8,7 +8,7 @@ class Watchable<T> {
 
 	public constructor(promise: Promise<T>) {
 		this._promise = promise;
-		promise.then(() => {
+		promise.finally(() => {
 			this._resolved = true;
 			for (const timeout of this._timeouts) {
 				clearTimeout(timeout);
@@ -29,7 +29,11 @@ class Watchable<T> {
 		if (!this._resolved) {
 			this._timeouts.push(
 				setTimeout(
-					callback,
+					() => {
+						if (!this._resolved) {
+							callback();
+						}
+					},
 					typeof input === 'number' ? input : toMillis(Duration.decode(input))
 				) as unknown as number
 			);
