@@ -10,13 +10,14 @@
 	type Props = HTMLOlAttributes;
 
 	const { ...props }: Props = $props();
+	const routes = $derived($page.data.routes?.filter((x) => x.breadcrumb === true));
 </script>
 
-{#if $page.data.routes}
+{#if routes}
 	<ol {...props} class={clsx('flex gap-2 text-sm', props.class)}>
-		{#each $page.data.routes.filter((x) => x.breadcrumb) as { meta: { title, href } }, i (href)}
+		{#each routes as { meta: { title, href } }, i (href)}
 			{@const notFirst = i !== 0}
-			{@const isLast = i === $page.data.routes.length - 1}
+			{@const isLast = i === routes.length - 1}
 			<li
 				class="flex items-center text-base-fg-3 overflow-hidden text-nowrap"
 				transition:slide={{ axis: 'x', duration: 200, easing: cubicInOut }}

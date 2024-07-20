@@ -22,7 +22,10 @@ declare global {
 			};
 		}
 		interface PageData {
-			routes?: { breadcrumb: boolean; meta: { title: string; href: string } }[];
+			routes?: (
+				| { breadcrumb?: never }
+				| { breadcrumb: true; meta: { title: string; href: string } }
+			)[];
 		}
 		// interface PageState { }
 		// interface Platform {}
