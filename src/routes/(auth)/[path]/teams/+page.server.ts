@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ isDataRequest, locals: { runtime },
 			page: 1,
 			size: 10,
 			order: '',
-			select: 'new(CreatedTime, UpdatedTime, Id, Name, Identifier)'
+			select: 'new(CreatedTime, UpdatedTime, Name, Identifier)'
 		})
 	);
 

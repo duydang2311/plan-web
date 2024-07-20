@@ -44,10 +44,10 @@
 
 	const sorted = $derived.by(() => {
 		if (!orders) return teamList;
-		return mapMaybePromise(teamList, (teams) =>
+		return mapMaybePromise(teamList, (list) =>
 			paginatedList({
 				items: orderBy(
-					teams.items,
+					list.items,
 					orders.map(
 						([x]) =>
 							(v) =>
@@ -55,9 +55,7 @@
 					),
 					orders.map(([, x]) => x)
 				),
-				size: teams.size,
-				offset: teams.offset,
-				totalCount: teams.totalCount
+				totalCount: list.totalCount
 			})
 		);
 	});
@@ -110,16 +108,17 @@
 					<Th sortable name="updatedTime">Updated</Th>
 				</Row>
 			</thead>
-			<tbody class={clsx(status === 'pending' && 'animate-pulse')}>
+			<tbody class={clsx((status === 'pending' || status === 'pending-long') && 'animate-twPulse')}>
 				{#await sorted}
 					<Row>
 						<td colspan="5">Loading teams...</td>
 					</Row>
 				{:then { items }}
 					{#if items.length}
-						{#each items as { id, createdTime, updatedTime, name, identifier }}
+						{#each items as { createdTime, updatedTime, name, identifier }}
 							<Row>
-								<td><Link href="/{$page.params['path']}/issues?teamId={id}">{name}</Link></td>
+								<td><Link href="/{$page.params['path']}/teams/{identifier}/issues">{name}</Link></td
+								>
 								<td>{identifier}</td>
 								<td>
 									{DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
