@@ -9,10 +9,21 @@
 	table-layout: auto;
 	width: 100%;
 	text-align: left;
+	border-collapse: separate;
 
-	& tr {
+	& > tbody > tr:not(:first-child) > td {
+		border-top: 1px solid var(--theme-table-border);
+	}
+
+	& > thead > tr > th {
+		background-color: var(--theme-base-1);
 		border-bottom: 1px solid var(--theme-table-border);
 	}
+}
+
+.c-table--thead {
+	position: sticky;
+	top: 0;
 }
 
 .c-table--row {

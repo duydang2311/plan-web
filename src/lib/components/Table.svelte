@@ -7,7 +7,7 @@
 	const { children, ...props }: Props = $props();
 </script>
 
-<table {...props} class={clsx('c-table', props.class)}>
+<table cellpadding={0} cellspacing={0} {...props} class={clsx('c-table', props.class)}>
 	{#if children}
 		{@render children()}
 	{/if}

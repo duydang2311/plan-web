@@ -6,14 +6,21 @@ import { ApiClientTag } from '~/lib/services/api_client.server';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url, params, isDataRequest, locals: { runtime } }) => {
+export const load: PageServerLoad = async ({
+	url,
+	params: { path },
+	parent,
+	isDataRequest,
+	locals: { runtime }
+}) => {
+	const data = await parent();
+
 	const query = paginatedQuery(
 		queryParams(url, {
-			teamId: null,
 			page: 1,
 			size: 20,
-			select: 'new(CreatedTime, UpdatedTime, Id, Title)',
-			order: null
+			select: 'new(CreatedTime, UpdatedTime, Id, OrderNumber, Title)',
+			order: 'orderNumber'
 		})
 	);
 
@@ -21,7 +28,7 @@ export const load: PageServerLoad = async ({ url, params, isDataRequest, locals:
 		Effect.gen(function* () {
 			const api = yield* ApiClientTag;
 			const response = yield* api.get('issues', {
-				query
+				query: { ...query, teamId: data.team.id }
 			});
 
 			if (response.status === 403) {
@@ -32,7 +39,7 @@ export const load: PageServerLoad = async ({ url, params, isDataRequest, locals:
 	);
 
 	if (Exit.isFailure(exit)) {
-		return redirect(302, `/${params.path}`);
+		return redirect(302, `/${path}`);
 	}
 
 	const list = runtime
@@ -48,7 +55,7 @@ export const load: PageServerLoad = async ({ url, params, isDataRequest, locals:
 		.then((v) => ({ ...v, size: query.size, offset: query.offset }));
 
 	if (Exit.isFailure(exit)) {
-		return redirect(302, `/${params.path}`);
+		return redirect(302, `/${path}`);
 	}
 
 	return {

@@ -1,12 +1,12 @@
 import { Duration } from 'effect';
 import { toMillis, type DurationInput } from 'effect/Duration';
 
-class Watchable {
-	private readonly _promise: Promise<unknown>;
+class Watchable<T> {
+	private readonly _promise: Promise<T>;
 	private _resolved = false;
 	private _timeouts: number[] = [];
 
-	public constructor(promise: Promise<unknown>) {
+	public constructor(promise: Promise<T>) {
 		this._promise = promise;
 		promise.then(() => {
 			this._resolved = true;
@@ -17,9 +17,14 @@ class Watchable {
 		});
 	}
 
-	public after(duration: DurationInput, callback: () => void): Watchable;
+	public then(callback: (value: T) => void) {
+		this._promise.then(callback);
+		return this;
+	}
+
+	public after(duration: DurationInput, callback: () => void): Watchable<T>;
 	// eslint-disable-next-line @typescript-eslint/unified-signatures
-	public after(ms: number, callback: () => void): Watchable;
+	public after(ms: number, callback: () => void): Watchable<T>;
 	public after(input: number | DurationInput, callback: () => void) {
 		if (!this._resolved) {
 			this._timeouts.push(
