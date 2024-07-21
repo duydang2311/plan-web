@@ -19,6 +19,12 @@ const config = {
 		}),
 		alias: {
 			'~': 'src'
+		},
+		csp: {
+			mode: 'nonce',
+			directives: {
+				'script-src': ['self']
+			}
 		}
 	},
 	compilerOptions: {
