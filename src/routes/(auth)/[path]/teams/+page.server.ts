@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ isDataRequest, locals: { runtime },
 	const query = paginatedQuery(
 		queryParams(url, {
 			page: 1,
-			size: 10,
+			size: 20,
 			order: '',
 			select: 'new(CreatedTime, UpdatedTime, Name, Identifier)'
 		})

@@ -85,7 +85,7 @@
 			Add team
 		</Button>
 	</div>
-	<div class="relative flex flex-col justify-between grow">
+	<div class="relative flex flex-col justify-between grow overflow-auto">
 		{#if status === 'pending-long'}
 			<div
 				transition:fade={{ easing: circInOut }}
@@ -100,6 +100,12 @@
 			</div>
 		{/if}
 		<Table>
+			<colgroup>
+				<col class="w-1/3" />
+				<col />
+				<col />
+				<col />
+			</colgroup>
 			<thead>
 				<Row class="*:py-2">
 					<Th sortable name="name">Name</Th>
@@ -111,7 +117,7 @@
 			<tbody class={clsx((status === 'pending' || status === 'pending-long') && 'animate-twPulse')}>
 				{#await sorted}
 					<Row>
-						<td colspan="5">Loading teams...</td>
+						<td colspan="4">Loading teams...</td>
 					</Row>
 				{:then { items }}
 					{#if items.length}
@@ -130,14 +136,16 @@
 						{/each}
 					{:else}
 						<Row>
-							<td colspan="5">No active teams yet.</td>
+							<td colspan="4">No active teams yet.</td>
 						</Row>
 					{/if}
 				{/await}
 			</tbody>
 		</Table>
 		{#await teamList then { items, size, offset, totalCount }}
-			<div class="flex justify-between items-center px-8 py-4">
+			<div
+				class="rounded-b-md bg-base-1/60 border-t border-t-[var(--theme-table-border)] backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+			>
 				<span class="text-base-fg-3 text-sm font-bold">
 					Displaying {offset + 1} - {offset + items.length} out of {totalCount} teams.
 				</span>

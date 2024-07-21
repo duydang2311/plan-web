@@ -24,10 +24,10 @@
 </svelte:head>
 
 <div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 p-2 pl-0">
-	<aside class="items-stretch w-60 px-4 py-2 space-y-4">
+	<aside class="items-stretch px-4 py-2 space-y-4 md:min-w-32 lg:min-w-60">
 		<div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
 			<Logo class="h-8 w-auto" />
-			<p>plan</p>
+			<p class="hidden md:block">plan</p>
 		</div>
 		<hr class="-mx-4 text-base-border" />
 		<Navigation

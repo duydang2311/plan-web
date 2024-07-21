@@ -38,7 +38,7 @@
 				.after('1 second', () => {
 					status = 'pending-long';
 				})
-				.finally(async () => {
+				.finally(() => {
 					status = undefined;
 				});
 		} else {
@@ -52,7 +52,7 @@
 		<p>Filter</p>
 		<Button
 			as="link"
-			href="teams/new"
+			href="/{$page.params['path']}/teams/{$page.params['identifier']}/issues/new"
 			variant="base"
 			outline
 			size="sm"
@@ -77,6 +77,12 @@
 			</div>
 		{/if}
 		<Table>
+			<colgroup>
+				<col class="w-24" />
+				<col class="lg:w-1/2" />
+				<col />
+				<col />
+			</colgroup>
 			<THead>
 				<Row class="*:py-2 border-b-red-500">
 					<Th sortable name="title" colspan={2}>Title</Th>
@@ -93,7 +99,7 @@
 					{#if items.length}
 						{#each items as { id, createdTime, updatedTime, orderNumber, title }}
 							<Row>
-								<td class="w-0">
+								<td>
 									<div class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center">
 										{data.team.identifier}-{orderNumber}
 									</div>

@@ -36,7 +36,7 @@
 				aria-hidden={isActive}
 			/>
 		</div>
-		<span>{label}</span>
+		<span class="hidden md:inline">{label}</span>
 		{@render children()}
 	</a>
 </li>

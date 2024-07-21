@@ -43,7 +43,7 @@
 	const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-<main class="max-w-screen-lg mx-auto p-8 space-y-8">
+<main class="max-w-screen-lg mx-auto p-8 space-y-8 max-h-full overflow-auto">
 	<div>
 		<h2>Create a new issue</h2>
 		<p class="mb-4">Create a new issue to manage separate cycles, workflows and notifications.</p>
