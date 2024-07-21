@@ -43,3 +43,11 @@
 		}
 	}
 }
+
+p.is-editor-empty:first-child::before {
+	color: theme('colors.base[fg-1]/0.4');
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}
