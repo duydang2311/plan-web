@@ -54,11 +54,11 @@
 <main class="px-8 py-16">
 	<div class="w-full mx-auto">
 		<LogoType class="h-24 mx-auto" />
-		<div class="transition-enforcement justify-center overflow-hidden">
+		<div class="transition-enforcement overflow-hidden">
 			{#if form?.email}
 				<div
 					in:fly={{ y: '15%', duration: 800, easing: circInOut }}
-					class="mt-8 text-center text-balance prose"
+					class="mt-8 mx-auto text-center text-balance prose"
 				>
 					<Success email={form.email} />
 				</div>
