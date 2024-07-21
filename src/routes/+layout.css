@@ -25,7 +25,7 @@
 		--font-family-display: 'Manrope', InterDisplay, var(--font-family-base);
 		--font-family-body: 'Manrope', Inter, var(--font-family-base);
 		--typo-scale: 1.2;
-		--font-size-sm: calc(var(--font-size-p) / var(--typo-scale));
+		--font-size-sm: 0.8125rem;
 		--font-size-p: 0.9375rem;
 		--font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
 		--font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
@@ -46,6 +46,17 @@
 		font-feature-settings:
 			'liga' 1,
 			'calt' 1; /* fix for Chrome */
+	}
+
+	.prose {
+		--typo-scale: 1.0625;
+		--font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
+		--font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
+		--font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
+		--font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
+		--font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
+		--font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+		--font-size-title: var(--font-size-h5);
 	}
 
 	@supports (font-variation-settings: normal) {
@@ -115,12 +126,4 @@
 	hr {
 		border-color: var(--theme-base-border);
 	}
-}
-
-p.is-editor-empty:first-child::before {
-	color: theme('colors.base[fg-1]/0.4');
-	content: attr(data-placeholder);
-	float: left;
-	height: 0;
-	pointer-events: none;
 }
