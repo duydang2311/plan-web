@@ -22,8 +22,8 @@ export default withAnimations({
 				title: 'var(--font-size-title)'
 			},
 			maxWidth: {
-				'paragraph-sm': '50ch',
-				'paragraph-lg': '70ch'
+				'paragraph-sm': '24rem',
+				'paragraph-lg': '48rem'
 			},
 			colors: {
 				primary: {
@@ -79,7 +79,10 @@ export default withAnimations({
 						'--tw-prose-body': 'var(--theme-base-fg-2)',
 						'--tw-prose-bold': 'var(--theme-base-fg-2)',
 						'--tw-prose-links': 'var(--theme-base-fg-3)',
-						'--tw-prose-hr': 'var(--theme-base-border)'
+						'--tw-prose-hr': 'var(--theme-base-border)',
+						'--tw-prose-code': 'var(--theme-base-fg-1)',
+						'--tw-prose-pre-code': 'var(--theme-base-fg-1)',
+						'--tw-prose-pre-bg': 'var(--theme-base-3)'
 					}
 				}
 			})
