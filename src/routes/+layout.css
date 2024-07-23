@@ -126,4 +126,15 @@
 	hr {
 		border-color: var(--theme-base-border);
 	}
+
+	::-webkit-scrollbar {
+		width: theme('width[2]');
+		height: theme('width[1]');
+	}
+
+	::-webkit-scrollbar-thumb {
+		border: theme('width[0.5]') solid var(--theme-base-1);
+		border-radius: theme('borderRadius[full]');
+		background: color-mix(in oklch, var(--theme-base-fg-2) 30%, var(--theme-base-1));
+	}
 }
