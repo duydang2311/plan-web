@@ -42,6 +42,10 @@
 			background-color: color-mix(in oklch, var(--theme-base-border) 80%, var(--theme-base-1));
 		}
 	}
+
+	.c-tiptap--editor {
+		@apply max-w-none min-h-full focus:outline-none;
+	}
 }
 
 p.is-editor-empty:first-child::before {

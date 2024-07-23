@@ -38,7 +38,7 @@
 				element,
 				editorProps: {
 					attributes: {
-						class: 'prose max-w-none min-h-full focus:outline-none'
+						class: clsx('c-tiptap--editor prose', props.class)
 					}
 				},
 				extensions: [
