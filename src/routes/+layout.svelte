@@ -13,7 +13,8 @@
 	}
 
 	onMount(() => {
-		if (localStorage.getItem('theme') === 'system') {
+		const theme = localStorage.getItem('theme');
+		if (!theme || theme === 'system') {
 			const media = window.matchMedia('(prefers-color-scheme: dark)');
 			media.addEventListener('change', onColorSchemePreferenceChange);
 			return () => {
