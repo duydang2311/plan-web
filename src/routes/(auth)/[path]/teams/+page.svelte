@@ -18,6 +18,7 @@
 	import { mapMaybePromise } from '~/lib/utils/promise';
 	import type { PageData } from './$types';
 	import Link from '~/lib/components/Link.svelte';
+	import THead from '~/lib/components/THead.svelte';
 
 	const { data }: { data: PageData } = $props();
 	let teamList = $state(data.teamList);
@@ -106,14 +107,14 @@
 				<col />
 				<col />
 			</colgroup>
-			<thead>
+			<THead>
 				<Row class="*:py-2">
 					<Th sortable name="name">Name</Th>
 					<Th sortable name="identifier">Identifier</Th>
 					<Th sortable name="createdTime">Created</Th>
 					<Th sortable name="updatedTime">Updated</Th>
 				</Row>
-			</thead>
+			</THead>
 			<tbody class={clsx((status === 'pending' || status === 'pending-long') && 'animate-twPulse')}>
 				{#await sorted}
 					<Row>
