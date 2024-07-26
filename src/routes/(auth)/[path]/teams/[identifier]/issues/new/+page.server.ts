@@ -12,7 +12,6 @@ export const actions: Actions = {
 				Effect.gen(function* () {
 					const formData = yield* Effect.tryPromise(() => request.formData());
 					const input = validate(decode(formData));
-					console.log(input);
 					if (!input.ok) {
 						return yield* Effect.fail(fail(400, { errors: input.errors }));
 					}
