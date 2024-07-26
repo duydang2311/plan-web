@@ -82,7 +82,8 @@ export default withAnimations({
 						'--tw-prose-hr': 'var(--theme-base-border)',
 						'--tw-prose-code': 'var(--theme-base-fg-1)',
 						'--tw-prose-pre-code': 'var(--theme-base-fg-1)',
-						'--tw-prose-pre-bg': 'var(--theme-base-3)'
+						'--tw-prose-pre-bg': 'var(--theme-base-3)',
+						'--tw-prose-quotes': 'var(--theme-base-fg-3)'
 					}
 				}
 			})
