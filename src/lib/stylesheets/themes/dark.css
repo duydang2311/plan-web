@@ -18,6 +18,7 @@
 	--theme-base-fg-1: var(--color-fg-1);
 	--theme-base-fg-2: var(--color-fg-2);
 	--theme-base-fg-3: var(--color-fg-3);
+	--theme-base-fg-disabled: color-mix(in oklch, var(--theme-base-fg-1) 20%, var(--theme-base-1));
 	--theme-base-border: oklch(from var(--color-bg) calc(l + 0.1) c h);
 
 	--theme-primary-1: var(--color-brand);

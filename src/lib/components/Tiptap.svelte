@@ -15,9 +15,10 @@
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		editor?: Editor;
 		placeholder?: string;
+		containerProps?: HTMLAttributes<HTMLDivElement>;
 	}
 
-	let { editor = $bindable(), placeholder, ...props }: Props = $props();
+	let { editor = $bindable(), placeholder, containerProps, ...props }: Props = $props();
 
 	let element = $state<HTMLDivElement>();
 	let editors = $state.frozen<[Editor]>();
@@ -68,7 +69,7 @@
 	});
 </script>
 
-<div {...props} class="w-full border border-base-border rounded-md h-full">
+<div {...containerProps} class={clsx('c-tiptap', containerProps?.class)}>
 	<div
 		class="bg-base-2 border-b border-b-base-border px-4 py-1 rounded-t-md overflow-hidden"
 		bind:this={toolbar}
