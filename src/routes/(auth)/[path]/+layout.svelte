@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Snippet } from 'svelte';
-	import { sineIn, sineOut } from 'svelte/easing';
-	import { fly } from 'svelte/transition';
 	import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
 	import Logo from '~/lib/components/Logo.svelte';
 	import type { LayoutData } from './$types';
 	import Navigation from './Navigation.svelte';
+	import { gsap } from 'gsap';
 
 	const { children, data }: { children: Snippet; data: LayoutData } = $props();
 	const route = $derived.by(() => {
@@ -15,6 +14,19 @@
 			return route;
 		}
 	});
+
+	function transitateIn(node: Element) {
+		gsap.from(node, {
+			opacity: 0,
+			y: '0.1rem',
+			scale: 0.995,
+			duration: 0.3,
+			ease: 'power2.out'
+		});
+		return {
+			duration: 300
+		};
+	}
 </script>
 
 <svelte:head>
@@ -53,11 +65,7 @@
 		<Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
 		<div class="transition-enforcement overflow-hidden">
 			{#key data.pathname.split('/', 3).join('')}
-				<div
-					in:fly={{ duration: 200, x: -4, easing: sineIn }}
-					out:fly={{ duration: 200, x: 2, easing: sineOut }}
-					class="overflow-hidden"
-				>
+				<div class="overflow-hidden" in:transitateIn>
 					{@render children()}
 				</div>
 			{/key}
