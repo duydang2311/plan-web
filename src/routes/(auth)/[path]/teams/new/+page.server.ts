@@ -28,7 +28,7 @@ export const actions: Actions = {
 					}
 
 					return yield* Effect.tryPromise(() =>
-						response.json<{ id: string; idenfitier: string }>()
+						response.json<{ id: string; identifier: string }>()
 					);
 				}),
 				Effect.catchTags({
@@ -43,6 +43,6 @@ export const actions: Actions = {
 		if (Exit.isFailure(exit)) {
 			return exit.cause.pipe(Cause.failureOption, Option.getOrNull);
 		}
-		return redirect(302, `/${params.path}/teams/${exit.value.idenfitier}`);
+		return redirect(302, `/${params.path}/teams/${exit.value.identifier}`);
 	}
 };
