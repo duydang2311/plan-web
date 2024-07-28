@@ -34,3 +34,29 @@ export function paginatedQuery<T extends { page: number; size: number }>(queryPa
 		offset: (queryParams.page - 1) * queryParams.size
 	};
 }
+
+export function fluentSearchParams(input: URL | URLSearchParams) {
+	return new FluentSearchParams(input instanceof URL ? input.searchParams : input);
+}
+
+class FluentSearchParams {
+	private _searchParams: URLSearchParams;
+
+	public constructor(searchParams: URLSearchParams) {
+		this._searchParams = new URLSearchParams(searchParams);
+	}
+
+	set(name: string, value: string) {
+		this._searchParams.set(name, value);
+		return this;
+	}
+
+	delete(name: string) {
+		this._searchParams.delete(name);
+		return this;
+	}
+
+	toString() {
+		return `?${this._searchParams.toString()}`;
+	}
+}
