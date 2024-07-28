@@ -20,7 +20,7 @@ export const load: LayoutServerLoad = async ({ params, locals: { runtime } }) =>
 					});
 				}
 
-				return yield* Effect.tryPromise(() => response.json<{ title: string }>());
+				return yield* Effect.tryPromise(() => response.json<{ authorId: string; title: string }>());
 			}),
 			Effect.catchTags({
 				ApiError: (e) =>

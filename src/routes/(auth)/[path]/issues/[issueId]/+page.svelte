@@ -2,16 +2,16 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { Editor } from '@tiptap/core';
-	import DOMPurify from 'isomorphic-dompurify';
 	import Button from '~/lib/components/Button.svelte';
 	import Icon from '~/lib/components/Icon.svelte';
 	import Tiptap from '~/lib/components/Tiptap.svelte';
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData, PageData } from './$types';
 	import Comment from './Comment.svelte';
+	import Description from './Description.svelte';
 	import { validate } from './utils';
 
-	const { data }: { data: PageData; form: ActionData } = $props();
+	const { data, form }: { data: PageData; form: ActionData } = $props();
 	let editor = $state<Editor>();
 	let validation = $state<ValidationResult>();
 
@@ -31,14 +31,7 @@
 		</span>
 	</h4>
 	<div class="relative mx-auto max-w-paragraph-lg p-4">
-		<div class="prose max-w-full pb-4 border-b border-b-base-border">
-			{#if data.issue.description && data.issue.description !== '<p></p>'}
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html DOMPurify.sanitize(data.issue.description, { USE_PROFILES: { html: true } })}
-			{:else}
-				<p class="text-base-fg-3"><i>No description.</i></p>
-			{/if}
-		</div>
+		<Description {form} isEditing={data.isEditing} description={data.issue.description} />
 		<h6 class="mt-4 font-bold">Activity</h6>
 		{#await data.commentList then list}
 			{#if list.items.length}
@@ -54,6 +47,7 @@
 		<div class="sticky mt-8 bottom-2">
 			<form
 				method="post"
+				action="?/comment"
 				class="space-y-2"
 				use:enhance={(e) => {
 					if (!editor) {

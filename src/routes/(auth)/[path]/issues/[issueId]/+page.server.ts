@@ -1,20 +1,27 @@
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { ApiClientTag } from '~/lib/services/api_client.server';
-import type { PageServerLoad } from './$types';
-import { decode, validate } from './utils';
+import type { PageServerLoad, Actions } from './$types';
+import { decode, decodeEditDescription, validate, validateEditDescription } from './utils';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { IssueComment } from '~/lib/models/issue_comment';
+import { queryParams } from '~/lib/utils/url';
 
-export const load: PageServerLoad = async ({ params, isDataRequest, locals: { runtime } }) => {
+export const load: PageServerLoad = async ({
+	params,
+	url,
+	isDataRequest,
+	locals: { runtime, user }
+}) => {
+	const query = queryParams(url, { edit: false });
 	const exit = await runtime.runPromiseExit(
 		pipe(
 			Effect.gen(function* () {
 				const api = yield* ApiClientTag;
 				const response = yield* api.get(`issues/${params.issueId}`, {
-					query: { select: 'CreatedTime, UpdatedTime, Title, Description, OrderNumber' }
+					query: { select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber' }
 				});
 				if (!response.ok) {
 					return yield* Effect.fail<void>(void 0);
@@ -46,19 +53,21 @@ export const load: PageServerLoad = async ({ params, isDataRequest, locals: { ru
 
 	return {
 		issue: exit.value,
-		commentList: isDataRequest ? commentList : await commentList
+		isAuthor: exit.value.authorId === user.id,
+		commentList: isDataRequest ? commentList : await commentList,
+		isEditing: query.edit
 	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals: { runtime } }) => {
+	comment: async ({ request, locals: { runtime } }) => {
 		const exit = await runtime.runPromiseExit(
 			pipe(
 				Effect.gen(function* () {
 					const formData = yield* Effect.tryPromise(() => request.formData());
 					const validation = validate(decode(formData));
 					if (!validation.ok) {
-						return yield* Effect.fail(fail(400, { errors: validation.errors }));
+						return yield* Effect.fail({ status: 400, errors: validation.errors });
 					}
 
 					const api = yield* ApiClientTag;
@@ -70,28 +79,78 @@ export const actions: Actions = {
 						if (response.status === 400) {
 							const json = yield* Effect.tryPromise(() => response.json());
 							const problemDetails = yield* validateProblemDetailsEffect(json);
-							return yield* Effect.fail(
-								fail(400, { errors: flattenProblemDetails(problemDetails) })
-							);
+							return yield* Effect.fail({
+								status: 400,
+								errors: flattenProblemDetails(problemDetails)
+							});
 						}
-						return yield* Effect.fail(
-							fail(response.status, { errors: { root: [response.status + ''] } })
-						);
+						return yield* Effect.fail({
+							status: response.status,
+							errors: { root: [response.status + ''] }
+						});
 					}
 
 					return yield* Effect.succeed<void>(void 0);
 				}),
 				Effect.catchTags({
-					ApiError: (e) => Effect.fail(fail(400, { errors: { root: [e.code] } })),
-					UnknownException: () => Effect.fail(fail(400, { errors: { root: ['unknown'] } }))
+					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
+					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
 				})
 			)
 		);
 
 		if (Exit.isFailure(exit)) {
-			return pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+			const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+			return fail(failure.status, {
+				comment: { errors: failure.errors as Record<string, string[]> }
+			});
 		}
 
-		return { success: true };
+		return { comment: { success: true } };
+	},
+	'edit-description': async ({ request, params, url, locals: { runtime } }) => {
+		const exit = await runtime.runPromiseExit(
+			pipe(
+				Effect.gen(function* () {
+					const formData = yield* Effect.tryPromise(() => request.formData());
+					const validation = validateEditDescription(decodeEditDescription(formData));
+
+					if (!validation.ok) {
+						return yield* Effect.fail({ status: 400, errors: validation.errors });
+					}
+
+					const api = yield* ApiClientTag;
+					const response = yield* api.patch(`issues/${validation.data.issueId}`, {
+						body: {
+							patch: [{ op: 'replace', path: '/Description', value: validation.data.description }]
+						}
+					});
+
+					if (!response.ok) {
+						if (response.status === 400) {
+							const json = yield* Effect.tryPromise(() => response.json());
+							const problem = yield* validateProblemDetailsEffect(json);
+							return yield* Effect.fail({ status: 400, errors: flattenProblemDetails(problem) });
+						}
+						return yield* Effect.fail({ status: 400, errors: { root: [response.status + ''] } });
+					}
+
+					return yield* Effect.succeed<void>(void 0);
+				}),
+				Effect.catchTags({
+					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
+					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
+				})
+			)
+		);
+
+		if (Exit.isFailure(exit)) {
+			const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+			return fail(failure.status, {
+				editDescription: { errors: failure.errors as Record<string, string[]> }
+			});
+		}
+
+		return redirect(302, `/${params.path}/issues/${params.issueId}`);
 	}
 };

@@ -17,7 +17,6 @@
 		"@tiptap/extension-underline": "^2.5.7",
 		"@tiptap/pm": "^2.5.7",
 		"@tiptap/starter-kit": "^2.5.7",
-		"@types/dompurify": "^3.0.5",
 		"@types/eslint": "^9.6.0",
 		"@types/eslint__js": "^8.42.3",
 		"@types/jsonwebtoken": "^9.0.6",

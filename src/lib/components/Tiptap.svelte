@@ -7,18 +7,19 @@
 	import clsx from 'clsx';
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Icon from './Icon.svelte';
 	import TiptapButton from './TiptapButton.svelte';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		editor?: Editor;
+		content?: string;
 		placeholder?: string;
 		containerProps?: HTMLAttributes<HTMLDivElement>;
 	}
 
-	let { editor = $bindable(), placeholder, containerProps, ...props }: Props = $props();
+	let { editor = $bindable(), content, placeholder, containerProps, ...props }: Props = $props();
 
 	let element = $state<HTMLDivElement>();
 	let editors = $state.frozen<[Editor]>();
@@ -33,10 +34,10 @@
 	});
 
 	onMount(() => {
-		const state = Flip.getState(toolbar!, { simple: true });
 		editors = [
 			new Editor({
 				element,
+				content,
 				editorProps: {
 					attributes: {
 						class: clsx('c-tiptap--editor prose', props.class)
@@ -55,14 +56,6 @@
 			})
 		];
 
-		tick().then(() => {
-			Flip.from(state, {
-				targets: toolbar,
-				duration: 0.2,
-				ease: 'power1.inOut'
-			});
-		});
-
 		return () => {
 			editors![0].destroy();
 		};
@@ -74,11 +67,8 @@
 		class="bg-base-2 border-b border-b-base-border px-4 py-1 rounded-t-md overflow-hidden"
 		bind:this={toolbar}
 	>
-		{#if editors?.[0]}
-			<ul
-				class="flex items-center gap-1 animate-fadeIn animate-duration-200 text-sm"
-				data-flip-id="toolbar"
-			>
+		<ul class="flex items-center min-h-12 gap-1 text-sm" data-flip-id="toolbar">
+			{#if editors?.[0]}
 				<li>
 					<TiptapButton
 						onclick={() => editors![0].chain().focus().toggleBold().run()}
@@ -167,18 +157,13 @@
 						<Icon name="quotes" />
 					</TiptapButton>
 				</li>
-			</ul>
-		{/if}
+			{/if}
+		</ul>
 	</div>
 
 	<div
 		bind:this={element}
 		{...props}
-		class={clsx(
-			'c-tiptap--textarea',
-			'relative',
-			editor ? 'animate-fadeIn animate-duration-200' : 'opacity-0',
-			props.class
-		)}
+		class={clsx('c-tiptap--textarea', 'relative', props.class)}
 	></div>
 </div>
