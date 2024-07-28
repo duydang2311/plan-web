@@ -3,7 +3,14 @@ import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { ApiClientTag } from '~/lib/services/api_client.server';
 import type { PageServerLoad, Actions } from './$types';
-import { decode, decodeEditDescription, validate, validateEditDescription } from './utils';
+import {
+	decode,
+	decodeEditComment,
+	decodeEditDescription,
+	validate,
+	validateEditComment,
+	validateEditDescription
+} from './utils';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { IssueComment } from '~/lib/models/issue_comment';
@@ -15,7 +22,7 @@ export const load: PageServerLoad = async ({
 	isDataRequest,
 	locals: { runtime, user }
 }) => {
-	const query = queryParams(url, { edit: false });
+	const query = queryParams(url, { 'edit-desc': false, 'edit-comment': null as unknown as string });
 	const exit = await runtime.runPromiseExit(
 		pipe(
 			Effect.gen(function* () {
@@ -41,7 +48,7 @@ export const load: PageServerLoad = async ({
 			Effect.gen(function* () {
 				const api = yield* ApiClientTag;
 				const response = yield* api.get(`issues/${params.issueId}/comments`, {
-					query: { select: 'CreatedTime, UpdatedTime, Content' }
+					query: { select: 'CreatedTime, UpdatedTime, Content, AuthorId' }
 				});
 				if (!response.ok) {
 					return yield* Effect.succeed(paginatedList<IssueComment>());
@@ -52,10 +59,12 @@ export const load: PageServerLoad = async ({
 		.then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<IssueComment>()));
 
 	return {
+		user,
 		issue: exit.value,
 		isAuthor: exit.value.authorId === user.id,
 		commentList: isDataRequest ? commentList : await commentList,
-		isEditing: query.edit
+		isEditing: query['edit-desc'],
+		editingCommentId: query['edit-comment']
 	};
 };
 
@@ -108,7 +117,7 @@ export const actions: Actions = {
 
 		return { comment: { success: true } };
 	},
-	'edit-description': async ({ request, params, url, locals: { runtime } }) => {
+	'edit-description': async ({ request, params, locals: { runtime } }) => {
 		const exit = await runtime.runPromiseExit(
 			pipe(
 				Effect.gen(function* () {
@@ -123,6 +132,51 @@ export const actions: Actions = {
 					const response = yield* api.patch(`issues/${validation.data.issueId}`, {
 						body: {
 							patch: [{ op: 'replace', path: '/Description', value: validation.data.description }]
+						}
+					});
+
+					if (!response.ok) {
+						if (response.status === 400) {
+							const json = yield* Effect.tryPromise(() => response.json());
+							const problem = yield* validateProblemDetailsEffect(json);
+							return yield* Effect.fail({ status: 400, errors: flattenProblemDetails(problem) });
+						}
+						return yield* Effect.fail({ status: 400, errors: { root: [response.status + ''] } });
+					}
+
+					return yield* Effect.succeed<void>(void 0);
+				}),
+				Effect.catchTags({
+					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
+					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
+				})
+			)
+		);
+
+		if (Exit.isFailure(exit)) {
+			const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+			return fail(failure.status, {
+				editDescription: { errors: failure.errors as Record<string, string[]> }
+			});
+		}
+
+		return redirect(302, `/${params.path}/issues/${params.issueId}`);
+	},
+	'edit-comment': async ({ request, params, locals: { runtime } }) => {
+		const exit = await runtime.runPromiseExit(
+			pipe(
+				Effect.gen(function* () {
+					const formData = yield* Effect.tryPromise(() => request.formData());
+					const validation = validateEditComment(decodeEditComment(formData));
+
+					if (!validation.ok) {
+						return yield* Effect.fail({ status: 400, errors: validation.errors });
+					}
+
+					const api = yield* ApiClientTag;
+					const response = yield* api.patch(`issue-comments/${validation.data.issueCommentId}`, {
+						body: {
+							patch: [{ op: 'replace', path: '/Content', value: validation.data.content }]
 						}
 					});
 

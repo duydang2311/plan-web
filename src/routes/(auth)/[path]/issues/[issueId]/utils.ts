@@ -40,6 +40,27 @@ export const validateEditDescription = validator<{ issueId: string; description:
 	}
 );
 
+export const validateEditComment = validator<{ issueCommentId: string; content: string }>(
+	(input, { error }) => {
+		if (typeof input !== 'object' || !input) {
+			return error('root', 'object');
+		}
+		if (!('issueCommentId' in input) || typeof input.issueCommentId !== 'string') {
+			return error('issueCommentId', 'string');
+		}
+
+		if (!('content' in input) || typeof input.content !== 'string') {
+			return error('content', 'string');
+		}
+		const content = input.content.trim();
+		if (content.length === 0) {
+			return error('content', 'string');
+		}
+
+		input.content = content;
+	}
+);
+
 export function decode(formData: FormData) {
 	return {
 		issueId: formData.get('issueId'),
@@ -51,5 +72,12 @@ export function decodeEditDescription(formData: FormData) {
 	return {
 		issueId: formData.get('issueId'),
 		description: formData.get('description')
+	};
+}
+
+export function decodeEditComment(formData: FormData) {
+	return {
+		issueCommentId: formData.get('issueCommentId'),
+		content: formData.get('content')
 	};
 }

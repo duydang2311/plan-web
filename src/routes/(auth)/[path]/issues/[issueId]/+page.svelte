@@ -10,6 +10,7 @@
 	import Comment from './Comment.svelte';
 	import Description from './Description.svelte';
 	import { validate } from './utils';
+	import { browser } from '$app/environment';
 
 	const { data, form }: { data: PageData; form: ActionData } = $props();
 	let editor = $state<Editor>();
@@ -38,7 +39,11 @@
 				<ol class="mt-4 space-y-8 pt-2">
 					{#each list.items as comment}
 						<li class="w-full">
-							<Comment {comment} />
+							<Comment
+								{comment}
+								isAuthor={comment.authorId === data.user.id}
+								isEditing={comment.id === data.editingCommentId}
+							/>
 						</li>
 					{/each}
 				</ol>

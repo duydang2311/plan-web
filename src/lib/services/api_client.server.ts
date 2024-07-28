@@ -69,7 +69,7 @@ export class HttpApiClient implements ApiClient {
 		path: string,
 		init?: ApiClientFetchRequestInit | undefined
 	): Effect.Effect<Response, ApiError> {
-		return this.fetch(path, { method: 'patch', ...init });
+		return this.fetch(path, { method: 'PATCH', ...init });
 	}
 
 	private _buildUrl(path: string, query?: RequestRecord) {
