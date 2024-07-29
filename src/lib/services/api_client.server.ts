@@ -20,6 +20,7 @@ export interface ApiClient {
 	post(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 	head(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 	patch(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
+	delete(path: string, init?: ApiClientFetchRequestInit): Effect.Effect<Response, ApiError>;
 }
 
 export class ApiClientTag extends Context.Tag('ApiClient')<ApiClientTag, ApiClient>() {}
@@ -70,6 +71,13 @@ export class HttpApiClient implements ApiClient {
 		init?: ApiClientFetchRequestInit | undefined
 	): Effect.Effect<Response, ApiError> {
 		return this.fetch(path, { method: 'PATCH', ...init });
+	}
+
+	delete(
+		path: string,
+		init?: ApiClientFetchRequestInit | undefined
+	): Effect.Effect<Response, ApiError> {
+		return this.fetch(path, { method: 'delete', ...init });
 	}
 
 	private _buildUrl(path: string, query?: RequestRecord) {

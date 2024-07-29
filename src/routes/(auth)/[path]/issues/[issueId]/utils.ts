@@ -61,6 +61,15 @@ export const validateEditComment = validator<{ issueCommentId: string; content: 
 	}
 );
 
+export const validateDeleteIssue = validator<{ issueId: string }>((input, { error }) => {
+	if (typeof input !== 'object' || !input) {
+		return error('root', 'object');
+	}
+	if (!('issueId' in input) || typeof input.issueId !== 'string') {
+		return error('issueId', 'string');
+	}
+});
+
 export function decode(formData: FormData) {
 	return {
 		issueId: formData.get('issueId'),
@@ -79,5 +88,11 @@ export function decodeEditComment(formData: FormData) {
 	return {
 		issueCommentId: formData.get('issueCommentId'),
 		content: formData.get('content')
+	};
+}
+
+export function decodeDeleteIssue(formData: FormData) {
+	return {
+		issueId: formData.get('issueId')
 	};
 }

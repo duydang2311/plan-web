@@ -5,6 +5,7 @@
 
 	interface Props {
 		defaultOpen?: boolean;
+		role?: 'dialog' | 'alertdialog';
 		onclose?: () => void;
 		children?: Snippet<
 			[
@@ -26,11 +27,12 @@
 	type Close = Parameters<Parameters<typeof close.subscribe>[0]>[0];
 	type Overlay = Parameters<Parameters<typeof overlay.subscribe>[0]>[0];
 
-	const { defaultOpen, children, open: __open, onclose }: Props = $props();
+	const { defaultOpen, children, open: __open, role, onclose }: Props = $props();
 	const {
 		elements: { overlay, content, title, description, close, portalled },
 		states: { open }
 	} = createDialog({
+		role,
 		forceVisible: true,
 		defaultOpen,
 		open: __open,

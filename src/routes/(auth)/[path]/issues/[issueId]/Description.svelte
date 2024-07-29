@@ -6,18 +6,24 @@
 	import { enhance } from '$app/forms';
 	import { Editor } from '@tiptap/core';
 	import type { ActionData } from './$types';
-	import { slideIn, slideOut } from './transitions';
+	import { scaleIn, scaleOut, slideIn, slideOut } from './transitions';
 	import { fluentSearchParams } from '~/lib/utils/url';
+	import Dialog from '~/lib/components/Dialog.svelte';
+	import { melt } from '@melt-ui/svelte';
+	import type { Issue } from '~/lib/models/issue';
+	import { fade } from 'svelte/transition';
+	import { writable } from 'svelte/store';
 
 	interface Props {
 		form: ActionData;
 		isEditing: boolean;
-		description?: string;
+		issue: Issue;
 	}
 
-	const { isEditing, description }: Props = $props();
+	const { isEditing, issue }: Props = $props();
 	const cancelHref = $derived(fluentSearchParams($page.url).delete('edit-desc').toString());
 	const editHref = $derived(fluentSearchParams($page.url).set('edit-desc', '').toString());
+	const open = writable(false);
 	let editor = $state<Editor>();
 </script>
 
@@ -36,16 +42,13 @@
 						}
 
 						e.formData.set('description', editor.getHTML());
-						return async ({ update }) => {
-							await update();
-						};
 					}}
 				>
 					<input type="hidden" name="issueId" value={$page.params['issueId']} />
 					<Tiptap
 						bind:editor
 						name="description"
-						content={description}
+						content={issue.description}
 						containerProps={{ class: 'pb-8' }}
 					/>
 					<div class="absolute right-2 bottom-2 flex gap-2">
@@ -58,18 +61,70 @@
 			</div>
 		{:else}
 			<div in:slideIn out:slideOut>
-				{#if description && description !== '<p></p>'}
+				{#if issue.description && issue.description !== '<p></p>'}
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html DOMPurify.sanitize(description, { USE_PROFILES: { html: true } })}
+					{@html DOMPurify.sanitize(issue.description, { USE_PROFILES: { html: true } })}
 				{:else}
 					<p class="text-base-fg-3"><i>No description.</i></p>
 				{/if}
 			</div>
 		{/if}
 	</div>
-	<div class="mt-8">
+	<div class="mt-8 flex gap-2">
 		<Button as="link" href={editHref} variant="base" filled={false} size="sm" class="w-fit">
 			Edit
 		</Button>
+		<Button
+			variant="negative"
+			filled={false}
+			size="sm"
+			onclick={() => {
+				$open = true;
+			}}
+			class="w-fit">Delete</Button
+		>
 	</div>
 </div>
+
+<Dialog
+	role="alertdialog"
+	{open}
+	defaultOpen={true}
+	onclose={() => {
+		$open = false;
+	}}
+>
+	{#snippet children({ overlay, content, title, close })}
+		<div
+			transition:fade|global={{ duration: 200 }}
+			use:melt={overlay}
+			class="fixed inset-0 bg-black/20"
+		></div>
+		<div
+			in:scaleIn|global
+			out:scaleOut|global
+			use:melt={content}
+			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border"
+		>
+			<h4 use:melt={title}>Delete the issue</h4>
+			<p>
+				Do you want to delete <span class="font-medium">"{issue.title}"</span>?
+			</p>
+			<div class="flex gap-4 w-fit ml-auto">
+				<Button
+					as="link"
+					href={fluentSearchParams($page.url).delete('delete-issue').toString()}
+					variant="base"
+					class="w-fit"
+					filled={false}
+					outline
+					melt={close}>Cancel</Button
+				>
+				<form method="post" action="?/delete-issue" use:enhance={() => {}}>
+					<input type="hidden" name="issueId" value={$page.params['issueId']} />
+					<Button variant="negative" class="w-fit">Delete</Button>
+				</form>
+			</div>
+		</div>
+	{/snippet}
+</Dialog>

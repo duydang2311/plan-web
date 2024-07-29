@@ -27,3 +27,27 @@ export function slideOut(node: HTMLElement) {
 		duration: 300
 	};
 }
+
+export function scaleIn(node: HTMLElement) {
+	gsap.from(node, {
+		opacity: 0,
+		scale: 0.95,
+		duration: 0.2,
+		ease: 'power4.inOut'
+	});
+	return {
+		duration: 200
+	};
+}
+
+export function scaleOut(node: HTMLElement) {
+	gsap.to(node, {
+		opacity: 0,
+		scale: 0.98,
+		duration: 0.2,
+		ease: 'power4.inOut'
+	});
+	return {
+		duration: 200
+	};
+}

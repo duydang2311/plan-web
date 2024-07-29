@@ -27,10 +27,15 @@
 	--theme-primary-fg-1: var(--color-bg);
 	--theme-primary-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
 	--theme-primary-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+	--theme-primary-border: color-mix(in oklch, var(--color-brand) 15%, transparent);
 
 	--theme-negative-1: var(--color-negative);
 	--theme-negative-2: oklch(from var(--color-negative) calc(l + var(--l-step)) c h);
 	--theme-negative-3: oklch(from var(--color-negative) calc(l + var(--l-step) * 2) c h);
+	--theme-negative-fg-1: var(--color-bg);
+	--theme-negative-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
+	--theme-negative-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+	--theme-negative-border: color-mix(in oklch, var(--color-negative) 15%, transparent);
 
 	--theme-positive-1: var(--color-positive);
 	--theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
