@@ -10,7 +10,6 @@
 	import Comment from './Comment.svelte';
 	import Description from './Description.svelte';
 	import { validate } from './utils';
-	import { browser } from '$app/environment';
 
 	const { data, form }: { data: PageData; form: ActionData } = $props();
 	let editor = $state<Editor>();
@@ -25,14 +24,14 @@
 </script>
 
 <main class="relative h-full overflow-auto">
-	<h4 class="font-bold content-center border-b border-b-base-border px-8 py-2">
-		{data.issue.title}
-		<span class="text-base-fg-3/60 font-normal">
-			#{data.issue.orderNumber}
-		</span>
-	</h4>
 	<div class="relative mx-auto max-w-paragraph-lg p-4">
-		<Description {form} isEditing={data.isEditing} description={data.issue.description} />
+		<h4 class="font-bold content-center">
+			{data.issue.title}
+			<span class="text-base-fg-3/60 font-normal">
+				#{data.issue.orderNumber}
+			</span>
+		</h4>
+		<Description {form} isEditing={data.isEditing} issue={data.issue} />
 		<h6 class="mt-4 font-bold">Activity</h6>
 		{#await data.commentList then list}
 			{#if list.items.length}
@@ -60,9 +59,6 @@
 						return;
 					}
 					e.formData.set('content', editor.getHTML());
-					return async ({ update }) => {
-						await update();
-					};
 				}}
 			>
 				<input type="hidden" name="issueId" value={$page.params['issueId']} />
