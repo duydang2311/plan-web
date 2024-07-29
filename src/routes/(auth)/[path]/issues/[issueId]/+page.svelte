@@ -8,7 +8,7 @@
 	import type { ValidationResult } from '~/lib/utils/validation';
 	import type { ActionData, PageData } from './$types';
 	import Comment from './Comment.svelte';
-	import Description from './Description.svelte';
+	import Issue from './Issue.svelte';
 	import { validate } from './utils';
 
 	const { data, form }: { data: PageData; form: ActionData } = $props();
@@ -31,7 +31,7 @@
 				#{data.issue.orderNumber}
 			</span>
 		</h4>
-		<Description {form} isEditing={data.isEditing} issue={data.issue} />
+		<Issue {form} isEditing={data.isEditing} issue={data.issue} />
 		<h6 class="mt-4 font-bold">Activity</h6>
 		{#await data.commentList then list}
 			{#if list.items.length}
