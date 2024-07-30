@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import './+layout.css';
+	import Toaster from '~/lib/components/Toaster.svelte';
 
 	const { children }: { children: Snippet } = $props();
 
@@ -24,4 +25,5 @@
 	});
 </script>
 
+<Toaster />
 {@render children()}

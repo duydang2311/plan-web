@@ -13,6 +13,7 @@
 	import type { Issue } from '~/lib/models/issue';
 	import { fade } from 'svelte/transition';
 	import { writable } from 'svelte/store';
+	import { addToast } from '~/lib/components/Toaster.svelte';
 
 	interface Props {
 		form: ActionData;
@@ -96,13 +97,13 @@
 >
 	{#snippet children({ overlay, content, title, close })}
 		<div
-			transition:fade|global={{ duration: 200 }}
+			transition:fade={{ duration: 200 }}
 			use:melt={overlay}
 			class="fixed inset-0 bg-black/20"
 		></div>
 		<div
-			in:scaleIn|global
-			out:scaleOut|global
+			in:scaleIn
+			out:scaleOut
 			use:melt={content}
 			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border"
 		>
@@ -111,16 +112,24 @@
 				Do you want to delete <span class="font-medium">"{issue.title}"</span>?
 			</p>
 			<div class="flex gap-4 w-fit ml-auto">
-				<Button
-					as="link"
-					href={fluentSearchParams($page.url).delete('delete-issue').toString()}
-					variant="base"
-					class="w-fit"
-					filled={false}
-					outline
-					melt={close}>Cancel</Button
+				<Button variant="base" class="w-fit" filled={false} melt={close}>Cancel</Button>
+				<form
+					method="post"
+					action="?/delete-issue"
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							if (result.type === 'redirect') {
+								addToast({
+									data: {
+										title: 'Issue deleted',
+										description
+									}
+								});
+							}
+							await update();
+						};
+					}}
 				>
-				<form method="post" action="?/delete-issue" use:enhance={() => {}}>
 					<input type="hidden" name="issueId" value={$page.params['issueId']} />
 					<Button variant="negative" class="w-fit">Delete</Button>
 				</form>
@@ -128,3 +137,7 @@
 		</div>
 	{/snippet}
 </Dialog>
+
+{#snippet description()}
+	"<span class="font-medium">{issue.title}</span>" has been deleted.
+{/snippet}

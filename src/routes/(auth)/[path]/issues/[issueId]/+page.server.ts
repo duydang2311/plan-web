@@ -209,7 +209,7 @@ export const actions: Actions = {
 
 		return redirect(302, `/${params.path}/issues/${params.issueId}`);
 	},
-	'delete-issue': async ({ request, locals: { runtime } }) => {
+	'delete-issue': async ({ request, params, locals: { runtime } }) => {
 		const exit = await runtime.runPromiseExit(
 			pipe(
 				Effect.gen(function* () {
@@ -246,6 +246,6 @@ export const actions: Actions = {
 			});
 		}
 
-		return { deleteIssue: { success: true } };
+		return redirect(302, `/${params.path}`);
 	}
 };
