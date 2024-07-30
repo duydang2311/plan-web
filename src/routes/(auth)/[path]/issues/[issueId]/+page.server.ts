@@ -5,10 +5,12 @@ import { ApiClientTag } from '~/lib/services/api_client.server';
 import type { PageServerLoad, Actions } from './$types';
 import {
 	decode,
+	decodeDeleteComment,
 	decodeDeleteIssue,
 	decodeEditComment,
 	decodeEditDescription,
 	validate,
+	validateDeleteComment,
 	validateDeleteIssue,
 	validateEditComment,
 	validateEditDescription
@@ -24,13 +26,18 @@ export const load: PageServerLoad = async ({
 	isDataRequest,
 	locals: { runtime, user }
 }) => {
-	const query = queryParams(url, { 'edit-desc': false, 'edit-comment': null as unknown as string });
+	const query = queryParams(url, {
+		'edit-desc': false,
+		'edit-comment': null as unknown as string
+	});
 	const exit = await runtime.runPromiseExit(
 		pipe(
 			Effect.gen(function* () {
 				const api = yield* ApiClientTag;
 				const response = yield* api.get(`issues/${params.issueId}`, {
-					query: { select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber' }
+					query: {
+						select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber'
+					}
 				});
 				if (!response.ok) {
 					return yield* Effect.fail<void>(void 0);
@@ -105,7 +112,8 @@ export const actions: Actions = {
 				}),
 				Effect.catchTags({
 					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
-					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
+					UnknownException: () =>
+						Effect.fail({ status: 400, errors: { root: ['unknown'] } })
 				})
 			)
 		);
@@ -133,7 +141,13 @@ export const actions: Actions = {
 					const api = yield* ApiClientTag;
 					const response = yield* api.patch(`issues/${validation.data.issueId}`, {
 						body: {
-							patch: [{ op: 'replace', path: '/Description', value: validation.data.description }]
+							patch: [
+								{
+									op: 'replace',
+									path: '/Description',
+									value: validation.data.description
+								}
+							]
 						}
 					});
 
@@ -141,16 +155,23 @@ export const actions: Actions = {
 						if (response.status === 400) {
 							const json = yield* Effect.tryPromise(() => response.json());
 							const problem = yield* validateProblemDetailsEffect(json);
-							return yield* Effect.fail({ status: 400, errors: flattenProblemDetails(problem) });
+							return yield* Effect.fail({
+								status: 400,
+								errors: flattenProblemDetails(problem)
+							});
 						}
-						return yield* Effect.fail({ status: 400, errors: { root: [response.status + ''] } });
+						return yield* Effect.fail({
+							status: 400,
+							errors: { root: [response.status + ''] }
+						});
 					}
 
 					return yield* Effect.succeed<void>(void 0);
 				}),
 				Effect.catchTags({
 					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
-					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
+					UnknownException: () =>
+						Effect.fail({ status: 400, errors: { root: ['unknown'] } })
 				})
 			)
 		);
@@ -176,26 +197,42 @@ export const actions: Actions = {
 					}
 
 					const api = yield* ApiClientTag;
-					const response = yield* api.patch(`issue-comments/${validation.data.issueCommentId}`, {
-						body: {
-							patch: [{ op: 'replace', path: '/Content', value: validation.data.content }]
+					const response = yield* api.patch(
+						`issue-comments/${validation.data.issueCommentId}`,
+						{
+							body: {
+								patch: [
+									{
+										op: 'replace',
+										path: '/Content',
+										value: validation.data.content
+									}
+								]
+							}
 						}
-					});
+					);
 
 					if (!response.ok) {
 						if (response.status === 400) {
 							const json = yield* Effect.tryPromise(() => response.json());
 							const problem = yield* validateProblemDetailsEffect(json);
-							return yield* Effect.fail({ status: 400, errors: flattenProblemDetails(problem) });
+							return yield* Effect.fail({
+								status: 400,
+								errors: flattenProblemDetails(problem)
+							});
 						}
-						return yield* Effect.fail({ status: 400, errors: { root: [response.status + ''] } });
+						return yield* Effect.fail({
+							status: 400,
+							errors: { root: [response.status + ''] }
+						});
 					}
 
 					return yield* Effect.succeed<void>(void 0);
 				}),
 				Effect.catchTags({
 					ApiError: (e) => Effect.fail({ status: 400, errors: { root: [e.code] } }),
-					UnknownException: () => Effect.fail({ status: 400, errors: { root: ['unknown'] } })
+					UnknownException: () =>
+						Effect.fail({ status: 400, errors: { root: ['unknown'] } })
 				})
 			)
 		);
@@ -234,7 +271,8 @@ export const actions: Actions = {
 				}),
 				Effect.catchTags({
 					ApiError: (e) => Effect.fail({ status: 500, errors: { root: [e.code] } }),
-					UnknownException: () => Effect.fail({ status: 500, errors: { root: ['unknown'] } })
+					UnknownException: () =>
+						Effect.fail({ status: 500, errors: { root: ['unknown'] } })
 				})
 			)
 		);
@@ -247,5 +285,48 @@ export const actions: Actions = {
 		}
 
 		return redirect(302, `/${params.path}`);
+	},
+	'delete-comment': async ({ request, locals: { runtime } }) => {
+		const exit = await runtime.runPromiseExit(
+			pipe(
+				Effect.gen(function* () {
+					const formData = yield* Effect.tryPromise(() => request.formData());
+					const validation = validateDeleteComment(decodeDeleteComment(formData));
+
+					if (!validation.ok) {
+						return yield* Effect.fail({ status: 400, errors: validation.errors });
+					}
+
+					const api = yield* ApiClientTag;
+					const response = yield* api.delete(
+						`issue-comments/${validation.data.issueCommentId}`
+					);
+
+					if (!response.ok) {
+						return yield* Effect.fail({
+							status: response.status,
+							errors: { root: [response.status + ''] }
+						});
+					}
+
+					return yield* Effect.succeed<void>(void 0);
+				}),
+				Effect.catchTags({
+					ApiError: (e) => Effect.fail({ status: 500, errors: { root: [e.code] } }),
+					UnknownException: () =>
+						Effect.fail({ status: 500, errors: { root: ['unknown'] } })
+				})
+			)
+		);
+
+		console.log(exit);
+		if (Exit.isFailure(exit)) {
+			const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+			return fail(failure.status, {
+				editDescription: { errors: failure.errors as Record<string, string[]> }
+			});
+		}
+
+		return null;
 	}
 };

@@ -29,12 +29,14 @@ export default withAnimations({
 				primary: {
 					1: 'oklch(from var(--theme-primary-1) l c h / <alpha-value>)',
 					2: 'oklch(from var(--theme-primary-2) l c h / <alpha-value>)',
-					3: 'oklch(from var(--theme-primary-3) l c h / <alpha-value>)'
+					3: 'oklch(from var(--theme-primary-3) l c h / <alpha-value>)',
+					border: 'oklch(from var(--theme-primary-border) l c h / <alpha-value>)'
 				},
 				negative: {
 					1: 'oklch(from var(--theme-negative-1) l c h / <alpha-value>)',
 					2: 'oklch(from var(--theme-negative-2) l c h / <alpha-value>)',
-					3: 'oklch(from var(--theme-negative-3) l c h / <alpha-value>)'
+					3: 'oklch(from var(--theme-negative-3) l c h / <alpha-value>)',
+					border: 'oklch(from var(--theme-negative-border) l c h / <alpha-value>)'
 				},
 				positive: {
 					1: 'oklch(from var(--theme-positive-1) l c h / <alpha-value>)',

@@ -1,3 +1,27 @@
+<script lang="ts" context="module">
+	import gsap from 'gsap';
+
+	function popoverIn(node: HTMLElement) {
+		gsap.from(node, {
+			scale: 0.98,
+			opacity: 0,
+			y: '-0.2rem',
+			duration: 0.15,
+			ease: 'power1.out'
+		});
+		return {
+			duration: 150
+		};
+	}
+
+	function popoverOut(node: HTMLElement) {
+		gsap.to(node, { scale: 0.98, opacity: 0, y: '-0.2rem', duration: 0.15, ease: 'power1.in' });
+		return {
+			duration: 150
+		};
+	}
+</script>
+
 <script lang="ts">
 	import type { IssueComment } from '~/lib/models/issue_comment';
 	import DOMPurify from 'isomorphic-dompurify';
@@ -9,6 +33,10 @@
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { fluentSearchParams } from '~/lib/utils/url';
+	import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
+	import { melt } from '@melt-ui/svelte';
+	import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
+	import { addToast } from '~/lib/components/Toaster.svelte';
 
 	const {
 		comment,
@@ -20,6 +48,7 @@
 	);
 	const cancelHref = $derived(fluentSearchParams($page.url).delete('edit-comment').toString());
 	let editor = $state<Editor>();
+	let open = $state(false);
 </script>
 
 <div class="max-w-full rounded-md">
@@ -33,16 +62,6 @@
 				</small>
 			</p>
 		</div>
-		{#if isAuthor}
-			<Button
-				as="link"
-				href={editHref}
-				filled={false}
-				variant="base"
-				size="sm"
-				class="ml-auto w-fit">Edit</Button
-			>
-		{/if}
 	</div>
 	<div class="mt-4">
 		{#if isEditing}
@@ -81,4 +100,63 @@
 			</div>
 		{/if}
 	</div>
+	{#if isAuthor}
+		<div class="mt-4 flex flex-wrap gap-2">
+			<Button as="link" href={editHref} filled={false} variant="base" size="sm" class="w-fit"
+				>Edit</Button
+			>
+			<PopoverBuilder bind:open>
+				{#snippet children({ trigger, content, arrow, close })}
+					<Button
+						filled={false}
+						variant="negative"
+						size="sm"
+						class="w-fit"
+						melt={trigger}
+					>
+						Delete
+					</Button>
+					{#if open}
+						<div in:popoverIn out:popoverOut class="c-popover" use:melt={content}>
+							<PopoverArrow melt={arrow} />
+							<div>
+								<p class="font-medium text-h5 text-base-fg-1">
+									Confirm comment deletion
+								</p>
+								<p class="mt-2">Proceed to delete this comment?</p>
+								<div class="flex w-fit ml-auto gap-2 mt-4">
+									<Button variant="base" melt={close}>Cancel</Button>
+									<form
+										method="post"
+										action="?/delete-comment"
+										use:enhance={() => {
+											return async ({ result, update }) => {
+												if (result.type === 'success') {
+													addToast({
+														data: {
+															title: 'Comment deleted',
+															description:
+																'The selected comment has been deleted.'
+														}
+													});
+												}
+												await update();
+											};
+										}}
+									>
+										<input
+											type="hidden"
+											name="issueCommentId"
+											value={comment.id}
+										/>
+										<Button variant="negative">Delete</Button>
+									</form>
+								</div>
+							</div>
+						</div>
+					{/if}
+				{/snippet}
+			</PopoverBuilder>
+		</div>
+	{/if}
 </div>

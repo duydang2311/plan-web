@@ -13,7 +13,11 @@
 		--c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
 
 		--c-button-base-bg: color-mix(in oklch, var(--theme-base-1) 99%, var(--theme-base-fg-1));
-		--c-button-base-bg-hover: color-mix(in oklch, var(--theme-base-2) 94%, var(--theme-base-fg-1));
+		--c-button-base-bg-hover: color-mix(
+			in oklch,
+			var(--theme-base-2) 94%,
+			var(--theme-base-fg-1)
+		);
 	}
 }
 
@@ -131,28 +135,47 @@
 }
 
 .c-button--base {
-	color: var(--theme-base-fg-1);
+	&:not(.c-button--filled) {
+		color: var(--theme-base-fg-1);
+		&:not(:disabled):hover {
+			background-color: var(--c-button-base-bg-hover);
+		}
 
-	&.c-button--filled {
-		background-color: var(--c-button-base-bg);
-	}
+		&:not(:disabled):active {
+			background-color: var(--c-button-base-bg-active);
+		}
 
-	&:hover {
-		background-color: var(--c-button-base-bg-hover);
-	}
-
-	&:active {
-		background-color: var(--c-button-base-bg-active);
-	}
-
-	&:disabled {
-		color: var(--c-button-text-disabled);
-		background-color: var(--c-button-bg-disabled);
+		&:disabled {
+			color: var(--c-button-text-disabled);
+		}
 	}
 
 	&:focus-visible {
 		outline: none;
 		@apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
+	}
+
+	&.c-button--filled {
+		color: var(--theme-base-fg-1);
+		background-color: var(--c-button-base-bg);
+
+		&:hover {
+			background-color: var(--c-button-base-bg-hover);
+		}
+
+		&:active {
+			background-color: var(--c-button-base-bg-active);
+		}
+
+		&:disabled {
+			color: var(--c-button-text-disabled);
+			background-color: var(--c-button-bg-disabled);
+		}
+
+		&:focus-visible {
+			outline: none;
+			@apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
+		}
 	}
 
 	&.c-button--outline {

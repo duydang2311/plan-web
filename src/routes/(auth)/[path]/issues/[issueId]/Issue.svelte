@@ -107,9 +107,9 @@
 			use:melt={content}
 			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border"
 		>
-			<h4 use:melt={title}>Delete the issue</h4>
+			<h4 use:melt={title}>Confirm issue deletion</h4>
 			<p>
-				Do you want to delete <span class="font-medium">"{issue.title}"</span>?
+				Proceed to delete <span class="font-medium">"{issue.title}"</span>?
 			</p>
 			<div class="flex gap-4 w-fit ml-auto">
 				<Button variant="base" class="w-fit" filled={false} melt={close}>Cancel</Button>

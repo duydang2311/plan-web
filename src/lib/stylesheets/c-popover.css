@@ -1,0 +1,22 @@
+@layer base {
+	.c-popover {
+		background-color: var(--theme-base-1);
+		padding: theme('padding[4]');
+		border: 1px solid var(--theme-base-border);
+		border-radius: theme('borderRadius[md]');
+		width: 100vw;
+		max-width: 24rem;
+		@apply shadow;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.c-popover--arrow {
+		--arrow-size: 0.7rem;
+		border-top: 1px solid var(--theme-base-border);
+		border-left: 1px solid var(--theme-base-border);
+		transform: translateX(4px) translateY(4px);
+	}
+}
