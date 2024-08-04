@@ -20,122 +20,122 @@
 @import '~/lib/stylesheets/tw-utilities.css';
 
 @layer base {
-	:root {
-		--font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-			Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-		--font-family-display: 'Manrope', InterDisplay, var(--font-family-base);
-		--font-family-body: 'InterVariable', Inter, var(--font-family-base);
-		--typo-scale: 1.2;
-		--font-size-sm: 0.9028rem;
-		--font-size-p: 1rem;
-		--font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
-		--font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
-		--font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
-		--font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
-		--font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
-		--font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
-		--font-size-title: var(--font-size-h5);
+    :root {
+        --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+            Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        --font-family-display: 'Manrope', InterDisplay, var(--font-family-base);
+        --font-family-body: 'InterVariable', Inter, var(--font-family-base);
+        --typo-scale: 1.2;
+        --font-size-sm: 0.9028rem;
+        --font-size-p: 1rem;
+        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
+        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
+        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
+        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
+        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
+        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+        --font-size-title: var(--font-size-h5);
 
-		color-scheme: light dark;
-		font-size: 90%;
-		line-height: 1.5;
-		font-synthesis: none;
-		text-rendering: optimizeLegibility;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-		-webkit-text-size-adjust: 100%;
-		font-feature-settings:
-			'liga' 1,
-			'calt' 1; /* fix for Chrome */
-	}
+        color-scheme: light dark;
+        font-size: 90%;
+        line-height: 1.5;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-text-size-adjust: 100%;
+        font-feature-settings:
+            'liga' 1,
+            'calt' 1; /* fix for Chrome */
+    }
 
-	.prose {
-		--typo-scale: 1.0625;
-		--font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
-		--font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
-		--font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
-		--font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
-		--font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
-		--font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
-		--font-size-title: var(--font-size-h5);
-	}
+    .prose {
+        --typo-scale: 1.0625;
+        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
+        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
+        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
+        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
+        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
+        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+        --font-size-title: var(--font-size-h5);
+    }
 
-	@supports (font-variation-settings: normal) {
-		:root {
-			font-family: InterVariable, sans-serif;
-		}
-	}
+    @supports (font-variation-settings: normal) {
+        :root {
+            font-family: InterVariable, sans-serif;
+        }
+    }
 
-	body {
-		font-family: var(--font-family-body);
-		font-size: var(--font-size-p);
-		background-color: theme('colors.base[1]');
-		color: theme('colors.base[fg-2]');
-		transition:
-			color 100ms ease-in-out,
-			background-color 100ms ease-in-out;
-	}
+    body {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-p);
+        background-color: theme('colors.base[1]');
+        color: theme('colors.base[fg-2]');
+        transition:
+            color 100ms ease-in-out,
+            background-color 100ms ease-in-out;
+    }
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		color: theme('colors.base[fg-1]');
-		font-family: var(--font-family-display);
-		font-weight: medium;
-	}
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: theme('colors.base[fg-1]');
+        font-family: var(--font-family-display);
+        font-weight: medium;
+    }
 
-	h6 {
-		font-size: var(--font-size-h6);
-	}
+    h6 {
+        font-size: var(--font-size-h6);
+    }
 
-	h5 {
-		font-size: var(--font-size-h5);
-	}
+    h5 {
+        font-size: var(--font-size-h5);
+    }
 
-	h4 {
-		font-size: var(--font-size-h4);
-	}
+    h4 {
+        font-size: var(--font-size-h4);
+    }
 
-	h3 {
-		font-size: var(--font-size-h3);
-	}
+    h3 {
+        font-size: var(--font-size-h3);
+    }
 
-	h2 {
-		font-size: var(--font-size-h2);
-	}
+    h2 {
+        font-size: var(--font-size-h2);
+    }
 
-	h1 {
-		font-size: var(--font-size-h1);
-	}
+    h1 {
+        font-size: var(--font-size-h1);
+    }
 
-	small {
-		font-size: var(--font-size-sm);
-	}
+    small {
+        font-size: var(--font-size-sm);
+    }
 
-	.transition-enforcement {
-		display: grid;
-	}
+    .transition-enforcement {
+        display: grid;
+    }
 
-	.transition-enforcement > * {
-		grid-column: 1/2;
-		grid-row: 1/2;
-	}
+    .transition-enforcement > * {
+        grid-column: 1/2;
+        grid-row: 1/2;
+    }
 
-	hr {
-		border-color: var(--theme-base-border);
-	}
+    hr {
+        border-color: var(--theme-base-border);
+    }
 
-	::-webkit-scrollbar {
-		width: theme('width[2]');
-		height: theme('width[1]');
-	}
+    ::-webkit-scrollbar {
+        width: theme('width[2]');
+        height: theme('width[1]');
+    }
 
-	::-webkit-scrollbar-thumb {
-		border: theme('width[0.5]') solid var(--theme-base-1);
-		border-radius: theme('borderRadius[full]');
-		background: color-mix(in oklch, var(--theme-base-fg-2) 30%, var(--theme-base-1));
-	}
+    ::-webkit-scrollbar-thumb {
+        border: theme('width[0.5]') solid var(--theme-base-1);
+        border-radius: theme('borderRadius[full]');
+        background: color-mix(in oklch, var(--theme-base-fg-2) 30%, var(--theme-base-1));
+    }
 }

@@ -1,43 +1,43 @@
 :root {
-	--l-step: 0.05;
+    --l-step: 0.05;
 
-	--color-fg-1: oklch(14.25% 0.0027 286.09);
-	--color-fg-2: oklch(from var(--color-fg-1) calc(l + 0.14) c h);
-	--color-fg-3: oklch(from var(--color-fg-1) calc(l + 0.32) c h);
+    --color-fg-1: oklch(14.25% 0.0027 286.09);
+    --color-fg-2: oklch(from var(--color-fg-1) calc(l + 0.14) c h);
+    --color-fg-3: oklch(from var(--color-fg-1) calc(l + 0.32) c h);
 
-	--color-bg: oklch(98.45% 0.0034 247.85);
-	--color-brand: oklch(48.32% 0.2931 274.22);
-	--color-negative: oklch(47.07% 0.1897 22.17);
-	--color-positive: oklch(43.42% 0.1461 142.04);
+    --color-bg: oklch(98.45% 0.0034 247.85);
+    --color-brand: oklch(48.32% 0.2931 274.22);
+    --color-negative: oklch(47.07% 0.1897 22.17);
+    --color-positive: oklch(43.42% 0.1461 142.04);
 }
 
 :root {
-	--theme-base-1: var(--color-bg);
-	--theme-base-2: oklch(from var(--color-bg) calc(l - 0.015) c h);
-	--theme-base-3: oklch(from var(--color-bg) calc(l - 0.04) c h);
-	--theme-base-fg-1: var(--color-fg-1);
-	--theme-base-fg-2: var(--color-fg-2);
-	--theme-base-fg-3: var(--color-fg-3);
-	--theme-base-fg-disabled: color-mix(in oklch, var(--theme-base-fg-1) 40%, var(--theme-base-1));
-	--theme-base-border: oklch(from var(--color-bg) calc(l - 0.08) c h);
+    --theme-base-1: var(--color-bg);
+    --theme-base-2: oklch(from var(--color-bg) calc(l - 0.015) c h);
+    --theme-base-3: oklch(from var(--color-bg) calc(l - 0.04) c h);
+    --theme-base-fg-1: var(--color-fg-1);
+    --theme-base-fg-2: var(--color-fg-2);
+    --theme-base-fg-3: var(--color-fg-3);
+    --theme-base-fg-disabled: color-mix(in oklch, var(--theme-base-fg-1) 40%, var(--theme-base-1));
+    --theme-base-border: oklch(from var(--color-bg) calc(l - 0.08) c h);
 
-	--theme-primary-1: var(--color-brand);
-	--theme-primary-2: oklch(from var(--color-brand) calc(l + var(--l-step)) c h);
-	--theme-primary-3: oklch(from var(--color-brand) calc(l + var(--l-step) * 2) c h);
-	--theme-primary-fg-1: var(--color-bg);
-	--theme-primary-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
-	--theme-primary-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
-	--theme-primary-border: color-mix(in oklch, var(--color-brand) 15%, transparent);
+    --theme-primary-1: var(--color-brand);
+    --theme-primary-2: oklch(from var(--color-brand) calc(l + var(--l-step)) c h);
+    --theme-primary-3: oklch(from var(--color-brand) calc(l + var(--l-step) * 2) c h);
+    --theme-primary-fg-1: var(--color-bg);
+    --theme-primary-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
+    --theme-primary-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+    --theme-primary-border: color-mix(in oklch, var(--color-brand) 15%, transparent);
 
-	--theme-negative-1: var(--color-negative);
-	--theme-negative-2: oklch(from var(--color-negative) calc(l + var(--l-step)) c h);
-	--theme-negative-3: oklch(from var(--color-negative) calc(l + var(--l-step) * 2) c h);
-	--theme-negative-fg-1: var(--color-bg);
-	--theme-negative-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
-	--theme-negative-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
-	--theme-negative-border: color-mix(in oklch, var(--color-negative) 15%, transparent);
+    --theme-negative-1: var(--color-negative);
+    --theme-negative-2: oklch(from var(--color-negative) calc(l + var(--l-step)) c h);
+    --theme-negative-3: oklch(from var(--color-negative) calc(l + var(--l-step) * 2) c h);
+    --theme-negative-fg-1: var(--color-bg);
+    --theme-negative-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
+    --theme-negative-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+    --theme-negative-border: color-mix(in oklch, var(--color-negative) 15%, transparent);
 
-	--theme-positive-1: var(--color-positive);
-	--theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
-	--theme-positive-3: oklch(from var(--color-positive) calc(l + var(--l-step) * 2) c h);
+    --theme-positive-1: var(--color-positive);
+    --theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
+    --theme-positive-3: oklch(from var(--color-positive) calc(l + var(--l-step) * 2) c h);
 }

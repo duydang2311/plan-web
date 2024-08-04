@@ -1,55 +1,59 @@
 @layer base {
-	:root {
-		--theme-table-border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
-		--theme-table-hover: color-mix(in oklch, var(--theme-base-border) 20%, var(--theme-base-1));
-	}
+    :root {
+        --theme-table-border: color-mix(
+            in oklch,
+            var(--theme-base-border) 40%,
+            var(--theme-base-1)
+        );
+        --theme-table-hover: color-mix(in oklch, var(--theme-base-border) 20%, var(--theme-base-1));
+    }
 }
 
 .c-table {
-	table-layout: fixed;
-	width: 100%;
-	text-align: left;
-	border-collapse: separate;
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+    border-collapse: separate;
 
-	& > tbody > tr:not(:first-child) > td {
-		border-top: 1px solid var(--theme-table-border);
-	}
+    & > tbody > tr:not(:first-child) > td {
+        border-top: 1px solid var(--theme-table-border);
+    }
 
-	& > thead > tr > th {
-		background-color: var(--theme-base-1);
-		border-bottom: 1px solid var(--theme-table-border);
-	}
+    & > thead > tr > th {
+        background-color: var(--theme-base-1);
+        border-bottom: 1px solid var(--theme-table-border);
+    }
 }
 
 .c-table--thead {
-	position: sticky;
-	top: 0;
+    position: sticky;
+    top: 0;
 }
 
 .c-table--row {
-	table-layout: auto;
-	width: 100%;
-	text-align: left;
+    table-layout: auto;
+    width: 100%;
+    text-align: left;
 
-	& > * {
-		padding: theme('padding[4]') theme('padding[2]');
-	}
+    & > * {
+        padding: theme('padding[4]') theme('padding[2]');
+    }
 
-	& > :first-child {
-		padding-inline-start: theme('padding[8]');
-	}
+    & > :first-child {
+        padding-inline-start: theme('padding[8]');
+    }
 
-	& > :last-child {
-		padding-inline-end: theme('padding[8]');
-	}
+    & > :last-child {
+        padding-inline-end: theme('padding[8]');
+    }
 }
 
 tbody > tr:hover {
-	transition: background-color 50ms ease-in-out;
-	background-color: var(--theme-table-hover);
+    transition: background-color 50ms ease-in-out;
+    background-color: var(--theme-table-hover);
 }
 
 th {
-	font-weight: 500;
-	font-size: var(--font-size-sm);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
 }

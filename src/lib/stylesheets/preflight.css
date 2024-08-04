@@ -3,10 +3,10 @@
 ::before,
 ::backdrop,
 ::file-selector-button {
-	box-sizing: border-box; /* 1 */
-	margin: 0; /* 2 */
-	padding: 0; /* 2 */
-	border: 0 solid; /* 3 */
+    box-sizing: border-box; /* 1 */
+    margin: 0; /* 2 */
+    padding: 0; /* 2 */
+    border: 0 solid; /* 3 */
 }
 
 /*
@@ -21,22 +21,22 @@
 
 html,
 :host {
-	line-height: 1.5; /* 1 */
-	-webkit-text-size-adjust: 100%; /* 2 */
-	tab-size: 4; /* 3 */
-	font-family: var(
-		--default-font-family,
-		ui-sans-serif,
-		system-ui,
-		sans-serif,
-		'Apple Color Emoji',
-		'Segoe UI Emoji',
-		'Segoe UI Symbol',
-		'Noto Color Emoji'
-	); /* 4 */
-	font-feature-settings: var(--default-font-feature-settings, normal); /* 5 */
-	font-variation-settings: var(--default-font-variation-settings, normal); /* 6 */
-	-webkit-tap-highlight-color: transparent; /* 7 */
+    line-height: 1.5; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+    tab-size: 4; /* 3 */
+    font-family: var(
+        --default-font-family,
+        ui-sans-serif,
+        system-ui,
+        sans-serif,
+        'Apple Color Emoji',
+        'Segoe UI Emoji',
+        'Segoe UI Symbol',
+        'Noto Color Emoji'
+    ); /* 4 */
+    font-feature-settings: var(--default-font-feature-settings, normal); /* 5 */
+    font-variation-settings: var(--default-font-variation-settings, normal); /* 6 */
+    -webkit-tap-highlight-color: transparent; /* 7 */
 }
 
 /*
@@ -44,7 +44,7 @@ html,
 */
 
 body {
-	line-height: inherit;
+    line-height: inherit;
 }
 
 /*
@@ -54,9 +54,9 @@ body {
 */
 
 hr {
-	height: 0; /* 1 */
-	color: inherit; /* 2 */
-	border-top-width: 1px; /* 3 */
+    height: 0; /* 1 */
+    color: inherit; /* 2 */
+    border-top-width: 1px; /* 3 */
 }
 
 /*
@@ -64,8 +64,8 @@ hr {
 */
 
 abbr:where([title]) {
-	-webkit-text-decoration: underline dotted;
-	text-decoration: underline dotted;
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
 }
 
 /*
@@ -78,8 +78,8 @@ h3,
 h4,
 h5,
 h6 {
-	font-size: inherit;
-	font-weight: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
 /*
@@ -87,9 +87,9 @@ h6 {
 */
 
 a {
-	color: inherit;
-	-webkit-text-decoration: inherit;
-	text-decoration: inherit;
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
 }
 
 /*
@@ -98,7 +98,7 @@ a {
 
 b,
 strong {
-	font-weight: bolder;
+    font-weight: bolder;
 }
 
 /*
@@ -112,20 +112,20 @@ code,
 kbd,
 samp,
 pre {
-	font-family: var(
-		--default-mono-font-family,
-		ui-monospace,
-		SFMono-Regular,
-		Menlo,
-		Monaco,
-		Consolas,
-		'Liberation Mono',
-		'Courier New',
-		monospace
-	); /* 4 */
-	font-feature-settings: var(--default-mono-font-feature-settings, normal); /* 5 */
-	font-variation-settings: var(--default-mono-font-variation-settings, normal); /* 6 */
-	font-size: 1em; /* 4 */
+    font-family: var(
+        --default-mono-font-family,
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        'Liberation Mono',
+        'Courier New',
+        monospace
+    ); /* 4 */
+    font-feature-settings: var(--default-mono-font-feature-settings, normal); /* 5 */
+    font-variation-settings: var(--default-mono-font-variation-settings, normal); /* 6 */
+    font-size: 1em; /* 4 */
 }
 
 /*
@@ -133,7 +133,7 @@ pre {
 */
 
 small {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 /*
@@ -142,18 +142,18 @@ small {
 
 sub,
 sup {
-	font-size: 75%;
-	line-height: 0;
-	position: relative;
-	vertical-align: baseline;
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
 }
 
 sub {
-	bottom: -0.25em;
+    bottom: -0.25em;
 }
 
 sup {
-	top: -0.5em;
+    top: -0.5em;
 }
 
 /*
@@ -163,9 +163,9 @@ sup {
 */
 
 table {
-	text-indent: 0; /* 1 */
-	border-color: inherit; /* 2 */
-	border-collapse: collapse; /* 3 */
+    text-indent: 0; /* 1 */
+    border-color: inherit; /* 2 */
+    border-collapse: collapse; /* 3 */
 }
 
 /*
@@ -179,12 +179,12 @@ optgroup,
 select,
 textarea,
 ::file-selector-button {
-	font: inherit; /* 1 */
-	font-feature-settings: inherit; /* 1 */
-	font-variation-settings: inherit; /* 1 */
-	letter-spacing: inherit; /* 1 */
-	color: inherit; /* 1 */
-	background: transparent; /* 2 */
+    font: inherit; /* 1 */
+    font-feature-settings: inherit; /* 1 */
+    font-variation-settings: inherit; /* 1 */
+    letter-spacing: inherit; /* 1 */
+    color: inherit; /* 1 */
+    background: transparent; /* 2 */
 }
 
 /*
@@ -194,7 +194,7 @@ textarea,
 input:where(:not([type='button'], [type='reset'], [type='submit'])),
 select,
 textarea {
-	border: 1px solid;
+    border: 1px solid;
 }
 
 /*
@@ -203,7 +203,7 @@ textarea {
 button,
 input:where([type='button'], [type='reset'], [type='submit']),
 ::file-selector-button {
-	appearance: button;
+    appearance: button;
 }
 
 /*
@@ -211,7 +211,7 @@ input:where([type='button'], [type='reset'], [type='submit']),
 */
 
 :-moz-focusring {
-	outline: auto;
+    outline: auto;
 }
 
 /*
@@ -219,7 +219,7 @@ input:where([type='button'], [type='reset'], [type='submit']),
 */
 
 :-moz-ui-invalid {
-	box-shadow: none;
+    box-shadow: none;
 }
 
 /*
@@ -227,7 +227,7 @@ input:where([type='button'], [type='reset'], [type='submit']),
 */
 
 progress {
-	vertical-align: baseline;
+    vertical-align: baseline;
 }
 
 /*
@@ -236,7 +236,7 @@ progress {
 
 ::-webkit-inner-spin-button,
 ::-webkit-outer-spin-button {
-	height: auto;
+    height: auto;
 }
 
 /*
@@ -244,7 +244,7 @@ progress {
 */
 
 ::-webkit-search-decoration {
-	-webkit-appearance: none;
+    -webkit-appearance: none;
 }
 
 /*
@@ -252,7 +252,7 @@ progress {
 */
 
 summary {
-	display: list-item;
+    display: list-item;
 }
 
 /*
@@ -262,7 +262,7 @@ summary {
 ol,
 ul,
 menu {
-	list-style: none;
+    list-style: none;
 }
 
 /*
@@ -270,7 +270,7 @@ menu {
 */
 
 textarea {
-	resize: vertical;
+    resize: vertical;
 }
 
 /*
@@ -279,8 +279,8 @@ textarea {
 */
 
 ::placeholder {
-	opacity: 1; /* 1 */
-	color: color-mix(in srgb, currentColor 50%, transparent); /* 2 */
+    opacity: 1; /* 1 */
+    color: color-mix(in srgb, currentColor 50%, transparent); /* 2 */
 }
 
 /*
@@ -288,7 +288,7 @@ textarea {
 */
 
 :disabled {
-	cursor: default;
+    cursor: default;
 }
 
 /*
@@ -305,8 +305,8 @@ audio,
 iframe,
 embed,
 object {
-	display: block; /* 1 */
-	vertical-align: middle; /* 2 */
+    display: block; /* 1 */
+    vertical-align: middle; /* 2 */
 }
 
 /*
@@ -315,8 +315,8 @@ object {
 
 img,
 video {
-	max-width: 100%;
-	height: auto;
+    max-width: 100%;
+    height: auto;
 }
 
 /*
@@ -324,5 +324,5 @@ video {
 */
 
 [hidden] {
-	display: none !important;
+    display: none !important;
 }

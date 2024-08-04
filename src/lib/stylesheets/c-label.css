@@ -1,6 +1,6 @@
 .c-label {
-	display: block;
-	color: var(--theme-base-fg-3);
-	font-weight: 500;
-	font-size: var(--font-size-sm);
+    display: block;
+    color: var(--theme-base-fg-3);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
 }

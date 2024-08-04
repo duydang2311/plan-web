@@ -1,10 +1,10 @@
 import { Data } from 'effect';
 
 export class ApiError extends Data.TaggedError('ApiError')<{
-	code: string;
-	message?: string;
-	cause?: unknown;
-	stack?: string;
+    code: string;
+    message?: string;
+    cause?: unknown;
+    stack?: string;
 }> {}
 // 	public readonly _tag = 'AppError';
 // 	public readonly code: string;
@@ -35,7 +35,7 @@ export class ApiError extends Data.TaggedError('ApiError')<{
 // }
 
 export class ValidationError extends Data.TaggedError('ValidationError')<{
-	errors: Record<string, string[]>;
+    errors: Record<string, string[]>;
 }> {}
 // 	public readonly _tag = 'ValidationError';
 // 	public readonly errors: Record<string, string[]>;

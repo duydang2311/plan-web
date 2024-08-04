@@ -1,40 +1,40 @@
 @layer base {
-	:root {
-		--c-input-border: color-mix(in oklch, var(--theme-base-border) 90%, var(--theme-base-fg-1));
-		--c-input-border-hover: oklch(from var(--c-input-border) calc(l - 0.08) c h);
-		--c-input-border-focus: var(--theme-primary-3);
-	}
+    :root {
+        --c-input-border: color-mix(in oklch, var(--theme-base-border) 90%, var(--theme-base-fg-1));
+        --c-input-border-hover: oklch(from var(--c-input-border) calc(l - 0.08) c h);
+        --c-input-border-focus: var(--theme-primary-3);
+    }
 
-	:root[data-theme='dark'] {
-		--c-input-border-hover: oklch(from var(--c-input-border) calc(l + 0.08) c h);
-	}
+    :root[data-theme='dark'] {
+        --c-input-border-hover: oklch(from var(--c-input-border) calc(l + 0.08) c h);
+    }
 
-	.c-input {
-		width: 100%;
-		padding: theme('size[2]') theme('size[2]');
-		border: theme('borderWidth.DEFAULT') solid var(--c-input-border);
-		border-radius: theme('borderRadius.md');
-		outline: none;
-		transition:
-			color 100ms ease-in-out,
-			background-color 100ms ease-in-out,
-			border-color 100ms ease-in-out,
-			box-shadow 100ms ease-out;
-		box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+    .c-input {
+        width: 100%;
+        padding: theme('size[2]') theme('size[2]');
+        border: theme('borderWidth.DEFAULT') solid var(--c-input-border);
+        border-radius: theme('borderRadius.md');
+        outline: none;
+        transition:
+            color 100ms ease-in-out,
+            background-color 100ms ease-in-out,
+            border-color 100ms ease-in-out,
+            box-shadow 100ms ease-out;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
 
-		&[aria-invalid='true'] {
-			border-color: var(--theme-negative-1);
-		}
+        &[aria-invalid='true'] {
+            border-color: var(--theme-negative-1);
+        }
 
-		&:hover {
-			border-color: var(--c-input-border-hover);
-		}
+        &:hover {
+            border-color: var(--c-input-border-hover);
+        }
 
-		&:focus-visible {
-			border-color: var(--c-input-border-focus);
-			box-shadow:
-				0 0 0 1px var(--c-input-border-focus),
-				0 3px 2px rgb(0 0 0 / 0.05);
-		}
-	}
+        &:focus-visible {
+            border-color: var(--c-input-border-focus);
+            box-shadow:
+                0 0 0 1px var(--c-input-border-focus),
+                0 3px 2px rgb(0 0 0 / 0.05);
+        }
+    }
 }
