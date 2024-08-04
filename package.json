@@ -22,6 +22,7 @@
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/luxon": "^3.4.2",
 		"@types/node": "^22.1.0",
+		"@types/validator": "^13.12.0",
 		"animated-tailwindcss": "^4.0.0",
 		"autoprefixer": "^10.4.19",
 		"clsx": "^2.1.1",

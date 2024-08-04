@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
-import { ApiClientTag } from '~/lib/services/api_client.server';
+import { ApiClient } from '~/lib/services/api_client.server';
 import type { PageServerLoad, Actions } from './$types';
 import {
     decode,
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({
     const exit = await runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
-                const api = yield* ApiClientTag;
+                const api = yield* ApiClient;
                 const response = yield* api.get(`issues/${params.issueId}`, {
                     query: {
                         select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber'
@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({
     const commentList = runtime
         .runPromiseExit(
             Effect.gen(function* () {
-                const api = yield* ApiClientTag;
+                const api = yield* ApiClient;
                 const response = yield* api.get(`issues/${params.issueId}/comments`, {
                     query: { select: 'CreatedTime, UpdatedTime, Content, AuthorId' }
                 });
@@ -88,7 +88,7 @@ export const actions: Actions = {
                         return yield* Effect.fail({ status: 400, errors: validation.errors });
                     }
 
-                    const api = yield* ApiClientTag;
+                    const api = yield* ApiClient;
                     const response = yield* api.post(`issues/${validation.data.issueId}/comments`, {
                         body: validation.data
                     });
@@ -138,7 +138,7 @@ export const actions: Actions = {
                         return yield* Effect.fail({ status: 400, errors: validation.errors });
                     }
 
-                    const api = yield* ApiClientTag;
+                    const api = yield* ApiClient;
                     const response = yield* api.patch(`issues/${validation.data.issueId}`, {
                         body: {
                             patch: [
@@ -196,7 +196,7 @@ export const actions: Actions = {
                         return yield* Effect.fail({ status: 400, errors: validation.errors });
                     }
 
-                    const api = yield* ApiClientTag;
+                    const api = yield* ApiClient;
                     const response = yield* api.patch(
                         `issue-comments/${validation.data.issueCommentId}`,
                         {
@@ -257,7 +257,7 @@ export const actions: Actions = {
                         return yield* Effect.fail({ status: 400, errors: validation.errors });
                     }
 
-                    const api = yield* ApiClientTag;
+                    const api = yield* ApiClient;
                     const response = yield* api.delete(`issues/${validation.data.issueId}`);
 
                     if (!response.ok) {
@@ -297,7 +297,7 @@ export const actions: Actions = {
                         return yield* Effect.fail({ status: 400, errors: validation.errors });
                     }
 
-                    const api = yield* ApiClientTag;
+                    const api = yield* ApiClient;
                     const response = yield* api.delete(
                         `issue-comments/${validation.data.issueCommentId}`
                     );
