@@ -83,7 +83,7 @@
                         bind:editor
                         name="content"
                         content={comment.content}
-                        containerProps={{ class: 'pb-8' }}
+                        editorProps={{ class: 'pb-8' }}
                     />
                     <div class="flex gap-2 absolute right-2 bottom-2">
                         <Button as="link" href={cancelHref} variant="base" size="sm" filled={false}>

@@ -50,7 +50,7 @@
                         bind:editor
                         name="description"
                         content={issue.description}
-                        containerProps={{ class: 'pb-8' }}
+                        editorProps={{ class: 'pb-8' }}
                     />
                     <div class="absolute right-2 bottom-2 flex gap-2">
                         <Button as="link" href={cancelHref} size="sm" filled={false} variant="base"

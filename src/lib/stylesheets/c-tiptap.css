@@ -26,8 +26,7 @@
     }
 
     .c-tiptap--textarea {
-        overflow: auto;
-        padding: theme('padding[2]') theme('padding[4]') theme('padding[4]') theme('padding[4]');
+        /* overflow: auto; */
         word-break: break-word;
         border-bottom-left-radius: theme('borderRadius[md]');
         border-bottom-right-radius: theme('borderRadius[md]');
@@ -58,9 +57,18 @@
             );
         }
     }
+}
 
+@layer components {
     .c-tiptap--editor {
-        @apply max-w-none min-h-full focus:outline-none;
+        overflow: auto;
+        max-width: none;
+        padding: theme('padding[4]');
+        border-bottom-left-radius: theme('borderRadius[md]');
+        border-bottom-right-radius: theme('borderRadius[md]');
+        &:focus {
+            outline: none;
+        }
     }
 }
 

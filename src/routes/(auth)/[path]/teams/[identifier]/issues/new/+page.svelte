@@ -106,7 +106,13 @@
                 />
             </noscript>
             <div>
-                <Tiptap bind:editor placeholder="Add more detail to the issue..." class="h-96" />
+                <Tiptap
+                    bind:editor
+                    placeholder="Add more detail to the issue..."
+                    editorProps={{
+                        class: 'h-80'
+                    }}
+                />
             </div>
             <Errors errors={errors['description']} errorMap={errorMap.description} />
         </fieldset>

@@ -115,7 +115,9 @@
                     <Tiptap
                         bind:editor
                         placeholder="Write your comment..."
-                        class="min-h-20 max-h-60 bg-base-1"
+                        editorProps={{
+                            class: 'bg-base-1 min-h-24 max-h-60'
+                        }}
                     />
                     <Button
                         variant="primary"
