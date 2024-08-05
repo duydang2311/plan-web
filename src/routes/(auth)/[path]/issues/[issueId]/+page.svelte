@@ -2,50 +2,78 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/stores';
     import { Editor } from '@tiptap/core';
-    import { Effect, Fiber, pipe, Stream } from 'effect';
+    import type { Subscription } from 'nats.ws';
     import { onMount } from 'svelte';
     import Button from '~/lib/components/Button.svelte';
     import Icon from '~/lib/components/Icon.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { addToast } from '~/lib/components/Toaster.svelte';
-    import { setRuntime } from '~/lib/contexts/runtime.client';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import type { IssueComment } from '~/lib/models/issue_comment';
+    import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData, PageData } from './$types';
     import Comment from './Comment.svelte';
     import Issue from './Issue.svelte';
-    import { clientValidate, newCommentsStream } from './utils.client';
+    import { clientValidate } from './utils.client';
+    import { tryPromise } from '~/lib/utils/neverthrow';
 
-    const { data, form }: { data: PageData; form: ActionData } = $props();
-    const runtime = setRuntime();
+    let { data, form }: { data: PageData; form: ActionData } = $props();
     let editor = $state<Editor>();
     let validation = $state<ValidationResult>();
+    let commentList = $state.frozen<PaginatedList<IssueComment>>(
+        data.comment.list instanceof Promise ? paginatedList() : data.comment.list
+    );
+    const { realtime } = useRuntime();
+    $effect(() => {
+        if (data.comment.list instanceof Promise) {
+            data.comment.list.then((v) => (commentList = v));
+        } else {
+            commentList = data.comment.list;
+        }
+    });
 
     onMount(() => {
-        const fiber = runtime.runFork(
-            pipe(
-                newCommentsStream($page.params['issueId']),
-                Stream.runForEach((a) =>
-                    Effect.tryPromise(async () => {
-                        const list = await data.commentList;
-                        console.log(list.items.length, list.totalCount);
-                        if (list.items.length !== list.totalCount) {
-                            addToast({
-                                data: {
-                                    title: 'New comment',
-                                    description:
-                                        'A user has added a comment on this issue. Scroll down to see it'
-                                }
-                            });
-                        } else {
-                            console.log('fetching new comment', a);
+        let subscription: Subscription | undefined = undefined;
+        (async () => {
+            const subscribeResult = await realtime.subscribe(
+                `issues.${$page.params['issueId']}.comments.created`
+            );
+            if (!subscribeResult.isOk()) {
+                return;
+            }
+            subscription = subscribeResult.value;
+            for await (const message of subscription) {
+                const data = message.json<{ issueCommentId: string }>();
+                if (commentList.items.length !== commentList.totalCount) {
+                    addToast({
+                        data: {
+                            title: 'New comment',
+                            description:
+                                'A user has added a comment on this issue. Scroll down to see it'
                         }
-                    })
-                ),
-                Effect.scoped
-            )
-        );
+                    });
+                } else {
+                    const tryFetch = await tryPromise(
+                        fetch(`/api/issue-comments/${data.issueCommentId}`, {
+                            method: 'get'
+                        })
+                    );
+                    if (tryFetch.isErr() || !tryFetch.value.ok) {
+                        return;
+                    }
+                    const tryDecode = await tryPromise(tryFetch.value.json<IssueComment>());
+                    if (tryDecode.isOk()) {
+                        commentList = paginatedList({
+                            items: [...commentList.items, tryDecode.value],
+                            totalCount: commentList.totalCount + 1
+                        });
+                    }
+                }
+            }
+        })();
         return () => {
-            runtime.runFork(Fiber.interrupt(fiber));
+            subscription?.unsubscribe();
         };
     });
 
@@ -79,21 +107,19 @@
         </h4>
         <Issue {form} isEditing={data.isEditing} issue={data.issue} />
         <h6 class="mt-4 font-bold">Activity</h6>
-        {#await data.commentList then list}
-            {#if list.items.length}
-                <ol class="mt-4 space-y-8 pt-2">
-                    {#each list.items as comment}
-                        <li class="w-full">
-                            <Comment
-                                {comment}
-                                isAuthor={comment.authorId === data.user.id}
-                                isEditing={comment.id === data.editingCommentId}
-                            />
-                        </li>
-                    {/each}
-                </ol>
-            {/if}
-        {/await}
+        {#if commentList.items.length}
+            <ol class="mt-4 space-y-8 pt-2">
+                {#each commentList.items as comment (comment.id)}
+                    <li class="w-full">
+                        <Comment
+                            {comment}
+                            isAuthor={comment.authorId === data.user.id}
+                            isEditing={comment.id === data.editingCommentId}
+                        />
+                    </li>
+                {/each}
+            </ol>
+        {/if}
         <div class="sticky mt-8 bottom-2">
             <form
                 method="post"

@@ -18,7 +18,7 @@ import {
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { IssueComment } from '~/lib/models/issue_comment';
-import { queryParams } from '~/lib/utils/url';
+import { paginatedQuery, queryParams } from '~/lib/utils/url';
 
 export const load: PageServerLoad = async ({
     params,
@@ -52,12 +52,21 @@ export const load: PageServerLoad = async ({
         return redirect(302, `/${params.path}`);
     }
 
+    const commentQuery = paginatedQuery(
+        queryParams(url, {
+            page: 1,
+            size: 20
+        })
+    );
     const commentList = runtime
         .runPromiseExit(
             Effect.gen(function* () {
                 const api = yield* ApiClient;
                 const response = yield* api.get(`issues/${params.issueId}/comments`, {
-                    query: { select: 'CreatedTime, UpdatedTime, Content, AuthorId' }
+                    query: {
+                        ...commentQuery,
+                        select: 'CreatedTime, UpdatedTime, Content, AuthorId'
+                    }
                 });
                 if (!response.ok) {
                     return yield* Effect.succeed(paginatedList<IssueComment>());
@@ -71,7 +80,10 @@ export const load: PageServerLoad = async ({
         user,
         issue: exit.value,
         isAuthor: exit.value.authorId === user.id,
-        commentList: isDataRequest ? commentList : await commentList,
+        comment: {
+            query: commentQuery,
+            list: isDataRequest ? commentList : await commentList
+        },
         isEditing: query['edit-desc'],
         editingCommentId: query['edit-comment']
     };

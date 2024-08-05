@@ -3,8 +3,6 @@
     import './+layout.css';
     import Toaster from '~/lib/components/Toaster.svelte';
     import { setRuntime } from '~/lib/contexts/runtime.client';
-    import { Effect } from 'effect';
-    import { Realtime } from '~/lib/services/realtime.client';
 
     const { children }: { children: Snippet } = $props();
     const runtime = setRuntime();
@@ -27,13 +25,7 @@
             };
         }
         return async () => {
-            await runtime.runPromiseExit(
-                Effect.gen(function* () {
-                    const realtime = yield* Realtime;
-                    yield* realtime.dispose;
-                })
-            );
-            await runtime.dispose();
+            runtime.realtime.dispose();
         };
     });
 </script>

@@ -1,19 +1,17 @@
-import { Context, Effect } from 'effect';
-import type { UnknownException } from 'effect/Cause';
 import {
     connect,
     usernamePasswordAuthenticator,
     type NatsConnection,
     type Subscription
 } from 'nats.ws';
+import { okAsync, ResultAsync } from 'neverthrow';
+import { GenericError } from '~/lib/models/errors';
+import { tryPromise } from '~/lib/utils/neverthrow';
 
-export class Realtime extends Context.Tag('Realtime')<
-    Realtime,
-    {
-        subscribe(subject: string): Effect.Effect<Subscription, UnknownException>;
-        readonly dispose: Effect.Effect<void, UnknownException>;
-    }
->() {}
+export interface Realtime {
+    subscribe(subject: string): ResultAsync<Subscription, GenericError>;
+    dispose(): ResultAsync<void, GenericError>;
+}
 
 export interface NATSRealtimeOptions {
     servers: string | string[];
@@ -21,7 +19,7 @@ export interface NATSRealtimeOptions {
     password: string;
 }
 
-export class NATSRealtime implements Context.Tag.Service<Realtime> {
+export class NATSRealtime implements Realtime {
     private readonly _options: NATSRealtimeOptions;
     private _connection: NatsConnection = undefined!;
 
@@ -30,20 +28,38 @@ export class NATSRealtime implements Context.Tag.Service<Realtime> {
     }
 
     public subscribe(subject: string) {
-        return Effect.gen(this, function* () {
-            yield* Effect.tryPromise(() => this._ensure());
-            return yield* Effect.succeed(this._connection.subscribe(subject));
+        return this._connectResult().map((a) => a.subscribe(subject));
+    }
+
+    public dispose() {
+        if (!this._connection) {
+            return okAsync(void 0);
+        }
+        return okAsync(this._connection).andThen((a) =>
+            tryPromise(a.close(), (e) =>
+                e instanceof Error
+                    ? new GenericError({ code: 'dispose', message: e.message })
+                    : new GenericError({
+                          code: 'dispose',
+                          message: 'Could not disconnect from websocket server'
+                      })
+            )
+        );
+    }
+
+    private _connectResult() {
+        return tryPromise(this._connect(), (e) => {
+            if (e instanceof Error) {
+                return new GenericError({ code: 'connect', message: e.message });
+            }
+            return new GenericError({
+                code: 'connect',
+                message: 'Could not connect to websocket server'
+            });
         });
     }
 
-    public get dispose() {
-        if (!this._connection) {
-            return Effect.void;
-        }
-        return Effect.tryPromise(() => this._connection?.close());
-    }
-
-    private async _ensure() {
+    private async _connect() {
         if (!this._connection) {
             this._connection = await connect({
                 servers: this._options.servers,
@@ -53,5 +69,6 @@ export class NATSRealtime implements Context.Tag.Service<Realtime> {
                 )
             });
         }
+        return this._connection;
     }
 }

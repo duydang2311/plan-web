@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { error, redirect, type Handle } from '@sveltejs/kit';
 import { Exit, Layer, ManagedRuntime } from 'effect';
 import jwt from 'jsonwebtoken';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
@@ -57,7 +57,9 @@ export const handle: Handle = async ({ event, event: { locals, route, cookies },
                 });
             });
         } else {
-            return redirect(302, '/login');
+            return route.id.includes('api')
+                ? error(403, { code: 'forbidden', message: 'Forbidden' })
+                : redirect(302, '/login');
         }
     }
     const response = await resolve(event);
