@@ -1,24 +1,24 @@
 <script lang="ts">
     import { navigating, page } from '$app/stores';
+    import { A, pipe } from '@mobily/ts-belt';
     import clsx from 'clsx';
-    import { Array, pipe } from 'effect';
     import { DateTime } from 'luxon';
     import { orderBy } from 'natural-orderby';
     import { backInOut, circInOut } from 'svelte/easing';
     import { fade, scale } from 'svelte/transition';
     import Button from '~/lib/components/Button.svelte';
     import Icon from '~/lib/components/Icon.svelte';
+    import Link from '~/lib/components/Link.svelte';
     import Pagination from '~/lib/components/Pagination.svelte';
     import Row from '~/lib/components/Row.svelte';
     import Spinner from '~/lib/components/Spinner.svelte';
     import Table from '~/lib/components/Table.svelte';
     import Th from '~/lib/components/Th.svelte';
+    import THead from '~/lib/components/THead.svelte';
     import { paginatedList } from '~/lib/models/paginatedList';
     import { watch } from '~/lib/models/watchable';
     import { mapMaybePromise } from '~/lib/utils/promise';
     import type { PageData } from './$types';
-    import Link from '~/lib/components/Link.svelte';
-    import THead from '~/lib/components/THead.svelte';
 
     const { data }: { data: PageData } = $props();
     let teamList = $state(data.teamList);
@@ -29,11 +29,11 @@
         if (!order) return null;
         return pipe(
             order.split(','),
-            Array.map((a) => {
+            A.map((a) => {
                 let desc = a[0] === '-';
                 return [desc ? a.substring(1) : a, desc ? 'desc' : 'asc'] as const;
             }),
-            Array.filter(
+            A.filter(
                 (a): a is ['name' | 'identifier' | 'createdTime' | 'updatedTime', 'desc' | 'asc'] =>
                     a[0] === 'name' ||
                     a[0] === 'identifier' ||

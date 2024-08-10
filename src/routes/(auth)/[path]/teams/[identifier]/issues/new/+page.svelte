@@ -1,6 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { Record } from 'effect';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
@@ -12,6 +11,7 @@
     import { validate } from './utils';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { Editor } from '@tiptap/core';
+    import { D } from '@mobily/ts-belt';
 
     const errorMap = {
         root: {
@@ -60,10 +60,10 @@
             form = validation.ok
                 ? null
                 : {
-                      errors: Record.filter(
+                      errors: D.filterWithKey(
                           validation.errors,
-                          (_, k) => hasProperty(fields, k) && !!fields[k]
-                      )
+                          (k) => hasProperty(fields, k) && !!fields[k]
+                      ) as typeof validation.errors
                   };
         }}
         use:enhance={(e) => {

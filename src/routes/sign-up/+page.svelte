@@ -8,7 +8,6 @@
 
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { Record } from 'effect';
     import { circInOut } from 'svelte/easing';
     import { fly } from 'svelte/transition';
     import Button from '~/lib/components/Button.svelte';
@@ -22,6 +21,7 @@
     import type { ActionData } from './$types';
     import Success from './Success.svelte';
     import { decode, validate } from './utils';
+    import { D } from '@mobily/ts-belt';
 
     const errorMap = {
         root: {
@@ -79,10 +79,10 @@
                             form = validation.ok
                                 ? null
                                 : {
-                                      errors: Record.filter(
+                                      errors: D.filterWithKey(
                                           validation.errors,
-                                          (_, k) => hasProperty(input, k) && !!input[k]
-                                      )
+                                          (k) => hasProperty(input, k) && !!input[k]
+                                      ) as typeof validation.errors
                                   };
                         }}
                         use:enhance={(e) => {
