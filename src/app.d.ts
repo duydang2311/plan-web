@@ -39,4 +39,8 @@ declare global {
         get<T = FormDataEntryValue>(name: string): T | null;
         getAll<T = FormDataEntryValue>(name: string): T[];
     }
+
+    namespace Belt {
+        type UseMutableArrays = 1;
+    }
 }

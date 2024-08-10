@@ -53,9 +53,17 @@
                         editorProps={{ class: 'pb-8' }}
                     />
                     <div class="absolute right-2 bottom-2 flex gap-2">
-                        <Button as="link" href={cancelHref} size="sm" filled={false} variant="base"
-                            >Cancel</Button
+                        <Button
+                            as="link"
+                            href={cancelHref}
+                            size="sm"
+                            filled={false}
+                            variant="base"
+                            data-sveltekit-preload-data="tap"
+                            data-sveltekit-replacestate
                         >
+                            Cancel
+                        </Button>
                         <Button size="sm" variant="primary" filled={false}>Save</Button>
                     </div>
                 </form>
@@ -72,7 +80,16 @@
         {/if}
     </div>
     <div class="mt-8 flex gap-2">
-        <Button as="link" href={editHref} variant="base" filled={false} size="sm" class="w-fit">
+        <Button
+            as="link"
+            href={editHref}
+            variant="base"
+            filled={false}
+            size="sm"
+            class="w-fit"
+            data-sveltekit-preload-data="tap"
+            data-sveltekit-replacestate
+        >
             Edit
         </Button>
         <Button

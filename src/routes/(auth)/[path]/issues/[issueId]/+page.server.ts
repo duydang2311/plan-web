@@ -54,8 +54,8 @@ export const load: PageServerLoad = async ({
 
     const commentQuery = paginatedQuery(
         queryParams(url, {
-            page: 1,
-            size: 20
+            offset: 0,
+            size: 10
         })
     );
     const commentList = runtime
@@ -64,7 +64,8 @@ export const load: PageServerLoad = async ({
                 const api = yield* ApiClient;
                 const response = yield* api.get(`issues/${params.issueId}/comments`, {
                     query: {
-                        ...commentQuery,
+                        offset: 0,
+                        size: commentQuery.offset + commentQuery.size,
                         select: 'CreatedTime, UpdatedTime, Content, AuthorId'
                     }
                 });
@@ -331,7 +332,6 @@ export const actions: Actions = {
             )
         );
 
-        console.log(exit);
         if (Exit.isFailure(exit)) {
             const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
             return fail(failure.status, {

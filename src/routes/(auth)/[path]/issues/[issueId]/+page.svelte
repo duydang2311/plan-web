@@ -1,37 +1,73 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import { A, pipe } from '@mobily/ts-belt';
+    import { createInfiniteQuery } from '@tanstack/svelte-query';
+    import { createVirtualizer, type SvelteVirtualizer } from '@tanstack/svelte-virtual';
     import { Editor } from '@tiptap/core';
     import type { Subscription } from 'nats.ws';
-    import { onMount } from 'svelte';
-    import Button from '~/lib/components/Button.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
-    import { addToast } from '~/lib/components/Toaster.svelte';
+    import { onMount, tick, untrack } from 'svelte';
+    import { type Readable } from 'svelte/store';
+    import { fade } from 'svelte/transition';
+    import { Button, Icon, Tiptap, addToast } from '~/lib/components';
+    import Spinner from '~/lib/components/Spinner.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { IssueComment } from '~/lib/models/issue_comment';
-    import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
+    import { paginatedQuery, queryParams } from '~/lib/utils/url';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData, PageData } from './$types';
     import Comment from './Comment.svelte';
     import Issue from './Issue.svelte';
-    import { clientValidate } from './utils.client';
-    import { tryPromise } from '~/lib/utils/neverthrow';
+    import { clientValidate, fetchCommentList } from './utils.client';
 
-    let { data, form }: { data: PageData; form: ActionData } = $props();
+    const { data, form }: { data: PageData; form: ActionData } = $props();
+    const { realtime } = useRuntime();
     let editor = $state<Editor>();
     let validation = $state<ValidationResult>();
-    let commentList = $state.frozen<PaginatedList<IssueComment>>(
-        data.comment.list instanceof Promise ? paginatedList() : data.comment.list
-    );
-    const { realtime } = useRuntime();
-    $effect(() => {
-        if (data.comment.list instanceof Promise) {
-            data.comment.list.then((v) => (commentList = v));
-        } else {
-            commentList = data.comment.list;
-        }
+    const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
+    const query = createInfiniteQuery({
+        queryKey: ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }],
+        queryFn: async ({ pageParam, signal }) => {
+            const result = await fetchCommentList({
+                issueId: $page.params['issueId'],
+                offset: pageParam,
+                size: commentQuery.size,
+                signal
+            });
+
+            if (result.isOk() && result.value) {
+                $page.url.searchParams.set('offset', pageParam + '');
+                await goto($page.url, { replaceState: true, noScroll: true });
+                return result.value;
+            }
+            return null;
+        },
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => lastPage?.nextOffset
     });
+
+    let virtualItemEls = $state<HTMLDivElement[]>([]);
+    let virtualizer = $state<Readable<SvelteVirtualizer<HTMLElement, HTMLElement>>>();
+    let items = $derived($virtualizer?.getVirtualItems());
+    const comments = $derived(
+        $query.data
+            ? pipe(
+                  $query.data.pages,
+                  A.filter((a) => a != null),
+                  A.flatMap((a) => a?.items)
+              )
+            : []
+    );
+
+    function virtualize(node: HTMLElement) {
+        virtualizer = createVirtualizer({
+            count: 0,
+            getScrollElement: () => node,
+            estimateSize: (index) => virtualItemEls[index]?.clientHeight ?? 145,
+            getItemKey: (index) => comments[index]?.id ?? 'loading-more',
+            overscan: 4
+        });
+    }
 
     onMount(() => {
         let subscription: Subscription | undefined = undefined;
@@ -43,38 +79,56 @@
                 return;
             }
             subscription = subscribeResult.value;
-            for await (const message of subscription) {
-                const data = message.json<{ issueCommentId: string }>();
-                if (commentList.items.length !== commentList.totalCount) {
+            for await (const _ of subscription) {
+                if ($query.hasNextPage) {
                     addToast({
                         data: {
-                            title: 'New comment',
-                            description:
-                                'A user has added a comment on this issue. Scroll down to see it'
+                            title: '',
+                            description: 'A new comment has been added.'
                         }
                     });
                 } else {
-                    const tryFetch = await tryPromise(
-                        fetch(`/api/issue-comments/${data.issueCommentId}`, {
-                            method: 'get'
-                        })
-                    );
-                    if (tryFetch.isErr() || !tryFetch.value.ok) {
-                        return;
-                    }
-                    const tryDecode = await tryPromise(tryFetch.value.json<IssueComment>());
-                    if (tryDecode.isOk()) {
-                        commentList = paginatedList({
-                            items: [...commentList.items, tryDecode.value],
-                            totalCount: commentList.totalCount + 1
-                        });
-                    }
+                    // TODO: use mutation
+                    await $query.refetch();
+                    await tick();
+                    $virtualizer?.measure();
+                    $virtualizer?.scrollToIndex(comments.length - 1);
                 }
             }
         })();
         return () => {
             subscription?.unsubscribe();
         };
+    });
+
+    $effect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        comments;
+        untrack(() => {
+            $virtualizer?.setOptions({
+                count: $query.hasNextPage ? comments.length + 1 : comments.length
+            });
+        });
+    });
+
+    $effect(() => {
+        for (const el of virtualItemEls) {
+            untrack(() => {
+                $virtualizer!.measureElement(el);
+            });
+        }
+    });
+
+    $effect(() => {
+        const lastItem = $virtualizer?.getVirtualItems().at(-1);
+        if (
+            lastItem &&
+            lastItem.index > comments.length - 1 &&
+            $query.hasNextPage &&
+            !$query.isFetchingNextPage
+        ) {
+            $query.fetchNextPage({ cancelRefetch: true });
+        }
     });
 
     $effect(() => {
@@ -97,30 +151,52 @@
     });
 </script>
 
-<main class="relative h-full overflow-auto">
-    <div class="relative mx-auto max-w-paragraph-lg p-4">
-        <h4 class="font-bold content-center">
+<main class="relative h-full overflow-auto" use:virtualize>
+    <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
+        <p class="font-bold content-center text-base-fg-1 text-h1">
             {data.issue.title}
             <span class="text-base-fg-3/60 font-normal">
                 #{data.issue.orderNumber}
             </span>
-        </h4>
+        </p>
         <Issue {form} isEditing={data.isEditing} issue={data.issue} />
-        <h6 class="mt-4 font-bold">Activity</h6>
-        {#if commentList.items.length}
-            <ol class="mt-4 space-y-8 pt-2">
-                {#each commentList.items as comment (comment.id)}
-                    <li class="w-full">
-                        <Comment
-                            {comment}
-                            isAuthor={comment.authorId === data.user.id}
-                            isEditing={comment.id === data.editingCommentId}
-                        />
-                    </li>
-                {/each}
-            </ol>
+        <p class="mt-8 font-bold text-base-fg-1 text-h4">Activity</p>
+        {#if $virtualizer}
+            <div style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;">
+                {#if items}
+                    <div
+                        style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
+                            ? items[0].start
+                            : 0}px);"
+                    >
+                        {#each items as row, idx (row.index)}
+                            <div
+                                bind:this={virtualItemEls[idx]}
+                                data-index={row.index}
+                                class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
+                            >
+                                {#if row.index > comments.length - 1}
+                                    <div in:fade>
+                                        {#if $query.hasNextPage}
+                                            <Spinner class="size-8 text-primary-1 mx-auto" />
+                                            Loading more...
+                                        {/if}
+                                    </div>
+                                {:else}
+                                    {@const comment = comments[row.index]}
+                                    <Comment
+                                        {comment}
+                                        isAuthor={comment.authorId === data.user.id}
+                                        isEditing={comment.id === data.editingCommentId}
+                                    />
+                                {/if}
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
         {/if}
-        <div class="sticky mt-8 bottom-2">
+        <div class="mt-8">
             <form
                 method="post"
                 action="?/comment"

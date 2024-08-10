@@ -28,10 +28,17 @@ export function queryParams<T extends Record<string, unknown>>(
     return obj;
 }
 
-export function paginatedQuery<T extends { page: number; size: number }>(queryParams: T) {
+export function paginatedQuery<T extends { page?: number; offset?: number; size: number }>(
+    queryParams: T
+) {
+    if (queryParams.offset == null || queryParams.offset === 0) {
+        queryParams.offset = queryParams.page
+            ? (queryParams.page - 1) * queryParams.size
+            : (queryParams.offset ?? 0);
+    }
     return {
         ...queryParams,
-        offset: (queryParams.page - 1) * queryParams.size
+        offset: queryParams.offset
     };
 }
 

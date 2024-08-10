@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { QueryClientProvider } from '@tanstack/svelte-query';
     import { onMount, type Snippet } from 'svelte';
-    import './+layout.css';
     import Toaster from '~/lib/components/Toaster.svelte';
     import { setRuntime } from '~/lib/contexts/runtime.client';
+    import type { LayoutData } from './$types';
+    import './+layout.css';
 
-    const { children }: { children: Snippet } = $props();
+    const { data, children }: { data: LayoutData; children: Snippet } = $props();
     const runtime = setRuntime();
 
     function onColorSchemePreferenceChange(e: MediaQueryListEvent) {
@@ -31,4 +33,6 @@
 </script>
 
 <Toaster />
-{@render children()}
+<QueryClientProvider client={data.queryClient}>
+    {@render children()}
+</QueryClientProvider>

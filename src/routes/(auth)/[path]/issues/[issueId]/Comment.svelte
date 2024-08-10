@@ -86,7 +86,15 @@
                         editorProps={{ class: 'pb-8' }}
                     />
                     <div class="flex gap-2 absolute right-2 bottom-2">
-                        <Button as="link" href={cancelHref} variant="base" size="sm" filled={false}>
+                        <Button
+                            as="link"
+                            href={cancelHref}
+                            variant="base"
+                            size="sm"
+                            filled={false}
+                            data-sveltekit-preload-data="tap"
+                            data-sveltekit-replacestate
+                        >
                             Cancel
                         </Button>
                         <Button variant="primary" size="sm" filled={false}>Save</Button>
@@ -102,9 +110,18 @@
     </div>
     {#if isAuthor}
         <div class="mt-4 flex flex-wrap gap-2">
-            <Button as="link" href={editHref} filled={false} variant="base" size="sm" class="w-fit"
-                >Edit</Button
+            <Button
+                as="link"
+                href={editHref}
+                filled={false}
+                variant="base"
+                size="sm"
+                class="w-fit"
+                data-sveltekit-preload-data="tap"
+                data-sveltekit-replacestate
             >
+                Edit
+            </Button>
             <PopoverBuilder bind:open>
                 {#snippet children({ trigger, content, arrow, close })}
                     <Button
@@ -131,6 +148,7 @@
                                         action="?/delete-comment"
                                         use:enhance={() => {
                                             return async ({ result, update }) => {
+                                                open = false;
                                                 if (result.type === 'success') {
                                                     addToast({
                                                         data: {
@@ -140,7 +158,9 @@
                                                         }
                                                     });
                                                 }
-                                                await update();
+                                                await update({
+                                                    reset: false
+                                                });
                                             };
                                         }}
                                     >
