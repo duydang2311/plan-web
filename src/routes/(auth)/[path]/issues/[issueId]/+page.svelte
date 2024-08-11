@@ -4,11 +4,10 @@
     import { page } from '$app/stores';
     import { A, pipe } from '@mobily/ts-belt';
     import { createInfiniteQuery } from '@tanstack/svelte-query';
-    import { createVirtualizer, type SvelteVirtualizer } from '@tanstack/svelte-virtual';
+    import { createVirtualizer } from '@tanstack/svelte-virtual';
     import { Editor } from '@tiptap/core';
     import type { Subscription } from 'nats.ws';
     import { onMount, tick, untrack } from 'svelte';
-    import { type Readable } from 'svelte/store';
     import { fade } from 'svelte/transition';
     import { Button, Icon, Tiptap, addToast } from '~/lib/components';
     import Spinner from '~/lib/components/Spinner.svelte';
@@ -46,8 +45,21 @@
         getNextPageParam: (lastPage) => lastPage?.nextOffset
     });
 
+    let scrollEl = $state<HTMLElement>();
+    let virtualListEl = $state<HTMLDivElement>();
     let virtualItemEls = $state<HTMLDivElement[]>([]);
-    let virtualizer = $state<Readable<SvelteVirtualizer<HTMLElement, HTMLElement>>>();
+    const virtualizer = $derived(
+        scrollEl && virtualListEl
+            ? createVirtualizer<HTMLElement, HTMLDivElement>({
+                  count: 0,
+                  getScrollElement: () => scrollEl!,
+                  estimateSize: (index) => virtualItemEls[index]?.clientHeight ?? 145,
+                  getItemKey: (index) => comments[index]?.id ?? 'loading-more',
+                  overscan: 4,
+                  scrollMargin: virtualListEl.offsetTop ?? 0
+              })
+            : null
+    );
     let items = $derived($virtualizer?.getVirtualItems());
     const comments = $derived(
         $query.data
@@ -58,16 +70,6 @@
               )
             : []
     );
-
-    function virtualize(node: HTMLElement) {
-        virtualizer = createVirtualizer({
-            count: 0,
-            getScrollElement: () => node,
-            estimateSize: (index) => virtualItemEls[index]?.clientHeight ?? 145,
-            getItemKey: (index) => comments[index]?.id ?? 'loading-more',
-            overscan: 4
-        });
-    }
 
     onMount(() => {
         let subscription: Subscription | undefined = undefined;
@@ -121,12 +123,15 @@
 
     $effect(() => {
         const lastItem = $virtualizer?.getVirtualItems().at(-1);
+        console.log($virtualizer?.getVirtualItems());
+        console.log(lastItem?.index, 'vs', comments.length);
         if (
             lastItem &&
             lastItem.index > comments.length - 1 &&
             $query.hasNextPage &&
             !$query.isFetchingNextPage
         ) {
+            console.log('fetch next');
             $query.fetchNextPage({ cancelRefetch: true });
         }
     });
@@ -151,7 +156,7 @@
     });
 </script>
 
-<main class="relative h-full overflow-auto" use:virtualize>
+<main class="relative h-full overflow-auto" bind:this={scrollEl}>
     <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
         <p class="font-bold content-center text-base-fg-1 text-h1">
             {data.issue.title}
@@ -161,41 +166,45 @@
         </p>
         <Issue {form} isEditing={data.isEditing} issue={data.issue} />
         <p class="mt-8 font-bold text-base-fg-1 text-h4">Activity</p>
-        {#if $virtualizer}
-            <div style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;">
-                {#if items}
-                    <div
-                        style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
-                            ? items[0].start
-                            : 0}px);"
-                    >
-                        {#each items as row, idx (row.index)}
-                            <div
-                                bind:this={virtualItemEls[idx]}
-                                data-index={row.index}
-                                class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
-                            >
-                                {#if row.index > comments.length - 1}
-                                    <div in:fade>
-                                        {#if $query.hasNextPage}
-                                            <Spinner class="size-8 text-primary-1 mx-auto" />
-                                            Loading more...
-                                        {/if}
-                                    </div>
-                                {:else}
-                                    {@const comment = comments[row.index]}
-                                    <Comment
-                                        {comment}
-                                        isAuthor={comment.authorId === data.user.id}
-                                        isEditing={comment.id === data.editingCommentId}
-                                    />
-                                {/if}
-                            </div>
-                        {/each}
-                    </div>
-                {/if}
-            </div>
-        {/if}
+        <div bind:this={virtualListEl}>
+            {#if $virtualizer}
+                <div
+                    style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;"
+                >
+                    {#if items}
+                        <div
+                            style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
+                                ? items[0].start - $virtualizer.options.scrollMargin
+                                : 0}px);"
+                        >
+                            {#each items as row, idx (row.index)}
+                                <div
+                                    bind:this={virtualItemEls[idx]}
+                                    data-index={row.index}
+                                    class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
+                                >
+                                    {#if row.index > comments.length - 1}
+                                        <div in:fade>
+                                            {#if $query.hasNextPage}
+                                                <Spinner class="size-8 text-primary-1 mx-auto" />
+                                                Loading more...
+                                            {/if}
+                                        </div>
+                                    {:else}
+                                        {@const comment = comments[row.index]}
+                                        <Comment
+                                            {comment}
+                                            isAuthor={comment.authorId === data.user.id}
+                                            isEditing={comment.id === data.editingCommentId}
+                                        />
+                                    {/if}
+                                </div>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+            {/if}
+        </div>
         <div class="mt-8">
             <form
                 method="post"
