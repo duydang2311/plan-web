@@ -5,7 +5,7 @@
             var(--theme-base-border) 40%,
             var(--theme-base-1)
         );
-        --theme-table-hover: color-mix(in oklch, var(--theme-base-border) 20%, var(--theme-base-1));
+        --theme-table-hover: color-mix(in oklch, var(--theme-base-border) 10%, var(--theme-base-1));
     }
 }
 
@@ -36,7 +36,7 @@
     text-align: left;
 
     & > * {
-        padding: theme('padding[4]') theme('padding[2]');
+        padding: theme('padding[4]') theme('padding[4]');
     }
 
     & > :first-child {

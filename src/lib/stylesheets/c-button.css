@@ -4,7 +4,11 @@
         --c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
 
         --c-button-base-bg: var(--theme-base-1);
-        --c-button-base-bg-hover: var(--theme-base-2);
+        --c-button-base-bg-hover: color-mix(
+            in oklch,
+            var(--theme-base-1) 96%,
+            var(--theme-base-fg-1)
+        );
         --c-button-base-bg-active: var(--theme-base-3);
     }
 
@@ -15,7 +19,7 @@
         --c-button-base-bg: color-mix(in oklch, var(--theme-base-1) 99%, var(--theme-base-fg-1));
         --c-button-base-bg-hover: color-mix(
             in oklch,
-            var(--theme-base-2) 94%,
+            var(--theme-base-1) 94%,
             var(--theme-base-fg-1)
         );
     }
@@ -136,7 +140,6 @@
 
 .c-button--base {
     &:not(.c-button--filled) {
-        color: var(--theme-base-fg-1);
         &:not(:disabled):hover {
             background-color: var(--c-button-base-bg-hover);
         }
@@ -156,7 +159,6 @@
     }
 
     &.c-button--filled {
-        color: var(--theme-base-fg-1);
         background-color: var(--c-button-base-bg);
 
         &:hover {

@@ -106,6 +106,7 @@
                 <col />
                 <col />
                 <col />
+                <col class="w-16" />
             </colgroup>
             <THead>
                 <Row class="*:py-2">
@@ -113,6 +114,7 @@
                     <Th sortable name="identifier">Identifier</Th>
                     <Th sortable name="createdTime">Created</Th>
                     <Th sortable name="updatedTime">Updated</Th>
+                    <Th></Th>
                 </Row>
             </THead>
             <tbody
@@ -122,17 +124,17 @@
             >
                 {#await sorted}
                     <Row>
-                        <td colspan="4">Loading teams...</td>
+                        <td colspan="5">Loading teams...</td>
                     </Row>
                 {:then { items }}
                     {#if items.length}
                         {#each items as { createdTime, updatedTime, name, identifier }}
                             <Row>
-                                <td
-                                    ><Link href="/{$page.params['path']}/teams/{identifier}/issues"
-                                        >{name}</Link
-                                    ></td
-                                >
+                                <td>
+                                    <Link href="/{$page.params['path']}/teams/{identifier}/issues">
+                                        {name}
+                                    </Link>
+                                </td>
                                 <td>{identifier}</td>
                                 <td>
                                     {DateTime.fromISO(createdTime).toLocaleString(
@@ -143,6 +145,21 @@
                                     {DateTime.fromISO(updatedTime).toLocaleString(
                                         DateTime.DATETIME_SHORT
                                     )}
+                                </td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <Button
+                                            as="link"
+                                            href="/{$page.params[
+                                                'path'
+                                            ]}/teams/{identifier}/settings"
+                                            variant="base"
+                                            class="w-fit p-1 text-base-fg-3 hover:text-base-fg-1"
+                                            filled={false}
+                                        >
+                                            <Icon name="settings" />
+                                        </Button>
+                                    </div>
                                 </td>
                             </Row>
                         {/each}

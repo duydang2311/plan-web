@@ -23,6 +23,8 @@
     import Quotes from '~icons/lucide/quote';
     import Files from '~icons/ph/files-fill';
     import FilesOutline from '~icons/ph/files';
+    import SettingsOutline from '~icons/heroicons/cog-6-tooth';
+    import Settings from '~icons/heroicons/cog-6-tooth-20-solid';
 
     export type IconName = keyof typeof icons;
 
@@ -50,7 +52,9 @@
         underline: Underline,
         quotes: Quotes,
         issues: Files,
-        'issues-outline': FilesOutline
+        'issues-outline': FilesOutline,
+        'settings-outline': SettingsOutline,
+        settings: Settings
     } as const;
 </script>
 
