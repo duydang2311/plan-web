@@ -1,26 +1,19 @@
 import type { Effect } from 'effect/Effect';
 import type { ApiError } from '../models/errors';
-import {
-    HttpApiClient,
-    type ApiClientFetchRequestInit,
-    type ApiClientOptions
-} from './api_client.server';
-
-export interface BearerHttpApiClientOptions extends ApiClientOptions {
-    accessToken: string;
-}
+import { HttpApiClient } from './api_client.server';
+import type { HttpClient, HttpClientFetchRequestInit } from './http_client';
 
 export class BearerHttpApiClient extends HttpApiClient {
     private readonly _accessToken: string;
 
-    public constructor(_options: BearerHttpApiClientOptions) {
+    public constructor(_options: { httpClient: HttpClient; accessToken: string }) {
         super(_options);
         this._accessToken = _options.accessToken;
     }
 
     public fetch(
         path: string,
-        init?: ApiClientFetchRequestInit | undefined
+        init?: HttpClientFetchRequestInit | undefined
     ): Effect<Response, ApiError, never> {
         return super.fetch(path, {
             ...init,

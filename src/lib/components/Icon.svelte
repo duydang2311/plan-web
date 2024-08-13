@@ -25,6 +25,7 @@
     import FilesOutline from '~icons/ph/files';
     import SettingsOutline from '~icons/heroicons/cog-6-tooth';
     import Settings from '~icons/heroicons/cog-6-tooth-20-solid';
+    import Check from '~icons/heroicons/check-20-solid';
 
     export type IconName = keyof typeof icons;
 
@@ -54,7 +55,8 @@
         issues: Files,
         'issues-outline': FilesOutline,
         'settings-outline': SettingsOutline,
-        settings: Settings
+        settings: Settings,
+        check: Check
     } as const;
 </script>
 

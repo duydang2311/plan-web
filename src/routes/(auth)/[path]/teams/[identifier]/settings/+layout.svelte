@@ -36,7 +36,7 @@
             ]}
         />
     </div>
-    <div class="bg-base-2 max-xl:h-full xl:grow bg-transparent">
+    <div class="bg-base-2 max-xl:h-full grow bg-transparent overflow-hidden">
         {@render children()}
     </div>
 </div>

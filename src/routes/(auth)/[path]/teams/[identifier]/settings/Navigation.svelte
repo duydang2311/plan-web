@@ -1,11 +1,11 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { beforeNavigate } from '$app/navigation';
     import { page } from '$app/stores';
-    import type { IconName } from '~/lib/components/Icon.svelte';
-    import NavigationItem from './NavigationItem.svelte';
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
-    import { browser } from '$app/environment';
+    import type { IconName } from '~/lib/components/Icon.svelte';
+    import NavigationItem from './NavigationItem.svelte';
 
     interface Props {
         items: {
@@ -33,6 +33,7 @@
                     Flip.from(state, {
                         targets: activeBar,
                         duration: 0.3,
+                        prune: true,
                         ease: 'power2.inOut'
                     });
                 }
@@ -44,6 +45,7 @@
                         opacity: 0,
                         scaleY: 0,
                         duration: 0.2,
+                        prune: true,
                         ease: 'power2.inOut'
                     });
                 }

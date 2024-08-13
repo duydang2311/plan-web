@@ -69,6 +69,12 @@ export default [
         }
     },
     {
+        files: ['**/*.svelte'],
+        rules: {
+            'no-undef': 'off'
+        }
+    },
+    {
         ignores: ['build/', '.svelte-kit/', 'dist/']
     }
 ];
