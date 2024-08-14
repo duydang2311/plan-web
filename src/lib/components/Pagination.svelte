@@ -4,7 +4,7 @@
     import clsx from 'clsx';
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
-    import { tick, untrack } from 'svelte';
+    import { tick, untrack, type Snippet } from 'svelte';
     import Icon from './Icon.svelte';
 
     interface Props {
@@ -13,8 +13,9 @@
         page: number;
         size: number;
         totalCount: number;
+        label?: Snippet<[{ from: number; to: number; totalCount: number }]>;
     }
-    const { page: pageNumber, offset, length, size, totalCount }: Props = $props();
+    const { page: pageNumber, offset, length, size, totalCount, label }: Props = $props();
     const totalPages = $derived(Math.ceil(totalCount / size));
     const search = $derived.by(() => {
         const searchParams = $page.url.searchParams;
@@ -120,8 +121,10 @@
     <span class="text-base-fg-3 text-sm font-bold">
         {#if length === 0}
             Nothing to display.
+        {:else if label}
+            {@render label({ from: offset + 1, to: offset + length, totalCount })}
         {:else}
-            Displaying {offset + 1} - {offset + length} out of {totalCount} teams.
+            Displaying {offset + 1} - {offset + length} out of {totalCount} items.
         {/if}
     </span>
     <ol class="flex items-stretch text-sm font-bold text-base-fg-3">

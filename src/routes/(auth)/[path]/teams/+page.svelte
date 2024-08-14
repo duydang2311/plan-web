@@ -178,7 +178,11 @@
                 length={items.length}
                 {totalCount}
                 page={data.query.page}
-            />
+            >
+                {#snippet label({ from, to, totalCount })}
+                    Displaying {from} - {to} out of {totalCount} teams.
+                {/snippet}
+            </Pagination>
         {/await}
     </div>
 </main>

@@ -136,7 +136,11 @@
                 length={items.length}
                 {totalCount}
                 page={data.query.page}
-            />
+            >
+                {#snippet label({ from, to, totalCount })}
+                    Displaying {from} - {to} out of {totalCount} issues.
+                {/snippet}
+            </Pagination>
         {/await}
     </div>
 </main>
