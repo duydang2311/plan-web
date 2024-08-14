@@ -129,14 +129,8 @@
                 {/await}
             </tbody>
         </Table>
-        {#await list then { items, totalCount }}
-            <Pagination
-                size={data.query.size}
-                offset={data.query.offset}
-                length={items.length}
-                {totalCount}
-                page={data.query.page}
-            >
+        {#await list then list}
+            <Pagination query={data.query} {list}>
                 {#snippet label({ from, to, totalCount })}
                     Displaying {from} - {to} out of {totalCount} issues.
                 {/snippet}

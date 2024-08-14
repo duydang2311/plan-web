@@ -6,17 +6,46 @@
     import Flip from 'gsap/dist/Flip';
     import { tick, untrack, type Snippet } from 'svelte';
     import Icon from './Icon.svelte';
+    import type { PaginatedList } from '../models/paginatedList';
 
-    interface Props {
-        offset: number;
-        length: number;
-        page: number;
-        size: number;
-        totalCount: number;
-        label?: Snippet<[{ from: number; to: number; totalCount: number }]>;
-    }
-    const { page: pageNumber, offset, length, size, totalCount, label }: Props = $props();
-    const totalPages = $derived(Math.ceil(totalCount / size));
+    type Props = (
+        | {
+              offset: number;
+              page: number;
+              size: number;
+              query?: never;
+          }
+        | {
+              query: { offset: number; page: number; size: number };
+              offset?: never;
+              page?: never;
+              size?: never;
+          }
+    ) &
+        (
+            | {
+                  length: number;
+                  totalCount: number;
+                  list?: never;
+              }
+            | {
+                  list: PaginatedList<unknown>;
+                  length?: never;
+                  totalCount?: never;
+              }
+        ) & {
+            label?: Snippet<[{ from: number; to: number; totalCount: number }]>;
+        };
+    const { label, ...props }: Props = $props();
+    const query = $derived(
+        props.query ? props.query : { page: props.page, size: props.size, offset: props.offset }
+    );
+    const list = $derived(
+        props.list
+            ? { length: props.list.items, totalCount: props.list.totalCount }
+            : { length: props.length, totalCount: props.totalCount }
+    );
+    const totalPages = $derived(Math.ceil(list.totalCount / query.size));
     const search = $derived.by(() => {
         const searchParams = $page.url.searchParams;
         searchParams.delete('page');
@@ -27,9 +56,9 @@
         return '?';
     });
     const pageNumbers = $derived.by(() => {
-        if (pageNumber > totalPages || pageNumber < 1) return [];
+        if (query.page > totalPages || query.page < 1) return [];
         const size = 1;
-        const pivot = pageNumber;
+        const pivot = query.page;
         const mid = Math.floor(totalPages / 2);
         let start = pivot - size;
         let end = pivot + size;
@@ -80,7 +109,7 @@
     let active = $state<HTMLDivElement>();
     $effect.pre(() => {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        pageNumber;
+        query.page;
 
         const state = Flip.getState(untrack(() => active!));
         tick().then(() => {
@@ -95,7 +124,7 @@
 
 {#snippet item(page: number)}
     <li class="relative w-12 text-center">
-        {#if pageNumber === page}
+        {#if query.page === page}
             <div
                 bind:this={active}
                 data-flip-id="pagination"
@@ -107,7 +136,7 @@
             href="{search}page={page}"
             class={clsx(
                 'relative block h-full content-center rounded-full py-1 transition ease-in-out',
-                pageNumber === page ? 'text-base-fg-2' : 'hover:bg-base-3'
+                query.page === page ? 'text-base-fg-2' : 'hover:bg-base-3'
             )}
         >
             {page}
@@ -122,9 +151,13 @@
         {#if length === 0}
             Nothing to display.
         {:else if label}
-            {@render label({ from: offset + 1, to: offset + length, totalCount })}
+            {@render label({
+                from: query.offset + 1,
+                to: query.offset + length,
+                totalCount: list.totalCount
+            })}
         {:else}
-            Displaying {offset + 1} - {offset + length} out of {totalCount} items.
+            Displaying {query.offset + 1} - {query.offset + length} out of {list.totalCount} items.
         {/if}
     </span>
     <ol class="flex items-stretch text-sm font-bold text-base-fg-3">
@@ -134,10 +167,10 @@
             <li>
                 <a
                     data-sveltekit-noscroll
-                    href="{search}page={pageNumber - 1}"
+                    href="{search}page={query.page - 1}"
                     class={clsx(
                         'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
-                        pageNumber === 1
+                        query.page === 1
                             ? 'pointer-events-none text-base-fg-3/40'
                             : 'hover:bg-base-3'
                     )}
@@ -153,10 +186,10 @@
             <li>
                 <a
                     data-sveltekit-noscroll
-                    href="{search}page={pageNumber + 1}"
+                    href="{search}page={query.page + 1}"
                     class={clsx(
                         'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
-                        pageNumber === totalPages
+                        query.page === totalPages
                             ? 'pointer-events-none text-base-fg-3/40'
                             : 'hover:bg-base-3'
                     )}
