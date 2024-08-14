@@ -30,5 +30,5 @@ export const load: PageServerLoad = async ({ isDataRequest, parent, locals: { ru
         .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<Team>()))
         .then((v) => ({ ...v, size: query.size, offset: query.offset }));
 
-    return { teamList: isDataRequest ? teamList : await teamList };
+    return { teamList: isDataRequest ? teamList : await teamList, query };
 };

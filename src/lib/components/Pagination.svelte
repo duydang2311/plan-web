@@ -8,11 +8,13 @@
     import Icon from './Icon.svelte';
 
     interface Props {
+        offset: number;
+        length: number;
         page: number;
         size: number;
         totalCount: number;
     }
-    const { page: pageNumber, size, totalCount }: Props = $props();
+    const { page: pageNumber, offset, length, size, totalCount }: Props = $props();
     const totalPages = $derived(Math.ceil(totalCount / size));
     const search = $derived.by(() => {
         const searchParams = $page.url.searchParams;
@@ -24,24 +26,50 @@
         return '?';
     });
     const pageNumbers = $derived.by(() => {
-        const mid = (totalPages - 1) / 2;
-        let bias = pageNumber > mid ? 1 : 0;
-        let start = pageNumber - 1 - (pageNumber > mid ? 1 : 0);
-        while (start <= 1) {
-            ++start;
-        }
-        let end = start + 2 + bias + (pageNumber <= mid ? 1 : 0);
-        while (end >= totalPages) {
-            if (start > 2) {
-                --start;
-            }
-            --end;
-        }
-        if (end < start) {
-            return [];
+        if (pageNumber > totalPages || pageNumber < 1) return [];
+        const size = 1;
+        const pivot = pageNumber;
+        const mid = Math.floor(totalPages / 2);
+        let start = pivot - size;
+        let end = pivot + size;
+
+        // one sided bias
+        if (pivot > mid) start -= size;
+        else end += size;
+
+        // translate start/end accordingly
+        if (start <= 1) {
+            const gap = 1 - start + 1;
+            end += gap;
+            start += gap;
+        } else if (end >= totalPages) {
+            const gap = end - totalPages + 1;
+            end -= gap;
+            start -= gap;
         }
 
-        return new Array(end - start + 1).fill(0).map((_, i) => start + i);
+        // make sure not out of bound
+        if (start < 1) start = 2;
+        if (end >= totalPages) end = totalPages - 1;
+        if (end < start) return [];
+
+        // add half jump
+        let arr = new Array(end - start + 1).fill(0).map((_, i) => start + i);
+        const halfStart = Math.floor(start / 2);
+        if (halfStart < start && halfStart > 1) {
+            arr.unshift(halfStart);
+        } else if (end + 1 < totalPages) {
+            arr.push(end + 1);
+        }
+        const halfEnd = Math.floor(end + (totalPages - end) / 2);
+        if (halfEnd > end && halfEnd < totalPages) {
+            arr.push(halfEnd);
+        } else if (start - 1 > 1) {
+            arr.unshift(arr[0]);
+            arr[0] = start - 1;
+        }
+
+        return arr;
     });
 
     if (browser) {
@@ -65,10 +93,9 @@
 </script>
 
 {#snippet item(page: number)}
-    <li class="relative">
+    <li class="relative w-12 text-center">
         {#if pageNumber === page}
             <div
-                id="wtf"
                 bind:this={active}
                 data-flip-id="pagination"
                 class="absolute inset-0 bg-base-3 rounded-full"
@@ -78,7 +105,7 @@
             data-sveltekit-noscroll
             href="{search}page={page}"
             class={clsx(
-                'relative block h-full content-center rounded-full px-4 py-1 transition ease-in-out',
+                'relative block h-full content-center rounded-full py-1 transition ease-in-out',
                 pageNumber === page ? 'text-base-fg-2' : 'hover:bg-base-3'
             )}
         >
@@ -87,40 +114,53 @@
     </li>
 {/snippet}
 
-<ol class="flex items-stretch text-sm font-bold text-base-fg-3">
-    {#if totalPages === 1}
-        {@render item(1)}
-    {:else}
-        <li>
-            <a
-                data-sveltekit-noscroll
-                href="{search}page={pageNumber - 1}"
-                class={clsx(
-                    'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
-                    pageNumber === 1 ? 'pointer-events-none text-base-fg-3/40' : 'hover:bg-base-3'
-                )}
-            >
-                <Icon name="chevron-left" />
-            </a>
-        </li>
-        {@render item(1)}
-        {#each pageNumbers as page}
-            {@render item(page)}
-        {/each}
-        {@render item(totalPages)}
-        <li>
-            <a
-                data-sveltekit-noscroll
-                href="{search}page={pageNumber + 1}"
-                class={clsx(
-                    'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
-                    pageNumber === totalPages
-                        ? 'pointer-events-none text-base-fg-3/40'
-                        : 'hover:bg-base-3'
-                )}
-            >
-                <Icon name="chevron-right" />
-            </a>
-        </li>
-    {/if}
-</ol>
+<div
+    class="rounded-b-md bg-base-1/60 border-t border-t-[var(--theme-table-border)] backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+>
+    <span class="text-base-fg-3 text-sm font-bold">
+        {#if length === 0}
+            Nothing to display.
+        {:else}
+            Displaying {offset + 1} - {offset + length} out of {totalCount} teams.
+        {/if}
+    </span>
+    <ol class="flex items-stretch text-sm font-bold text-base-fg-3">
+        {#if totalPages <= 1}
+            {@render item(1)}
+        {:else}
+            <li>
+                <a
+                    data-sveltekit-noscroll
+                    href="{search}page={pageNumber - 1}"
+                    class={clsx(
+                        'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                        pageNumber === 1
+                            ? 'pointer-events-none text-base-fg-3/40'
+                            : 'hover:bg-base-3'
+                    )}
+                >
+                    <Icon name="chevron-left" />
+                </a>
+            </li>
+            {@render item(1)}
+            {#each pageNumbers as page}
+                {@render item(page)}
+            {/each}
+            {@render item(totalPages)}
+            <li>
+                <a
+                    data-sveltekit-noscroll
+                    href="{search}page={pageNumber + 1}"
+                    class={clsx(
+                        'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                        pageNumber === totalPages
+                            ? 'pointer-events-none text-base-fg-3/40'
+                            : 'hover:bg-base-3'
+                    )}
+                >
+                    <Icon name="chevron-right" />
+                </a>
+            </li>
+        {/if}
+    </ol>
+</div>

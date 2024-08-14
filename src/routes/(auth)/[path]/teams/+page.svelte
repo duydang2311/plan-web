@@ -171,19 +171,14 @@
                 {/await}
             </tbody>
         </Table>
-        {#await teamList then { items, size, offset, totalCount }}
-            <div
-                class="rounded-b-md bg-base-1/60 border-t border-t-[var(--theme-table-border)] backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
-            >
-                <span class="text-base-fg-3 text-sm font-bold">
-                    Displaying {offset + 1} - {offset + items.length} out of {totalCount} teams.
-                </span>
-                <Pagination
-                    {size}
-                    {totalCount}
-                    page={Number($page.url.searchParams.get('page') ?? '1')}
-                />
-            </div>
+        {#await teamList then { items, totalCount }}
+            <Pagination
+                size={data.query.size}
+                offset={data.query.offset}
+                length={items.length}
+                {totalCount}
+                page={data.query.page}
+            />
         {/await}
     </div>
 </main>

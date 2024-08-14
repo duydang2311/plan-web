@@ -59,6 +59,7 @@ export const load: PageServerLoad = async ({
     }
 
     return {
-        issueList: isDataRequest ? list : await list
+        issueList: isDataRequest ? list : await list,
+        query
     };
 };
