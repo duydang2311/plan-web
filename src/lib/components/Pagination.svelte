@@ -42,7 +42,7 @@
     );
     const list = $derived(
         props.list
-            ? { length: props.list.items, totalCount: props.list.totalCount }
+            ? { length: props.list.items.length, totalCount: props.list.totalCount }
             : { length: props.length, totalCount: props.totalCount }
     );
     const totalPages = $derived(Math.ceil(list.totalCount / query.size));
@@ -148,12 +148,12 @@
     class="rounded-b-md bg-base-1/60 border-t border-t-[var(--theme-table-border)] backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
 >
     <span class="text-base-fg-3 text-sm font-bold">
-        {#if length === 0}
+        {#if list.length === 0}
             Nothing to display.
         {:else if label}
             {@render label({
                 from: query.offset + 1,
-                to: query.offset + length,
+                to: query.offset + list.length,
                 totalCount: list.totalCount
             })}
         {:else}
