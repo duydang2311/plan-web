@@ -27,7 +27,7 @@
         editorProps,
         ...props
     }: Props = $props();
-    let editors = $state.frozen<[Editor]>();
+    let editors = $state.raw<[Editor]>();
     let status = $state<'ready' | 'loading' | null>(null);
 
     $effect(() => {
