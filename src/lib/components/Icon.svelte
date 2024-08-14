@@ -61,13 +61,15 @@
 </script>
 
 <script lang="ts">
-    import type { SVGAttributes } from 'svelte/elements';
+    import type { SvelteHTMLElements, SVGAttributes } from 'svelte/elements';
+    import type { SvelteComponent } from 'svelte';
 
     interface Props extends SVGAttributes<SVGElement> {
         name: IconName;
     }
 
     const { name, ...props }: Props = $props();
+    const Component = $derived<typeof SvelteComponent<SvelteHTMLElements['svg']>>(icons[name]);
 </script>
 
-<svelte:component this={icons[name]} {...props} />
+<Component {...props}></Component>
