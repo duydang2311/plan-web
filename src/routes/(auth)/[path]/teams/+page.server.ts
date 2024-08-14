@@ -5,9 +5,11 @@ import type { Team } from '~/lib/models/team';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 
-export const load: PageServerLoad = async ({ isDataRequest, locals: { runtime }, url }) => {
+export const load: PageServerLoad = async ({ isDataRequest, parent, locals: { runtime }, url }) => {
+    const data = await parent();
     const query = paginatedQuery(
         queryParams(url, {
+            workspaceId: data.workspace.id,
             page: 1,
             size: 20,
             order: '',
