@@ -26,6 +26,8 @@
     import SettingsOutline from '~icons/heroicons/cog-6-tooth';
     import Settings from '~icons/heroicons/cog-6-tooth-20-solid';
     import Check from '~icons/heroicons/check-20-solid';
+    import UserPlus from '~icons/heroicons/user-plus-20-solid';
+    import Search from '~icons/heroicons/magnifying-glass-20-solid';
 
     export type IconName = keyof typeof icons;
 
@@ -56,7 +58,9 @@
         'issues-outline': FilesOutline,
         'settings-outline': SettingsOutline,
         settings: Settings,
-        check: Check
+        check: Check,
+        'user-plus': UserPlus,
+        search: Search
     } as const;
 </script>
 
@@ -69,7 +73,7 @@
     }
 
     const { name, ...props }: Props = $props();
-    const Component = $derived<typeof SvelteComponent<SvelteHTMLElements['svg']>>(icons[name]);
+    const Icon = $derived<typeof SvelteComponent<SvelteHTMLElements['svg']>>(icons[name]);
 </script>
 
-<Component {...props}></Component>
+<Icon {...props} />

@@ -1,58 +1,29 @@
-import Accordion from './Accordion.svelte';
-import Breadcrumb from './Breadcrumb.svelte';
-import Button from './Button.svelte';
-import Dialog from './Dialog.svelte';
-import Errors from './Errors.svelte';
-import Field from './Field.svelte';
-import Flippable from './Flippable.svelte';
-import Icon from './Icon.svelte';
-import Input from './Input.svelte';
-import Label from './Label.svelte';
-import Link from './Link.svelte';
-import Logo from './Logo.svelte';
-import LogoType from './LogoType.svelte';
-import Pagination from './Pagination.svelte';
-import Popover from './Popover.svelte';
-import PopoverArrow from './PopoverArrow.svelte';
-import PopoverBuilder from './PopoverBuilder.svelte';
-import Row from './Row.svelte';
-import Spinner from './Spinner.svelte';
-import Table from './Table.svelte';
-import TextArea from './TextArea.svelte';
-import Th from './Th.svelte';
-import THead from './THead.svelte';
-import Tiptap from './Tiptap.svelte';
-import TiptapButton from './TiptapButton.svelte';
-import Toaster, { addToast } from './Toaster.svelte';
-import ToastItem from './ToastItem.svelte';
-
-export {
-    Accordion,
-    Breadcrumb,
-    Button,
-    Dialog,
-    Errors,
-    Field,
-    Flippable,
-    Icon,
-    Input,
-    Label,
-    Link,
-    Logo,
-    LogoType,
-    Pagination,
-    Popover,
-    PopoverArrow,
-    PopoverBuilder,
-    Row,
-    Spinner,
-    Table,
-    TextArea,
-    Th,
-    THead,
-    Tiptap,
-    TiptapButton,
-    Toaster,
-    addToast,
-    ToastItem
-};
+export { default as Accordion } from './Accordion.svelte';
+export { default as Breadcrumb } from './Breadcrumb.svelte';
+export { default as Button } from './Button.svelte';
+export { type DialogProps, default as Dialog } from './Dialog.svelte';
+export { default as Errors } from './Errors.svelte';
+export { default as Field } from './Field.svelte';
+export { default as Flippable } from './Flippable.svelte';
+export { default as Icon } from './Icon.svelte';
+export { default as Input } from './Input.svelte';
+export { default as Label } from './Label.svelte';
+export { default as Link } from './Link.svelte';
+export { default as Logo } from './Logo.svelte';
+export { default as LogoType } from './LogoType.svelte';
+export { default as Pagination } from './Pagination.svelte';
+export { default as Popover } from './Popover.svelte';
+export { default as PopoverArrow } from './PopoverArrow.svelte';
+export { default as PopoverBuilder } from './PopoverBuilder.svelte';
+export { default as Row } from './Row.svelte';
+export { default as Spinner } from './Spinner.svelte';
+export { default as Table } from './Table.svelte';
+export { default as TextArea } from './TextArea.svelte';
+export { default as Th } from './Th.svelte';
+export { default as THead } from './THead.svelte';
+export { default as Tiptap } from './Tiptap.svelte';
+export { default as TiptapButton } from './TiptapButton.svelte';
+export { default as Toaster, addToast } from './Toaster.svelte';
+export { default as ToastItem } from './ToastItem.svelte';
+export { default as Combobox } from './Combobox.svelte';
+export { default as StaticErrors } from './StaticErrors.svelte';

@@ -1,12 +1,8 @@
-<script lang="ts">
-    import { createDialog, melt } from '@melt-ui/svelte';
-    import type { Snippet } from 'svelte';
-    import type { Writable } from 'svelte/store';
-
-    interface Props {
+<script lang="ts" context="module">
+    export interface DialogProps {
         defaultOpen?: boolean;
         role?: 'dialog' | 'alertdialog';
-        onclose?: () => void;
+        onClose?: () => void;
         children?: Snippet<
             [
                 {
@@ -21,13 +17,20 @@
         open?: Writable<boolean>;
     }
 
-    type Title = Parameters<Parameters<typeof title.subscribe>[0]>[0];
-    type Description = Parameters<Parameters<typeof description.subscribe>[0]>[0];
-    type Content = Parameters<Parameters<typeof content.subscribe>[0]>[0];
-    type Close = Parameters<Parameters<typeof close.subscribe>[0]>[0];
-    type Overlay = Parameters<Parameters<typeof overlay.subscribe>[0]>[0];
+    type T = ReturnType<typeof createDialog>;
+    type Title = Parameters<Parameters<T['elements']['title']['subscribe']>[0]>[0];
+    type Description = Parameters<Parameters<T['elements']['description']['subscribe']>[0]>[0];
+    type Content = Parameters<Parameters<T['elements']['content']['subscribe']>[0]>[0];
+    type Close = Parameters<Parameters<T['elements']['close']['subscribe']>[0]>[0];
+    type Overlay = Parameters<Parameters<T['elements']['overlay']['subscribe']>[0]>[0];
+</script>
 
-    const { defaultOpen, children, open: __open, role, onclose }: Props = $props();
+<script lang="ts">
+    import { createDialog, melt } from '@melt-ui/svelte';
+    import type { Snippet } from 'svelte';
+    import type { Writable } from 'svelte/store';
+
+    const { defaultOpen, children, open: __open, role, onClose }: DialogProps = $props();
     const {
         elements: { overlay, content, title, description, close, portalled },
         states: { open }
@@ -37,7 +40,7 @@
         defaultOpen,
         open: __open,
         onOpenChange: ({ next }) => {
-            if (next === false) onclose?.();
+            if (next === false) onClose?.();
             return next;
         }
     });

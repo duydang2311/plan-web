@@ -1,10 +1,13 @@
 <script lang="ts">
+    import type { AnyMeltElement } from '@melt-ui/svelte';
     import clsx from 'clsx';
     import type { HTMLInputAttributes } from 'svelte/elements';
 
-    type Props = HTMLInputAttributes;
+    interface Props extends HTMLInputAttributes {
+        melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
+    }
 
-    let { value = $bindable(), ...props }: Props = $props();
+    let { value = $bindable(), melt: useMelt, ...props }: Props = $props();
     let element: HTMLInputElement;
 
     $effect(() => {
@@ -12,6 +15,15 @@
             element.focus();
         }
     });
+
+    const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
 </script>
 
-<input bind:this={element} {...props} bind:value class={clsx('c-input', props.class)} />
+<input
+    bind:this={element}
+    {...props}
+    bind:value
+    class={clsx('c-input', props.class)}
+    {...useMelt}
+    use:meltAction
+/>

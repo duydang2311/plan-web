@@ -1,13 +1,18 @@
 <script lang="ts">
+    import type { AnyMeltElement } from '@melt-ui/svelte';
     import clsx from 'clsx';
     import type { HTMLLabelAttributes } from 'svelte/elements';
 
-    type Props = HTMLLabelAttributes;
+    interface Props extends HTMLLabelAttributes {
+        melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
+    }
 
-    const { children, ...props }: Props = $props();
+    const { children, melt: useMelt, ...props }: Props = $props();
+
+    const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
 </script>
 
-<label {...props} class={clsx('c-label', props.class)}>
+<label {...props} class={clsx('c-label', props.class)} {...useMelt ?? {}} use:meltAction>
     {#if children}
         {@render children()}
     {/if}
