@@ -1,5 +1,6 @@
 import { linear } from 'svelte/easing';
-import type { EasingFunction, TransitionConfig } from 'svelte/transition';
+import { type EasingFunction, type TransitionConfig } from 'svelte/transition';
+import { gsap as __gsap } from 'gsap';
 
 const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
     const [minA, maxA] = scaleA;
@@ -34,3 +35,24 @@ export const flyAndScale = (node: HTMLElement, options: FlyAndScaleOptions): Tra
         easing: options.easing ?? linear
     };
 };
+
+export function none(_node: HTMLElement, { delay = 0, duration = 400 } = {}) {
+    return {
+        delay,
+        css: () => {
+            return '';
+        },
+        duration,
+        easing: linear
+    };
+}
+
+export function tsap(
+    node: HTMLElement,
+    callback: (node: HTMLElement, gsap: typeof __gsap) => gsap.core.Animation
+) {
+    const animation = callback(node, __gsap);
+    return {
+        duration: animation.totalDuration() * 1000
+    };
+}

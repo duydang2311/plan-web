@@ -50,6 +50,7 @@ export default withAnimations({
                     'fg-1': 'oklch(from var(--theme-base-fg-1) l c h / <alpha-value>)',
                     'fg-2': 'oklch(from var(--theme-base-fg-2) l c h / <alpha-value>)',
                     'fg-3': 'oklch(from var(--theme-base-fg-3) l c h / <alpha-value>)',
+                    'fg-ghost': 'oklch(from var(--theme-base-fg-ghost) l c h / <alpha-value>)',
                     border: 'oklch(from var(--theme-base-border) l c h / <alpha-value>)'
                 }
             },

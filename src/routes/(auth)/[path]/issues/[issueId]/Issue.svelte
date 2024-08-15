@@ -108,7 +108,7 @@
     role="alertdialog"
     {open}
     defaultOpen={true}
-    onclose={() => {
+    onClose={() => {
         $open = false;
     }}
 >

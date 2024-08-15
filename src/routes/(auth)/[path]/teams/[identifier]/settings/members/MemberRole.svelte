@@ -53,6 +53,7 @@
             return { oldMembers };
         },
         onSettled: async (data, error, _variables, context) => {
+            // TODO: handle error
             if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData(queryKey, context.oldMembers);
