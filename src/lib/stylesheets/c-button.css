@@ -10,6 +10,11 @@
             var(--theme-base-fg-1)
         );
         --c-button-base-bg-active: var(--theme-base-3);
+        --c-button-base-border: color-mix(
+            in oklch,
+            var(--theme-base-border) 80%,
+            var(--theme-base-1)
+        );
     }
 
     :root[data-theme='dark'] {
@@ -41,7 +46,7 @@
 }
 
 .c-button--primary {
-    &:not(.c-button--filled) {
+    &:where(:not(.c-button--filled)) {
         color: var(--theme-primary-1);
         &:not(:disabled):hover {
             background-color: var(--c-button-base-bg-hover);
@@ -56,12 +61,12 @@
         }
     }
 
-    &:focus-visible {
+    &:where(:focus-visible) {
         outline: none;
         @apply ring ring-primary-3 ring-offset-1 ring-offset-base-1 outline-none;
     }
 
-    &.c-button--filled {
+    &:where(.c-button--filled) {
         color: var(--theme-primary-fg-1);
         background-color: var(--theme-primary-1);
 
@@ -84,13 +89,13 @@
         }
     }
 
-    &.c-button--outline {
+    &:where(.c-button--outline) {
         border: 1px solid var(--theme-primary-border);
     }
 }
 
 .c-button--negative {
-    &:not(.c-button--filled) {
+    &:where(:not(.c-button--filled)) {
         color: var(--theme-negative-1);
         &:not(:disabled):hover {
             background-color: var(--c-button-base-bg-hover);
@@ -105,12 +110,12 @@
         }
     }
 
-    &:focus-visible {
+    &:where(:focus-visible) {
         outline: none;
         @apply ring ring-negative-3 ring-offset-1 ring-offset-base-1 outline-none;
     }
 
-    &.c-button--filled {
+    &:where(.c-button--filled) {
         color: var(--theme-negative-fg-1);
         background-color: var(--theme-negative-1);
 
@@ -133,13 +138,13 @@
         }
     }
 
-    &.c-button--outline {
+    &:where(.c-button--outline) {
         border: 1px solid var(--theme-negative-border);
     }
 }
 
 .c-button--base {
-    &:not(.c-button--filled) {
+    &:where(:not(.c-button--filled)) {
         &:not(:disabled):hover {
             background-color: var(--c-button-base-bg-hover);
         }
@@ -153,12 +158,12 @@
         }
     }
 
-    &:focus-visible {
+    &:where(:focus-visible) {
         outline: none;
         @apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
     }
 
-    &.c-button--filled {
+    &:where(.c-button--filled) {
         background-color: var(--c-button-base-bg);
 
         &:hover {
@@ -180,8 +185,8 @@
         }
     }
 
-    &.c-button--outline {
-        border: 1px solid var(--theme-base-border);
+    &:where(.c-button--outline) {
+        border: 1px solid var(--c-button-base-border);
     }
 }
 
