@@ -3,6 +3,7 @@
     import { melt, type ComboboxOption } from '@melt-ui/svelte';
     import { createQuery, type CreateQueryOptions } from '@tanstack/svelte-query';
     import clsx from 'clsx';
+    import { untrack } from 'svelte';
     import { circInOut } from 'svelte/easing';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
@@ -23,7 +24,7 @@
     import { flyAndScale, tsap } from '~/lib/utils/transition';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';
-    import { decodeInvite, validateInvite } from './utils';
+    import { validateInvite } from './utils';
 
     interface Props extends DialogProps {
         team: Pick<Team, 'id' | 'name'>;
@@ -34,6 +35,12 @@
         email: string;
         similarity: number;
     }
+
+    const errorMap = {
+        userId: {
+            duplicated: 'The user is already in the team.'
+        }
+    };
 
     const { team, form, ...props }: Props = $props();
     const { httpClient } = useRuntime();
@@ -52,12 +59,11 @@
         >
     >({ queryKey: ['invite-member', { search: '' }], initialData: paginatedList<SearchItem>() });
     const query = createQuery(queryOptions);
-    const open = $derived(search.length > 0);
     let status = $state<'submitting' | null>(null);
+    let open = $state(false);
 
-    const selected = writable<ComboboxOption<{ email: string }>>();
-    let validation: ValidationResult<{ teamId: string; query: string }> | undefined = undefined;
-    let inputValue = $state<string>('');
+    const selected = writable<ComboboxOption<SearchItem>>();
+    let validation: ValidationResult<{ teamId: string; memberId: string }> | undefined = undefined;
     let errors = $state<Record<string, string[]> | null>(null);
 
     $effect(() => {
@@ -81,12 +87,36 @@
     });
 
     $effect(() => {
-        inputValue = $selected?.value.email ?? search;
+        if (form?.invite && 'errors' in form.invite && form.invite.errors) {
+            errors = form.invite.errors;
+        }
     });
 
     $effect(() => {
-        if (form?.invite && 'errors' in form.invite && form.invite.errors) {
-            errors = form.invite.errors;
+        if (!open) {
+            untrack(() => {
+                search = $selected?.label ?? '';
+            });
+        }
+        validation = validateInvite({
+            teamId: team.id,
+            memberId: $selected?.value.userId
+        });
+        errors = validation.ok ? null : validation.errors;
+    });
+
+    $effect(() => {
+        if (!$selected || !$query.data) {
+            return;
+        }
+
+        const item = $query.data.items.find((a) => a.userId === $selected.value.userId);
+        if (!item) {
+            return;
+        }
+
+        if (!$state.is($selected.value, item)) {
+            $selected = { value: item, label: item.email };
         }
     });
 </script>
@@ -102,7 +132,6 @@
             use:melt={content}
             class="fixed w-full max-w-paragraph-lg top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-8 focus:outline-none"
         >
-            {JSON.stringify(form)}
             <div
                 transition:flyAndScale|global={{
                     start: 0.98,
@@ -123,11 +152,6 @@
                     method="post"
                     action="?/invite"
                     class="mt-8 space-y-4"
-                    oninput={(e) => {
-                        const formData = new FormData(e.currentTarget);
-                        validation = validateInvite(decodeInvite(formData));
-                        errors = validation.ok ? null : validation.errors;
-                    }}
                     use:enhance={(e) => {
                         if (!validation?.ok) {
                             e.cancel();
@@ -142,6 +166,7 @@
                     }}
                 >
                     <input type="hidden" name="teamId" value={team.id} />
+                    <input type="hidden" name="memberId" value={$selected?.value.userId} />
                     <Combobox
                         options={{
                             positioning: {
@@ -154,8 +179,8 @@
                             },
                             selected
                         }}
-                        {open}
-                        bind:inputValue
+                        bind:open
+                        bind:inputValue={search}
                     >
                         {#snippet children({ label, input, menu, option, helpers: { isSelected } })}
                             <div class="space-y-1">
@@ -167,16 +192,18 @@
                                         name="query"
                                         placeholder="Find people..."
                                         class="pl-9"
-                                        bind:value={search}
                                         melt={input}
-                                        aria-invalid={!!errors?.['query']}
+                                        aria-invalid={!!errors?.['userId']}
                                     />
                                     <Icon
                                         name="search"
                                         class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
                                     />
                                 </div>
-                                <StaticErrors errors={errors?.['query']} />
+                                <StaticErrors
+                                    errors={errors?.['userId']}
+                                    errorMap={errorMap.userId}
+                                />
                                 {#if open && $query.data}
                                     <div
                                         use:melt={menu}
@@ -189,7 +216,7 @@
                                             )}
                                         >
                                             {#if !$query.data.items.length}
-                                                <li>No results.</li>
+                                                <li class="text-base-fg-ghost p-2">No results.</li>
                                             {:else}
                                                 {#each $query.data.items as item (item.userId)}
                                                     <li

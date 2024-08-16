@@ -66,7 +66,7 @@ export const actions: Actions = {
                     const response = yield* api.post(
                         `teams/${validation.data.teamId}/invitations`,
                         {
-                            body: { query: validation.data.query }
+                            body: { memberId: validation.data.memberId }
                         }
                     );
 
@@ -83,6 +83,7 @@ export const actions: Actions = {
             )
         );
 
+        console.dir(exit, { depth: null });
         if (Exit.isFailure(exit)) {
             const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
             return fail(failure.status, { invite: failure.data });
