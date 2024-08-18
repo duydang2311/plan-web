@@ -1,11 +1,11 @@
 import { error, fail } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import type { PaginatedList } from '~/lib/models/paginatedList';
+import { type PaginatedList } from '~/lib/models/paginatedList';
 import type { Team, TeamInvitation, TeamMember } from '~/lib/models/team';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { decodeInvite, validateInvite } from './utils';
+import { decodeInvite, decodeRevoke, validateInvite, validateRevoke } from './utils';
 
 export const load: PageServerLoad = async ({ url, parent, depends, locals }) => {
     const data = await parent();
@@ -58,6 +58,38 @@ export const actions: Actions = {
         }
 
         return { invite: { success: true } };
+    },
+    'revoke-invitation': async ({ request, locals: { runtime } }) => {
+        const exit = await runtime.runPromiseExit(
+            pipe(
+                Effect.gen(function* () {
+                    const formData = yield* Effect.tryPromise(() => request.formData());
+                    const validation = yield* ActionResponse.Validation(
+                        validateRevoke(decodeRevoke(formData))
+                    );
+                    const api = yield* ApiClient;
+                    const response = yield* api.delete(
+                        `teams/${validation.data.teamId}/invitations/${validation.data.memberId}`
+                    );
+                    if (!response.ok) {
+                        return yield* ActionResponse.HTTPError(response);
+                    }
+
+                    return yield* Effect.succeed<void>(void 0);
+                }),
+                Effect.catchTags({
+                    ApiError: ActionResponse.FetchError,
+                    UnknownException: ActionResponse.UnknownError
+                })
+            )
+        );
+
+        if (Exit.isFailure(exit)) {
+            const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
+            return fail(failure.status, { revokeInvitation: failure.data });
+        }
+
+        return { revokeInvitation: { success: true } };
     }
 };
 

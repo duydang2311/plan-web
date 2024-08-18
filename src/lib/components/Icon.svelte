@@ -28,6 +28,7 @@
     import Check from '~icons/heroicons/check-20-solid';
     import UserPlus from '~icons/heroicons/user-plus-20-solid';
     import Search from '~icons/heroicons/magnifying-glass-20-solid';
+    import Trash from '~icons/heroicons/trash-20-solid';
 
     export type IconName = keyof typeof icons;
 
@@ -60,7 +61,8 @@
         settings: Settings,
         check: Check,
         'user-plus': UserPlus,
-        search: Search
+        search: Search,
+        trash: Trash
     } as const;
 </script>
 

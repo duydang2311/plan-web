@@ -7,9 +7,18 @@
     import type { TeamInvitation } from '~/lib/models/team';
     import type { PageData } from './$types';
     import PendingMemberRow from './PendingMemberRow.svelte';
+    import { browser } from '$app/environment';
+    import gsap from 'gsap';
+    import Flip from 'gsap/dist/Flip';
+    import { tick } from 'svelte';
+    import { createEffect } from '~/lib/utils/svelte.svelte';
 
     interface Props {
         data: PageData;
+    }
+
+    if (browser) {
+        gsap.registerPlugin(Flip);
     }
 
     const { data }: Props = $props();
@@ -21,20 +30,42 @@
             return data.teamInvitationList!;
         }
     });
+    let tbody = $state<HTMLElement>();
+
+    createEffect.pre(
+        () => {
+            if (!tbody) {
+                return;
+            }
+            const state = Flip.getState(tbody.querySelectorAll('& > tr'), {
+                props: 'height'
+            });
+            tick().then(() => {
+                Flip.from(state, {
+                    targets: tbody!.querySelectorAll('& > tr'),
+                    duration: 0.3,
+                    ease: 'power1.inOut'
+                });
+            });
+        },
+        () => $query
+    );
 </script>
 
 <Table class="w-full rounded-md">
     <colgroup>
         <col />
         <col />
+        <col class="w-48" />
     </colgroup>
-    <THead>
+    <THead class="relative">
         <Row>
             <Th>Member</Th>
             <Th>Status</Th>
+            <Th></Th>
         </Row>
     </THead>
-    <tbody>
+    <tbody bind:this={tbody} class="animate-tbody">
         {#if $query.data}
             {#each $query.data.items as item (item.member.id)}
                 <PendingMemberRow data={item} />

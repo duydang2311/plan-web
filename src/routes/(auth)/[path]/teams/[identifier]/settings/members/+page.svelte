@@ -86,7 +86,7 @@
             </Button>
         </div>
     </div>
-    <div class="mx-auto grow overflow-auto">
+    <div class="grow overflow-auto">
         {#if params.show === 'pending'}
             <PendingMembers {data} />
         {:else}
