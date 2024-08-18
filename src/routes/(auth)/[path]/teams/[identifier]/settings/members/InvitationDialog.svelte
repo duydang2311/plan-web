@@ -3,7 +3,7 @@
     import { melt, type ComboboxOption } from '@melt-ui/svelte';
     import { createQuery, type CreateQueryOptions } from '@tanstack/svelte-query';
     import clsx from 'clsx';
-    import { untrack } from 'svelte';
+    import { onMount } from 'svelte';
     import { circInOut } from 'svelte/easing';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
@@ -21,6 +21,7 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';
+    import { createEffect } from '~/lib/utils/svelte.svelte';
     import { flyAndScale, tsap } from '~/lib/utils/transition';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';
@@ -37,7 +38,8 @@
     }
 
     const errorMap = {
-        userId: {
+        memberId: {
+            string: 'Enter username or email address.',
             duplicated: 'The user is already in the team.'
         }
     };
@@ -59,32 +61,35 @@
         >
     >({ queryKey: ['invite-member', { search: '' }], initialData: paginatedList<SearchItem>() });
     const query = createQuery(queryOptions);
-    let status = $state<'submitting' | null>(null);
-    let open = $state(false);
+    let status = $state.raw<'initial' | 'submitting' | null>('initial');
+    let open = $state.raw(false);
 
     const selected = writable<ComboboxOption<SearchItem>>();
     let validation: ValidationResult<{ teamId: string; memberId: string }> | undefined = undefined;
-    let errors = $state<Record<string, string[]> | null>(null);
+    let errors = $state.raw<Record<string, string[]> | null>(null);
 
-    $effect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        search;
-        const timeout = setTimeout(() => {
-            $queryOptions = {
-                queryKey: ['invite-member', { search }],
-                queryFn: () =>
-                    httpClient
-                        .get('/api/users/search', { query: { query: search, size: 5 } })
-                        .then((v) =>
-                            v.ok ? v.json<PaginatedList<SearchItem>>() : paginatedList<SearchItem>()
-                        ),
-                placeholderData: $query.data
+    createEffect(
+        () => {
+            const timeout = setTimeout(() => {
+                $queryOptions = {
+                    queryKey: ['invite-member', { search }],
+                    queryFn: () =>
+                        httpClient
+                            .get('/api/users/search', { query: { query: search, size: 5 } })
+                            .then((v) =>
+                                v.ok
+                                    ? v.json<PaginatedList<SearchItem>>()
+                                    : paginatedList<SearchItem>()
+                            ),
+                    placeholderData: $query.data
+                };
+            }, 250);
+            return () => {
+                clearTimeout(timeout);
             };
-        }, 250);
-        return () => {
-            clearTimeout(timeout);
-        };
-    });
+        },
+        () => search
+    );
 
     $effect(() => {
         if (form?.invite && 'errors' in form.invite && form.invite.errors) {
@@ -92,18 +97,20 @@
         }
     });
 
-    $effect(() => {
-        if (!open) {
-            untrack(() => {
+    createEffect(
+        () => {
+            if (!open) {
                 search = $selected?.label ?? '';
+            }
+            if (status === 'initial') return;
+            validation = validateInvite({
+                teamId: team.id,
+                memberId: $selected?.value.userId
             });
-        }
-        validation = validateInvite({
-            teamId: team.id,
-            memberId: $selected?.value.userId
-        });
-        errors = validation.ok ? null : validation.errors;
-    });
+            errors = validation.ok ? null : validation.errors;
+        },
+        () => open
+    );
 
     $effect(() => {
         if (!$selected || !$query.data) {
@@ -118,6 +125,10 @@
         if (!$state.is($selected.value, item)) {
             $selected = { value: item, label: item.email };
         }
+    });
+
+    onMount(() => {
+        status = null;
     });
 </script>
 
@@ -193,7 +204,7 @@
                                         placeholder="Find people..."
                                         class="pl-9"
                                         melt={input}
-                                        aria-invalid={!!errors?.['userId']}
+                                        aria-invalid={!!errors?.['memberId']}
                                     />
                                     <Icon
                                         name="search"
@@ -201,8 +212,8 @@
                                     />
                                 </div>
                                 <StaticErrors
-                                    errors={errors?.['userId']}
-                                    errorMap={errorMap.userId}
+                                    errors={errors?.['memberId']}
+                                    errorMap={errorMap.memberId}
                                 />
                                 {#if open && $query.data}
                                     <div

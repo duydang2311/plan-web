@@ -9,26 +9,19 @@
 </script>
 
 <script lang="ts">
-    import { invalidate, replaceState } from '$app/navigation';
-    import { createQuery } from '@tanstack/svelte-query';
-    import { Button, Icon, Row, Table, Th, THead } from '~/lib/components';
-    import { GenericError } from '~/lib/models/errors';
-    import { type PaginatedList } from '~/lib/models/paginatedList';
-    import type { TeamMember } from '~/lib/models/team';
-    import type { ActionData, PageData } from './$types';
-    import MemberRow from './MemberRow.svelte';
+    import { replaceState } from '$app/navigation';
     import { page } from '$app/stores';
-    import InvitationDialog from './InvitationDialog.svelte';
+    import clsx from 'clsx';
+    import { Button, Icon } from '~/lib/components';
     import { none } from '~/lib/utils/transition';
+    import { fluentSearchParams, queryParams } from '~/lib/utils/url';
+    import type { ActionData, PageData } from './$types';
+    import AllMembers from './AllMembers.svelte';
+    import InvitationDialog from './InvitationDialog.svelte';
+    import PendingMembers from './PendingMembers.svelte';
 
     let { data, form }: { data: PageData; form: ActionData } = $props();
-    const query = createQuery<PaginatedList<TeamMember>, GenericError>({
-        queryKey: ['team-members', { teamId: data.team.id }],
-        queryFn: async () => {
-            await invalidate('fetch:team-members');
-            return data.teamMemberList;
-        }
-    });
+    const params = $derived(queryParams($page.url, { show: '' }));
 
     function handleInvite() {
         replaceState('', { ...$page.state, showInvitationDialog: true });
@@ -48,10 +41,37 @@
     </div>
 {/if}
 <main class="h-full flex flex-col divide divide-y divide-base-border">
-    <div class="px-8 py-2 flex justify-between items-center">
+    <div class="px-8 py-2 flex gap-4 justify-between items-center whitespace-nowrap">
         <div>
             <h1 class="sr-only">Manage team members</h1>
-            <h2>Members</h2>
+            <div class="flex gap-4">
+                <Button
+                    as="link"
+                    href={fluentSearchParams($page.url).delete('show').toString()}
+                    variant="base"
+                    outline
+                    size="sm"
+                    class={clsx(
+                        'w-fit',
+                        params.show !== 'pending' ? 'bg-base-3' : 'text-base-fg-ghost'
+                    )}
+                >
+                    All members
+                </Button>
+                <Button
+                    as="link"
+                    href={fluentSearchParams($page.url).set('show', 'pending').toString()}
+                    variant="base"
+                    outline
+                    size="sm"
+                    class={clsx(
+                        'w-fit',
+                        params.show === 'pending' ? 'bg-base-3' : 'text-base-fg-ghost'
+                    )}
+                >
+                    Pending members
+                </Button>
+            </div>
         </div>
         <div>
             <Button
@@ -61,30 +81,16 @@
                 class="flex gap-4 items-center"
                 onclick={handleInvite}
             >
-                <Icon name="user-plus" />
+                <Icon name="user-plus" class="size-4" />
                 <span>Invite member</span>
             </Button>
         </div>
     </div>
     <div class="mx-auto grow overflow-auto">
-        <Table class="w-full rounded-md">
-            <colgroup>
-                <col />
-                <col />
-            </colgroup>
-            <THead>
-                <Row>
-                    <Th>Member</Th>
-                    <Th>Role</Th>
-                </Row>
-            </THead>
-            <tbody>
-                {#if $query.data}
-                    {#each $query.data.items as item (item.member.id)}
-                        <MemberRow data={item} />
-                    {/each}
-                {/if}
-            </tbody>
-        </Table>
+        {#if params.show === 'pending'}
+            <PendingMembers {data} />
+        {:else}
+            <AllMembers {data} />
+        {/if}
     </div>
 </main>

@@ -29,3 +29,11 @@ export interface TeamRolePermission {
     roleId: number;
     permission: string;
 }
+
+export interface TeamInvitation {
+    createdTime: string;
+    teamId: string;
+    team: Team;
+    memberId: string;
+    member: User;
+}
