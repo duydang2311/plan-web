@@ -9,6 +9,7 @@
     --color-brand: oklch(48.32% 0.2931 274.22);
     --color-negative: oklch(47.07% 0.1897 22.17);
     --color-positive: oklch(43.42% 0.1461 142.04);
+    --color-info: oklch(45.27% 0.1498 255.17);
 }
 
 :root {
@@ -41,4 +42,9 @@
     --theme-positive-1: var(--color-positive);
     --theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
     --theme-positive-3: oklch(from var(--color-positive) calc(l + var(--l-step) * 2) c h);
+
+    --theme-info-1: var(--color-info);
+    --theme-info-2: color-mix(in oklch, var(--color-info) 90%, var(--theme-base-1));
+    --theme-info-3: color-mix(in oklch, var(--color-info) 80%, var(--theme-base-1));
+    --theme-info-fg-1: var(--color-bg);
 }

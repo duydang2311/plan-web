@@ -27,3 +27,4 @@ export { default as Toaster, addToast } from './Toaster.svelte';
 export { default as ToastItem } from './ToastItem.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as StaticErrors } from './StaticErrors.svelte';
+export { default as Badge } from './Badge.svelte';

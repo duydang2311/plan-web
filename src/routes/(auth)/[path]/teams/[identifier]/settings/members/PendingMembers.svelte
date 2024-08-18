@@ -26,10 +26,12 @@
 <Table class="w-full rounded-md">
     <colgroup>
         <col />
+        <col />
     </colgroup>
     <THead>
         <Row>
             <Th>Member</Th>
+            <Th>Status</Th>
         </Row>
     </THead>
     <tbody>

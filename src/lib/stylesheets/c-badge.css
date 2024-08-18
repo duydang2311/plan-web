@@ -1,0 +1,16 @@
+.c-badge {
+    width: fit-content;
+    border: 1px solid var(--theme-base-border);
+    border-radius: theme('borderRadius[full]');
+    padding: theme('padding[0.5]') theme('padding[3]');
+    font-weight: 500;
+}
+
+.c-badge--sm {
+    font-size: var(--font-size-sm);
+}
+
+.c-badge--info {
+    color: var(--theme-info-1);
+    border-color: var(--theme-info-3);
+}

@@ -9,6 +9,7 @@
     --color-brand: oklch(70.11% 0.1673 288.9);
     --color-negative: oklch(70.65% 0.1875 16.21);
     --color-positive: oklch(67.05% 0.2256 142.04);
+    --color-info: oklch(68.28% 0.1508 237.81);
 }
 
 :root[data-theme='dark'] {
