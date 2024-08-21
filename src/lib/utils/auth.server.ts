@@ -1,6 +1,11 @@
+import { env } from '$env/dynamic/private';
 import type { Cookies } from '@sveltejs/kit';
 import { Effect } from 'effect';
+import jwt from 'jsonwebtoken';
 import { ApiClient } from '../services/api_client.server';
+
+const { verify } = jwt;
+const certBuffer = Buffer.from(env.JWT_PUBLIC_KEY.replaceAll('\\n', '\n'));
 
 export const authenticateOrRefresh = (cookies: Cookies) =>
     Effect.gen(function* () {
@@ -42,4 +47,15 @@ export const refresh = (cookies: Cookies) =>
             return yield* Effect.succeed({ accessToken: result.accessToken });
         }
         return yield* Effect.fail<void>(void 0);
+    });
+
+export const decodeAccessToken = (accessToken: string) =>
+    Effect.async<{ sub: string }, void>((resume) => {
+        verify(accessToken!, certBuffer, { algorithms: ['RS512'] }, (err, decoded) => {
+            if (err || typeof decoded?.sub !== 'string') {
+                resume(Effect.fail<void>(void 0));
+            } else {
+                resume(Effect.succeed(decoded as { sub: string }));
+            }
+        });
     });
