@@ -122,7 +122,7 @@
             return;
         }
 
-        if (!$state.is($selected.value, item)) {
+        if ($selected.value.userId !== item.userId) {
             $selected = { value: item, label: item.email };
         }
     });
