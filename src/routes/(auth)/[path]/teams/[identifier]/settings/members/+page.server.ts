@@ -21,7 +21,6 @@ export const load: PageServerLoad = async ({ url, parent, depends, locals }) => 
 
 export const actions: Actions = {
     invite: async ({ request, locals: { runtime } }) => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         const exit = await runtime.runPromiseExit(
             pipe(
                 Effect.gen(function* () {
@@ -51,7 +50,6 @@ export const actions: Actions = {
             )
         );
 
-        console.dir(exit, { depth: null });
         if (Exit.isFailure(exit)) {
             const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
             return fail(failure.status, { invite: failure.data });

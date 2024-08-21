@@ -1,6 +1,6 @@
+import { gsap as __gsap } from 'gsap';
 import { linear } from 'svelte/easing';
 import { type EasingFunction, type TransitionConfig } from 'svelte/transition';
-import { gsap as __gsap } from 'gsap';
 
 const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
     const [minA, maxA] = scaleA;
