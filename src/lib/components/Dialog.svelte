@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     export interface DialogProps {
         defaultOpen?: boolean;
         role?: 'dialog' | 'alertdialog';

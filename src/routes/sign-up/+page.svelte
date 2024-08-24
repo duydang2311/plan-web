@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     const clientValidate = extend(validate, (input, { error }) => {
         if (input.password !== input.passwordConfirmation) {
             return error('passwordConfirmation', 'confirmed');

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import Home from '~icons/ph/house-bold';
     import HomeSolid from '~icons/ph/house-fill';
     import UserGroup from '~icons/heroicons/user-group-solid';

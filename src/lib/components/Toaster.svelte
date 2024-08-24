@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import gsap from 'gsap';
     export interface ToastData {
         title: string | Snippet;
