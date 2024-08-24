@@ -7,7 +7,7 @@
         | ({ as: 'link' } & HTMLAnchorAttributes)
         | ({ as?: never } & HTMLButtonAttributes)
     ) & {
-        variant?: 'base' | 'primary' | 'negative';
+        variant?: 'base' | 'primary' | 'negative' | 'positive';
         filled?: boolean;
         outline?: boolean;
         size?: 'sm';

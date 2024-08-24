@@ -40,8 +40,12 @@
     --theme-negative-border: color-mix(in oklch, var(--color-negative) 15%, transparent);
 
     --theme-positive-1: var(--color-positive);
-    --theme-positive-2: oklch(from var(--color-positive) calc(l + var(--l-step)) c h);
-    --theme-positive-3: oklch(from var(--color-positive) calc(l + var(--l-step) * 2) c h);
+    --theme-positive-2: color-mix(in oklch, var(--color-positive) 90%, var(--color-bg));
+    --theme-positive-3: color-mix(in oklch, var(--color-positive) 80%, var(--color-bg));
+    --theme-positive-fg-1: var(--color-bg);
+    --theme-positive-fg-2: color-mix(in oklch, var(--color-positive) 90%, var(--color-bg));
+    --theme-positive-fg-3: color-mix(in oklch, var(--color-positive) 80%, var(--color-bg));
+    --theme-positive-border: color-mix(in oklch, var(--color-positive) 15%, transparent);
 
     --theme-info-1: var(--color-info);
     --theme-info-2: color-mix(in oklch, var(--color-info) 90%, var(--theme-base-1));
