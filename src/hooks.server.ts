@@ -31,54 +31,59 @@ export const handle: Handle = async ({
     event: { locals, route, cookies, fetch },
     resolve
 }) => {
-    if (route.id?.includes('(auth)')) {
+    const authRequired = route.id && route.id.includes('(auth)');
+    if (route.id && (authRequired || route.id.includes('(auth-optional)'))) {
         let accessToken = cookies.get('access_token');
+        let failed = true;
         if (!accessToken) {
-            locals.appLive = pipe(
-                HttpApiClientLive,
-                Layer.provide(Layer.sync(Fetcher, () => fetch))
-            );
-            locals.runtime = ManagedRuntime.make(locals.appLive);
+            initLocals(locals, fetch);
             const exit = await locals.runtime.runPromiseExit(refresh(cookies));
             if (Exit.isSuccess(exit)) {
                 accessToken = exit.value.accessToken;
             }
         }
         if (accessToken) {
-            locals.appLive = pipe(
-                Layer.effect(
-                    ApiClient,
-                    Effect.gen(function* () {
-                        const fetch = yield* Fetcher;
-                        return new BearerHttpApiClient({
-                            httpClient: new UniversalHttpClient({
-                                baseUrl: env.API_BASE_URL,
-                                version: env.API_VERSION,
-                                fetch
-                            }),
-                            accessToken: accessToken!
-                        });
-                    })
-                ),
-                Layer.provide(Layer.sync(Fetcher, () => fetch))
-            );
-            locals.runtime = ManagedRuntime.make(locals.appLive);
-            const exit = await locals.runtime.runPromiseExit(decodeAccessToken(accessToken));
+            const exit = await Effect.runPromiseExit(decodeAccessToken(accessToken));
             if (Exit.isFailure(exit)) {
                 cookies.delete('access_token', { path: '/' });
             } else {
                 locals.user = { id: exit.value.sub };
+                locals.appLive = pipe(
+                    Layer.effect(
+                        ApiClient,
+                        Effect.gen(function* () {
+                            const fetch = yield* Fetcher;
+                            return new BearerHttpApiClient({
+                                httpClient: new UniversalHttpClient({
+                                    baseUrl: env.API_BASE_URL,
+                                    version: env.API_VERSION,
+                                    fetch
+                                }),
+                                accessToken: accessToken!
+                            });
+                        })
+                    ),
+                    Layer.provide(Layer.sync(Fetcher, () => fetch))
+                );
+                locals.runtime = ManagedRuntime.make(locals.appLive);
+                failed = false;
             }
-        } else {
+        }
+        if (failed && authRequired) {
             return route.id.includes('api')
                 ? error(403, { code: 'forbidden', message: 'Forbidden' })
                 : redirect(302, '/login');
         }
     } else {
-        locals.appLive = pipe(HttpApiClientLive, Layer.provide(Layer.sync(Fetcher, () => fetch)));
-        locals.runtime = ManagedRuntime.make(locals.appLive);
+        initLocals(locals, fetch);
     }
+
     const response = await resolve(event);
     await locals.runtime.dispose();
     return response;
 };
+
+function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
+    locals.appLive = pipe(HttpApiClientLive, Layer.provide(Layer.sync(Fetcher, () => fetch)));
+    locals.runtime = ManagedRuntime.make(locals.appLive);
+}
