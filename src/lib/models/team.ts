@@ -32,6 +32,7 @@ export interface TeamRolePermission {
 
 export interface TeamInvitation {
     createdTime: string;
+    id: string;
     teamId: string;
     team: Team;
     memberId: string;

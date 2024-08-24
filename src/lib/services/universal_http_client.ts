@@ -15,9 +15,7 @@ export class UniversalHttpClient {
             init.body = isRecordOrArray(init.body) ? JSON.stringify(init.body) : init.body;
             init.headers = { 'Content-Type': 'application/json', ...init.headers };
         }
-        return this._options.fetch(this._buildUrl(path, init?.query), {
-            ...(init as RequestInit)
-        });
+        return this._options.fetch(this._buildUrl(path, init?.query), init as RequestInit);
     }
 
     get(path: string, init?: HttpClientFetchRequestInit | undefined) {
