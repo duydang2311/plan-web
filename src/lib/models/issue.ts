@@ -1,3 +1,5 @@
+import type { Status } from './status';
+
 export interface Issue {
     createdTime: string;
     updatedTime: string;
@@ -6,4 +8,7 @@ export interface Issue {
     orderNumber: number;
     title: string;
     description?: string;
+    statusId?: number;
+    status?: Status;
+    orderByStatus: number;
 }

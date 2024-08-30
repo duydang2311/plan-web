@@ -29,6 +29,10 @@
     import UserPlus from '~icons/heroicons/user-plus-20-solid';
     import Search from '~icons/heroicons/magnifying-glass-20-solid';
     import Trash from '~icons/heroicons/trash-20-solid';
+    import ChevronUpDown from '~icons/heroicons/chevron-up-down-20-solid';
+    import Rows from '~icons/lucide/rows-3';
+    import Columns from '~icons/lucide/columns-3';
+    import GripVertical from '~icons/lucide/grip-vertical';
 
     export type IconName = keyof typeof icons;
 
@@ -62,7 +66,11 @@
         check: Check,
         'user-plus': UserPlus,
         search: Search,
-        trash: Trash
+        trash: Trash,
+        'chevron-up-down': ChevronUpDown,
+        rows: Rows,
+        columns: Columns,
+        draggable: GripVertical
     } as const;
 </script>
 

@@ -123,8 +123,6 @@
 
     $effect(() => {
         const lastItem = $virtualizer?.getVirtualItems().at(-1);
-        console.log($virtualizer?.getVirtualItems());
-        console.log(lastItem?.index, 'vs', comments.length);
         if (
             lastItem &&
             lastItem.index > comments.length - 1 &&
