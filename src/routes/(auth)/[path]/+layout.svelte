@@ -60,7 +60,7 @@
         />
     </aside>
     <div
-        class="bg-base-1 grow rounded-md border border-base-border shadow-sm grid grid-rows-[auto_1fr] max-h-[calc(100vh-1rem)]"
+        class="bg-base-1 grow rounded-xl border border-base-border shadow-sm grid grid-rows-[auto_1fr] max-h-[calc(100vh-1rem)]"
     >
         <Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
         <div class="transition-enforcement overflow-hidden">

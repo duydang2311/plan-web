@@ -1,19 +1,19 @@
 <script lang="ts">
+    import { invalidate } from '$app/navigation';
+    import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { orderBy } from 'natural-orderby';
     import { onMount } from 'svelte';
+    import invariant from 'tiny-invariant';
+    import { addToast } from '~/lib/components';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Issue } from '~/lib/models/issue';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Status } from '~/lib/models/status';
     import type { PageData } from '../$types';
     import Board from './Board.svelte';
     import { validateDraggableIssueData } from './utils';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import invariant from 'tiny-invariant';
-    import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-    import { orderBy } from 'natural-orderby';
-    import { addToast } from '~/lib/components';
-    import { invalidate } from '$app/navigation';
 
     interface Data {
         statuses: Status[];
@@ -131,8 +131,6 @@
             }
         }
     });
-
-    $inspect($query.data);
 
     onMount(() => {
         return monitorForElements({

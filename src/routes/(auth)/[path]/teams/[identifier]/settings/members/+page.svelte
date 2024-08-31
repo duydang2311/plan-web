@@ -1,13 +1,3 @@
-<script lang="ts" module>
-    declare global {
-        namespace App {
-            interface PageState {
-                showInvitationDialog?: boolean;
-            }
-        }
-    }
-</script>
-
 <script lang="ts">
     import { replaceState } from '$app/navigation';
     import { page } from '$app/stores';

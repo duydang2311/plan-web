@@ -1,3 +1,9 @@
+<script lang="ts" module>
+    const dragStatusClasses = {
+        dragover: 'bg-base-1 border-primary-border/20'
+    };
+</script>
+
 <script lang="ts">
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
     import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
@@ -7,6 +13,7 @@
     import { tsap } from '~/lib/utils/transition';
     import BoardIssue from './BoardIssue.svelte';
     import { validateDraggableIssueData } from './utils';
+    import clsx from 'clsx';
 
     const {
         identifier,
@@ -17,6 +24,7 @@
         issues: readonly Issue[];
         status: Pick<Status, 'id' | 'value' | 'color'>;
     } = $props();
+    let dragStatus = $state<'dragover' | null>(null);
 
     function atlas(node: HTMLElement, state: Pick<Status, 'id'>) {
         let cleanup: CleanupFn | undefined = undefined;
@@ -30,6 +38,15 @@
                 canDrop: ({ source }) => {
                     const validation = validateDraggableIssueData(source.data);
                     return validation.ok && (validation.data.statusId ?? -1) !== state.id;
+                },
+                onDragEnter: () => {
+                    dragStatus = 'dragover';
+                },
+                onDragLeave: () => {
+                    dragStatus = null;
+                },
+                onDrop: () => {
+                    dragStatus = null;
                 }
             });
         }
@@ -42,7 +59,10 @@
 </script>
 
 <li
-    class="min-w-96 flex flex-col bg-base-2 py-4 rounded-lg border border-base-border"
+    class={clsx(
+        'min-w-96 flex flex-col py-4 rounded-lg border transition ease-in-out duration-75',
+        dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2 border-base-border'
+    )}
     use:atlas={{ id: status.id }}
 >
     <p class="text-h5 font-medium px-4">{status.value}</p>

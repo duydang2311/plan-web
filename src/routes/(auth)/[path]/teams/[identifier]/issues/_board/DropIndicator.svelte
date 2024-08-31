@@ -36,5 +36,5 @@
 <div
     style="--line-thickness: {strokeSize}px; --line-offset: {lineOffset}; --terminal-size: {terminalSize}px; --terminal-radius: {terminalSize /
         2}px; --offset-terminal: {offsetToAlignTerminalWithLine}px;"
-    class={`absolute z-10 bg-blue-700 pointer-events-none before:content-[''] before:w-[--terminal-size] before:h-[--terminal-size] box-border before:absolute before:border-[length:--line-thickness] before:border-solid before:border-blue-700 before:rounded-full ${orientationStyles[orientation]} ${[edgeStyles[edge]]}`}
+    class={`absolute z-10 bg-primary-border pointer-events-none before:content-[''] before:w-[--terminal-size] before:h-[--terminal-size] box-border before:absolute before:border-[length:--line-thickness] before:border-solid before:border-primary-border before:rounded-full ${orientationStyles[orientation]} ${[edgeStyles[edge]]}`}
 ></div>

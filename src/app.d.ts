@@ -27,7 +27,9 @@ declare global {
                 | { breadcrumb: true; meta: { title: string; href: string } }
             )[];
         }
-        // interface PageState { }
+        interface PageState {
+            showInvitationDialog?: boolean;
+        }
         // interface Platform {}
     }
 
