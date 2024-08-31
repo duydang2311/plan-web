@@ -33,6 +33,8 @@
     import Rows from '~icons/lucide/rows-3';
     import Columns from '~icons/lucide/columns-3';
     import GripVertical from '~icons/lucide/grip-vertical';
+    import ChevronUp from '~icons/heroicons/chevron-up-20-solid';
+    import ChevronDown from '~icons/heroicons/chevron-down-20-solid';
 
     export type IconName = keyof typeof icons;
 
@@ -70,7 +72,9 @@
         'chevron-up-down': ChevronUpDown,
         rows: Rows,
         columns: Columns,
-        draggable: GripVertical
+        draggable: GripVertical,
+        'chevron-up': ChevronUp,
+        'chevron-down': ChevronDown
     } as const;
 </script>
 
