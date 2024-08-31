@@ -14,8 +14,6 @@
 
 :root {
     --theme-base-1: var(--color-bg);
-    /* --theme-base-2: oklch(from var(--color-bg) calc(l - 0.015) c h);
-    --theme-base-3: oklch(from var(--color-bg) calc(l - 0.04) c h); */
     --theme-base-2: color-mix(in oklch, var(--color-bg) 98.5%, black);
     --theme-base-3: color-mix(in oklch, var(--color-bg) 97%, black);
     --theme-base-fg-1: var(--color-fg-1);

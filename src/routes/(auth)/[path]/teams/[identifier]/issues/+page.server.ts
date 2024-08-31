@@ -1,24 +1,31 @@
 import { D } from '@mobily/ts-belt';
-import { redirect } from '@sveltejs/kit';
 import { Effect, Exit, pipe } from 'effect';
+import { orderBy } from 'natural-orderby';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { Workspace } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
-import type { PageServerLoad } from './$types';
-import { orderBy } from 'natural-orderby';
+import type { PageServerLoad, PageServerLoadEvent } from './$types';
 
-export const load: PageServerLoad = async ({
-    url,
-    params: { path },
+export const load: PageServerLoad = (e) => {
+    switch (e.url.searchParams.get('layout')) {
+        case 'board':
+            return loadBoardLayout(e);
+        default:
+            return loadTableLayout(e);
+    }
+};
+
+const loadBoardLayout = async ({
     parent,
-    depends,
+    url,
     isDataRequest,
+    depends,
     locals: { runtime }
-}) => {
+}: PageServerLoadEvent) => {
+    depends('fetch:issues-board');
     const data = await parent();
-
     const query = paginatedQuery(
         queryParams(url, {
             page: 1,
@@ -27,68 +34,64 @@ export const load: PageServerLoad = async ({
             order: 'orderNumber'
         })
     );
-
-    if (url.searchParams.get('layout') === 'board') {
-        depends('fetch:issues-board');
-        const exit = runtime
-            .runPromiseExit(
-                Effect.gen(function* () {
-                    const statuses = (yield* getWorkspaceStatuses(data.workspace.id)) ?? [];
-                    const issueLists = yield* getIssuesForBoard(
-                        { ...query, teamId: data.team.id },
-                        statuses.map((a) => a.id + '')
-                    );
-                    return { statuses, issueLists };
-                })
-            )
-            .then((a) => (Exit.isFailure(a) ? { statuses: [], issueLists: {} } : a.value));
-
-        return {
-            board: isDataRequest ? exit : await exit
-        };
-    }
-
-    const exit = await runtime.runPromiseExit(
-        Effect.gen(function* () {
-            const api = yield* ApiClient;
-            const response = yield* api.get('issues', {
-                query: { ...query, teamId: data.team.id }
-            });
-
-            if (response.status === 403) {
-                return yield* Effect.fail<void>(void 0);
-            }
-            return response;
-        })
-    );
-
-    if (Exit.isFailure(exit)) {
-        return redirect(302, `/${path}`);
-    }
-
-    const list = runtime
+    const exit = runtime
         .runPromiseExit(
             Effect.gen(function* () {
-                if (!exit.value.ok) {
-                    return yield* Effect.succeed(paginatedList<Issue>());
-                }
-                return yield* Effect.tryPromise(() => exit.value.json<PaginatedList<Issue>>());
+                const statuses = (yield* getWorkspaceStatuses(data.workspace.id)) ?? [];
+                const issueLists = yield* getIssuesForBoard(
+                    { ...query, teamId: data.team.id },
+                    statuses.map((a) => a.id)
+                );
+                return { statuses, issueLists };
             })
         )
-        .then((exit) => (Exit.isFailure(exit) ? paginatedList<Issue>() : exit.value))
-        .then((v) => ({ ...v, size: query.size, offset: query.offset }));
-
-    if (Exit.isFailure(exit)) {
-        return redirect(302, `/${path}`);
-    }
+        .then((a) => (Exit.isFailure(a) ? { statuses: [], issueLists: {} } : a.value));
 
     return {
-        issueList: isDataRequest ? list : await list,
-        query
+        board: isDataRequest ? exit : await exit
     };
 };
 
-const getIssuesForBoard = (query: Record<string, unknown>, statusIds: string[]) =>
+const loadTableLayout = async ({
+    parent,
+    url,
+    isDataRequest,
+    depends,
+    locals: { runtime }
+}: PageServerLoadEvent) => {
+    depends('fetch:issues');
+    const data = await parent();
+    const query = paginatedQuery(
+        queryParams(url, {
+            page: 1,
+            size: 20,
+            select: 'CreatedTime, UpdatedTime, Id, OrderNumber, Title, StatusId, OrderByStatus',
+            order: 'orderNumber'
+        })
+    );
+    const issueList = runtime
+        .runPromiseExit(
+            Effect.gen(function* () {
+                const api = yield* ApiClient;
+                const response = yield* api.get('issues', {
+                    query: { ...query, teamId: data.team.id }
+                });
+
+                if (!response.ok) {
+                    return paginatedList<Issue>();
+                }
+                return yield* Effect.tryPromise(() => response.json<PaginatedList<Issue>>());
+            })
+        )
+        .then((a) => (Exit.isFailure(a) ? paginatedList<Issue>() : a.value));
+
+    return {
+        query,
+        issueList: isDataRequest ? issueList : await issueList
+    };
+};
+
+const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) =>
     Effect.gen(function* () {
         const api = yield* ApiClient;
         const pairs = yield* Effect.all(
@@ -118,10 +121,6 @@ const getIssuesForBoard = (query: Record<string, unknown>, statusIds: string[]) 
             pairs.map(([id, response]) =>
                 pipe(
                     Effect.tryPromise(() => response.json<PaginatedList<Issue>>()),
-                    Effect.tap((a) => {
-                        console.log(a.items.map((a) => a.orderByStatus));
-                        return Effect.void;
-                    }),
                     Effect.map(
                         (a) =>
                             [

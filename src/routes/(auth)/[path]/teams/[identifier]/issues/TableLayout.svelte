@@ -1,64 +1,30 @@
 <script lang="ts">
-    import { beforeNavigate } from '$app/navigation';
+    import { invalidate } from '$app/navigation';
     import { page } from '$app/stores';
+    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
-    import { backInOut, circInOut } from 'svelte/easing';
-    import { fade, scale } from 'svelte/transition';
-    import Link from '~/lib/components/Link.svelte';
-    import Pagination from '~/lib/components/Pagination.svelte';
-    import Row from '~/lib/components/Row.svelte';
-    import Spinner from '~/lib/components/Spinner.svelte';
-    import Table from '~/lib/components/Table.svelte';
-    import Th from '~/lib/components/Th.svelte';
-    import THead from '~/lib/components/THead.svelte';
-    import { watch } from '~/lib/models/watchable';
+    import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
     import type { PageData } from './$types';
+    import { mapMaybePromise } from '~/lib/utils/promise';
 
     const { data }: { data: PageData } = $props();
-    let list = $state(data.issueList);
-    let status = $state<'pending' | 'pending-long'>();
-
-    beforeNavigate(async ({ complete, from, to, type }) => {
-        if (type === 'link' && from?.route.id === to?.route.id) {
-            status = 'pending';
-            watch(complete.catch(() => {})).after('1 second', () => (status = 'pending-long'));
+    const queryClient = useQueryClient();
+    const queryKey = ['issues'];
+    const query = createQuery({
+        queryKey,
+        queryFn: async () => {
+            await invalidate('fetch:issues');
+            return await data.issueList!;
         }
     });
 
     $effect(() => {
-        if (data.issueList instanceof Promise) {
-            status = 'pending';
-            watch(data.issueList)
-                .then((issueList) => {
-                    list = issueList;
-                })
-                .after('1 second', () => {
-                    status = 'pending-long';
-                })
-                .finally(() => {
-                    status = undefined;
-                });
-        } else {
-            list = data.issueList;
-        }
+        mapMaybePromise(data.issueList, (a) => queryClient.setQueryData(queryKey, a));
     });
 </script>
 
 <div class="flex flex-col grow justify-between overflow-auto">
-    {#if status === 'pending-long'}
-        <div
-            transition:fade={{ easing: circInOut }}
-            class="fixed backdrop-blur-sm z-50 inset-0 bg-black/10"
-        >
-            <div
-                transition:scale={{ easing: backInOut }}
-                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            >
-                <Spinner class="w-8 h-8 text-primary-1" />
-            </div>
-        </div>
-    {/if}
     <Table>
         <colgroup>
             <col class="w-24" />
@@ -73,50 +39,44 @@
                 <Th sortable name="updatedTime">Updated</Th>
             </Row>
         </THead>
-        <tbody class={clsx(status === 'pending' && 'animate-twPulse')}>
-            {#await list}
+        <tbody class={clsx($query.isFetching && 'animate-twPulse')}>
+            {#if !$query.data}
                 <Row>
                     <td colspan="4">Loading issues...</td>
                 </Row>
-            {:then { items }}
-                {#if items.length}
-                    {#each items as { id, createdTime, updatedTime, orderNumber, title }}
-                        <Row>
-                            <td>
-                                <div
-                                    class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
-                                >
-                                    {data.team.identifier}-{orderNumber}
-                                </div>
-                            </td>
-                            <td>
-                                <Link href="/{$page.params['path']}/issues/{id}">{title}</Link>
-                            </td>
-                            <td>
-                                {DateTime.fromISO(createdTime).toLocaleString(
-                                    DateTime.DATETIME_SHORT
-                                )}
-                            </td>
-                            <td>
-                                {DateTime.fromISO(updatedTime).toLocaleString(
-                                    DateTime.DATETIME_SHORT
-                                )}
-                            </td>
-                        </Row>
-                    {/each}
-                {:else}
+            {:else if $query.data.items.length === 0}
+                <Row>
+                    <td colspan="4">No issues yet.</td>
+                </Row>
+            {:else}
+                {#each $query.data.items as { id, createdTime, updatedTime, orderNumber, title }}
                     <Row>
-                        <td colspan="4">No issues yet.</td>
+                        <td>
+                            <div
+                                class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
+                            >
+                                {data.team.identifier}-{orderNumber}
+                            </div>
+                        </td>
+                        <td>
+                            <Link href="/{$page.params['path']}/issues/{id}">{title}</Link>
+                        </td>
+                        <td>
+                            {DateTime.fromISO(createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
+                        </td>
+                        <td>
+                            {DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATETIME_SHORT)}
+                        </td>
                     </Row>
-                {/if}
-            {/await}
+                {/each}
+            {/if}
         </tbody>
     </Table>
-    {#await list then list}
-        <Pagination query={data.query} {list}>
+    {#if $query.data && data.query}
+        <Pagination query={data.query} list={$query.data}>
             {#snippet label({ from, to, totalCount })}
                 Displaying {from} - {to} out of {totalCount} issues.
             {/snippet}
         </Pagination>
-    {/await}
+    {/if}
 </div>

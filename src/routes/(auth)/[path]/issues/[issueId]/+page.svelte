@@ -129,7 +129,6 @@
             $query.hasNextPage &&
             !$query.isFetchingNextPage
         ) {
-            console.log('fetch next');
             $query.fetchNextPage({ cancelRefetch: true });
         }
     });

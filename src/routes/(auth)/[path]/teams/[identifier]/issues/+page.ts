@@ -10,6 +10,13 @@ export const load: PageLoad = async ({ parent, data, url }) => {
                     return await data.board!;
                 }
             });
+        } else {
+            await queryClient.prefetchQuery({
+                queryKey: ['issues'],
+                queryFn: async () => {
+                    return await data.issueList!;
+                }
+            });
         }
     }
     return data;
