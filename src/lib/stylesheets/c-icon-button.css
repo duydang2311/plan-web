@@ -1,0 +1,18 @@
+.c-icon-button {
+    transition:
+        color 75ms ease-in-out,
+        transform 75ms ease-in-out;
+}
+
+.c-icon-button--base {
+    color: var(--theme-base-fg-2);
+
+    &:hover {
+        color: var(--theme-base-fg-1);
+    }
+
+    &:active {
+        color: var(--theme-base-fg-3);
+        @apply scale-90;
+    }
+}

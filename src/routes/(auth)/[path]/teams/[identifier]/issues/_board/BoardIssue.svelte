@@ -19,7 +19,6 @@
     import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
     import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
     import clsx from 'clsx';
-    import { gsap } from 'gsap';
     import Icon from '~/lib/components/Icon.svelte';
     import type { Issue } from '~/lib/models/issue';
     import DropIndicator from './DropIndicator.svelte';

@@ -36,28 +36,54 @@
 </svelte:head>
 
 <div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 p-2 pl-0">
-    <aside class="items-stretch px-4 py-2 space-y-4 md:min-w-32 lg:min-w-60">
+    <aside class="items-stretch px-4 py-2 space-y-4 min-w-60 flex flex-col">
         <div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
             <Logo class="h-8 w-auto" />
-            <p class="hidden md:block">plan</p>
+            <p class="block">plan</p>
         </div>
         <hr class="-mx-4 text-base-border" />
-        <Navigation
-            items={[
-                {
-                    href: `/${$page.params['path']}`,
-                    icon: 'home',
-                    activeIcon: 'home-solid',
-                    label: 'Home'
-                },
-                {
-                    href: `/${$page.params['path']}/teams`,
-                    icon: 'users',
-                    activeIcon: 'users-solid',
-                    label: 'Teams'
-                }
-            ]}
-        />
+        <div class="flex flex-col justify-between grow">
+            <ul class="font-medium group text-sm">
+                <Navigation
+                    items={[
+                        {
+                            href: `/${$page.params['path']}`,
+                            icon: 'home',
+                            activeIcon: 'home-solid',
+                            label: 'Home'
+                        },
+                        {
+                            href: `/${$page.params['path']}/teams`,
+                            icon: 'users',
+                            activeIcon: 'users-solid',
+                            label: 'Teams'
+                        }
+                    ]}
+                />
+            </ul>
+            <ul class="font-medium group text-sm">
+                <Navigation
+                    items={[
+                        {
+                            href: `/${$page.params['path']}/settings`,
+                            icon: 'settings-outline',
+                            activeIcon: 'settings',
+                            label: 'Settings',
+                            child: {
+                                items: [
+                                    {
+                                        href: `/${$page.params['path']}/settings/status`,
+                                        icon: 'circle-dashed-outline',
+                                        activeIcon: 'circle-dashed',
+                                        label: 'Status'
+                                    }
+                                ]
+                            }
+                        }
+                    ]}
+                />
+            </ul>
+        </div>
     </aside>
     <div
         class="bg-base-1 grow rounded-xl border border-base-border shadow-sm grid grid-rows-[auto_1fr] max-h-[calc(100vh-1rem)]"

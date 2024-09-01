@@ -1,8 +1,8 @@
 @layer base {
     :root {
-        --theme-link-fg: var(--theme-base-fg);
-        --theme-link-fg-hover: var(--color-fg-1);
-        --theme-link-fg-active: var(--color-fg-3);
+        --theme-link-fg: var(--theme-base-fg-2);
+        --theme-link-fg-hover: var(--theme-base-fg-1);
+        --theme-link-fg-active: var(--theme-base-fg-3);
     }
 }
 

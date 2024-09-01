@@ -28,3 +28,4 @@ export { default as ToastItem } from './ToastItem.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as StaticErrors } from './StaticErrors.svelte';
 export { default as Badge } from './Badge.svelte';
+export { default as IconButton } from './IconButton.svelte';
