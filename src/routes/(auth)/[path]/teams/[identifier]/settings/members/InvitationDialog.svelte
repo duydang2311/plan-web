@@ -21,7 +21,7 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';
-    import { createEffect } from '~/lib/utils/svelte.svelte';
+    import { createEffect } from '~/lib/utils/svelte';
     import { flyAndScale, tsap } from '~/lib/utils/transition';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';

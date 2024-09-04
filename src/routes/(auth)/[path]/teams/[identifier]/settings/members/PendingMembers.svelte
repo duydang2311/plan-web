@@ -11,7 +11,7 @@
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
     import { tick } from 'svelte';
-    import { createEffect } from '~/lib/utils/svelte.svelte';
+    import { createEffect } from '~/lib/utils/svelte';
 
     interface Props {
         data: PageData;
