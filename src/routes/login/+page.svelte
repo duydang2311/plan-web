@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { D } from '@mobily/ts-belt';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
@@ -10,7 +11,7 @@
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';
     import { decode, validate } from './utils';
-    import { D } from '@mobily/ts-belt';
+    import Icon from '~/lib/components/Icon.svelte';
 
     const errorMap = {
         root: {
@@ -45,76 +46,91 @@
     <div class="w-full mx-auto">
         <LogoType class="h-24 mx-auto" />
         <h1 class="text-center mb-8 mt-8">Sign in</h1>
-        <form
-            method="post"
-            class="space-y-6 w-full max-w-[40ch] mx-auto"
-            onchange={({ currentTarget }) => {
-                const input = decode(new FormData(currentTarget));
-                validation = validate(input);
-                form = validation.ok
-                    ? null
-                    : {
-                          errors: D.filterWithKey(
-                              validation.errors,
-                              (k) => hasProperty(input, k) && !!input[k]
-                          ) as typeof validation.errors
-                      };
-            }}
-            use:enhance={(e) => {
-                if (!validation?.ok) {
-                    e.cancel();
-                    return;
-                }
+        <div class="max-w-[40ch] mx-auto">
+            <form
+                method="post"
+                action="?/sign-in"
+                class="space-y-6 w-full"
+                onchange={({ currentTarget }) => {
+                    const input = decode(new FormData(currentTarget));
+                    validation = validate(input);
+                    form = validation.ok
+                        ? null
+                        : {
+                              errors: D.filterWithKey(
+                                  validation.errors,
+                                  (k) => hasProperty(input, k) && !!input[k]
+                              ) as typeof validation.errors
+                          };
+                }}
+                use:enhance={(e) => {
+                    if (!validation?.ok) {
+                        e.cancel();
+                        return;
+                    }
 
-                status = 'submitting';
-                return async ({ update }) => {
-                    status = null;
-                    await update();
-                };
-            }}
-        >
-            <Errors errors={errors['root']} errorMap={errorMap.root} class="text-center" />
-            <div class="space-y-1">
-                <Label for="email" class="block">Email address</Label>
-                <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    autofocus
-                    required
-                    aria-invalid={errors['email']?.filter((x) => x !== 'invalid_credentials').length
-                        ? 'true'
-                        : undefined}
-                    bind:value={fields.email}
-                />
-                <Errors
-                    errors={errors['email']?.filter((x) => x !== 'invalid_credentials')}
-                    errorMap={errorMap.email}
-                />
-            </div>
-            <div class="space-y-1">
-                <div class="flex justify-between flex-wrap gap-2">
-                    <Label for="password" class="block">Password</Label>
-                    <Link
-                        href="https://ark-ui.com/react/docs/components/clipboard"
-                        class="ml-auto text-sm"
-                    >
-                        Forgot password?
-                    </Link>
+                    status = 'submitting';
+                    return async ({ update }) => {
+                        status = null;
+                        await update();
+                    };
+                }}
+            >
+                <Errors errors={errors['root']} errorMap={errorMap.root} class="text-center" />
+                <div class="space-y-1">
+                    <Label for="email" class="block">Email address</Label>
+                    <Input
+                        type="email"
+                        id="email"
+                        name="email"
+                        autofocus
+                        required
+                        aria-invalid={errors['email']?.filter((x) => x !== 'invalid_credentials')
+                            .length
+                            ? 'true'
+                            : undefined}
+                        bind:value={fields.email}
+                    />
+                    <Errors
+                        errors={errors['email']?.filter((x) => x !== 'invalid_credentials')}
+                        errorMap={errorMap.email}
+                    />
                 </div>
-                <Input
-                    type="password"
-                    id="password"
-                    name="password"
-                    autofocus
-                    required
-                    aria-invalid={errors['password'] ? 'true' : undefined}
-                    bind:value={fields.password}
-                />
-                <Errors errors={errors['password']} errorMap={errorMap.password} />
-            </div>
-            <Button disabled={status === 'submitting'}>Sign in</Button>
-        </form>
+                <div class="space-y-1">
+                    <div class="flex justify-between flex-wrap gap-2">
+                        <Label for="password" class="block">Password</Label>
+                        <Link
+                            href="https://ark-ui.com/react/docs/components/clipboard"
+                            class="ml-auto text-sm"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+                    <Input
+                        type="password"
+                        id="password"
+                        name="password"
+                        autofocus
+                        required
+                        aria-invalid={errors['password'] ? 'true' : undefined}
+                        bind:value={fields.password}
+                    />
+                    <Errors errors={errors['password']} errorMap={errorMap.password} />
+                </div>
+                <Button disabled={status === 'submitting'}>Sign in</Button>
+            </form>
+            <form method="post" action="?/google-sign-in" class="mt-8">
+                <Button
+                    type="submit"
+                    variant="base"
+                    outline
+                    class="flex items-center gap-4 justify-center"
+                >
+                    <Icon name="google" />
+                    Sign in with Google
+                </Button>
+            </form>
+        </div>
         <div class="mt-8 space-y-4 text-center w-fit mx-auto">
             <hr class="w-full text-base-border" />
             <p>

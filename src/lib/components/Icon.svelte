@@ -37,6 +37,7 @@
     import ChevronDown from '~icons/heroicons/chevron-down-20-solid';
     import CircleDashedOutline from '~icons/ph/circle-dashed';
     import CircleDashed from '~icons/ph/circle-dashed-fill';
+    import Google from '~icons/custom/google';
 
     export type IconName = keyof typeof icons;
 
@@ -78,7 +79,8 @@
         'chevron-up': ChevronUp,
         'chevron-down': ChevronDown,
         'circle-dashed-outline': CircleDashedOutline,
-        'circle-dashed': CircleDashed
+        'circle-dashed': CircleDashed,
+        google: Google
     } as const;
 </script>
 

@@ -1,5 +1,7 @@
+import { env } from '$env/dynamic/private';
 import { fail, redirect } from '@sveltejs/kit';
 import { Effect, Either, Schedule, pipe } from 'effect';
+import crypto from 'node:crypto';
 import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
@@ -14,7 +16,7 @@ interface SignInResponse {
 }
 
 export const actions = {
-    default: async ({ request, cookies, locals: { appLive } }) => {
+    'sign-in': async ({ request, cookies, locals: { appLive } }) => {
         return pipe(
             await Effect.runPromise(
                 Effect.gen(function* ($) {
@@ -64,6 +66,25 @@ export const actions = {
                 }
             })
         );
+    },
+    'google-sign-in': async ({ url, cookies }) => {
+        const state = crypto.randomBytes(32).toString('hex');
+        cookies.set('google_oauth_state', state, {
+            path: '/oauth/google/callback',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax',
+            maxAge: 60 * 10
+        });
+
+        const authUrl = new URL(`https://accounts.google.com/o/oauth2/v2/auth`);
+        authUrl.searchParams.set('response_type', 'code');
+        authUrl.searchParams.set('client_id', env.GOOGLE_OAUTH_CLIENT_ID);
+        authUrl.searchParams.set('scope', 'openid email profile');
+        authUrl.searchParams.set('redirect_uri', `${url.origin}/oauth/google/callback`);
+        authUrl.searchParams.set('state', state);
+        authUrl.searchParams.set('nonce', crypto.randomBytes(32).toString('hex'));
+        return redirect(302, authUrl);
     }
 } satisfies Actions;
 
