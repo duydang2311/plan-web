@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ cookies, url, fetch, locals: { runti
             }
 
             const state = url.searchParams.get('state');
-            if (!state || state !== googleOAuthState) {
+            if (state !== googleOAuthState) {
                 return yield* Effect.fail(json({ errors: ['state'] }, { status: 400 }));
             }
 
