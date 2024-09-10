@@ -16,5 +16,7 @@
 </script>
 
 {#each items as { href, icon, activeIcon, label, child } (href)}
-    <NavigationItem {href} {icon} {activeIcon} {label} childItems={child?.items} />
+    <li>
+        <NavigationItem {href} {icon} {activeIcon} {label} childItems={child?.items} />
+    </li>
 {/each}

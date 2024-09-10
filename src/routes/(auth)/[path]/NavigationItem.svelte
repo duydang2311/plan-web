@@ -28,7 +28,7 @@
 {#if childItems && childItems.length}
     <Collapsible options={{ open }}>
         {#snippet children({ root, content, trigger })}
-            <li use:melt={root}>
+            <div use:melt={root}>
                 <svelte:self {href} {icon} {activeIcon} {label} {isActive} class="pl-8">
                     <IconButton
                         type="button"
@@ -69,44 +69,44 @@
                         use:melt={content}
                     >
                         {#each childItems as item (item.href)}
-                            <svelte:self {...item} />
+                            <li>
+                                <svelte:self {...item} />
+                            </li>
                         {/each}
                     </ul>
                 {/if}
-            </li>
+            </div>
         {/snippet}
     </Collapsible>
 {:else}
-    <li>
-        <div
-            class={clsx(
-                'relative flex gap-2 rounded-md transition-[color_background-color_font-weight] ease-in-out duration-75 hover:bg-base-fg-2/5',
-                isActive && 'font-bold group-[:not(:hover)]:bg-base-fg-2/5 text-base-fg-1',
-                props.class
-            )}
-        >
-            <a {href} class="grow flex p-2 items-center gap-2">
-                <div class="transition-enforcement">
-                    <Icon
-                        name={activeIcon}
-                        class={clsx(
-                            'transition-opacity ease-in-out duration-200',
-                            !isActive && 'opacity-0'
-                        )}
-                        aria-hidden={!isActive}
-                    />
-                    <Icon
-                        name={icon}
-                        class={clsx(
-                            'transition-opacity ease-in-out duration-200',
-                            isActive && 'opacity-0'
-                        )}
-                        aria-hidden={isActive}
-                    />
-                </div>
-                <span>{label}</span>
-            </a>
-            {@render children?.()}
-        </div>
-    </li>
+    <div
+        class={clsx(
+            'relative flex gap-2 rounded-md transition-[color_background-color_font-weight] ease-in-out duration-75 hover:bg-base-fg-2/5',
+            isActive && 'font-bold group-[:not(:hover)]:bg-base-fg-2/5 text-base-fg-1',
+            props.class
+        )}
+    >
+        <a {href} class="grow flex p-2 items-center gap-2">
+            <div class="transition-enforcement">
+                <Icon
+                    name={activeIcon}
+                    class={clsx(
+                        'transition-opacity ease-in-out duration-200',
+                        !isActive && 'opacity-0'
+                    )}
+                    aria-hidden={!isActive}
+                />
+                <Icon
+                    name={icon}
+                    class={clsx(
+                        'transition-opacity ease-in-out duration-200',
+                        isActive && 'opacity-0'
+                    )}
+                    aria-hidden={isActive}
+                />
+            </div>
+            <span>{label}</span>
+        </a>
+        {@render children?.()}
+    </div>
 {/if}
