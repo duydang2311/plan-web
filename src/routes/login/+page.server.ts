@@ -52,14 +52,12 @@ export const actions = {
                         path: '/',
                         httpOnly: true,
                         secure: true,
-                        sameSite: 'strict',
                         maxAge: accessTokenMaxAge
                     });
                     cookies.set('refresh_token', refreshToken, {
                         path: '/',
                         httpOnly: true,
                         secure: true,
-                        sameSite: 'strict',
                         maxAge: refreshTokenMaxAge
                     });
                     return redirect(302, '/');
