@@ -4,11 +4,11 @@
     import type { HTMLButtonAttributes } from 'svelte/elements';
 
     interface Props extends HTMLButtonAttributes {
-        variant?: 'base';
+        variant?: 'base' | 'negative';
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
     }
 
-    const { icon, variant = 'base', melt: useMelt, children, ...props }: Props = $props();
+    const { variant = 'base', melt: useMelt, children, ...props }: Props = $props();
     const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
 </script>
 
@@ -18,5 +18,8 @@
     {...useMelt ?? {}}
     use:meltAction
 >
-    {@render children?.()}
+    <div class="inner relative">
+        <div class="hover"></div>
+        {@render children?.()}
+    </div>
 </button>

@@ -12,6 +12,15 @@ export class ApiError extends Data.TaggedError('ApiError')<{
     stack?: string;
 }> {}
 
+export class HttpError extends Data.TaggedError('HttpError')<{
+    status: number;
+    message?: string;
+}> {
+    public static from(response: Response) {
+        return new HttpError({ status: response.status, message: response.statusText });
+    }
+}
+
 export class ValidationError extends Data.TaggedError('ValidationError')<{
     errors: Record<string, string[]>;
 }> {}

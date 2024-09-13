@@ -13,11 +13,11 @@ export const load: LayoutServerLoad = async ({ params, locals: { runtime }, url 
             let response: Response;
             if (id) {
                 response = yield* apiClient.get(`workspaces/${id}`, {
-                    query: { select: 'new { Id, Name }' }
+                    query: { select: 'Id, Name' }
                 });
             } else {
                 response = yield* apiClient.get(`workspaces/path/${params.path}`, {
-                    query: { select: 'new { Id, Name }' }
+                    query: { select: 'Id, Name' }
                 });
             }
             if (!response.ok) {

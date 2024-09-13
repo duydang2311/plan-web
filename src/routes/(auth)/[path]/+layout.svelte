@@ -76,6 +76,12 @@
                                         icon: 'circle-dashed-outline',
                                         activeIcon: 'circle-dashed',
                                         label: 'Status'
+                                    },
+                                    {
+                                        href: `/${$page.params['path']}/settings/members`,
+                                        icon: 'users',
+                                        activeIcon: 'users-solid',
+                                        label: 'Members'
                                     }
                                 ]
                             }
