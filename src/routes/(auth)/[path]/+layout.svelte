@@ -53,6 +53,12 @@
                             label: 'Home'
                         },
                         {
+                            href: `/${$page.params['path']}/projects`,
+                            icon: 'project-outline',
+                            activeIcon: 'project',
+                            label: 'Projects'
+                        },
+                        {
                             href: `/${$page.params['path']}/teams`,
                             icon: 'users',
                             activeIcon: 'users-solid',

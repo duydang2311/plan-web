@@ -38,6 +38,8 @@
     import CircleDashedOutline from '~icons/ph/circle-dashed';
     import CircleDashed from '~icons/ph/circle-dashed-fill';
     import Google from '~icons/custom/google';
+    import CubeOutline from '~icons/ph/cube';
+    import Cube from '~icons/ph/cube-fill';
 
     export type IconName = keyof typeof icons;
 
@@ -80,7 +82,9 @@
         'chevron-down': ChevronDown,
         'circle-dashed-outline': CircleDashedOutline,
         'circle-dashed': CircleDashed,
-        google: Google
+        google: Google,
+        'project-outline': CubeOutline,
+        project: Cube
     } as const;
 </script>
 
