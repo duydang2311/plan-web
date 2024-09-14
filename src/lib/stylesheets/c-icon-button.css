@@ -1,21 +1,24 @@
 .c-icon-button {
+    position: relative;
     transition:
         color 75ms ease-in-out,
         transform 75ms ease-in-out;
+    padding: theme('padding[0.5]');
 
-    & > .inner > .hover {
+    &::before {
+        content: '';
+        @apply block absolute inset-0 opacity-0 scale-90 rounded;
         transition:
             opacity 75ms ease-in-out,
             transform 120ms ease-in-out;
-        @apply rounded opacity-0 absolute inset-0 scale-75;
     }
 
-    &:hover > .inner > .hover {
-        @apply opacity-10 scale-125;
+    &:hover::before {
+        @apply opacity-10 scale-110;
     }
 
-    &:active > .inner > .hover {
-        @apply opacity-5 scale-110;
+    &:active::before {
+        @apply opacity-15 scale-100;
     }
 }
 
@@ -30,7 +33,7 @@
         color: var(--theme-base-fg-3);
     }
 
-    & > .inner > .hover {
+    &::before {
         background-color: var(--theme-base-fg-2);
     }
 }
@@ -48,7 +51,7 @@
         color: var(--theme-negative-3);
     }
 
-    & > .inner > .hover {
+    &::before {
         background-color: var(--theme-negative-1);
     }
 }

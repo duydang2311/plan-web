@@ -18,8 +18,5 @@
     {...useMelt ?? {}}
     use:meltAction
 >
-    <div class="inner relative">
-        <div class="hover"></div>
-        {@render children?.()}
-    </div>
+    {@render children?.()}
 </button>

@@ -34,7 +34,7 @@
                         type="button"
                         variant="base"
                         class={clsx(
-                            'absolute left-2 top-1/2 -translate-y-1/2 h-full',
+                            'absolute left-2 top-1/2 -translate-y-1/2',
                             isActive && 'text-base-fg-1'
                         )}
                         melt={trigger}
