@@ -2,8 +2,8 @@
     const imports = {
         home: () => import('~icons/ph/house-bold'),
         'home-solid': () => import('~icons/ph/house-fill'),
-        users: () => import('~icons/heroicons/user-group-solid'),
-        'users-solid': () => import('~icons/heroicons/user-group'),
+        users: () => import('~icons/heroicons/user-group'),
+        'users-solid': () => import('~icons/heroicons/user-group-20-solid'),
         plus: () => import('~icons/heroicons/plus-20-solid'),
         'x-mark': () => import('~icons/heroicons/x-mark-20-solid'),
         'chevron-left': () => import('~icons/heroicons/chevron-left-20-solid'),
