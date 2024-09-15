@@ -23,13 +23,9 @@
     });
 </script>
 
-<Table class="w-full rounded-md">
-    <colgroup>
-        <col />
-        <col />
-    </colgroup>
+<Table class="w-full rounded-md" style="grid-template-columns: 1fr 1fr;">
     <THead>
-        <Row>
+        <Row class="py-2">
             <Th>Member</Th>
             <Th>Role</Th>
         </Row>

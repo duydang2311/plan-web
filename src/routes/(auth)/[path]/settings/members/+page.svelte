@@ -15,12 +15,7 @@
 </script>
 
 <main class="h-full flex flex-col justify-between overflow-auto">
-    <Table>
-        <colgroup>
-            <col />
-            <col />
-            <col class="w-36" />
-        </colgroup>
+    <Table style="grid-template-columns: 1fr 1fr auto;">
         <THead>
             <Row class="*:py-2">
                 <Th>Email address</Th>
@@ -31,7 +26,7 @@
         <tbody>
             {#if !$query.data}
                 <Row>
-                    <td colspan={3}>No members yet.</td>
+                    <td style="grid-column: 1 / -1;">No members yet.</td>
                 </Row>
             {:else}
                 {#each $query.data.items as { userId, user, role } (userId)}

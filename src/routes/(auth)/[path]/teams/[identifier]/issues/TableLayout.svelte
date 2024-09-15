@@ -25,16 +25,10 @@
 </script>
 
 <div class="flex flex-col grow justify-between overflow-auto">
-    <Table>
-        <colgroup>
-            <col class="w-24" />
-            <col class="lg:w-1/2" />
-            <col />
-            <col />
-        </colgroup>
+    <Table style="grid-template-columns: auto 1fr 1fr auto;">
         <THead>
-            <Row class="*:py-2 border-b-red-500">
-                <Th sortable name="title" colspan={2}>Title</Th>
+            <Row class="py-2">
+                <Th sortable name="title" style="grid-column: span 2;">Title</Th>
                 <Th sortable name="createdTime">Created</Th>
                 <Th sortable name="updatedTime">Updated</Th>
             </Row>
@@ -42,11 +36,11 @@
         <tbody class={clsx($query.isFetching && 'animate-twPulse')}>
             {#if !$query.data}
                 <Row>
-                    <td colspan="4">Loading issues...</td>
+                    <td style="grid-column: 1 / -1;">Loading issues...</td>
                 </Row>
             {:else if $query.data.items.length === 0}
                 <Row>
-                    <td colspan="4">No issues yet.</td>
+                    <td style="grid-column: 1 / -1;">No issues yet.</td>
                 </Row>
             {:else}
                 {#each $query.data.items as { id, createdTime, updatedTime, orderNumber, title }}

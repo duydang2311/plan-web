@@ -100,16 +100,9 @@
                 </div>
             </div>
         {/if}
-        <Table>
-            <colgroup>
-                <col class="w-1/3" />
-                <col />
-                <col />
-                <col />
-                <col class="w-16" />
-            </colgroup>
+        <Table style="grid-template-columns: 1fr auto auto auto auto;">
             <THead>
-                <Row class="*:py-2">
+                <Row class="py-2">
                     <Th sortable name="name">Name</Th>
                     <Th sortable name="identifier">Identifier</Th>
                     <Th sortable name="createdTime">Created</Th>
@@ -124,7 +117,7 @@
             >
                 {#await sorted}
                     <Row>
-                        <td colspan="5">Loading teams...</td>
+                        <td style="grid-column: 1 / -1;">Loading teams...</td>
                     </Row>
                 {:then { items }}
                     {#if items.length}
@@ -138,12 +131,12 @@
                                 <td>{identifier}</td>
                                 <td>
                                     {DateTime.fromISO(createdTime).toLocaleString(
-                                        DateTime.DATETIME_SHORT
+                                        DateTime.DATE_MED
                                     )}
                                 </td>
                                 <td>
                                     {DateTime.fromISO(updatedTime).toLocaleString(
-                                        DateTime.DATETIME_SHORT
+                                        DateTime.DATE_MED
                                     )}
                                 </td>
                                 <td>
@@ -165,7 +158,7 @@
                         {/each}
                     {:else}
                         <Row>
-                            <td colspan="4">No active teams yet.</td>
+                            <td style="grid-column: 1 / -1;">No active teams yet.</td>
                         </Row>
                     {/if}
                 {/await}

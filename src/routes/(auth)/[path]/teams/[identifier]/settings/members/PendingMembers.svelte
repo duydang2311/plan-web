@@ -52,14 +52,9 @@
     );
 </script>
 
-<Table class="w-full rounded-md">
-    <colgroup>
-        <col />
-        <col />
-        <col class="w-48" />
-    </colgroup>
+<Table class="w-full rounded-md" style="grid-template-columns: 1fr 1fr auto;">
     <THead class="relative">
-        <Row>
+        <Row class="py-2">
             <Th>Member</Th>
             <Th>Status</Th>
             <Th></Th>
