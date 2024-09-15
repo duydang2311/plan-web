@@ -10,6 +10,8 @@ interface Project {
     id: string;
     name: string;
     identifier: string;
+    createdTime: string;
+    updatedTime: string;
 }
 
 export const load: PageServerLoad = async ({
@@ -31,7 +33,7 @@ export const load: PageServerLoad = async ({
                 const response = yield* api.get(`workspaces/${id}/projects`, {
                     query: {
                         ...query,
-                        select: 'Id, Name, Identifier'
+                        select: 'Id, Name, Identifier, CreatedTime, UpdatedTime'
                     }
                 });
                 if (!response.ok) {
