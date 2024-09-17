@@ -1,8 +1,8 @@
 import { invalidate } from '$app/navigation';
-import { Cause, Effect, Option, pipe } from 'effect';
-import { validateProblemDetailsEffect, flattenProblemDetails } from './problem_details';
 import { fail, json } from '@sveltejs/kit';
+import { Effect, pipe } from 'effect';
 import type { ApiError } from '../models/errors';
+import { flattenProblemDetails, validateProblemDetailsEffect } from './problem_details';
 import type { ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
@@ -10,6 +10,67 @@ export function invalidateSome(...hrefs: string[]) {
         return hrefs.includes(url.href);
     });
 }
+
+type A =
+    | {
+          readonly status: 500;
+          readonly code: 'unknown';
+          readonly message: 'An unknown error occurred';
+      }
+    | {
+          readonly status: 500;
+          readonly code: string;
+          readonly message: string;
+      };
+
+export const LoadResponse = {
+    UnknownError: () =>
+        Effect.fail({
+            _tag: 'UnknownError',
+            status: 500,
+            code: 'unknown',
+            message: 'An unknown error occurred'
+        } as const),
+    FetchError: (e: ApiError) =>
+        Effect.fail({ _tag: 'FetchError', status: 500, code: e.code, message: e.message } as const),
+    HTTPError: (response: Response) =>
+        Effect.fail({
+            _tag: 'HTTPError',
+            status: response.status,
+            code: 'http',
+            message: response.statusText
+        } as const),
+    HTTP: (effect: Effect.Effect<Response, ApiError>) =>
+        Effect.gen(function* () {
+            const response = yield* pipe(
+                effect,
+                Effect.mapError(
+                    (e) =>
+                        ({
+                            _tag: 'FetchError',
+                            status: 500,
+                            code: e.code,
+                            message: e.message
+                        }) as const
+                )
+            );
+            if (!response.ok) {
+                return yield* LoadResponse.HTTPError(response);
+            }
+            return response;
+        }),
+    JSON: <T = unknown>(f: () => Promise<T>) =>
+        Effect.tryPromise({
+            try: f,
+            catch: () =>
+                ({
+                    _tag: 'JSONError',
+                    status: 500,
+                    code: 'json',
+                    message: 'Could not parse JSON'
+                }) as const
+        })
+} as const;
 
 export const ActionResponse = {
     UnknownError: () => Effect.fail(fail(500, { errors: { root: ['unknown'] } })),
