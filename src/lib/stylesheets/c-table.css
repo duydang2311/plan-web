@@ -27,6 +27,7 @@
 .c-table--thead {
     position: sticky;
     top: 0;
+    border-bottom: 1px solid var(--theme-table-border);
 }
 
 .c-table--row {
