@@ -6,6 +6,36 @@
     >(options: CreateSelectProps<Value, Multiple, S>): CreateSelectProps<Value, Multiple, S> {
         return options;
     }
+
+    type Elements = ReturnType<typeof createSelect>['elements'];
+    type Helpers = ReturnType<typeof createSelect>['helpers'];
+    type Trigger = Parameters<Parameters<Elements['trigger']['subscribe']>[0]>[0];
+    type Menu = Parameters<Parameters<Elements['menu']['subscribe']>[0]>[0];
+    type Option = Parameters<Parameters<Elements['option']['subscribe']>[0]>[0];
+    type Group = Parameters<Parameters<Elements['group']['subscribe']>[0]>[0];
+    type GroupLabel = Parameters<Parameters<Elements['groupLabel']['subscribe']>[0]>[0];
+    type Label = Parameters<Parameters<Elements['label']['subscribe']>[0]>[0];
+    type Arrow = Parameters<Parameters<Elements['arrow']['subscribe']>[0]>[0];
+    type HiddenInput = Parameters<Parameters<Elements['hiddenInput']['subscribe']>[0]>[0];
+    type IsSelected = Parameters<Parameters<Helpers['isSelected']['subscribe']>[0]>[0];
+    type IsHighlighted = Parameters<Parameters<Helpers['isHighlighted']['subscribe']>[0]>[0];
+    type CloseMenu = Helpers['closeMenu'];
+
+    export interface SelectChildrenProps {
+        trigger: Trigger;
+        menu: Menu;
+        option: Option;
+        group: Group;
+        groupLabel: GroupLabel;
+        label: Label;
+        arrow: Arrow;
+        hiddenInput: HiddenInput;
+        helpers: {
+            isSelected: IsSelected;
+            isHighlighted: IsHighlighted;
+            closeMenu: CloseMenu;
+        };
+    }
 </script>
 
 <script

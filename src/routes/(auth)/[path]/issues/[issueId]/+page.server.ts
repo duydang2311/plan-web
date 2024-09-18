@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import type { Issue } from '~/lib/models/issue';
+import type { Issue, IssuePriority } from '~/lib/models/issue';
 import { ApiClient } from '~/lib/services/api_client.server';
 import type { PageServerLoad, Actions } from './$types';
 import {
@@ -20,6 +20,20 @@ import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { IssueComment } from '~/lib/models/issue_comment';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 
+interface Issue {
+    createdTime: string;
+    updatedTime: string;
+    authorId: string;
+    title: string;
+    description?: string;
+    orderNumber: number;
+    priority: IssuePriority;
+    statusId?: string;
+    status?: {
+        value: string;
+    };
+}
+
 export const load: PageServerLoad = async ({
     params,
     url,
@@ -36,7 +50,7 @@ export const load: PageServerLoad = async ({
                 const api = yield* ApiClient;
                 const response = yield* api.get(`issues/${params.issueId}`, {
                     query: {
-                        select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber'
+                        select: 'CreatedTime, UpdatedTime, AuthorId, Title, Description, OrderNumber, Priority, Status.Id, Status.Value, Status.Icon'
                     }
                 });
                 if (!response.ok) {
@@ -47,6 +61,7 @@ export const load: PageServerLoad = async ({
             Effect.catchAll(() => Effect.fail<void>(void 0))
         )
     );
+    console.log(exit.value);
 
     if (Exit.isFailure(exit)) {
         return redirect(302, `/${params.path}`);

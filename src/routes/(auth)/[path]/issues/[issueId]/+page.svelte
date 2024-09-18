@@ -18,6 +18,8 @@
     import Comment from './Comment.svelte';
     import Issue from './Issue.svelte';
     import { clientValidate, fetchCommentList } from './utils.client';
+    import Status from './Status.svelte';
+    import Priority from './Priority.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const { realtime } = useRuntime();
@@ -153,91 +155,102 @@
     });
 </script>
 
-<main class="relative h-full overflow-auto" bind:this={scrollEl}>
-    <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
-        <p class="font-bold content-center text-base-fg-1 text-h1">
-            {data.issue.title}
-            <span class="text-base-fg-3/60 font-normal">
-                #{data.issue.orderNumber}
-            </span>
-        </p>
-        <Issue {form} isEditing={data.isEditing} issue={data.issue} />
-        <p class="mt-8 font-bold text-base-fg-1 text-h4">Activity</p>
-        <div bind:this={virtualListEl}>
-            {#if $virtualizer}
-                <div
-                    style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;"
-                >
-                    {#if items}
-                        <div
-                            style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
-                                ? items[0].start - $virtualizer.options.scrollMargin
-                                : 0}px);"
-                        >
-                            {#each items as row, idx (row.index)}
-                                <div
-                                    bind:this={virtualItemEls[idx]}
-                                    data-index={row.index}
-                                    class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
-                                >
-                                    {#if row.index > comments.length - 1}
-                                        <div in:fade>
-                                            {#if $query.hasNextPage}
-                                                <Spinner class="size-8 text-primary-1 mx-auto" />
-                                                Loading more...
-                                            {/if}
-                                        </div>
-                                    {:else}
-                                        {@const comment = comments[row.index]}
-                                        <Comment
-                                            {comment}
-                                            isAuthor={comment.authorId === data.user.id}
-                                            isEditing={comment.id === data.editingCommentId}
-                                        />
-                                    {/if}
-                                </div>
-                            {/each}
-                        </div>
-                    {/if}
-                </div>
-            {/if}
-        </div>
-        <div class="mt-8">
-            <form
-                method="post"
-                action="?/comment"
-                class="space-y-2"
-                use:enhance={(e) => {
-                    if (!editor) {
-                        e.cancel();
-                        return;
-                    }
-                    e.formData.set('content', editor.getHTML());
-                    return async ({ update }) => {
-                        await update({ invalidateAll: false, reset: true });
-                    };
-                }}
-            >
-                <input type="hidden" name="issueId" value={$page.params['issueId']} />
-                <div class="relative">
-                    <Tiptap
-                        bind:editor
-                        placeholder="Write your comment..."
-                        editorProps={{
-                            class: 'bg-base-1 min-h-24 max-h-60'
-                        }}
-                    />
-                    <Button
-                        variant="primary"
-                        class="absolute p-1 bottom-2 right-3 block ml-auto w-fit"
-                        filled={false}
-                        outline
-                        disabled={validation && !validation.ok}
+<main class="flex items-stretch h-full divide-x divide-base-border overflow-hidden">
+    <div class="grow relative h-full overflow-auto" bind:this={scrollEl}>
+        <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
+            <p class="font-bold content-center text-base-fg-1 text-h1">
+                {data.issue.title}
+                <span class="text-base-fg-3/60 font-normal">
+                    #{data.issue.orderNumber}
+                </span>
+            </p>
+            <Issue {form} isEditing={data.isEditing} issue={data.issue} />
+            <p class="mt-8 font-bold text-base-fg-1 text-h4">Activity</p>
+            <div bind:this={virtualListEl}>
+                {#if $virtualizer}
+                    <div
+                        style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;"
                     >
-                        <Icon name="arrow-up" />
-                    </Button>
-                </div>
-            </form>
+                        {#if items}
+                            <div
+                                style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
+                                    ? items[0].start - $virtualizer.options.scrollMargin
+                                    : 0}px);"
+                            >
+                                {#each items as row, idx (row.index)}
+                                    <div
+                                        bind:this={virtualItemEls[idx]}
+                                        data-index={row.index}
+                                        class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
+                                    >
+                                        {#if row.index > comments.length - 1}
+                                            <div in:fade>
+                                                {#if $query.hasNextPage}
+                                                    <Spinner
+                                                        class="size-8 text-primary-1 mx-auto"
+                                                    />
+                                                    Loading more...
+                                                {/if}
+                                            </div>
+                                        {:else}
+                                            {@const comment = comments[row.index]}
+                                            <Comment
+                                                {comment}
+                                                isAuthor={comment.authorId === data.user.id}
+                                                isEditing={comment.id === data.editingCommentId}
+                                            />
+                                        {/if}
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+            <div class="mt-8">
+                <form
+                    method="post"
+                    action="?/comment"
+                    class="space-y-2"
+                    use:enhance={(e) => {
+                        if (!editor) {
+                            e.cancel();
+                            return;
+                        }
+                        e.formData.set('content', editor.getHTML());
+                        return async ({ update }) => {
+                            await update({ invalidateAll: false, reset: true });
+                        };
+                    }}
+                >
+                    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+                    <div class="relative">
+                        <Tiptap
+                            bind:editor
+                            placeholder="Write your comment..."
+                            editorProps={{
+                                class: 'bg-base-1 min-h-24 max-h-60'
+                            }}
+                        />
+                        <Button
+                            variant="primary"
+                            class="absolute p-1 bottom-2 right-3 block ml-auto w-fit"
+                            filled={false}
+                            outline
+                            disabled={validation && !validation.ok}
+                        >
+                            <Icon name="arrow-up" />
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="hidden xl:block w-full max-w-60 p-4 h-full">
+        <p class="font-medium font-display text-base-fg-3 mb-4">Properties</p>
+        <div class="space-y-1">
+            <Status workspaceId={data.workspace.id} status={data.issue.status} />
+            <Priority priority={data.issue.priority} />
         </div>
     </div>
 </main>
