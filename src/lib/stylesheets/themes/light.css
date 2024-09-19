@@ -14,6 +14,8 @@
     --theme-base-1: var(--color-bg);
     --theme-base-2: color-mix(in oklch, var(--color-bg) 98.5%, black);
     --theme-base-3: color-mix(in oklch, var(--color-bg) 97%, black);
+    --theme-base-hover: color-mix(in oklch, var(--color-bg) 97.5%, var(--color-fg-1));
+    --theme-base-active: color-mix(in oklch, var(--color-bg) 96%, var(--color-fg-1));
     --theme-base-fg-1: var(--color-fg-1);
     --theme-base-fg-2: color-mix(in oklch, var(--color-fg-1) 80%, var(--color-bg));
     --theme-base-fg-3: color-mix(in oklch, var(--color-fg-1) 60%, var(--color-bg));

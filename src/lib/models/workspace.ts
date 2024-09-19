@@ -1,10 +1,10 @@
 import type { Role } from './role';
-import type { Status } from './status';
+import type { WorkspaceStatus } from './status';
 import type { User } from './user';
 
 export interface Workspace {
     id: string;
-    statuses?: Status[];
+    statuses?: WorkspaceStatus[];
 }
 
 export interface WorkspaceMember {

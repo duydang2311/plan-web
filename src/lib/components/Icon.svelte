@@ -40,10 +40,25 @@
         'circle-dashed': () => import('~icons/ph/circle-dashed-fill'),
         google: () => import('~icons/custom/google'),
         'project-outline': () => import('~icons/ph/cube'),
-        project: () => import('~icons/ph/cube-fill')
+        project: () => import('~icons/ph/cube-fill'),
+        'priority-none': () => import('~icons/ph/cell-signal-none-fill'),
+        'priority-low': () => import('~icons/ph/cell-signal-low-fill'),
+        'priority-medium': () => import('~icons/ph/cell-signal-medium-fill'),
+        'priority-high': () => import('~icons/ph/cell-signal-high-fill'),
+        'priority-urgent': () => import('~icons/ph/warning-fill'),
+        backlog: () => import('~icons/ph/circle-dashed'),
+        todo: () => import('~icons/ph/circle'),
+        'in-progress': () => import('~icons/ph/circle-half'),
+        done: () => import('~icons/ph/check-circle-fill'),
+        canceled: () => import('~icons/ph/x-circle'),
+        duplicated: () => import('~icons/ph/x-circle')
     };
 
     export type IconName = keyof typeof imports;
+
+    export function isIconName(name: string): name is IconName {
+        return name in imports;
+    }
 
     const loaded = writable<{
         [k in keyof typeof imports]?: typeof import('~icons/*').default;

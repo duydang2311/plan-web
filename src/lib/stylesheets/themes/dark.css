@@ -14,6 +14,8 @@
     --theme-base-1: oklch(from var(--color-bg) calc(l + 0.02) c h);
     --theme-base-2: var(--color-bg);
     --theme-base-3: oklch(from var(--color-bg) calc(l + 0.06) c h);
+    --theme-base-hover: color-mix(in oklch, var(--color-bg) 93%, var(--color-fg-1));
+    --theme-base-active: color-mix(in oklch, var(--color-bg) 91%, var(--color-fg-1));
     --theme-base-fg-1: var(--color-fg-1);
     --theme-base-fg-ghost: oklch(from var(--color-fg-1) calc(l - 0.4) c h);
     --theme-base-fg-disabled: color-mix(in oklch, var(--theme-base-fg-1) 20%, var(--theme-base-1));

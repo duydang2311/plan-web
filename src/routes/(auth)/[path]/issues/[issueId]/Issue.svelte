@@ -18,7 +18,7 @@
     interface Props {
         form: ActionData;
         isEditing: boolean;
-        issue: Issue;
+        issue: Pick<Issue, 'title' | 'description'>;
     }
 
     const { isEditing, issue }: Props = $props();

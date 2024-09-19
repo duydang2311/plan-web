@@ -27,7 +27,7 @@ export const PATCH: RequestHandler = async ({ request, params, locals: { runtime
     return new Response(null, { status: 204 });
 };
 
-const validate = validator<{ orderByStatus: number; statusId: number }>((input, { error }) => {
+const validate = validator<{ orderByStatus?: number; statusId: number }>((input, { error }) => {
     if (!input || typeof input !== 'object') {
         return error('root', 'object');
     }
@@ -36,7 +36,7 @@ const validate = validator<{ orderByStatus: number; statusId: number }>((input, 
         return error('statusId', 'number');
     }
 
-    if (!('orderByStatus' in input) || typeof input.orderByStatus !== 'number') {
-        return error('issueId', 'number');
+    if ('orderByStatus' in input && typeof input.orderByStatus !== 'number') {
+        return error('orderByStatus', 'number');
     }
 });
