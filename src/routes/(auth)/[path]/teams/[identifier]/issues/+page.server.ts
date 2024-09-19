@@ -77,7 +77,6 @@ const loadTableLayout = async ({
                     query: { ...query, teamId: data.team.id }
                 });
 
-                console.log(response);
                 if (!response.ok) {
                     return paginatedList<Issue>();
                 }

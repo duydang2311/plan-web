@@ -11,7 +11,6 @@ export const GET: RequestHandler = async ({ params, locals: { runtime } }) => {
         })
     );
 
-    console.log(exit);
     if (Exit.isFailure(exit)) {
         return pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
     }
