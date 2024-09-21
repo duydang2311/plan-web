@@ -169,13 +169,9 @@ export const actions: Actions = {
                     const api = yield* ApiClient;
                     const response = yield* api.patch(`issues/${validation.data.issueId}`, {
                         body: {
-                            patch: [
-                                {
-                                    op: 'replace',
-                                    path: '/Description',
-                                    value: validation.data.description
-                                }
-                            ]
+                            patch: {
+                                description: validation.data.description
+                            }
                         }
                     });
 

@@ -10,7 +10,7 @@
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';
     import { tryPromise } from '~/lib/utils/neverthrow';
-    import { tsap } from '~/lib/utils/transition';
+    import { select, tsap } from '~/lib/utils/transition';
 
     interface Item {
         label: string;
@@ -66,27 +66,7 @@
     });
 </script>
 
-<div
-    class="c-select--menu"
-    use:melt={menu}
-    in:tsap={(node, gsap) =>
-        gsap.from(node, {
-            opacity: 0,
-            scaleY: 0.95,
-            y: '-0.5rem',
-            duration: 0.15,
-            force3D: true,
-            ease: 'circ.out'
-        })}
-    out:tsap={(node, gsap) =>
-        gsap.to(node, {
-            opacity: 0,
-            y: '-0.5rem',
-            duration: 0.075,
-            force3D: true,
-            ease: 'circ.in'
-        })}
->
+<div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
     {#if $query.isFetching}
         <li class="c-select--option text-base-fg-ghost">Loading...</li>
     {:else if $query.data && $query.data.items.length > 0}

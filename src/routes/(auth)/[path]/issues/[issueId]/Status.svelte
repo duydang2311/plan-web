@@ -52,8 +52,8 @@
                 }
                 addToast({
                     data: {
-                        title: 'Something went wrong',
-                        description: `We could not change the status of the issue (${error ? error : data!.status}).`
+                        title: 'Failed to update status',
+                        description: `We could not update the status of the issue (${error ? error : data!.status}).`
                     }
                 });
             }

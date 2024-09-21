@@ -250,7 +250,7 @@
         <p class="font-medium font-display text-base-fg-3 mb-4">Properties</p>
         <div class="space-y-2">
             <Status workspaceId={data.workspace.id} issueId={data.issue.id} />
-            <Priority priority={data.issue.priority} />
+            <Priority issueId={data.issue.id} />
         </div>
     </div>
 </main>

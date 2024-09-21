@@ -47,12 +47,30 @@ export function none(_node: HTMLElement, { delay = 0, duration = 400 } = {}) {
     };
 }
 
-export function tsap(
-    node: HTMLElement,
-    callback: (node: HTMLElement, gsap: typeof __gsap) => gsap.core.Animation
-) {
+type TsapCallback = (node: HTMLElement, gsap: typeof __gsap) => gsap.core.Animation;
+export function tsap(node: HTMLElement, callback: TsapCallback) {
     const animation = callback(node, __gsap);
     return {
         duration: animation.totalDuration() * 1000
     };
 }
+
+export const select: { [k in 'in' | 'out']: TsapCallback } = {
+    in: (node, gsap) =>
+        gsap.from(node, {
+            opacity: 0,
+            scaleY: 0.95,
+            y: '-0.5rem',
+            duration: 0.15,
+            force3D: true,
+            ease: 'circ.out'
+        }),
+    out: (node, gsap) =>
+        gsap.to(node, {
+            opacity: 0,
+            y: '-0.5rem',
+            duration: 0.075,
+            force3D: true,
+            ease: 'circ.in'
+        })
+};
