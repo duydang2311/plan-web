@@ -23,30 +23,27 @@
 </script>
 
 <script lang="ts">
-    import type { IssueComment } from '~/lib/models/issue_comment';
+    import { enhance } from '$app/forms';
+    import { page } from '$app/stores';
+    import { melt } from '@melt-ui/svelte';
+    import { type InfiniteData, useQueryClient } from '@tanstack/svelte-query';
+    import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
     import { DateTime } from 'luxon';
     import Button from '~/lib/components/Button.svelte';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
-    import { slideIn, slideOut } from './transitions';
-    import { Editor } from '@tiptap/core';
-    import { page } from '$app/stores';
-    import { enhance } from '$app/forms';
-    import { fluentSearchParams } from '~/lib/utils/url';
-    import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
-    import { melt } from '@melt-ui/svelte';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
+    import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
+    import Tiptap from '~/lib/components/Tiptap.svelte';
     import { addToast } from '~/lib/components/Toaster.svelte';
+    import type { IssueComment } from '~/lib/models/issue_comment';
+    import { type PaginatedList } from '~/lib/models/paginatedList';
+    import { slideIn, slideOut } from './transitions';
 
-    const {
-        comment,
-        isAuthor,
-        isEditing
-    }: { comment: IssueComment; isAuthor: boolean; isEditing: boolean } = $props();
-    const editHref = $derived(
-        fluentSearchParams($page.url).set('edit-comment', comment.id).toString()
-    );
-    const cancelHref = $derived(fluentSearchParams($page.url).delete('edit-comment').toString());
+    const { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
+        $props();
+    const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
+    const queryClient = useQueryClient();
+    let editing = $state(false);
     let editor = $state<Editor>();
     let open = $state(false);
 </script>
@@ -64,18 +61,46 @@
         </div>
     </div>
     <div class="mt-4">
-        {#if isEditing}
+        {#if editing}
             <div in:slideIn out:slideOut>
                 <form
                     method="post"
                     action="?/edit-comment"
                     class="relative"
-                    use:enhance={(e) => {
+                    use:enhance={async (e) => {
                         if (!editor) {
                             e.cancel();
                             return;
                         }
+                        const oldData =
+                            queryClient.getQueryData<
+                                InfiniteData<PaginatedList<IssueComment>, number>
+                            >(queryKey);
+                        if (oldData) {
+                            queryClient.setQueryData(queryKey, {
+                                ...oldData,
+                                pages: oldData.pages.map((a) =>
+                                    a
+                                        ? {
+                                              ...a,
+                                              items: a.items.map((b) =>
+                                                  b.id === comment.id
+                                                      ? { ...b, content: editor!.getHTML() }
+                                                      : b
+                                              )
+                                          }
+                                        : a
+                                )
+                            });
+                        }
                         e.formData.set('content', editor.getHTML());
+                        editing = false;
+                        return async ({ result, update }) => {
+                            if (result.type !== 'success') {
+                                queryClient.setQueryData(queryKey, oldData);
+                            }
+                            await update({ invalidateAll: false, reset: false });
+                        };
                     }}
                 >
                     <input type="hidden" name="issueCommentId" value={comment.id} />
@@ -87,13 +112,10 @@
                     />
                     <div class="flex gap-2 absolute right-2 bottom-2">
                         <Button
-                            as="link"
-                            href={cancelHref}
                             variant="base"
                             size="sm"
                             filled={false}
-                            data-sveltekit-preload-data="tap"
-                            data-sveltekit-replacestate
+                            onclick={() => (editing = false)}
                         >
                             Cancel
                         </Button>
@@ -111,14 +133,11 @@
     {#if isAuthor}
         <div class="mt-4 flex flex-wrap gap-2">
             <Button
-                as="link"
-                href={editHref}
                 filled={false}
                 variant="base"
                 size="sm"
                 class="w-fit"
-                data-sveltekit-preload-data="tap"
-                data-sveltekit-replacestate
+                onclick={() => (editing = true)}
             >
                 Edit
             </Button>

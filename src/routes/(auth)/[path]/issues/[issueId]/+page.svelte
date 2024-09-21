@@ -197,7 +197,7 @@
                                             <Comment
                                                 {comment}
                                                 isAuthor={comment.authorId === data.user.id}
-                                                isEditing={comment.id === data.editingCommentId}
+                                                size={commentQuery.size}
                                             />
                                         {/if}
                                     </div>

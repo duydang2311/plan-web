@@ -42,8 +42,7 @@ export const load: PageServerLoad = async ({
     locals: { runtime, user }
 }) => {
     const query = queryParams(url, {
-        'edit-desc': false,
-        'edit-comment': null as unknown as string
+        'edit-desc': false
     });
     const exit = await runtime.runPromiseExit(
         pipe(
@@ -100,8 +99,7 @@ export const load: PageServerLoad = async ({
             query: commentQuery,
             list: isDataRequest ? commentList : await commentList
         },
-        isEditing: query['edit-desc'],
-        editingCommentId: query['edit-comment']
+        isEditing: query['edit-desc']
     };
 };
 
@@ -209,7 +207,7 @@ export const actions: Actions = {
 
         return redirect(302, `/${params.path}/issues/${params.issueId}`);
     },
-    'edit-comment': async ({ request, params, locals: { runtime } }) => {
+    'edit-comment': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(
             pipe(
                 Effect.gen(function* () {
@@ -263,8 +261,7 @@ export const actions: Actions = {
                 editDescription: { errors: failure.errors as Record<string, string[]> }
             });
         }
-
-        return redirect(302, `/${params.path}/issues/${params.issueId}`);
+        return void 0 as void;
     },
     'delete-issue': async ({ request, params, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(

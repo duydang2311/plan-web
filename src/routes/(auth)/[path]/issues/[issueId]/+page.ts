@@ -1,13 +1,17 @@
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ parent, data, url, params }) => {
-    const { queryClient } = await parent();
+export const load: PageLoad = async ({ parent, data, url, untrack, params }) => {
+    console.log('load');
+    const { queryClient } = await untrack(() => parent());
     const commentQuery = paginatedQuery(
-        queryParams(url, {
-            offset: 0,
-            size: 10
-        })
+        queryParams(
+            untrack(() => url),
+            {
+                offset: 0,
+                size: 10
+            }
+        )
     );
 
     const prefetchPromises: Promise<unknown>[] = [];
@@ -58,7 +62,6 @@ export const load: PageLoad = async ({ parent, data, url, params }) => {
         );
     }
 
-    console.log(prefetchPromises);
     await Promise.all(prefetchPromises);
     return data;
 };
