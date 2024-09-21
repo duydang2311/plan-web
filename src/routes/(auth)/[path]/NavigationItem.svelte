@@ -30,7 +30,7 @@
     <Collapsible options={{ open }}>
         {#snippet children({ root, content, trigger })}
             <div use:melt={root}>
-                <Self {href} {icon} {activeIcon} {label} {isActive} class="pl-8">
+                <Self {href} {icon} {activeIcon} {label} class="pl-8">
                     <IconButton
                         type="button"
                         variant="base"
