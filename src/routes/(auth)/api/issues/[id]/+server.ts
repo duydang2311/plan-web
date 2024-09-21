@@ -32,6 +32,7 @@ export const PATCH: RequestHandler = async ({ request, params, locals: { runtime
 const validate = validator<{
     patch: {
         priority?: number;
+        statusId?: number;
     };
 }>((input, { error }) => {
     if (!input || typeof input !== 'object') {
@@ -47,5 +48,12 @@ const validate = validator<{
         (input.patch.priority == null || typeof input.patch.priority !== 'number')
     ) {
         return error('patch.priority', 'number');
+    }
+
+    if (
+        'statusId' in input.patch &&
+        (input.patch.statusId == null || typeof input.patch.statusId !== 'number')
+    ) {
+        return error('patch.statusId', 'number');
     }
 });

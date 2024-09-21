@@ -58,6 +58,7 @@ export const load: PageLoad = async ({ parent, data, url, params }) => {
         );
     }
 
+    console.log(prefetchPromises);
     await Promise.all(prefetchPromises);
     return data;
 };

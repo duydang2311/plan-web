@@ -25,7 +25,7 @@
     });
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
-            httpClient.patch(`/api/issues/${issueId}/status`, { body: { statusId } }),
+            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { statusId } } }),
         onMutate: async ({ statusId }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);

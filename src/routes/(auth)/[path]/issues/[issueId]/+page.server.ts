@@ -1,8 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import type { Issue, IssuePriority } from '~/lib/models/issue';
+import type { IssuePriority } from '~/lib/models/issue';
+import type { IssueComment } from '~/lib/models/issue_comment';
+import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
-import type { PageServerLoad, Actions } from './$types';
+import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
+import { paginatedQuery, queryParams } from '~/lib/utils/url';
+import type { Actions, PageServerLoad } from './$types';
 import {
     decode,
     decodeDeleteComment,
@@ -15,10 +19,6 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
-import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
-import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-import type { IssueComment } from '~/lib/models/issue_comment';
-import { paginatedQuery, queryParams } from '~/lib/utils/url';
 
 interface Issue {
     id: string;
@@ -225,13 +225,9 @@ export const actions: Actions = {
                         `issue-comments/${validation.data.issueCommentId}`,
                         {
                             body: {
-                                patch: [
-                                    {
-                                        op: 'replace',
-                                        path: '/Content',
-                                        value: validation.data.content
-                                    }
-                                ]
+                                patch: {
+                                    content: validation.data.content
+                                }
                             }
                         }
                     );
