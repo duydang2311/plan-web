@@ -102,7 +102,7 @@
                     id="description"
                     name="description"
                     rows={8}
-                    bind:value={fields.description}
+                    bind:value={fields.description!}
                 />
             </noscript>
             <div>

@@ -9,6 +9,7 @@
     import { writable } from 'svelte/store';
     import { IconButton } from '~/lib/components';
     import { tsap } from '~/lib/utils/transition';
+    import Self from './NavigationItem.svelte';
 
     interface Props {
         href: string;
@@ -29,7 +30,7 @@
     <Collapsible options={{ open }}>
         {#snippet children({ root, content, trigger })}
             <div use:melt={root}>
-                <svelte:self {href} {icon} {activeIcon} {label} {isActive} class="pl-8">
+                <Self {href} {icon} {activeIcon} {label} {isActive} class="pl-8">
                     <IconButton
                         type="button"
                         variant="base"
@@ -47,7 +48,7 @@
                             )}
                         />
                     </IconButton>
-                </svelte:self>
+                </Self>
                 {#if $open}
                     <ul
                         class="pl-8"
@@ -70,7 +71,7 @@
                     >
                         {#each childItems as item (item.href)}
                             <li>
-                                <svelte:self {...item} />
+                                <Self {...item} />
                             </li>
                         {/each}
                     </ul>
