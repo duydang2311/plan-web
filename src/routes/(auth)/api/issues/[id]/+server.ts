@@ -19,14 +19,11 @@ export const PATCH: RequestHandler = async ({ request, params, locals: { runtime
         })
     );
 
-    if (Exit.isFailure(exit)) {
-        return pipe(
-            exit.cause,
-            Cause.failureOption,
-            Option.getOrThrowWith(() => exit.cause)
-        );
-    }
-    return exit.value;
+    return Exit.match(exit, {
+        onFailure: (cause) =>
+            pipe(cause, Cause.failureOption, Option.getOrElse(EndpointResponse.Die)),
+        onSuccess: (a) => a
+    });
 };
 
 const validate = validator<{

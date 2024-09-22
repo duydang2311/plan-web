@@ -172,5 +172,6 @@ export const EndpointResponse = {
                 Effect.fail(json({ errors: { root: ['json'] } }, { status: 400 }))
             ),
             Effect.annotateLogs('scope', 'EndpointResponse.JSON')
-        )
+        ),
+    Die: () => json({ errors: { root: ['die'] } }, { status: 500 })
 } as const;

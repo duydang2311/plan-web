@@ -6,6 +6,7 @@ import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { RequestHandler } from './$types';
 import type { PaginatedList } from '~/lib/models/paginatedList';
+import { EndpointResponse } from '~/lib/utils/kit';
 
 export const GET: RequestHandler = async ({ url, params, locals: { runtime } }) => {
     const query = paginatedQuery(
@@ -52,9 +53,14 @@ export const GET: RequestHandler = async ({ url, params, locals: { runtime } }) 
         )
     );
 
-    if (Exit.isFailure(exit)) {
-        const { status, ...data } = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
-        return error(status, data);
-    }
-    return json(exit.value, { status: 200 });
+    return Exit.match(exit, {
+        onFailure: (cause) =>
+            pipe(
+                cause,
+                Cause.failureOption,
+                Option.map(({ status, ...data }) => error(status, data)),
+                Option.getOrElse(EndpointResponse.Die)
+            ),
+        onSuccess: (a) => json(a, { status: 200 })
+    });
 };

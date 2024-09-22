@@ -11,8 +11,9 @@ export const GET: RequestHandler = async ({ params, locals: { runtime } }) => {
         })
     );
 
-    if (Exit.isFailure(exit)) {
-        return pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
-    }
-    return exit.value;
+    return Exit.match(exit, {
+        onFailure: (cause) =>
+            pipe(cause, Cause.failureOption, Option.getOrElse(EndpointResponse.Die)),
+        onSuccess: (a) => a
+    });
 };

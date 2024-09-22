@@ -21,10 +21,11 @@ export const PATCH: RequestHandler = async ({ request, params, locals: { runtime
         })
     );
 
-    if (Exit.isFailure(exit)) {
-        return pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
-    }
-    return new Response(null, { status: 204 });
+    return Exit.match(exit, {
+        onFailure: (cause) =>
+            pipe(cause, Cause.failureOption, Option.getOrElse(EndpointResponse.Die)),
+        onSuccess: () => new Response(null, { status: 204 })
+    });
 };
 
 const validate = validator<{ orderByStatus?: number; statusId: number }>((input, { error }) => {
