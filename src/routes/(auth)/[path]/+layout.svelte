@@ -98,7 +98,7 @@
         </div>
     </aside>
     <div
-        class="bg-base-1 grow grid grid-rows-[auto_1fr] lg:rounded-xl lg:border lg:border-base-border lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
+        class="bg-base-1 grow grid grid-rows-[auto_1fr] max-h-screen lg:rounded-xl lg:border lg:border-base-border lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
     >
         <Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
         <div class="transition-enforcement overflow-hidden">
