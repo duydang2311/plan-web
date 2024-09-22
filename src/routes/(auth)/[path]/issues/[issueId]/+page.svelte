@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { goto } from '$app/navigation';
+    import { replaceState } from '$app/navigation';
     import { page } from '$app/stores';
     import { A, pipe } from '@mobily/ts-belt';
     import { createInfiniteQuery } from '@tanstack/svelte-query';
@@ -12,6 +12,7 @@
     import { Button, Icon, Tiptap, addToast } from '~/lib/components';
     import Spinner from '~/lib/components/Spinner.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { createAsyncEffect, createEffect } from '~/lib/utils/runes.svelte';
     import { paginatedQuery, queryParams } from '~/lib/utils/url';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData, PageData } from './$types';
@@ -28,17 +29,17 @@
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
     const query = createInfiniteQuery({
         queryKey: ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }],
-        queryFn: async ({ pageParam, signal }) => {
+        queryFn: async ({ pageParam }) => {
             const result = await fetchCommentList({
                 issueId: $page.params['issueId'],
                 offset: pageParam,
-                size: commentQuery.size,
-                signal
+                size: commentQuery.size
             });
 
             if (result.isOk() && result.value) {
-                $page.url.searchParams.set('offset', pageParam + '');
-                await goto($page.url, { replaceState: true, noScroll: true });
+                const url = new URL($page.url);
+                url.searchParams.set('offset', pageParam + '');
+                replaceState(url, $page.state);
                 return result.value;
             }
             return null;
@@ -50,19 +51,6 @@
     let scrollEl = $state<HTMLElement>();
     let virtualListEl = $state<HTMLDivElement>();
     let virtualItemEls = $state<HTMLDivElement[]>([]);
-    const virtualizer = $derived(
-        scrollEl && virtualListEl
-            ? createVirtualizer<HTMLElement, HTMLDivElement>({
-                  count: 0,
-                  getScrollElement: () => scrollEl!,
-                  estimateSize: (index) => virtualItemEls[index]?.clientHeight ?? 145,
-                  getItemKey: (index) => comments[index]?.id ?? 'loading-more',
-                  overscan: 4,
-                  scrollMargin: virtualListEl.offsetTop ?? 0
-              })
-            : null
-    );
-    let items = $derived($virtualizer?.getVirtualItems());
     const comments = $derived(
         $query.data
             ? pipe(
@@ -72,6 +60,19 @@
               )
             : []
     );
+    const virtualizer = $derived(
+        scrollEl && virtualListEl
+            ? createVirtualizer<HTMLElement, HTMLDivElement>({
+                  count: 0,
+                  getScrollElement: () => scrollEl!,
+                  estimateSize: () => 145,
+                  getItemKey: (index) => untrack(() => comments[index]?.id) ?? 'loading-more',
+                  overscan: 4,
+                  scrollMargin: virtualListEl.offsetTop ?? 0
+              })
+            : null
+    );
+    let items = $derived($virtualizer?.getVirtualItems());
 
     onMount(() => {
         let subscription: Subscription | undefined = undefined;
@@ -105,35 +106,38 @@
         };
     });
 
-    $effect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        comments;
-        untrack(() => {
+    createEffect(
+        () => {
             $virtualizer?.setOptions({
                 count: $query.hasNextPage ? comments.length + 1 : comments.length
             });
-        });
-    });
+        },
+        () => $query
+    );
 
-    $effect(() => {
-        for (const el of virtualItemEls) {
-            untrack(() => {
+    createEffect(
+        () => {
+            for (const el of virtualItemEls) {
                 $virtualizer!.measureElement(el);
-            });
-        }
-    });
+            }
+        },
+        () => [virtualItemEls, $query]
+    );
 
-    $effect(() => {
-        const lastItem = $virtualizer?.getVirtualItems().at(-1);
-        if (
-            lastItem &&
-            lastItem.index > comments.length - 1 &&
-            $query.hasNextPage &&
-            !$query.isFetchingNextPage
-        ) {
-            $query.fetchNextPage({ cancelRefetch: true });
-        }
-    });
+    createAsyncEffect(
+        () => {
+            const lastItem = $virtualizer?.getVirtualItems().at(-1);
+            if (
+                lastItem &&
+                lastItem.index > comments.length - 1 &&
+                $query.hasNextPage &&
+                !$query.isFetchingNextPage
+            ) {
+                return $query.fetchNextPage();
+            }
+        },
+        () => [$virtualizer, $query]
+    );
 
     $effect(() => {
         if (!editor) return;
