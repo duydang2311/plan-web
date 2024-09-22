@@ -1,35 +1,33 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import { replaceState } from '$app/navigation';
     import { page } from '$app/stores';
     import { A, pipe } from '@mobily/ts-belt';
     import { createInfiniteQuery } from '@tanstack/svelte-query';
     import { createVirtualizer } from '@tanstack/svelte-virtual';
-    import { Editor } from '@tiptap/core';
     import type { Subscription } from 'nats.ws';
     import { onMount, tick, untrack } from 'svelte';
     import { fade } from 'svelte/transition';
-    import { Button, Icon, Tiptap, addToast } from '~/lib/components';
+    import { addToast } from '~/lib/components';
     import Spinner from '~/lib/components/Spinner.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { createAsyncEffect, createEffect } from '~/lib/utils/runes.svelte';
     import { paginatedQuery, queryParams } from '~/lib/utils/url';
-    import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData, PageData } from './$types';
+    import AddComment from './AddComment.svelte';
     import Comment from './Comment.svelte';
     import Issue from './Issue.svelte';
     import Priority from './Priority.svelte';
     import Status from './Status.svelte';
-    import { clientValidate, fetchCommentList } from './utils.client';
+    import { fetchCommentList } from './utils.client';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const { realtime } = useRuntime();
-    let editor = $state<Editor>();
-    let validation = $state<ValidationResult>();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
+    const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
     const query = createInfiniteQuery({
-        queryKey: ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }],
+        queryKey,
         queryFn: async ({ pageParam }) => {
+            console.log('fetch', pageParam);
             const result = await fetchCommentList({
                 issueId: $page.params['issueId'],
                 offset: pageParam,
@@ -65,7 +63,7 @@
             ? createVirtualizer<HTMLElement, HTMLDivElement>({
                   count: 0,
                   getScrollElement: () => scrollEl!,
-                  estimateSize: () => 145,
+                  estimateSize: () => 130,
                   getItemKey: (index) => untrack(() => comments[index]?.id) ?? 'loading-more',
                   overscan: 4,
                   scrollMargin: virtualListEl.offsetTop ?? 0
@@ -114,6 +112,7 @@
         },
         () => $query
     );
+    $inspect($query);
 
     createEffect(
         () => {
@@ -121,7 +120,14 @@
                 $virtualizer!.measureElement(el);
             }
         },
-        () => [virtualItemEls, $query]
+        () => [virtualItemEls, $virtualizer]
+    );
+
+    createEffect(
+        () => {
+            $virtualizer!.measure();
+        },
+        () => $query
     );
 
     createAsyncEffect(
@@ -138,29 +144,10 @@
         },
         () => [$virtualizer, $query]
     );
-
-    $effect(() => {
-        if (!editor) return;
-
-        function handle({ editor }: { editor: Editor }) {
-            validation = clientValidate({
-                editor,
-                issueId: $page.params['issueId']
-            });
-        }
-
-        editor.on('create', handle);
-        editor.on('update', handle);
-
-        return () => {
-            editor!.off('create', handle);
-            editor!.off('update', handle);
-        };
-    });
 </script>
 
 <main class="flex items-stretch h-full divide-x divide-base-border overflow-hidden">
-    <div class="grow relative h-full overflow-auto" bind:this={scrollEl}>
+    <div class="grow relative h-full overflow-auto" bind:this={scrollEl} style="contain: strict;">
         <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
             <p class="font-bold content-center text-base-fg-1 text-h1">
                 {data.issue.title}
@@ -212,41 +199,7 @@
                 {/if}
             </div>
             <div class="mt-8">
-                <form
-                    method="post"
-                    action="?/comment"
-                    class="space-y-2"
-                    use:enhance={(e) => {
-                        if (!editor) {
-                            e.cancel();
-                            return;
-                        }
-                        e.formData.set('content', editor.getHTML());
-                        return async ({ update }) => {
-                            await update({ invalidateAll: false, reset: true });
-                        };
-                    }}
-                >
-                    <input type="hidden" name="issueId" value={$page.params['issueId']} />
-                    <div class="relative">
-                        <Tiptap
-                            bind:editor
-                            placeholder="Write your comment..."
-                            editorProps={{
-                                class: 'bg-base-1 min-h-24 max-h-60'
-                            }}
-                        />
-                        <Button
-                            variant="primary"
-                            class="absolute p-1 bottom-2 right-3 block ml-auto w-fit"
-                            filled={false}
-                            outline
-                            disabled={validation && !validation.ok}
-                        >
-                            <Icon name="arrow-up" />
-                        </Button>
-                    </div>
-                </form>
+                <AddComment userId={data.user.id} size={commentQuery.size} />
             </div>
         </div>
     </div>
