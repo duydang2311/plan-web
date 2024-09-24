@@ -39,7 +39,7 @@
             );
             return { oldStatus };
         },
-        onSettled: (data, error, _, context) => {
+        onSettled: async (data, error, _, context) => {
             if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData<WorkspaceStatus>(queryKey, context.oldStatus);
@@ -57,6 +57,7 @@
                     }
                 });
             }
+            await queryClient.invalidateQueries({ queryKey });
         }
     });
     const selected = writable<SelectOption<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>>>(

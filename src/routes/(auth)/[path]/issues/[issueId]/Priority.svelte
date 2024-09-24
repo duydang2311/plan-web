@@ -38,8 +38,8 @@
             $selected = items.find((a) => a.value === priority)!;
             return { oldPriority };
         },
-        onSettled: (data, error, _, context) => {
-            if (error || !data!.ok) {
+        onSettled: async (data, error, _, context) => {
+            if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData<IssuePriority>(queryKey, context.oldPriority);
                     $selected = items.find((a) => a.value === context.oldPriority)!;
@@ -51,6 +51,7 @@
                     }
                 });
             }
+            await queryClient.invalidateQueries({ queryKey });
         }
     });
     const priority = $derived($query.data ?? 0);

@@ -126,9 +126,8 @@
                         description: `Could not move issue ${sourceIssue.title} from ${sourceStatus} to ${targetStatus}.`
                     }
                 });
-            } else if (response && response.ok) {
-                await queryClient.invalidateQueries({ queryKey });
             }
+            await queryClient.invalidateQueries({ queryKey });
         }
     });
 

@@ -57,7 +57,6 @@
             if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData(queryKey, context.oldMembers);
-                    return;
                 }
             }
             await queryClient.invalidateQueries({

@@ -27,7 +27,6 @@
     const query = createInfiniteQuery({
         queryKey,
         queryFn: async ({ pageParam }) => {
-            console.log('fetch', pageParam);
             const result = await fetchCommentList({
                 issueId: $page.params['issueId'],
                 offset: pageParam,
