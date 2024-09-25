@@ -21,8 +21,9 @@ export const teamMembers = new Hono()
                         }
                     )
                 );
+                return c.body(null, 204);
             }),
-            Effect.catchAll((e) => Effect.succeed(e)),
+            Effect.catchAll(Effect.succeed),
             c.var.runtime.runPromise
         )
     );

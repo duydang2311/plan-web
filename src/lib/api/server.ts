@@ -10,9 +10,10 @@ import * as routes from './routes';
 export const app = new Hono()
     .use(install_base)
     .basePath('/api')
-    .route('/issues', routes.issues)
-    .route('/issue-comments', routes.issueComments)
-    .route('/', routes.teamMembers);
+    .route('/', routes.issues)
+    .route('/', routes.issueComments)
+    .route('/', routes.teamMembers)
+    .route('/', routes.users);
 
 export interface Environment {
     Variables?: {
