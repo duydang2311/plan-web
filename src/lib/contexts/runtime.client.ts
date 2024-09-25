@@ -10,10 +10,13 @@ import { NATSRealtime, type Realtime } from '../services/realtime.client';
 import { UniversalHttpClient } from '../services/universal_http_client';
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
+import type { Api, Rpc } from '../api/server';
+import { hc } from 'hono/client';
 
 interface Runtime {
     readonly httpClient: HttpClient;
     readonly realtime: Realtime;
+    readonly rpc: Rpc;
 }
 
 export function setRuntime() {
@@ -37,6 +40,7 @@ export function setRuntime() {
                 fetch: globalThis.fetch
             })
     );
+    defineLazyProperty(runtime, 'rpc', () => hc<Api>(get(page).url.origin));
     return setContext('runtime', runtime as Runtime);
 }
 

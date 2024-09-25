@@ -1,8 +1,5 @@
 import { Editor } from '@tiptap/core';
 import { extend, validator } from '~/lib/utils/validation';
-import { tryPromise } from '~/lib/utils/neverthrow';
-import type { PaginatedList } from '~/lib/models/paginatedList';
-import type { IssueComment } from '~/lib/models/issue_comment';
 
 const validateEditor = validator<{ editor: Editor }>((input, { error }) => {
     if (typeof input !== 'object' || !input) {
@@ -29,30 +26,3 @@ export const clientValidate = extend<{ editor: Editor }, { editor: Editor; issue
         }
     }
 );
-
-export function fetchCommentList({
-    issueId,
-    offset,
-    size
-}: {
-    issueId: string;
-    offset: number;
-    size: number;
-}) {
-    return tryPromise(
-        fetch(
-            `/api/issues/${issueId}/comments?offset=${offset}&size=${size}&select=CreatedTime,UpdatedTime,Id,Content,AuthorId`,
-            { method: 'get' }
-        )
-    )
-        .map((a) => a.json<PaginatedList<IssueComment>>())
-        .map((a) => {
-            const totalSize = offset + a.items.length;
-            return a.items.length === 0
-                ? null
-                : {
-                      ...a,
-                      nextOffset: totalSize >= a.totalCount ? null : totalSize
-                  };
-        });
-}

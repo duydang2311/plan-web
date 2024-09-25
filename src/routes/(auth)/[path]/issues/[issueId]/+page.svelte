@@ -10,6 +10,7 @@
     import { addToast } from '~/lib/components';
     import Spinner from '~/lib/components/Spinner.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { tryPromise } from '~/lib/utils/neverthrow';
     import { createAsyncEffect, createEffect } from '~/lib/utils/runes.svelte';
     import { paginatedQuery, queryParams } from '~/lib/utils/url';
     import type { ActionData, PageData } from './$types';
@@ -18,20 +19,35 @@
     import Issue from './Issue.svelte';
     import Priority from './Priority.svelte';
     import Status from './Status.svelte';
-    import { fetchCommentList } from './utils.client';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
-    const { realtime } = useRuntime();
+    const { realtime, rpc } = useRuntime();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
     const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
     const query = createInfiniteQuery({
         queryKey,
         queryFn: async ({ pageParam }) => {
-            const result = await fetchCommentList({
-                issueId: $page.params['issueId'],
-                offset: pageParam,
-                size: commentQuery.size
-            });
+            const result = await tryPromise(
+                rpc.api.issues[':id'].comments.$get({
+                    param: { id: $page.params['issueId'] },
+                    query: {
+                        offset: pageParam + '',
+                        size: commentQuery.size + '',
+                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+                    }
+                })
+            )
+                .map((a) => a.json().then((a) => a))
+                .map((a) => {
+                    if (a.type === 'error' || a.data.items.length === 0) {
+                        return null;
+                    }
+                    const totalSize = pageParam + a.data.items.length;
+                    return {
+                        ...a.data,
+                        nextOffset: totalSize >= a.data.totalCount ? null : totalSize
+                    };
+                });
 
             if (result.isOk() && result.value) {
                 const url = new URL($page.url);

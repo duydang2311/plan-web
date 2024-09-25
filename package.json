@@ -39,6 +39,7 @@
         "eslint-plugin-svelte": "^2.44.0",
         "globals": "^15.9.0",
         "gsap": "^3.12.5",
+        "hono": "^4.6.3",
         "isomorphic-dompurify": "^2.15.0",
         "jsonwebtoken": "^9.0.2",
         "luxon": "^3.5.0",
@@ -66,10 +67,10 @@
         "validator": "^13.12.0",
         "vite": "^5.4.7"
     },
+    "private": true,
     "resolutions": {
         "prosemirror-model": "1.22.3"
     },
-    "private": true,
     "scripts": {
         "dev": "vite dev",
         "build": "vite build",

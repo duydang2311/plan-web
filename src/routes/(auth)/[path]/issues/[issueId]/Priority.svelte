@@ -13,7 +13,6 @@
     }
 
     const { issueId }: Props = $props();
-    const { httpClient } = useRuntime();
     const queryClient = useQueryClient();
     const items = pipe(
         IssuePriorities,
@@ -28,9 +27,15 @@
     const query = createQuery<IssuePriority>({
         queryKey
     });
+    const { rpc } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ priority }: { priority: IssuePriority }) =>
-            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { priority } } }),
+            rpc.api.issues[':id'].$patch({
+                param: { id: issueId },
+                json: {
+                    patch: { priority }
+                }
+            }),
         onMutate: async ({ priority }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldPriority = queryClient.getQueryData<IssuePriority>(queryKey);

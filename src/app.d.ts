@@ -3,6 +3,7 @@
 import type { Layer } from 'effect/Layer';
 import type { ManagedRuntime } from 'effect/ManagedRuntime';
 import 'unplugin-icons/types/svelte';
+import type { Api } from './lib/api/server';
 import type { ApiClient } from './lib/services/api_client.server';
 
 // for information about these interfaces
@@ -20,6 +21,7 @@ declare global {
             user: {
                 id: string;
             };
+            api: Api;
         }
         interface PageData {
             routes?: (

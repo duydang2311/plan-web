@@ -10,3 +10,11 @@ export function tryPromise<T, E = unknown>(
 ): ResultAsync<T, E> {
     return ResultAsync.fromPromise<T, E>(promise, errorFn ?? defaultErrorFn);
 }
+
+export async function tryPromise2<T>(promise: Promise<T>): Promise<T | unknown> {
+    try {
+        return await promise;
+    } catch (e) {
+        return e;
+    }
+}

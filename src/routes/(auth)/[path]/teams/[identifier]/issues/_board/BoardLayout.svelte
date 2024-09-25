@@ -30,7 +30,7 @@
         }
     });
     const queryClient = useQueryClient();
-    const { httpClient } = useRuntime();
+    const { rpc } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({
             issueId,
@@ -43,8 +43,9 @@
                 statusId: number;
             };
         }) =>
-            httpClient.patch(`/api/issues/${issueId}/status`, {
-                body: { orderByStatus: target.orderByStatus, statusId: target.statusId }
+            rpc.api.issues[':id'].status.$patch({
+                param: { id: issueId },
+                json: { orderByStatus: target.orderByStatus, statusId: target.statusId }
             }),
         onMutate: async ({ issueId, source, target }) => {
             await queryClient.cancelQueries({ queryKey });

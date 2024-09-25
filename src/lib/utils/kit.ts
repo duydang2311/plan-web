@@ -11,18 +11,6 @@ export function invalidateSome(...hrefs: string[]) {
     });
 }
 
-type A =
-    | {
-          readonly status: 500;
-          readonly code: 'unknown';
-          readonly message: 'An unknown error occurred';
-      }
-    | {
-          readonly status: 500;
-          readonly code: string;
-          readonly message: string;
-      };
-
 export const LoadResponse = {
     UnknownError: () =>
         Effect.fail({

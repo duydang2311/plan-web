@@ -2,7 +2,6 @@ import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, data, url, untrack, params }) => {
-    console.log('load');
     const { queryClient } = await untrack(() => parent());
     const commentQuery = paginatedQuery(
         queryParams(

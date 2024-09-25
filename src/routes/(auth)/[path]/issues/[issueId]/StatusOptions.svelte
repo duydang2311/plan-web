@@ -7,7 +7,7 @@
     import { isIconName } from '~/lib/components/Icon.svelte';
     import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { paginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';
     import { tryPromise } from '~/lib/utils/neverthrow';
     import { select, tsap } from '~/lib/utils/transition';
@@ -31,15 +31,16 @@
         option,
         helpers: { isSelected }
     } = $derived(selectProps);
-    const { httpClient } = useRuntime();
+    const { rpc } = useRuntime();
 
     const query = createQuery({
         queryKey: ['statuses', { workspaceId }],
         queryFn: async () => {
             const tryGet = await tryPromise(
-                httpClient.get(`/api/workspaces/${workspaceId}/statuses`, {
+                rpc.api.workspaces[':id'].statuses.$get({
+                    param: { id: workspaceId },
                     query: {
-                        select: 'Id, Value, Icon'
+                        select: 'Id,Value,Icon'
                     }
                 })
             );
@@ -48,17 +49,14 @@
                 return paginatedList<Item>();
             }
 
-            const tryJson = await tryPromise(
-                tryGet.value.json<PaginatedList<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>>>()
-            );
-
-            if (tryJson.isErr()) {
+            const tryJson = await tryPromise(tryGet.value.json().then((a) => a));
+            if (tryJson.isErr() || tryJson.value.type !== 'success') {
                 return paginatedList<Item>();
             }
 
             const list = paginatedList<Item>({
-                items: tryJson.value.items.map((a) => ({ label: a.value, value: a })),
-                totalCount: tryJson.value.totalCount
+                items: tryJson.value.data.items.map((a) => ({ label: a.value, value: a })),
+                totalCount: tryJson.value.data.totalCount
             });
             $selected = list.items.find((a) => a.value.id == $selected?.value.id)!;
             return list;
