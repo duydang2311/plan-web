@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { error, redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime, pipe } from 'effect';
+import { app, rpc } from './lib/api/server';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { BearerHttpApiClient } from './lib/services/bearer_api_client.server';
 import { Fetcher } from './lib/services/fetcher.server';
@@ -31,8 +32,23 @@ export const handle: Handle = async ({
     event: { locals, route, cookies, fetch },
     resolve
 }) => {
-    const authRequired = route.id && route.id.includes('(auth)');
-    if (route.id && (authRequired || route.id.includes('(auth-optional)'))) {
+    const routeId = route.id!;
+    const isHonoApiRoute = routeId && routeId.startsWith('/api');
+
+    if (isHonoApiRoute) {
+        locals.api = app;
+        locals.rpc = rpc;
+        return await resolve(event);
+    }
+
+    let isAuthRoute = false;
+    let isAuthOptionalRoute = false;
+    if (routeId) {
+        isAuthRoute = routeId.includes('(auth)');
+        isAuthOptionalRoute = routeId.includes('(auth-optional)');
+    }
+
+    if (isAuthRoute || isAuthOptionalRoute) {
         let accessToken = cookies.get('access_token');
         let failed = true;
         if (!accessToken) {
@@ -69,8 +85,8 @@ export const handle: Handle = async ({
                 failed = false;
             }
         }
-        if (failed && authRequired) {
-            return route.id.includes('api')
+        if (failed && isAuthRoute) {
+            return routeId.includes('api')
                 ? error(403, { code: 'forbidden', message: 'Forbidden' })
                 : redirect(302, '/login');
         }
@@ -79,7 +95,7 @@ export const handle: Handle = async ({
     }
 
     const response = await resolve(event);
-    await locals.runtime.dispose();
+    await locals.runtime?.dispose();
     return response;
 };
 
