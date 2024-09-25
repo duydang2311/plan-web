@@ -111,16 +111,12 @@
         },
         () => $query
     );
-    $inspect($query);
 
-    createEffect(
-        () => {
-            for (const el of virtualItemEls) {
-                $virtualizer!.measureElement(el);
-            }
-        },
-        () => [virtualItemEls, $virtualizer]
-    );
+    $effect(() => {
+        for (const el of virtualItemEls) {
+            untrack(() => $virtualizer!.measureElement(el));
+        }
+    });
 
     createEffect(
         () => {
@@ -141,7 +137,7 @@
                 return $query.fetchNextPage();
             }
         },
-        () => [$virtualizer, $query]
+        () => $virtualizer
     );
 </script>
 
