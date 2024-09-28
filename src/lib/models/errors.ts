@@ -23,4 +23,12 @@ export class HttpError extends Data.TaggedError('HttpError')<{
 
 export class ValidationError extends Data.TaggedError('ValidationError')<{
     errors: Record<string, string[]>;
-}> {}
+}> {
+    public static of(errors: Record<string, string[]>) {
+        return new ValidationError({ errors });
+    }
+}
+
+export class UnauthorizedError extends Data.TaggedError('UnauthorizedError') {
+    public static readonly instance = new UnauthorizedError();
+}

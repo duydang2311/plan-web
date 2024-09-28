@@ -26,6 +26,8 @@
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';
     import { validateInvite } from './utils';
+    import { pipe } from '@baetheus/fun/fn';
+    import { TE } from '~/lib/utils/functional';
 
     interface Props extends DialogProps {
         team: Pick<Team, 'id' | 'name'>;
@@ -73,14 +75,24 @@
             const timeout = setTimeout(() => {
                 $queryOptions = {
                     queryKey: ['invite-member', { search }],
-                    queryFn: () =>
-                        httpClient
-                            .get('/api/users/search', { query: { query: search, size: 5 } })
-                            .then((v) =>
-                                v.ok
-                                    ? v.json<PaginatedList<SearchItem>>()
-                                    : paginatedList<SearchItem>()
+                    queryFn: () => {
+                        return pipe(
+                            TE.fromPromise(() =>
+                                httpClient.get('/api/users/search', {
+                                    query: { query: search, size: 5 }
+                                })
+                            )(),
+                            TE.flatMap((r) =>
+                                r.ok
+                                    ? TE.fromPromise(() => r.json<PaginatedList<SearchItem>>())()
+                                    : TE.leftVoid
                             ),
+                            TE.match(
+                                () => paginatedList<SearchItem>(),
+                                (r) => r
+                            )
+                        )();
+                    },
                     placeholderData: $query.data
                 };
             }, 250);

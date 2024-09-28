@@ -18,6 +18,9 @@ export function queryParams<T extends Record<string, unknown>>(
         if (value) {
             if (typeof defaultValues[k] === 'number') {
                 value = Number(value);
+                if (isNaN(value)) {
+                    value = defaultValues[k];
+                }
             }
             obj[k] = value as T[Extract<keyof T, string>];
         } else if (obj[k] == null) {

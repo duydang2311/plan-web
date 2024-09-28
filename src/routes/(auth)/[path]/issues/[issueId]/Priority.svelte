@@ -27,15 +27,10 @@
     const query = createQuery<IssuePriority>({
         queryKey
     });
-    const { rpc } = useRuntime();
+    const { httpClient } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ priority }: { priority: IssuePriority }) =>
-            rpc.api.issues[':id'].$patch({
-                param: { id: issueId },
-                json: {
-                    patch: { priority }
-                }
-            }),
+            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: priority } }),
         onMutate: async ({ priority }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldPriority = queryClient.getQueryData<IssuePriority>(queryKey);

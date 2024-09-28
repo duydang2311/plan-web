@@ -21,7 +21,7 @@
 
     let { data }: Props = $props();
     let status = $state<'pending-long' | null>(null);
-    const { rpc } = useRuntime();
+    const { httpClient } = useRuntime();
     const queryKey = $derived(['team-members', { teamId: $page.data['team'].id }]);
     const queryClient = useQueryClient();
     const roles = ['Administrator', 'Manager', 'Member', 'Guest'].map((a) => ({
@@ -30,9 +30,8 @@
     }));
     const mutation = createMutation({
         mutationFn: (role: string) =>
-            rpc.api.teams[':teamId'].members[':memberId'].role.$put({
-                param: { teamId: data.teamId, memberId: data.member.id },
-                json: { roleName: role }
+            httpClient.put(`/api/teams/${data.teamId}/members/${data.member.id}`, {
+                body: { roleName: role }
             }),
         onMutate: async (role) => {
             await queryClient.cancelQueries({ queryKey });

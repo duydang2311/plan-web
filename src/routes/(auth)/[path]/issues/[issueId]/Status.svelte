@@ -1,14 +1,14 @@
 <script lang="ts">
     import { type SelectOption } from '@melt-ui/svelte';
+    import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
     import { addToast, Button, Icon } from '~/lib/components';
     import { isIconName } from '~/lib/components/Icon.svelte';
     import Select from '~/lib/components/Select.svelte';
-    import type { WorkspaceStatus } from '~/lib/models/status';
-    import StatusOptions from './StatusOptions.svelte';
-    import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
+    import type { WorkspaceStatus } from '~/lib/models/status';
+    import StatusOptions from './StatusOptions.svelte';
 
     interface Props {
         workspaceId: string;
@@ -16,7 +16,7 @@
     }
 
     const { workspaceId, issueId }: Props = $props();
-    const { rpc } = useRuntime();
+    const { httpClient } = useRuntime();
     const queryClient = useQueryClient();
     const open = writable(false);
     const queryKey = ['workspace-status', { issueId }];
@@ -25,7 +25,8 @@
     });
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
-            rpc.api.issues[':id'].$patch({ param: { id: issueId }, json: { patch: { statusId } } }),
+            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { statusId } } }),
+
         onMutate: async ({ statusId }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);

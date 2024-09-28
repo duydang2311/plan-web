@@ -10,7 +10,9 @@
     import { addToast } from '~/lib/components';
     import Spinner from '~/lib/components/Spinner.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { tryPromise } from '~/lib/utils/neverthrow';
+    import type { IssueComment } from '~/lib/models/issue_comment';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
+    import { TE } from '~/lib/utils/functional';
     import { createAsyncEffect, createEffect } from '~/lib/utils/runes.svelte';
     import { paginatedQuery, queryParams } from '~/lib/utils/url';
     import type { ActionData, PageData } from './$types';
@@ -21,41 +23,42 @@
     import Status from './Status.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
-    const { realtime, rpc } = useRuntime();
+    const { realtime, httpClient } = useRuntime();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
     const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
     const query = createInfiniteQuery({
         queryKey,
-        queryFn: async ({ pageParam }) => {
-            const result = await tryPromise(
-                rpc.api.issues[':id'].comments.$get({
-                    param: { id: $page.params['issueId'] },
-                    query: {
-                        offset: pageParam + '',
-                        size: commentQuery.size + '',
-                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+        queryFn: ({ pageParam }) => {
+            return pipe(
+                TE.fromPromise(() =>
+                    httpClient.get(`/api/issues/${$page.params['issueId']}/comments`, {
+                        query: {
+                            offset: pageParam,
+                            size: commentQuery.size,
+                            select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+                        }
+                    })
+                )(),
+                TE.flatMap((r) =>
+                    r.ok
+                        ? TE.fromPromise(() => r.json<PaginatedList<IssueComment>>())()
+                        : TE.leftVoid
+                ),
+                TE.flatMap((r) => (r.items.length === 0 ? TE.leftVoid : TE.right(r))),
+                TE.match(
+                    () => null,
+                    (r) => {
+                        const url = new URL($page.url);
+                        const totalSize = pageParam + r.items.length;
+                        url.searchParams.set('offset', pageParam + '');
+                        replaceState(url, $page.state);
+                        return {
+                            ...r,
+                            nextOffset: totalSize >= r.totalCount ? null : totalSize
+                        };
                     }
-                })
-            )
-                .map((a) => a.json().then((a) => a))
-                .map((a) => {
-                    if (a.type === 'error' || a.data.items.length === 0) {
-                        return null;
-                    }
-                    const totalSize = pageParam + a.data.items.length;
-                    return {
-                        ...a.data,
-                        nextOffset: totalSize >= a.data.totalCount ? null : totalSize
-                    };
-                });
-
-            if (result.isOk() && result.value) {
-                const url = new URL($page.url);
-                url.searchParams.set('offset', pageParam + '');
-                replaceState(url, $page.state);
-                return result.value;
-            }
-            return null;
+                )
+            )();
         },
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage?.nextOffset

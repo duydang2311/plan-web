@@ -84,12 +84,14 @@ export const GET: RequestHandler = async ({ cookies, url, fetch, locals: { runti
         path: '/',
         httpOnly: true,
         secure: true,
+        sameSite: 'lax',
         maxAge: authExit.value.accessTokenMaxAge
     });
     cookies.set('refresh_token', authExit.value.refreshToken, {
         path: '/',
         httpOnly: true,
         secure: true,
+        sameSite: 'lax',
         maxAge: authExit.value.refreshTokenMaxAge
     });
     return new Response(null, { status: 302, headers: { Location: '/' } });

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { pipe } from '@baetheus/fun/fn';
     import type { SelectOption } from '@melt-ui/svelte';
     import { melt } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
@@ -7,9 +8,9 @@
     import { isIconName } from '~/lib/components/Icon.svelte';
     import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { paginatedList } from '~/lib/models/paginatedList';
+    import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';
-    import { tryPromise } from '~/lib/utils/neverthrow';
+    import { TE } from '~/lib/utils/functional';
     import { select, tsap } from '~/lib/utils/transition';
 
     interface Item {
@@ -31,35 +32,35 @@
         option,
         helpers: { isSelected }
     } = $derived(selectProps);
-    const { rpc } = useRuntime();
+    const { httpClient } = useRuntime();
 
     const query = createQuery({
         queryKey: ['statuses', { workspaceId }],
-        queryFn: async () => {
-            const tryGet = await tryPromise(
-                rpc.api.workspaces[':id'].statuses.$get({
-                    param: { id: workspaceId },
-                    query: {
-                        select: 'Id,Value,Icon'
-                    }
-                })
-            );
-
-            if (tryGet.isErr() || !tryGet.value.ok) {
-                return paginatedList<Item>();
-            }
-
-            const tryJson = await tryPromise(tryGet.value.json().then((a) => a));
-            if (tryJson.isErr() || tryJson.value.type !== 'success') {
-                return paginatedList<Item>();
-            }
-
-            const list = paginatedList<Item>({
-                items: tryJson.value.data.items.map((a) => ({ label: a.value, value: a })),
-                totalCount: tryJson.value.data.totalCount
-            });
-            $selected = list.items.find((a) => a.value.id == $selected?.value.id)!;
-            return list;
+        queryFn: () => {
+            return pipe(
+                TE.fromPromise(() =>
+                    httpClient.get(`/api/workspaces/${workspaceId}/statuses`, {
+                        query: { select: 'Id,Value,Icon' }
+                    })
+                )(),
+                TE.flatMap((r) =>
+                    r.ok
+                        ? TE.fromPromise(() => r.json<PaginatedList<WorkspaceStatus>>())()
+                        : TE.leftVoid
+                ),
+                TE.map((r) => {
+                    const list = paginatedList<Item>({
+                        items: r.items.map((a) => ({ label: a.value, value: a })),
+                        totalCount: r.totalCount
+                    });
+                    $selected = list.items.find((a) => a.value.id == $selected?.value.id)!;
+                    return list;
+                }),
+                TE.match(
+                    () => paginatedList<Item>(),
+                    (r) => r
+                )
+            )();
         }
     });
 </script>

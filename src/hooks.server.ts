@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
-import { error, redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime, pipe } from 'effect';
-import { app } from './lib/api/server';
+import { app } from './lib/elysia_api/server';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { BearerHttpApiClient } from './lib/services/bearer_api_client.server';
 import { Fetcher } from './lib/services/fetcher.server';
@@ -32,21 +32,13 @@ export const handle: Handle = async ({
     event: { locals, route, cookies, fetch },
     resolve
 }) => {
-    const routeId = route.id!;
-    const isHonoApiRoute = routeId && routeId.startsWith('/api');
-
-    if (isHonoApiRoute) {
-        locals.api = app;
+    const routeId = route.id;
+    if (!routeId || routeId.startsWith('/api')) {
         return await resolve(event);
     }
 
-    let isAuthRoute = false;
-    let isAuthOptionalRoute = false;
-    if (routeId) {
-        isAuthRoute = routeId.includes('(auth)');
-        isAuthOptionalRoute = routeId.includes('(auth-optional)');
-    }
-
+    const isAuthRoute = routeId.includes('(auth)');
+    const isAuthOptionalRoute = routeId.includes('(auth-optional)');
     if (isAuthRoute || isAuthOptionalRoute) {
         let accessToken = cookies.get('access_token');
         let failed = true;
@@ -85,9 +77,7 @@ export const handle: Handle = async ({
             }
         }
         if (failed && isAuthRoute) {
-            return routeId.includes('api')
-                ? error(403, { code: 'forbidden', message: 'Forbidden' })
-                : redirect(302, '/login');
+            return redirect(302, '/login');
         }
     } else {
         initLocals(locals, fetch);

@@ -41,6 +41,7 @@ export const refresh = (cookies: Cookies) =>
                 path: '/',
                 httpOnly: true,
                 secure: true,
+                sameSite: 'lax',
                 maxAge: result.accessTokenMaxAge
             });
             return yield* Effect.succeed({ accessToken: result.accessToken });
