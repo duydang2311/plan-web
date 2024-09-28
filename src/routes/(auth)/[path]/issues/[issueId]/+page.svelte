@@ -33,7 +33,7 @@
                     query: {
                         offset: pageParam + '',
                         size: commentQuery.size + '',
-                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+                        select: ['CreatedTime', 'UpdatedTime', 'Id', 'Content', 'AuthorId']
                     }
                 })
             )

@@ -86,6 +86,7 @@ const refresh = (c: Context, refreshToken: string) =>
             setCookie(c, 'access_token', result.accessToken, {
                 path: '/',
                 httpOnly: true,
+                sameSite: 'lax',
                 secure: true,
                 maxAge: result.accessTokenMaxAge
             });

@@ -16,7 +16,7 @@
     }
 
     const { workspaceId, issueId }: Props = $props();
-    const { rpc } = useRuntime();
+    const { rpc, httpClient } = useRuntime();
     const queryClient = useQueryClient();
     const open = writable(false);
     const queryKey = ['workspace-status', { issueId }];
@@ -25,7 +25,9 @@
     });
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
-            rpc.api.issues[':id'].$patch({ param: { id: issueId }, json: { patch: { statusId } } }),
+            // rpc.api.issues[':id'].$patch({ param: { id: issueId }, json: { patch: { statusId } } }),
+            httpClient.patch(`/api/issues/${issueId}`, { body: { wtf: 1 } }),
+
         onMutate: async ({ statusId }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);

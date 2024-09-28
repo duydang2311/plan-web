@@ -1,6 +1,7 @@
+import { D } from '@mobily/ts-belt';
 import { Effect } from 'effect';
 import { Hono, type Context } from 'hono';
-import { validator as hv } from 'hono/validator';
+import { validator as honoValidator } from 'hono/validator';
 import type { IssueComment } from '~/lib/models/issue_comment';
 import type { PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
@@ -9,25 +10,21 @@ import { validator } from '~/lib/utils/validation';
 import { requireAuth } from '../middlewares/require_auth';
 import type { Environment } from '../server';
 import { HonoResponse, success } from '../utils/hono';
-import { queryParams } from '../utils/url';
+import { queryParamsDict } from '../utils/url';
 
 export const issues = new Hono()
     .basePath('/issues')
     .use(requireAuth)
     .get(
         '/:id/comments',
-        hv('query', () => {
-            return {} as {
-                page?: number;
-                offset?: number;
-                size?: number;
-                select?: string;
-            };
+        honoValidator('query', (query) => {
+            const q = D.selectKeys(query, ['page', 'offset', 'size', 'select']);
+            return q as Partial<typeof q>;
         }),
         (c) => {
             return Effect.gen(function* () {
                 const query = paginatedQuery(
-                    queryParams(c, {
+                    queryParamsDict(c.req.valid('query'), {
                         page: 1,
                         offset: 0,
                         size: 20,
@@ -49,7 +46,7 @@ export const issues = new Hono()
     )
     .patch(
         '/:id',
-        hv('json', (body, c: Context<Environment>) => {
+        honoValidator('json', (body, c: Context<Environment>) => {
             return HonoResponse.Validation(validatePatchIssue(body)).pipe(
                 Effect.map((a) => a.data),
                 Effect.catchAll(Effect.succeed),
@@ -71,7 +68,7 @@ export const issues = new Hono()
     )
     .patch(
         '/:id/status',
-        hv('json', (body, c: Context<Environment>) => {
+        honoValidator('json', (body, c: Context<Environment>) => {
             return HonoResponse.Validation(validatePatchStatus(body)).pipe(
                 Effect.map((a) => a.data),
                 Effect.catchAll(Effect.succeed),

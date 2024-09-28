@@ -45,7 +45,7 @@
     };
 
     const { team, form, ...props }: Props = $props();
-    const { httpClient } = useRuntime();
+    const { rpc, httpClient } = useRuntime();
     let search = $state.raw('');
     const queryOptions = writable<
         CreateQueryOptions<
@@ -74,12 +74,17 @@
                 $queryOptions = {
                     queryKey: ['invite-member', { search }],
                     queryFn: () =>
-                        httpClient
-                            .get('/api/users/search', { query: { query: search, size: 5 } })
-                            .then((v) =>
-                                v.ok
-                                    ? v.json<PaginatedList<SearchItem>>()
-                                    : paginatedList<SearchItem>()
+                        // httpClient
+                        //     .get('/api/users/search', { query: { query: search, size: 5 } })
+                        //     .then((v) =>
+                        //         v.ok
+                        //             ? v.json<PaginatedList<SearchItem>>()
+                        //             : paginatedList<SearchItem>()
+                        //     ),
+                        rpc.api.users.search
+                            .$get({ query: { query: search, size: '5' } })
+                            .then((a) =>
+                                a.ok ? a.json().then((a) => a) : paginatedList<SearchItem>()
                             ),
                     placeholderData: $query.data
                 };

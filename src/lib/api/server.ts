@@ -7,13 +7,16 @@ import type { ManagedRuntime } from 'effect/ManagedRuntime';
 import * as routes from './routes';
 
 export const app = new Hono()
-    .use(install_base)
+    // .use(install_base)
     .basePath('/api')
-    .route('/', routes.issues)
-    .route('/', routes.issueComments)
-    .route('/', routes.teamMembers)
-    .route('/', routes.users)
-    .route('/', routes.workspaces);
+    // .route('/', routes.issues)
+    // .route('/', routes.issueComments)
+    // .route('/', routes.teamMembers)
+    // .route('/', routes.users)
+    // .route('/', routes.workspaces)
+    .get('/hello', (c) => {
+        return c.text('hello');
+    });
 
 export interface Environment {
     Variables?: {
