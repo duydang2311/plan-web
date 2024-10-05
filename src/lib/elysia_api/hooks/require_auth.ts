@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
-import { Effect, Layer, ManagedRuntime } from 'effect';
-import { type Cookie } from 'elysia';
+import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
+import Elysia, { error, type Cookie } from 'elysia';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
@@ -13,16 +13,16 @@ import { D } from '@mobily/ts-belt';
 const { verify } = jwt;
 const certBuffer = Buffer.from(env.JWT_PUBLIC_KEY.replaceAll('\\n', '\n'));
 
-export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ set, cookie, runtime }) =>
-    Effect.gen(function* () {
+export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ set, cookie, runtime }) => {
+    return Effect.gen(function* () {
         const { accessToken } = yield* authenticateOrRefresh(cookie);
         const user = yield* decodeAccessToken(accessToken);
 
         // Workaround for https://github.com/elysiajs/elysia/issues/857
-        if (set.cookie && set.cookie['access_token'].maxAge == null) {
+        if (set.cookie && set.cookie['access_token']?.maxAge == null) {
             set.cookie = D.deleteKey(set.cookie, 'access_token');
         }
-        if (set.cookie && set.cookie['refresh_token'].maxAge == null) {
+        if (set.cookie && set.cookie['refresh_token']?.maxAge == null) {
             set.cookie = D.deleteKey(set.cookie, 'refresh_token');
         }
         return {
@@ -51,8 +51,8 @@ export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ set, cookie, ru
         }),
         Effect.catchAll(Effect.succeed),
         runtime.runPromise
-    )
-);
+    );
+});
 
 const authenticateOrRefresh = (
     cookie: Record<'access_token' | 'refresh_token', Cookie<string | undefined>>
