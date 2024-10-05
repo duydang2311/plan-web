@@ -30,7 +30,7 @@
     const { httpClient } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ priority }: { priority: IssuePriority }) =>
-            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: priority } }),
+            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { priority } } }),
         onMutate: async ({ priority }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldPriority = queryClient.getQueryData<IssuePriority>(queryKey);
