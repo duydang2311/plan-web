@@ -78,7 +78,6 @@
     }
 
     const { name, ...props }: Props = $props();
-    const Icon = $derived($loaded[name]);
 
     if (!$loaded[name] && !loading[name]) {
         loading[name] = true;
@@ -90,8 +89,12 @@
                 loading[name] = false;
             });
     }
+
+    const Icon = $derived($loaded[name]);
 </script>
 
 {#if Icon}
     <Icon {...props} />
+{:else}
+    <svg viewBox="0 0 24 24" width="1.2em" height="1.2em" {...props}></svg>
 {/if}
