@@ -12,7 +12,7 @@
 
     const { userId, size }: { userId: string; size: number } = $props();
     const queryClient = useQueryClient();
-    let editor = $state<Editor>();
+    let editor = $state.raw<Editor>();
     let validation = $state<ValidationResult>();
 
     $effect(() => {

@@ -38,7 +38,7 @@
     });
     let status = $state<'submitting' | null>(null);
     let validation: ValidationResult | undefined;
-    let editor = $state<Editor>();
+    let editor = $state.raw<Editor>();
 
     const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>

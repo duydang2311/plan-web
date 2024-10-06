@@ -25,7 +25,7 @@
     const cancelHref = $derived(fluentSearchParams($page.url).delete('edit-desc').toString());
     const editHref = $derived(fluentSearchParams($page.url).set('edit-desc', '').toString());
     const open = writable(false);
-    let editor = $state<Editor>();
+    let editor = $state.raw<Editor>();
 </script>
 
 <div class="border-b border-b-base-border pb-2">
