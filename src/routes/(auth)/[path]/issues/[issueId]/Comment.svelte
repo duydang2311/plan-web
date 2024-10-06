@@ -37,14 +37,13 @@
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import { slideIn, slideOut } from './transitions';
 
-    const { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
+    let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
         $props();
     const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
     const queryClient = useQueryClient();
     let editing = $state(false);
-    let editor = $state<Editor>();
+    let editor = $state.raw<Editor>();
     let open = $state(false);
 </script>
 
@@ -62,69 +61,71 @@
     </div>
     <div class="mt-4">
         {#if editing}
-            <div in:slideIn out:slideOut>
-                <form
-                    method="post"
-                    action="?/edit-comment"
-                    class="relative"
-                    use:enhance={async (e) => {
-                        if (!editor) {
-                            e.cancel();
-                            return;
+            <form
+                method="post"
+                action="?/edit-comment"
+                class="relative"
+                use:enhance={async (e) => {
+                    if (!editor) {
+                        e.cancel();
+                        return;
+                    }
+                    editing = false;
+                    const oldData =
+                        queryClient.getQueryData<InfiniteData<PaginatedList<IssueComment>, number>>(
+                            queryKey
+                        );
+                    if (oldData) {
+                        await queryClient.cancelQueries({ queryKey });
+                        queryClient.setQueryData(queryKey, {
+                            ...oldData,
+                            pages: oldData.pages.map((a) =>
+                                a
+                                    ? {
+                                          ...a,
+                                          items: a.items.map((b) =>
+                                              b.id === comment.id
+                                                  ? { ...b, content: editor!.getHTML() }
+                                                  : b
+                                          )
+                                      }
+                                    : a
+                            )
+                        });
+                    }
+                    e.formData.set('content', editor.getHTML());
+                    return async ({ result }) => {
+                        if (result.type !== 'success') {
+                            queryClient.setQueryData(queryKey, oldData);
                         }
-                        const oldData =
-                            queryClient.getQueryData<
-                                InfiniteData<PaginatedList<IssueComment>, number>
-                            >(queryKey);
-                        if (oldData) {
-                            queryClient.setQueryData(queryKey, {
-                                ...oldData,
-                                pages: oldData.pages.map((a) =>
-                                    a
-                                        ? {
-                                              ...a,
-                                              items: a.items.map((b) =>
-                                                  b.id === comment.id
-                                                      ? { ...b, content: editor!.getHTML() }
-                                                      : b
-                                              )
-                                          }
-                                        : a
-                                )
-                            });
-                        }
-                        e.formData.set('content', editor.getHTML());
-                        editing = false;
-                        return async ({ result, update }) => {
-                            if (result.type !== 'success') {
-                                queryClient.setQueryData(queryKey, oldData);
-                            }
-                            await update({ invalidateAll: false, reset: false });
-                        };
-                    }}
-                >
-                    <input type="hidden" name="issueCommentId" value={comment.id} />
-                    <Tiptap
-                        bind:editor
-                        name="content"
-                        content={comment.content}
-                        editorProps={{ class: 'pb-8' }}
-                    />
-                    <div class="flex gap-2 absolute right-2 bottom-2">
-                        <Button
-                            variant="base"
-                            size="sm"
-                            filled={false}
-                            onclick={() => (editing = false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button variant="primary" size="sm" filled={false}>Save</Button>
-                    </div>
-                </form>
-            </div>
+                        await queryClient.invalidateQueries({ queryKey });
+                    };
+                }}
+            >
+                <input type="hidden" name="issueCommentId" value={comment.id} />
+                <Tiptap
+                    bind:editor
+                    name="content"
+                    content={comment.content}
+                    editorProps={{ class: 'pb-8' }}
+                />
+                <div class="flex gap-2 absolute right-2 bottom-2">
+                    <Button
+                        type="button"
+                        variant="base"
+                        size="sm"
+                        filled={false}
+                        onclick={() => {
+                            editing = false;
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="primary" size="sm" filled={false}>Save</Button>
+                </div>
+            </form>
         {:else}
-            <div in:slideIn out:slideOut class="prose">
+            <div class="prose">
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html DOMPurify.sanitize(comment.content, { USE_PROFILES: { html: true } })}
             </div>
@@ -133,17 +134,21 @@
     {#if isAuthor}
         <div class="mt-4 flex flex-wrap gap-2">
             <Button
+                type="button"
                 filled={false}
                 variant="base"
                 size="sm"
                 class="w-fit"
-                onclick={() => (editing = true)}
+                onclick={() => {
+                    editing = true;
+                }}
             >
                 Edit
             </Button>
             <PopoverBuilder bind:open>
                 {#snippet children({ trigger, content, arrow, close })}
                     <Button
+                        type="button"
                         filled={false}
                         variant="negative"
                         size="sm"
@@ -161,14 +166,40 @@
                                 </p>
                                 <p class="mt-2">Proceed to delete this comment?</p>
                                 <div class="flex w-fit ml-auto gap-2 mt-4">
-                                    <Button variant="base" melt={close}>Cancel</Button>
+                                    <Button type="button" variant="base" melt={close}>Cancel</Button
+                                    >
                                     <form
                                         method="post"
                                         action="?/delete-comment"
-                                        use:enhance={() => {
-                                            return async ({ result, update }) => {
-                                                open = false;
-                                                if (result.type === 'success') {
+                                        use:enhance={async () => {
+                                            open = false;
+                                            const oldData =
+                                                queryClient.getQueryData<
+                                                    InfiniteData<
+                                                        PaginatedList<IssueComment>,
+                                                        number
+                                                    >
+                                                >(queryKey);
+                                            if (oldData) {
+                                                await queryClient.cancelQueries({ queryKey });
+                                                queryClient.setQueryData(queryKey, {
+                                                    ...oldData,
+                                                    pages: oldData.pages.map((a) =>
+                                                        a
+                                                            ? {
+                                                                  ...a,
+                                                                  items: a.items.filter(
+                                                                      (b) => b.id !== comment.id
+                                                                  )
+                                                              }
+                                                            : a
+                                                    )
+                                                });
+                                            }
+                                            return async ({ result }) => {
+                                                if (result.type !== 'success') {
+                                                    queryClient.setQueryData(queryKey, oldData);
+                                                } else {
                                                     addToast({
                                                         data: {
                                                             title: 'Comment deleted',
@@ -177,9 +208,7 @@
                                                         }
                                                     });
                                                 }
-                                                await update({
-                                                    reset: false
-                                                });
+                                                await queryClient.invalidateQueries({ queryKey });
                                             };
                                         }}
                                     >
@@ -188,7 +217,7 @@
                                             name="issueCommentId"
                                             value={comment.id}
                                         />
-                                        <Button variant="negative">Delete</Button>
+                                        <Button type="submit" variant="negative">Delete</Button>
                                     </form>
                                 </div>
                             </div>

@@ -65,24 +65,25 @@
     });
 
     let scrollEl = $state<HTMLElement>();
-    let virtualListEl = $state<HTMLDivElement>();
+    let virtualListEl = $state.raw<HTMLDivElement>();
     let virtualItemEls = $state<HTMLDivElement[]>([]);
     const comments = $derived(
         $query.data
             ? pipe(
                   $query.data.pages,
                   A.filter((a) => a != null),
-                  A.flatMap((a) => a?.items)
+                  A.flatMap((a) => a.items)
               )
             : []
     );
+
     const virtualizer = $derived(
         scrollEl && virtualListEl
             ? createVirtualizer<HTMLElement, HTMLDivElement>({
                   count: 0,
                   getScrollElement: () => scrollEl!,
                   estimateSize: () => 130,
-                  getItemKey: (index) => untrack(() => comments[index]?.id) ?? 'loading-more',
+                  getItemKey: (index) => untrack(() => comments[index]?.id) ?? 'load-more',
                   overscan: 4,
                   scrollMargin: virtualListEl.offsetTop ?? 0
               })
@@ -131,11 +132,14 @@
         () => $query
     );
 
-    $effect(() => {
-        for (const el of virtualItemEls) {
-            untrack(() => $virtualizer!.measureElement(el));
-        }
-    });
+    createEffect(
+        () => {
+            for (const el of virtualItemEls) {
+                $virtualizer!.measureElement(el);
+            }
+        },
+        () => [...virtualItemEls]
+    );
 
     createEffect(
         () => {
@@ -182,7 +186,7 @@
                                     ? items[0].start - $virtualizer.options.scrollMargin
                                     : 0}px);"
                             >
-                                {#each items as row, idx (row.index)}
+                                {#each items as row, idx (comments[row.index]?.id ?? 'load-more')}
                                     <div
                                         bind:this={virtualItemEls[idx]}
                                         data-index={row.index}

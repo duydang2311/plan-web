@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({
                     query: {
                         offset: 0,
                         size: commentQuery.offset + commentQuery.size,
-                        select: 'CreatedTime, UpdatedTime, Content, AuthorId'
+                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
                     }
                 });
                 if (!response.ok) {

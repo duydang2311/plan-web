@@ -60,7 +60,7 @@
                 createdTime: DateTime.now().toISO(),
                 updatedTime: DateTime.now().toISO(),
                 authorId: userId,
-                id: '',
+                id: Math.random() + '',
                 $optimistic: true
             };
             if (lastPage.items.length >= size) {
