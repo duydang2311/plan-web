@@ -99,11 +99,11 @@
             return data;
         });
         e.formData.set('content', html);
-        return async ({ result, update }) => {
+        return async ({ result }) => {
             if (result.type !== 'success') {
                 queryClient.setQueryData(queryKey, oldData);
             }
-            await update({ invalidateAll: false, reset: true });
+            await queryClient.invalidateQueries({ queryKey });
         };
     }}
 >
