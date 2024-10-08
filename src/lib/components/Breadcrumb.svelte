@@ -1,9 +1,8 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import clsx from 'clsx';
-    import { cubicInOut } from 'svelte/easing';
     import type { HTMLOlAttributes } from 'svelte/elements';
-    import { slide } from 'svelte/transition';
+    import { tsap } from '../utils/transition';
     import Icon from './Icon.svelte';
     import Link from './Link.svelte';
 
@@ -20,7 +19,18 @@
             {@const isLast = i === routes.length - 1}
             <li
                 class="flex items-center text-base-fg-3 overflow-hidden text-nowrap"
-                transition:slide={{ axis: 'x', duration: 200, easing: cubicInOut }}
+                in:tsap={(node, gsap) =>
+                    gsap.from(node, {
+                        width: 0,
+                        duration: 0.2,
+                        ease: 'cubic.inOut'
+                    })}
+                out:tsap={(node, gsap) =>
+                    gsap.to(node, {
+                        width: 0,
+                        duration: 0.2,
+                        ease: 'cubic.inOut'
+                    })}
             >
                 {#if notFirst}
                     <Icon
