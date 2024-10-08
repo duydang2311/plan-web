@@ -17,7 +17,7 @@
 <main class="h-full flex flex-col justify-between overflow-auto">
     <Table style="grid-template-columns: 1fr 1fr auto;">
         <THead>
-            <Row class="*:py-2">
+            <Row class="py-2">
                 <Th>Email address</Th>
                 <Th>Role</Th>
                 <Th>Actions</Th>
