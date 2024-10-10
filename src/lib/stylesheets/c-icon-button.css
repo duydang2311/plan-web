@@ -1,11 +1,9 @@
 .c-icon-button {
-    transition:
-        color 75ms ease-in-out,
-        transform 75ms ease-in-out;
+    border-radius: theme('borderRadius[sm]');
     padding: theme('padding[0.5]');
     transition:
-        opacity 75ms ease-in-out,
         transform 120ms ease-in-out,
+        color 75ms ease-in-out,
         background-color 75ms 50ms ease-in-out,
         box-shadow 75ms ease-in-out;
 
@@ -13,8 +11,8 @@
 
     &:hover {
         transition:
-            opacity 75ms ease-in-out,
             transform 120ms ease-in-out,
+            color 75ms ease-in-out,
             background-color 75ms ease-in-out,
             box-shadow 75ms 50ms ease-in-out;
         @apply ring-1;
