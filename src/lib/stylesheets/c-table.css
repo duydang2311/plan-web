@@ -13,13 +13,15 @@
     display: grid;
 
     & > tbody,
-    & > thead {
+    & > div.c-table--tbody,
+    & > .c-table--thead {
         display: grid;
         grid-column: 1 / -1;
         grid-template-columns: subgrid;
     }
 
-    & > tbody > .c-table--row:hover {
+    :where(& > tbody > .c-table--row:hover),
+    :where(& > div.c-table--tbody > .c-table--row:hover) {
         background-color: var(--theme-table-hover);
     }
 }
@@ -27,6 +29,7 @@
 .c-table--thead {
     position: sticky;
     top: 0;
+    background-color: var(--theme-base-1);
     border-bottom: 1px solid var(--theme-table-border);
 }
 
@@ -38,11 +41,11 @@
     transition: background-color 50ms ease-in-out;
     text-align: left;
 
-    & > * {
+    :where(& > *) {
         padding-inline: theme('padding[4]');
     }
 
-    & > th {
+    :where(& > .c-table--th) {
         font-weight: 500;
         font-size: var(--font-size-sm);
     }

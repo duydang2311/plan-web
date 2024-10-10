@@ -43,7 +43,7 @@
     });
 </script>
 
-<th {...props}>
+<th {...props} class={clsx('c-table--th', props.class)}>
     {#if props.sortable === true && state}
         <a
             href="?{state[1].toString()}"

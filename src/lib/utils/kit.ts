@@ -1,9 +1,9 @@
 import { invalidate } from '$app/navigation';
-import { fail, json } from '@sveltejs/kit';
+import { fail, json, type ActionFailure } from '@sveltejs/kit';
 import { Effect, pipe } from 'effect';
 import type { ApiError } from '../models/errors';
 import { flattenProblemDetails, validateProblemDetailsEffect } from './problem_details';
-import type { ValidationResult } from './validation';
+import type { ValidateOk, ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
     return invalidate((url) => {
@@ -63,7 +63,9 @@ export const LoadResponse = {
 export const ActionResponse = {
     UnknownError: () => Effect.fail(fail(500, { errors: { root: ['unknown'] } })),
     ValidationError: (errors: Record<string, string[]>) => Effect.fail(fail(400, { errors })),
-    Validation: <T>(validation: ValidationResult<T>) =>
+    Validation: <T>(
+        validation: ValidationResult<T>
+    ): Effect.Effect<ValidateOk<T>, ActionFailure<{ errors: Record<string, string[]> }>> =>
         validation.ok
             ? Effect.succeed(validation)
             : ActionResponse.ValidationError(validation.errors),
@@ -72,7 +74,9 @@ export const ActionResponse = {
         Effect.gen(function* () {
             if (response.status === 400) {
                 const json = yield* ActionResponse.JSON(() => response.json());
-                const problem = yield* validateProblemDetailsEffect(json);
+                const problem = yield* validateProblemDetailsEffect(json).pipe(
+                    Effect.catchAll((e) => Effect.fail(fail(500, { errors: { root: [e.code] } })))
+                );
                 return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
             }
             return yield* Effect.fail(
@@ -83,7 +87,7 @@ export const ActionResponse = {
         Effect.gen(function* () {
             const response = yield* pipe(
                 effect,
-                Effect.mapError((a) => json({ errors: { root: [a.code] } }))
+                Effect.mapError((a) => fail(500, { errors: { root: [a.code] } }))
             );
             if (!response.ok) {
                 return yield* ActionResponse.HTTPError(response);

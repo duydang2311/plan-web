@@ -74,3 +74,22 @@ export const select: { [k in 'in' | 'out']: TsapCallback } = {
             ease: 'circ.in'
         })
 };
+
+export const dialog: { [k in 'in' | 'out']: TsapCallback } = {
+    in: (node, gsap) =>
+        gsap.from(node, {
+            opacity: 0,
+            scale: 0.98,
+            duration: 0.15,
+            ease: 'power4.out',
+            force3D: true
+        }),
+    out: (node, gsap) =>
+        gsap.to(node, {
+            opacity: 0,
+            scale: 0.98,
+            duration: 0.15,
+            ease: 'power4.in',
+            force3D: true
+        })
+};

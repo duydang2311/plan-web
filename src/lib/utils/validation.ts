@@ -4,11 +4,12 @@ interface ValidatorProps {
     error: ErrorFunction;
 }
 
-interface ValidateOk<T> {
+export interface ValidateOk<T> {
     ok: true;
     data: T;
 }
-interface ValidateFail {
+
+export interface ValidateFail {
     ok: false;
     errors: Record<string, string[]>;
 }
