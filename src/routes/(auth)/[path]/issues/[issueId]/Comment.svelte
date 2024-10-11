@@ -37,6 +37,7 @@
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
+    import { writable } from 'svelte/store';
 
     let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
         $props();
@@ -44,7 +45,7 @@
     const queryClient = useQueryClient();
     let editing = $state(false);
     let editor = $state.raw<Editor>();
-    let open = $state(false);
+    const open = writable(false);
 </script>
 
 <div class="max-w-full rounded-md">
@@ -145,7 +146,7 @@
             >
                 Edit
             </Button>
-            <PopoverBuilder bind:open>
+            <PopoverBuilder options={{ open, forceVisible: true }}>
                 {#snippet children({ trigger, content, arrow, close })}
                     <Button
                         type="button"
@@ -157,7 +158,7 @@
                     >
                         Delete
                     </Button>
-                    {#if open}
+                    {#if $open}
                         <div in:popoverIn out:popoverOut class="c-popover" use:melt={content}>
                             <PopoverArrow melt={arrow} />
                             <div>
@@ -172,7 +173,7 @@
                                         method="post"
                                         action="?/delete-comment"
                                         use:enhance={async () => {
-                                            open = false;
+                                            $open = false;
                                             const oldData =
                                                 queryClient.getQueryData<
                                                     InfiniteData<

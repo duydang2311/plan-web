@@ -7,12 +7,16 @@
     import { dialog, tsap } from '~/lib/utils/transition';
     import { type ValidationResult } from '~/lib/utils/validation';
     import { decodeAddStatus, validateAddStatus } from './utils';
+    import { page } from '$app/stores';
 
     const { workspaceId, onClose }: { workspaceId: string; onClose: () => void } = $props();
     const queryKey = ['workspace-statuses', { workspaceId: workspaceId }];
     const queryClient = useQueryClient();
     let validation = $state<ValidationResult>();
-    const errors = $derived(validation != null && !validation.ok ? validation.errors : {});
+    const errors = $derived(
+        ($page.form?.['addStatus']?.errors as Record<string, string[]> | undefined) ??
+            (validation != null && !validation.ok ? validation.errors : null)
+    );
 </script>
 
 <Dialog defaultOpen={true} {onClose}>
@@ -50,7 +54,6 @@
                             return;
                         }
                         return async ({ result, update }) => {
-                            console.log(result);
                             if (result.type === 'success') {
                                 await queryClient.invalidateQueries({ queryKey });
                             }
@@ -65,24 +68,18 @@
                             id="value"
                             name="value"
                             type="text"
-                            aria-invalid={errors['value'] != null}
+                            aria-invalid={errors?.['value'] != null}
                         />
-                        <Errors errors={errors['value']} />
+                        <Errors errors={errors?.['value']} />
                     </Field>
                     <Field>
                         <Label for="desc">Description (optional)</Label>
                         <Input id="desc" name="description" type="text" />
-                        <Errors errors={errors['description']} />
+                        <Errors errors={errors?.['description']} />
                     </Field>
                     <div class="flex justify-end gap-4 !mt-8">
                         <Button variant="base" outline class="w-fit" melt={close}>Cancel</Button>
-                        <Button
-                            outline
-                            disabled={validation == null || !validation.ok}
-                            class="w-fit"
-                        >
-                            Create
-                        </Button>
+                        <Button outline disabled={errors != null} class="w-fit">Create</Button>
                     </div>
                 </form>
             </div>

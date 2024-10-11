@@ -3,6 +3,7 @@
     import { melt } from '@melt-ui/svelte';
     import { useQueryClient } from '@tanstack/svelte-query';
     import clsx from 'clsx';
+    import { writable } from 'svelte/store';
     import {
         Badge,
         Button,
@@ -24,13 +25,13 @@
 
     const { data }: Props = $props();
     const queryClient = useQueryClient();
-    let open = $state.raw(false);
+    const open = writable(false);
     let status = $state.raw<'submitting' | null>(null);
     const isSubmitting = $derived(status === 'submitting');
 
     const submit: SubmitFunction = () => {
         status = 'submitting';
-        open = false;
+        $open = false;
         return async ({ formData, result, update }) => {
             if (result.type === 'success') {
                 const validation = validateRevoke(decodeRevoke(formData));
@@ -65,7 +66,7 @@
     </td>
     <td>
         <div class="flex gap-2">
-            <PopoverBuilder bind:open>
+            <PopoverBuilder options={{ open, forceVisible: true }}>
                 {#snippet children({ trigger, content, arrow, close })}
                     <Button
                         type="button"
@@ -82,7 +83,7 @@
                         {/if}
                         Revoke
                     </Button>
-                    {#if open}
+                    {#if $open}
                         <div use:melt={content} class="p-4">
                             <Popover class="relative text-balance">
                                 <PopoverArrow melt={arrow}></PopoverArrow>

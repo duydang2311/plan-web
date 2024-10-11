@@ -75,7 +75,7 @@ export const ActionResponse = {
             if (response.status === 400) {
                 const json = yield* ActionResponse.JSON(() => response.json());
                 const problem = yield* validateProblemDetailsEffect(json).pipe(
-                    Effect.mapError((e) => Effect.fail(fail(500, { errors: { root: [e.code] } })))
+                    Effect.mapError((e) => fail(500, { errors: { root: [e.code] } }))
                 );
                 return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
             }

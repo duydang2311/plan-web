@@ -3,10 +3,16 @@ import type { Actions, PageServerLoad } from './$types';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-import { decodeAddStatus, validateAddStatus } from './utils';
+import {
+    decodeAddStatus,
+    decodeDeleteStatus,
+    validateAddStatus,
+    validateDeleteStatus
+} from './utils';
+import { fail } from '@sveltejs/kit';
 
 interface WorkspaceStatus {
-    id: string;
+    id: number;
     value: string;
     color: string;
     description?: string;
@@ -57,6 +63,24 @@ export const actions: Actions = {
                 })
             );
             return { addStatus: { success: true } };
-        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+        }).pipe(
+            Effect.catchAll((a) => Effect.succeed(fail(a.status, { addStatus: a.data }))),
+            runtime.runPromise
+        );
+    },
+    'delete-status': ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteStatus(decodeDeleteStatus(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`workspace-statuses/${validation.data.statusId}`)
+            );
+            return { deleteStatus: { success: true } };
+        }).pipe(
+            Effect.catchAll((a) => Effect.succeed(fail(a.status, { deleteStatus: a.data }))),
+            runtime.runPromise
+        );
     }
 };

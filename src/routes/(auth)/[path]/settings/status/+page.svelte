@@ -1,9 +1,10 @@
 <script lang="ts">
     import { invalidate } from '$app/navigation';
     import { createQuery } from '@tanstack/svelte-query';
-    import { Button, Icon, IconButton, Input, Row, Table, Th, THead } from '~/lib/components';
+    import { Button, Icon, Input, Row, Table, Th, THead } from '~/lib/components';
     import type { PageData } from './$types';
     import AddStatusDialog from './AddStatusDialog.svelte';
+    import DeleteButton from './DeleteButton.svelte';
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['workspace-statuses', { workspaceId: data.workspace.id }];
@@ -82,14 +83,7 @@
                                 {/if}
                             </td>
                             <td class="flex flex-wrap gap-2">
-                                <IconButton
-                                    type="button"
-                                    variant="negative"
-                                    title="Remove member"
-                                    class="w-fit"
-                                >
-                                    <Icon name="trash" />
-                                </IconButton>
+                                <DeleteButton {queryKey} status={{ id, value }} />
                             </td>
                         </Row>
                     {/each}

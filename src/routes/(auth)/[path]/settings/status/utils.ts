@@ -15,7 +15,12 @@ export const validateAddStatus = validator<{
         return error('workspaceId', 'string');
     }
 
-    if (!('value' in input) || !input.value || typeof input.value !== 'string') {
+    if (
+        !('value' in input) ||
+        !input.value ||
+        typeof input.value !== 'string' ||
+        input.value.length === 0
+    ) {
         return error('value', 'string');
     }
 
@@ -36,4 +41,29 @@ export const decodeAddStatus = (formData: FormData) => ({
     workspaceId: formData.get('workspaceId'),
     value: formData.get('value'),
     description: formData.get('description')
+});
+
+export const validateDeleteStatus = validator<{
+    statusId: number;
+}>((input, { error }) => {
+    if (!input || typeof input !== 'object') {
+        return error('$', 'object');
+    }
+
+    if (!('statusId' in input) || !input.statusId) {
+        return error('statusId', 'number');
+    }
+
+    if (
+        (typeof input.statusId !== 'number' && typeof input.statusId !== 'string') ||
+        isNaN(Number(input.statusId))
+    ) {
+        return error('statusId', 'number');
+    }
+
+    input.statusId = Number(input.statusId);
+});
+
+export const decodeDeleteStatus = (formData: FormData) => ({
+    statusId: formData.get('statusId')
 });
