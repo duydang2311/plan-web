@@ -75,7 +75,7 @@ export const ActionResponse = {
             if (response.status === 400) {
                 const json = yield* ActionResponse.JSON(() => response.json());
                 const problem = yield* validateProblemDetailsEffect(json).pipe(
-                    Effect.catchAll((e) => Effect.fail(fail(500, { errors: { root: [e.code] } })))
+                    Effect.mapError((e) => Effect.fail(fail(500, { errors: { root: [e.code] } })))
                 );
                 return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
             }
@@ -95,25 +95,15 @@ export const ActionResponse = {
             return response;
         }),
     JSON: <T = unknown>(f: () => Promise<T>) =>
-        pipe(
-            Effect.tryPromise({
-                try: f,
-                catch: (e) => e
-            }),
-            Effect.tapError((e) => Effect.logError('could not parse json', e)),
-            Effect.mapError(() => fail(500, { errors: { root: ['json'] } })),
-            Effect.annotateLogs('scope', 'ActionResponse.JSON')
-        ),
+        Effect.tryPromise({
+            try: f,
+            catch: () => fail(500, { errors: { root: ['json'] } })
+        }),
     FormData: (f: () => Promise<FormData>) =>
-        pipe(
-            Effect.tryPromise({
-                try: f,
-                catch: (e) => e
-            }),
-            Effect.tapError((e) => Effect.logError('could not parse form data', e)),
-            Effect.mapError(() => fail(500, { errors: { root: ['form_data'] } })),
-            Effect.annotateLogs('scope', 'ActionResponse.FormData')
-        )
+        Effect.tryPromise({
+            try: f,
+            catch: () => fail(400, { errors: { root: ['form_data'] } })
+        })
 } as const;
 
 export const EndpointResponse = {
