@@ -49,7 +49,7 @@ export const actions: Actions = {
                 validateAddStatus(decodeAddStatus(formData))
             );
             yield* ActionResponse.HTTP(
-                (yield* ApiClient).post(`workspaces/${validation.data.workspaceId}/`, {
+                (yield* ApiClient).post(`workspaces/${validation.data.workspaceId}/statuses`, {
                     body: {
                         value: validation.data.value,
                         description: validation.data.description
