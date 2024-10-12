@@ -11,6 +11,7 @@
     import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';
     import { TE } from '~/lib/utils/functional';
+    import { createEffect } from '~/lib/utils/runes.svelte';
     import { select, tsap } from '~/lib/utils/transition';
 
     interface Item {
@@ -35,7 +36,7 @@
     const { httpClient } = useRuntime();
 
     const query = createQuery({
-        queryKey: ['statuses', { workspaceId }],
+        queryKey: ['workspace-statuses', { workspaceId }],
         queryFn: () => {
             return pipe(
                 TE.fromPromise(() =>
@@ -48,28 +49,35 @@
                         ? TE.fromPromise(() => r.json<PaginatedList<WorkspaceStatus>>())()
                         : TE.leftVoid
                 ),
-                TE.map((r) => {
-                    const list = paginatedList<Item>({
-                        items: r.items.map((a) => ({ label: a.value, value: a })),
-                        totalCount: r.totalCount
-                    });
-                    $selected = list.items.find((a) => a.value.id == $selected?.value.id)!;
-                    return list;
-                }),
                 TE.match(
-                    () => paginatedList<Item>(),
+                    () => paginatedList<WorkspaceStatus>(),
                     (r) => r
                 )
             )();
         }
     });
+    const options = $derived(
+        $query.data
+            ? paginatedList<Item>({
+                  items: $query.data.items.map((a) => ({ label: a.value, value: a })),
+                  totalCount: $query.data.totalCount
+              })
+            : null
+    );
+    createEffect(
+        () => {
+            if (!options) return;
+            $selected = options.items.find((a) => a.value.id == $selected?.value.id)!;
+        },
+        () => options
+    );
 </script>
 
 <div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
     {#if $query.isFetching}
         <li class="c-select--option text-base-fg-ghost">Loading...</li>
-    {:else if $query.data && $query.data.items.length > 0}
-        {#each $query.data.items as item (item.value.id)}
+    {:else if options && options.items.length > 0}
+        {#each options.items as item (item.value.id)}
             {@const opt = option(item)}
             {@const selected = isSelected(item.value)}
             <li use:melt={opt} class="c-select--option">

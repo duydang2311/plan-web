@@ -31,7 +31,7 @@
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);
             const statuses = queryClient.getQueryData<PaginatedList<WorkspaceStatus>>([
-                'statuses',
+                'workspace-statuses',
                 { workspaceId }
             ]);
             queryClient.setQueryData<WorkspaceStatus>(

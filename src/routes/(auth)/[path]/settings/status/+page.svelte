@@ -78,8 +78,6 @@
                             >
                                 {#if description}
                                     {description}
-                                {:else}
-                                    <span class="text-base-fg-ghost"></span>
                                 {/if}
                             </td>
                             <td class="flex flex-wrap gap-2">
