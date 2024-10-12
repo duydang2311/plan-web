@@ -10,6 +10,19 @@ import { queryParamsDict } from '../utils/url';
 
 export const issues = baseApp({ prefix: '/issues' })
     .use(requireAuth)
+    .get('/:id', ({ query, params, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(`issues/${params.id}`, {
+                    query
+                })
+            );
+            const list = yield* ElysiaResponse.JSON(() =>
+                response.json<PaginatedList<IssueComment>>()
+            );
+            return Response.json(list, { status: 200 });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
     .get('/:id/comments', ({ query, params, runtime }) => {
         return Effect.gen(function* () {
             const api = yield* ApiClient;

@@ -9,6 +9,8 @@
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { WorkspaceStatus } from '~/lib/models/status';
     import StatusOptions from './StatusOptions.svelte';
+    import { pipe } from '@baetheus/fun/fn';
+    import { TE } from '~/lib/utils/functional';
 
     interface Props {
         workspaceId: string;
@@ -20,13 +22,33 @@
     const queryClient = useQueryClient();
     const open = writable(false);
     const queryKey = ['workspace-status', { issueId }];
-    const query = createQuery<WorkspaceStatus | null>({
-        queryKey
+    const query = createQuery<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> | null>({
+        queryKey,
+        queryFn: () => {
+            return pipe(
+                TE.fromPromise(() =>
+                    httpClient.get(`/api/issues/${issueId}`, {
+                        query: { select: 'Status.Id,Status.Value,Status.Icon' }
+                    })
+                )(),
+                TE.flatMap((a) =>
+                    a.ok
+                        ? TE.fromPromise(() =>
+                              a.json<{ status: Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> }>()
+                          )()
+                        : TE.leftVoid
+                ),
+                TE.map(({ status }) => status),
+                TE.match(
+                    () => null,
+                    (r) => r
+                )
+            )();
+        }
     });
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
             httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { statusId } } }),
-
         onMutate: async ({ statusId }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);
