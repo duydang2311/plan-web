@@ -67,7 +67,7 @@ export const actions = {
             })
         );
     },
-    'google-sign-in': async ({ url, cookies }) => {
+    'google-sign-in': ({ url, cookies }) => {
         const state = crypto.randomBytes(32).toString('hex');
         cookies.set('google_oauth_state', state, {
             path: '/oauth/google/callback',

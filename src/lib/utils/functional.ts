@@ -69,7 +69,7 @@ const tapRight: TapRight<KindAsyncEither> = (onRight) =>
     createTapRight<KindAsyncEither>(AsyncEither.FailableAsyncEitherParallel)(onRight);
 
 const {
-    flatmap,
+    flatmap: _0,
     tryCatch: _1,
     mapSecond: _2,
     tap: _3,
