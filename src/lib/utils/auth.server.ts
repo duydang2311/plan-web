@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import type { Cookies } from '@sveltejs/kit';
 import { Effect } from 'effect';
 import jwt from 'jsonwebtoken';
+import { Buffer } from 'node:buffer';
 import { ApiClient } from '../services/api_client.server';
 
 const { verify } = jwt;

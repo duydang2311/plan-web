@@ -1,7 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime, pipe } from 'effect';
-import { app } from './lib/elysia_api/server';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { BearerHttpApiClient } from './lib/services/bearer_api_client.server';
 import { Fetcher } from './lib/services/fetcher.server';

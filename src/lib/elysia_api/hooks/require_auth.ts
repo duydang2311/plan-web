@@ -1,14 +1,15 @@
 import { env } from '$env/dynamic/private';
-import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
-import Elysia, { error, type Cookie } from 'elysia';
+import { D } from '@mobily/ts-belt';
+import { Effect, Layer, ManagedRuntime } from 'effect';
+import { type Cookie } from 'elysia';
 import jwt from 'jsonwebtoken';
+import { Buffer } from 'node:buffer';
 import { UnauthorizedError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { BearerHttpApiClient } from '~/lib/services/bearer_api_client.server';
 import { UniversalHttpClient } from '~/lib/services/universal_http_client';
 import { ErrorFnLive } from '../contexts';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
-import { D } from '@mobily/ts-belt';
 
 const { verify } = jwt;
 const certBuffer = Buffer.from(env.JWT_PUBLIC_KEY.replaceAll('\\n', '\n'));

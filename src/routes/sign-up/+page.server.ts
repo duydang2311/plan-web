@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import { timingSafeEqual } from 'crypto';
 import { Effect, Either, Schedule, pipe } from 'effect';
+import { Buffer } from 'node:buffer';
 import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
