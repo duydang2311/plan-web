@@ -4,7 +4,7 @@
     import { Button, Icon, Input, Row, Table, Th, THead } from '~/lib/components';
     import type { PageData } from './$types';
     import AddStatusDialog from './AddStatusDialog.svelte';
-    import DeleteButton from './DeleteButton.svelte';
+    import DeleteStatus from './DeleteStatus.svelte';
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['workspace-statuses', { workspaceId: data.workspace.id }];
@@ -81,7 +81,7 @@
                                 {/if}
                             </td>
                             <td class="flex flex-wrap gap-2">
-                                <DeleteButton {queryKey} status={{ id, value }} />
+                                <DeleteStatus {queryKey} status={{ id, value }} />
                             </td>
                         </Row>
                     {/each}

@@ -1,27 +1,3 @@
-<script lang="ts" module>
-    import gsap from 'gsap';
-
-    function popoverIn(node: HTMLElement) {
-        gsap.from(node, {
-            scale: 0.98,
-            opacity: 0,
-            y: '-0.2rem',
-            duration: 0.15,
-            ease: 'power1.out'
-        });
-        return {
-            duration: 150
-        };
-    }
-
-    function popoverOut(node: HTMLElement) {
-        gsap.to(node, { scale: 0.98, opacity: 0, y: '-0.2rem', duration: 0.15, ease: 'power1.in' });
-        return {
-            duration: 150
-        };
-    }
-</script>
-
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { page } from '$app/stores';
@@ -30,6 +6,7 @@
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
     import { DateTime } from 'luxon';
+    import { writable } from 'svelte/store';
     import Button from '~/lib/components/Button.svelte';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
@@ -37,7 +14,7 @@
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import { writable } from 'svelte/store';
+    import { popover, tsap } from '~/lib/utils/transition';
 
     let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
         $props();
@@ -159,7 +136,12 @@
                         Delete
                     </Button>
                     {#if $open}
-                        <div in:popoverIn out:popoverOut class="c-popover" use:melt={content}>
+                        <div
+                            in:tsap={popover.in}
+                            out:tsap={popover.out}
+                            class="c-popover"
+                            use:melt={content}
+                        >
                             <PopoverArrow melt={arrow} />
                             <div>
                                 <p class="font-medium text-h5 text-base-fg-1">

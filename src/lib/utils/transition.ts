@@ -93,3 +93,16 @@ export const dialog: { [k in 'in' | 'out']: TsapCallback } = {
             force3D: true
         })
 };
+
+export const popover: { [k in 'in' | 'out']: TsapCallback } = {
+    in: (node, gsap) =>
+        gsap.from(node, {
+            scale: 0.95,
+            opacity: 0,
+            y: '-0.2rem',
+            duration: 0.1,
+            ease: 'power1.out'
+        }),
+    out: (node, gsap) =>
+        gsap.to(node, { scale: 0.98, opacity: 0, y: '-0.2rem', duration: 0.1, ease: 'power1.in' })
+};

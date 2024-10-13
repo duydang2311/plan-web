@@ -14,6 +14,7 @@
     } from '~/lib/components';
     import type { WorkspaceStatus } from '~/lib/models/status';
     import type { PageData } from './$types';
+    import { popover, tsap } from '~/lib/utils/transition';
 
     const {
         queryKey,
@@ -40,6 +41,7 @@
         open,
         forceVisible: true,
         positioning: {
+            placement: 'bottom',
             fitViewport: true
         }
     }}
@@ -55,7 +57,7 @@
             <Icon name="trash" />
         </IconButton>
         {#if $open}
-            <div use:melt={content} class="p-4">
+            <div in:tsap={popover.in} out:tsap={popover.out} use:melt={content} class="p-4">
                 <Popover class="relative text-pretty">
                     <PopoverArrow melt={arrow}></PopoverArrow>
                     <p class="text-h4 mb-2">Delete the status?</p>
