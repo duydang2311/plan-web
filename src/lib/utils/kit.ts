@@ -21,6 +21,20 @@ export const LoadResponse = {
         } as const),
     FetchError: (e: ApiError) =>
         Effect.fail({ _tag: 'FetchError', status: 500, code: e.code, message: e.message } as const),
+    Fetch: (f: () => Promise<Response>) =>
+        pipe(
+            Effect.tryPromise({
+                try: f,
+                catch: () =>
+                    Effect.fail({
+                        _tag: 'FetchError',
+                        status: 500,
+                        code: 'fetch',
+                        message: 'Fetch failed'
+                    })
+            }),
+            Effect.flatMap((a) => (!a.ok ? LoadResponse.HTTPError(a) : Effect.succeed(a)))
+        ),
     HTTPError: (response: Response) =>
         Effect.fail({
             _tag: 'HTTPError',

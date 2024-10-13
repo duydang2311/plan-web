@@ -6,6 +6,24 @@ import { queryParamsDict } from '../utils/url';
 
 export const users = baseApp({ prefix: '/users' })
     .use(requireAuth)
+    .get('/profile-name/:profileName', ({ params, query, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(`users/profile-name/${params.profileName}`, { query })
+            );
+            const json = yield* ElysiaResponse.JSON(() => response.json());
+            return Response.json(json, { status: response.status });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
+    .get('/:id', ({ params, query, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(`users/${params.id}`, { query })
+            );
+            const json = yield* ElysiaResponse.JSON(() => response.json());
+            return Response.json(json, { status: response.status });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
     .get('/search', ({ query, runtime }) => {
         return Effect.gen(function* () {
             const q = queryParamsDict(query, {
