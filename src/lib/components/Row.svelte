@@ -2,12 +2,14 @@
     import clsx from 'clsx';
     import type { HTMLAttributes } from 'svelte/elements';
 
-    type Props = HTMLAttributes<HTMLTableRowElement>;
+    interface Props extends HTMLAttributes<HTMLTableRowElement> {
+        ref?: HTMLTableRowElement;
+    }
 
-    const { children, ...props }: Props = $props();
+    let { children, ref = $bindable(), ...props }: Props = $props();
 </script>
 
-<tr class={clsx('c-table--row', props.class)}>
+<tr bind:this={ref} class={clsx('c-table--row', props.class)}>
     {#if children}
         {@render children()}
     {/if}
