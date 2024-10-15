@@ -11,7 +11,7 @@
         extractClosestEdge
     } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-    import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
+    import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types';
     import {
         draggable,
         dropTargetForElements

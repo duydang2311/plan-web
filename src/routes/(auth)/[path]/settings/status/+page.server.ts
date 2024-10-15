@@ -10,14 +10,12 @@ import {
     validateDeleteStatus
 } from './utils';
 import { fail } from '@sveltejs/kit';
+import type { WorkspaceStatus } from '~/lib/models/status';
 
-interface WorkspaceStatus {
-    id: number;
-    value: string;
-    color: string;
-    description?: string;
-    isDefault: boolean;
-}
+export type LocalWorkspaceStatus = Pick<
+    WorkspaceStatus,
+    'id' | 'rank' | 'value' | 'color' | 'isDefault' | 'description'
+>;
 
 export const load: PageServerLoad = async ({
     parent,
@@ -31,12 +29,12 @@ export const load: PageServerLoad = async ({
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
             api.get(`workspaces/${data.workspace.id}/statuses`, {
-                query: { select: 'Id,Value,Color,IsDefault,Description' }
+                query: { select: 'Id,Rank,Value,Color,IsDefault,Description' }
             })
         );
-        return yield* LoadResponse.JSON(() => response.json<PaginatedList<WorkspaceStatus>>());
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>());
     }).pipe(
-        Effect.orElseSucceed(() => paginatedList<WorkspaceStatus>()),
+        Effect.orElseSucceed(() => paginatedList<LocalWorkspaceStatus>()),
         runtime.runPromise
     );
 

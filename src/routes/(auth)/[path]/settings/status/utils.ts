@@ -67,3 +67,17 @@ export const validateDeleteStatus = validator<{
 export const decodeDeleteStatus = (formData: FormData) => ({
     statusId: formData.get('statusId')
 });
+
+export const toDraggleStatusData = <T extends object>(status: T) => ({
+    type: 'status' as const,
+    ...status
+});
+
+export const validateDraggleStatusData = validator<{ type: 'status' }>((input, { error }) => {
+    if (!input || typeof input !== 'object') {
+        return error('$', 'object');
+    }
+    if (!('type' in input) || input.type !== 'status') {
+        return error('type', 'invalid');
+    }
+});

@@ -1,6 +1,6 @@
 export interface Status {
     id: number;
-    order: number;
+    rank: number;
     value: string;
     color: string;
     icon?: string;
