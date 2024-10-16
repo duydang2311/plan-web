@@ -31,7 +31,10 @@ const validatePatch = validator<{ patch: { rank?: number } }>((input, { error })
         return error('patch', 'object');
     }
 
-    if ('rank' in input.patch && (!input.patch.rank || typeof input.patch.rank !== 'number')) {
+    if (
+        'rank' in input.patch &&
+        (input.patch.rank == null || typeof input.patch.rank !== 'number')
+    ) {
         return error('patch.rank', 'number');
     }
 });

@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
             api.get(`workspaces/${data.workspace.id}/statuses`, {
-                query: { select: 'Id,Rank,Value,Color,IsDefault,Description' }
+                query: { select: 'Id,Rank,Value,Color,IsDefault,Description', order: 'Rank' }
             })
         );
         return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>());

@@ -10,7 +10,7 @@ export const workspaces = baseApp({ prefix: '/workspaces' })
     .use(requireAuth)
     .get('/:id/statuses', ({ query, params, runtime }) => {
         return Effect.gen(function* () {
-            const q = queryParamsDict(query, { select: null });
+            const q = queryParamsDict(query, { select: null, order: null });
             const api = yield* ApiClient;
             const response = yield* ElysiaResponse.HTTP(
                 api.get(`workspaces/${params.id}/statuses`, {

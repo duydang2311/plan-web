@@ -9,6 +9,7 @@ import { issues } from './routes/issues';
 import { teamMembers } from './routes/team_members';
 import { users } from './routes/users';
 import { workspaces } from './routes/workspaces';
+import { workspaceStatuses } from './routes/workspace-statuses';
 
 const baseApp = new Elysia({ prefix: '/api' })
     .decorate(
@@ -43,4 +44,5 @@ export const app = baseApp
     .use(workspaces)
     .use(issues)
     .use(issueComments)
-    .use(teamMembers);
+    .use(teamMembers)
+    .use(workspaceStatuses);
