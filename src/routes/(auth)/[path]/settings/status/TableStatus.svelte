@@ -78,8 +78,8 @@
                         idx2 = null;
                     }
 
-                    const MAX = 2 ** 31;
-                    const MIN = -MAX;
+                    const MIN = 1 << 31;
+                    const MAX = ~MIN;
                     const newRank = Math.floor(
                         previousData.items[idx].rank / 2 +
                             (idx2 != null
