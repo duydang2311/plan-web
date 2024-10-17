@@ -51,7 +51,9 @@
         'in-progress': () => import('~icons/ph/circle-half'),
         done: () => import('~icons/ph/check-circle-fill'),
         canceled: () => import('~icons/ph/x-circle'),
-        duplicated: () => import('~icons/ph/x-circle')
+        duplicated: () => import('~icons/ph/x-circle'),
+        upload: () => import('~icons/heroicons/cloud-arrow-up-16-solid'),
+        'upload-outline': () => import('~icons/heroicons/cloud-arrow-up')
     };
 
     export type IconName = keyof typeof imports;

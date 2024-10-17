@@ -3,12 +3,14 @@
     import type { PageData } from './$types';
     import { page } from '$app/stores';
     import CreateProfileView from './CreateProfileView.svelte';
+    import { invalidate } from '$app/navigation';
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['profiles', { profileName: $page.params['profileName'] }];
     const query = createQuery({
         queryKey,
         queryFn: async () => {
+            await invalidate('fetch:profiles');
             return await data.profile;
         }
     });

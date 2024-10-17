@@ -5,6 +5,8 @@
         "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
         "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
         "@baetheus/fun": "npm:@jsr/baetheus__fun",
+        "@dicebear/collection": "^9.2.2",
+        "@dicebear/core": "^9.2.2",
         "@eslint/js": "^9.12.0",
         "@iconify-json/heroicons": "^1.2.1",
         "@iconify-json/lucide": "^1.2.10",
