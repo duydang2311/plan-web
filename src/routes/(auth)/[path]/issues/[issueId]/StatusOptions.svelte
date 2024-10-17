@@ -41,7 +41,7 @@
             return pipe(
                 TE.fromPromise(() =>
                     httpClient.get(`/api/workspaces/${workspaceId}/statuses`, {
-                        query: { select: 'Id,Value,Icon' }
+                        query: { select: 'Id,Rank,Value,Icon', order: 'Rank' }
                     })
                 )(),
                 TE.flatMap((r) =>
