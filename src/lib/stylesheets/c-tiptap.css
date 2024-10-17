@@ -1,14 +1,4 @@
 @layer base {
-    :root {
-        --c-input-border: color-mix(in oklch, var(--theme-base-border) 90%, var(--theme-base-fg-1));
-        --c-input-border-hover: oklch(from var(--c-input-border) calc(l - 0.08) c h);
-        --c-input-border-focus: var(--theme-primary-3);
-    }
-
-    :root[data-theme='dark'] {
-        --c-input-border-hover: oklch(from var(--c-input-border) calc(l + 0.08) c h);
-    }
-
     .c-tiptap {
         box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
         width: 100%;
