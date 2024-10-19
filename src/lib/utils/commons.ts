@@ -2,7 +2,6 @@ import clsx, { type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function isEmptyObject(object: object) {
-    if (typeof object !== 'object' || object == null) return false;
     for (const _ in object) {
         return false;
     }

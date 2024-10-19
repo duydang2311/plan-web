@@ -45,7 +45,7 @@
         ></div>
     </div>
 
-    <div class="mt-4">
+    <div class="mt-4 text-pretty">
         <p use:melt={$title(id)} class="font-medium text-h5">
             {#if typeof data.title === 'string'}
                 {data.title}

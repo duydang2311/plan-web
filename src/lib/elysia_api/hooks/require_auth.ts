@@ -7,7 +7,7 @@ import { UnauthorizedError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { BearerHttpApiClient } from '~/lib/services/bearer_api_client.server';
 import { UniversalHttpClient } from '~/lib/services/universal_http_client';
-import { ErrorFnLive } from '../contexts';
+import { CloudinaryLive, ErrorFnLive } from '../contexts';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
 
 const { verify } = jwt;
@@ -33,7 +33,8 @@ export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ cookie, runtime
                                 accessToken
                             })
                     ),
-                    ErrorFnLive
+                    ErrorFnLive,
+                    CloudinaryLive
                 )
             )
         };

@@ -1,8 +1,6 @@
 <script lang="ts" module>
     export interface DialogProps {
-        defaultOpen?: boolean;
-        role?: 'dialog' | 'alertdialog';
-        onClose?: () => void;
+        options?: CreateDialogProps;
         children?: Snippet<
             [
                 {
@@ -14,7 +12,6 @@
                 }
             ]
         >;
-        open?: Writable<boolean>;
     }
 
     type T = ReturnType<typeof createDialog>;
@@ -28,22 +25,13 @@
 <script lang="ts">
     import { createDialog, melt } from '@melt-ui/svelte';
     import type { Snippet } from 'svelte';
-    import type { Writable } from 'svelte/store';
+    import type { CreateDialogProps } from '@melt-ui/svelte';
 
-    const { defaultOpen, children, open: __open, role, onClose }: DialogProps = $props();
+    const { options, children }: DialogProps = $props();
     const {
         elements: { overlay, content, title, description, close, portalled },
         states: { open }
-    } = createDialog({
-        role,
-        forceVisible: true,
-        defaultOpen,
-        open: __open,
-        onOpenChange: ({ next }) => {
-            if (next === false) onClose?.();
-            return next;
-        }
-    });
+    } = createDialog(options);
 </script>
 
 {#if $open}

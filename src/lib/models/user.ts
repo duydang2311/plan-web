@@ -1,3 +1,5 @@
+import type { Asset } from './asset';
+
 export interface User {
     id: string;
     email: string;
@@ -6,5 +8,5 @@ export interface User {
 
 export interface UserProfile {
     name: string;
-    imageUrl?: string;
+    image: Partial<Asset>;
 }

@@ -1,5 +1,7 @@
+import { env } from '$env/dynamic/private';
 import { Effect } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
+import { Cloudinary } from '~/lib/services/cloudinary.server';
 import { requireAuth } from '../hooks/require_auth';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
 import { queryParamsDict } from '../utils/url';
@@ -46,4 +48,26 @@ export const users = baseApp({ prefix: '/users' })
             );
             return Response.json(json, { status: 200 });
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
+    .get('/profiles/image-signed-upload', ({ user, runtime }) => {
+        return Effect.gen(function* () {
+            const { utils } = yield* Cloudinary;
+            const timestamp = Math.round(Date.now() / 1000);
+            const params = {
+                timestamp,
+                transformation: 'c_fill,h_256,w_256',
+                public_id: `${user.sub}/profile-image`
+            };
+            const signature = utils.api_sign_request(params, env.CLOUDINARY_API_SECRET);
+
+            return Response.json(
+                {
+                    ...params,
+                    url: utils.api_url(),
+                    api_key: env.CLOUDINARY_API_KEY,
+                    signature
+                },
+                { status: 200 }
+            );
+        }).pipe(runtime.runSync);
     });

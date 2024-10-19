@@ -105,11 +105,8 @@
 </div>
 
 <Dialog
-    role="alertdialog"
-    {open}
-    defaultOpen={true}
-    onClose={() => {
-        $open = false;
+    options={{
+        open
     }}
 >
     {#snippet children({ overlay, content, title, close })}

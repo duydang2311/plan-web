@@ -1,4 +1,7 @@
-type ErrorFunction = (name: string, code: string) => void;
+interface ErrorFunction {
+    (name: string, code: string): void;
+    (errors: Record<string, string[]>): void;
+}
 
 interface ValidatorProps {
     error: ErrorFunction;
@@ -59,11 +62,27 @@ export function extend<T, TNew = T>(
     }) as Validator<TNew> | AsyncValidator<TNew>;
 }
 
-function addError(errors: Record<string, string[]>, name: string, code: string) {
-    if (errors[name]) {
-        errors[name]?.push(code);
+function addError(
+    errors: Record<string, string[]>,
+    nameOrErrors: string | Record<string, string[]>,
+    code?: string
+) {
+    if (typeof nameOrErrors === 'string') {
+        if (errors[nameOrErrors]) {
+            errors[nameOrErrors].push(code!);
+        } else {
+            errors[nameOrErrors] = [code!];
+        }
     } else {
-        errors[name] = [code];
+        for (const [k, vs] of Object.entries(nameOrErrors)) {
+            for (const v of vs) {
+                if (errors[k]) {
+                    errors[k].push(v);
+                } else {
+                    errors[k] = [v];
+                }
+            }
+        }
     }
 }
 
@@ -77,7 +96,7 @@ function validateInternal<TIn, TOut = TIn>(
 ): MaybePromise<ValidationResult<TOut>> {
     const errors: Record<string, string[]> = {};
     const ret = validate(input, {
-        error: (name: string, code: string) => addError(errors, name, code)
+        error: (nameOrErrors, code?) => addError(errors, nameOrErrors, code as string)
     });
     if (ret instanceof Promise) {
         return ret.then(() => {

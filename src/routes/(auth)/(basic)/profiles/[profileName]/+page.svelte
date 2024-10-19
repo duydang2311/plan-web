@@ -19,7 +19,7 @@
 {#if $query.data == null}
     Loading...
 {:else if !('profile' in $query.data) || $query.data.profile == null}
-    <CreateProfileView />
+    <CreateProfileView userId={$query.data.id} />
 {:else}
     {JSON.stringify($query.data)}
 {/if}

@@ -5,14 +5,14 @@
 
     interface Props extends HTMLInputAttributes {
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
+        ref?: HTMLInputElement;
     }
 
-    let { value = $bindable(), melt: useMelt, ...props }: Props = $props();
-    let element: HTMLInputElement;
+    let { value = $bindable(), melt: useMelt, ref = $bindable(), ...props }: Props = $props();
 
     $effect(() => {
-        if (document.activeElement !== element && props['aria-invalid']) {
-            element.focus();
+        if (props['aria-invalid'] && ref && document.activeElement !== ref) {
+            ref.focus();
         }
     });
 
@@ -20,7 +20,7 @@
 </script>
 
 <input
-    bind:this={element}
+    bind:this={ref}
     {...props}
     bind:value
     class={clsx('c-input', props.class)}

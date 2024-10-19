@@ -1,5 +1,7 @@
 <script lang="ts" module>
     import gsap from 'gsap';
+    import type { Snippet } from 'svelte';
+
     export interface ToastData {
         title: string | Snippet;
         description: string | Snippet;
@@ -37,9 +39,8 @@
 
 <script lang="ts">
     import { createToaster } from '@melt-ui/svelte';
-    import ToastItem from './ToastItem.svelte';
     import { flip } from 'svelte/animate';
-    import type { Snippet } from 'svelte';
+    import ToastItem from './ToastItem.svelte';
 </script>
 
 <div

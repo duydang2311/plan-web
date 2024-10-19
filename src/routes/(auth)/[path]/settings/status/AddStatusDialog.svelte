@@ -19,7 +19,17 @@
     );
 </script>
 
-<Dialog defaultOpen={true} {onClose}>
+<Dialog
+    options={{
+        defaultOpen: true,
+        onOpenChange: ({ next }) => {
+            if (next === false) {
+                onClose();
+            }
+            return next;
+        }
+    }}
+>
     {#snippet children({ overlay, content, title, description, close })}
         <div
             transition:fade|global={{ duration: 150 }}
@@ -28,8 +38,8 @@
         ></div>
         <div class="fixed inset-8 z-50">
             <div
-                in:tsap|global={dialog.in}
-                out:tsap|global={dialog.out}
+                in:tsap|global={dialog.in()}
+                out:tsap|global={dialog.out()}
                 use:melt={content}
                 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border"
             >

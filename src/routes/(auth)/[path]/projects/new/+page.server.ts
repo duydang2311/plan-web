@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse } from '~/lib/utils/kit';
@@ -21,9 +21,6 @@ export const actions: Actions = {
                     return yield* ActionResponse.JSON(() =>
                         response.json<{ id: string; identifier: string }>()
                     );
-                }),
-                Effect.catchTags({
-                    ApiError: (e) => Effect.fail(fail(500, { errors: { root: [e.code] } }))
                 })
             )
         );

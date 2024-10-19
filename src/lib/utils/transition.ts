@@ -75,24 +75,26 @@ export const select: { [k in 'in' | 'out']: TsapCallback } = {
         })
 };
 
-export const dialog: { [k in 'in' | 'out']: TsapCallback } = {
-    in: (node, gsap) =>
+export const dialog = {
+    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,
             scale: 0.98,
             duration: 0.15,
             ease: 'power4.out',
-            force3D: true
+            force3D: true,
+            ...vars
         }),
-    out: (node, gsap) =>
+    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
         gsap.to(node, {
             opacity: 0,
             scale: 0.98,
             duration: 0.15,
             ease: 'power4.in',
-            force3D: true
+            force3D: true,
+            ...vars
         })
-};
+} as const;
 
 export const popover: { [k in 'in' | 'out']: TsapCallback } = {
     in: (node, gsap) =>

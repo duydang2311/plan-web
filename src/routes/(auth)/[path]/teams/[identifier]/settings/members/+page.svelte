@@ -23,9 +23,14 @@
         <InvitationDialog
             team={data.team}
             {form}
-            defaultOpen={true}
-            onClose={() => {
-                replaceState('', { ...$page.state, showInvitationDialog: false });
+            options={{
+                defaultOpen: true,
+                onOpenChange: ({ next }) => {
+                    if (next === false) {
+                        replaceState('', { ...$page.state, showInvitationDialog: false });
+                    }
+                    return next;
+                }
             }}
         />
     </div>
