@@ -8,11 +8,9 @@
     }
 
     let { value = $bindable(), errors, ...props }: Props = $props();
-    let element: HTMLTextAreaElement;
 </script>
 
 <textarea
-    bind:this={element}
     aria-invalid={value && errors?.length ? true : undefined}
     {...props}
     bind:value
