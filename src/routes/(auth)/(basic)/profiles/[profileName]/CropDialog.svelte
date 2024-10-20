@@ -4,7 +4,7 @@
     import { fade } from 'svelte/transition';
     import { Button, Dialog, type DialogProps } from '~/lib/components';
     import { dialog, tsap } from '~/lib/utils/transition';
-    import { getCroppedImage } from './utils';
+    import { getCroppedImage } from './utils.client';
 
     interface CropArea {
         x: number;
