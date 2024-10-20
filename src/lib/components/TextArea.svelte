@@ -1,17 +1,21 @@
 <script lang="ts">
     import clsx from 'clsx';
     import type { HTMLTextareaAttributes } from 'svelte/elements';
+    import Errors from './Errors.svelte';
 
-    type Props = Exclude<HTMLTextareaAttributes, 'children'>;
+    interface Props extends Exclude<HTMLTextareaAttributes, 'children'> {
+        errors?: string[];
+    }
 
-    let { value = $bindable(), ...props }: Props = $props();
+    let { value = $bindable(), errors, ...props }: Props = $props();
     let element: HTMLTextAreaElement;
-
-    $effect(() => {
-        if (document.activeElement !== element && props['aria-invalid']) {
-            element.focus();
-        }
-    });
 </script>
 
-<textarea bind:this={element} {...props} bind:value class={clsx('c-input', props.class)}></textarea>
+<textarea
+    bind:this={element}
+    aria-invalid={value && errors?.length ? true : undefined}
+    {...props}
+    bind:value
+    class={clsx('c-input', props.class)}
+></textarea>
+<Errors errors={value ? errors : undefined} />

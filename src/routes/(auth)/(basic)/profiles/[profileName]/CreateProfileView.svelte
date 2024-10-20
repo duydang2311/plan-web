@@ -2,22 +2,11 @@
     import { enhance } from '$app/forms';
     import { pipe } from '@baetheus/fun/fn';
     import { lorelei } from '@dicebear/collection';
-    import { D } from '@mobily/ts-belt';
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
-    import {
-        addToast,
-        Button,
-        Errors,
-        Field,
-        Icon,
-        Input,
-        Label,
-        TextArea
-    } from '~/lib/components';
+    import { addToast, Button, Field, Icon, Input, Label, TextArea } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Asset } from '~/lib/models/asset';
-    import { hasProperty } from '~/lib/utils/commons';
     import { TE } from '~/lib/utils/functional';
     import type { ValidationResult } from '~/lib/utils/validation';
     import CropDialog from './CropDialog.svelte';
@@ -66,6 +55,7 @@
     {@render errorDescription('An error occurred while uploading your profile picture.')}
 {/snippet}
 
+{JSON.stringify(validation)}
 <main class="lg:max-w-paragraph-lg mx-auto grow content-center w-full">
     <p class="text-h6 mb-12 text-base-fg-ghost text-center">
         It seems like you don't have a profile yet!
@@ -170,17 +160,14 @@
             }
         }}
         oninput={(e) => {
-            const fields = decodeCreateProfile(new FormData(e.currentTarget));
-            validation = validateCreateProfile(fields);
-            if (!validation.ok) {
-                validation = {
-                    ...validation,
-                    errors: D.filterWithKey(
-                        validation.errors,
-                        (k) => hasProperty(fields, k) && !!fields[k]
-                    ) as typeof validation.errors
-                };
+            const target = e.target as HTMLInputElement;
+            if (!target?.ariaInvalid) {
+                return;
             }
+            validation = validateCreateProfile(decodeCreateProfile(new FormData(e.currentTarget)));
+        }}
+        onchange={(e) => {
+            validation = validateCreateProfile(decodeCreateProfile(new FormData(e.currentTarget)));
         }}
     >
         <input type="hidden" hidden name="userId" value={userId} />
@@ -198,9 +185,8 @@
                         }
                         defaultSrc = createAvatarDataUri(e.currentTarget.value);
                     }}
-                    aria-invalid={errors['name'] ? true : undefined}
+                    errors={errors['name']}
                 />
-                <Errors errors={errors['name']} />
             </Field>
             <Field class="grow">
                 <Label for="displayName">Display name</Label>
@@ -209,14 +195,14 @@
                     id="displayName"
                     name="displayName"
                     placeholder="John Smith"
-                    aria-invalid={errors['displayName'] ? true : undefined}
+                    errors={errors['displayName']}
                 />
-                <Errors errors={errors['displayName']} />
+                <!-- <Errors errors={errors['displayName']} /> -->
             </Field>
         </div>
 
         <fieldset class="space-y-4">
-            <legend class="text-h4 text-base-fg-3">Optional information</legend>
+            <legend class="text-h4 text-base-fg-3">Optional details</legend>
             <Field class="w-full !mt-2">
                 <ProfileImageFileField
                     onInput={(file) => {
@@ -257,36 +243,34 @@
                 />
             </Field>
             <Field class="w-full">
-                <Label for="bio">Bio (optional)</Label>
+                <Label for="bio">Bio</Label>
                 <TextArea
                     id="bio"
                     name="bio"
                     placeholder="Add your bio..."
                     rows={4}
                     class="resize-none"
-                    aria-invalid={errors['bio'] ? true : undefined}
+                    errors={errors['bio']}
                 />
-                <Errors errors={errors['bio']} />
             </Field>
             <Field class="w-full">
-                <Label for="socialLink">Social links (optional)</Label>
+                <Label for="socialLink">Social links</Label>
                 <div class="space-y-4">
-                    <Input type="text" id="socialLink1" name="socialLink" placeholder="https://" />
-                    <Input type="text" id="socialLink2" name="socialLink" placeholder="https://" />
+                    <Field>
+                        <Input
+                            type="text"
+                            id="socialLinks/0"
+                            name="socialLinks"
+                            placeholder="https://"
+                            errors={errors['socialLinks/0']}
+                        />
+                    </Field>
                 </div>
             </Field>
         </fieldset>
         <div class="flex gap-4 justify-end">
             <Button type="reset" variant="base" outline class="w-fit">Reset</Button>
-            <Button
-                type="submit"
-                variant="primary"
-                outline
-                class="w-fit"
-                disabled={validation == null || !validation.ok}
-            >
-                Create
-            </Button>
+            <Button type="submit" variant="primary" outline class="w-fit">Create</Button>
         </div>
     </form>
 </main>
