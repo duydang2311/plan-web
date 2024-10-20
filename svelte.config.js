@@ -23,7 +23,7 @@ const config = {
         csp: {
             mode: 'nonce',
             directives: {
-                'script-src': ['self']
+                'script-src': ['self', 'unsafe-eval']
             }
         }
     },

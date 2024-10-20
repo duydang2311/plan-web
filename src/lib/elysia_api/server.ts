@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { ValueErrorType } from '@sinclair/typebox/errors';
 import { Layer, ManagedRuntime } from 'effect';
 import { Elysia } from 'elysia';
 import { ApiClient, HttpApiClient } from '../services/api_client.server';
@@ -8,8 +9,8 @@ import { issueComments } from './routes/issue_comments';
 import { issues } from './routes/issues';
 import { teamMembers } from './routes/team_members';
 import { users } from './routes/users';
-import { workspaces } from './routes/workspaces';
 import { workspaceStatuses } from './routes/workspace-statuses';
+import { workspaces } from './routes/workspaces';
 
 const baseApp = new Elysia({ prefix: '/api' })
     .decorate(
@@ -32,9 +33,22 @@ const baseApp = new Elysia({ prefix: '/api' })
             )
         )
     )
-    .onError(({ code }) => {
-        if (code === 'PARSE') {
-            return Response.json({ errors: { body: ['parse'] } }, { status: 400 });
+    .onError((e) => {
+        switch (e.code) {
+            case 'PARSE':
+                return { errors: { body: ['parse'] } };
+            case 'VALIDATION': {
+                const errors: Record<string, string[]> = {};
+                for (const error of e.error.validator.Errors(e.error.value)) {
+                    const path = error.path.length === 0 ? '/' : error.path;
+                    if (!errors[path]) {
+                        errors[path] = [ValueErrorType[error.type]];
+                    } else {
+                        errors[path].push(ValueErrorType[error.type]);
+                    }
+                }
+                return errors;
+            }
         }
     });
 

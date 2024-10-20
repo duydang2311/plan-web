@@ -1,3 +1,8 @@
+import type { Static, TSchema } from '@sinclair/typebox';
+import { TypeCheck, TypeCompiler } from '@sinclair/typebox/compiler';
+import { ValueErrorType } from '@sinclair/typebox/value';
+import { isEmptyObject } from './commons';
+
 interface ErrorFunction {
     (name: string, code: string): void;
     (errors: Record<string, string[]>): void;
@@ -23,15 +28,24 @@ type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
 
 type ValidateFunction<T> = (input: T, props: ValidatorProps) => void;
 type AsyncValidateFunction<T> = (input: T, props: ValidatorProps) => PromiseLike<void>;
+interface TypeBoxValidatorOptions {
+    stripLeadingSlash: boolean;
+}
 
+export function validator<T extends TSchema>(
+    schema: T,
+    options?: Partial<TypeBoxValidatorOptions>
+): Validator<Static<T>>;
 export function validator<T>(validate: AsyncValidateFunction<unknown>): AsyncValidator<T>;
 export function validator<T>(validate: ValidateFunction<unknown>): Validator<T>;
-export function validator<T>(
-    validate: ValidateFunction<unknown> | AsyncValidateFunction<unknown>
-): Validator<T> | AsyncValidator<T> {
-    return ((input: unknown) => validateInternal<unknown, T>(input, validate)) as
-        | Validator<T>
-        | AsyncValidator<T>;
+export function validator(
+    validate: ValidateFunction<unknown> | AsyncValidateFunction<unknown> | TSchema,
+    options?: Partial<TypeBoxValidatorOptions>
+) {
+    if (typeof validate === 'function') {
+        return (input: unknown) => validateInternal(input, validate);
+    }
+    return validatorFromType(validate, options);
 }
 
 export function extend<T, TNew = T>(
@@ -60,6 +74,34 @@ export function extend<T, TNew = T>(
         }
         return ret.ok ? validateInternal<T, TNew>(ret.data, validate) : ret;
     }) as Validator<TNew> | AsyncValidator<TNew>;
+}
+
+const typeCompilers = new Map<TSchema, TypeCheck<TSchema>>();
+function validatorFromType<T extends TSchema>(
+    schema: T,
+    { stripLeadingSlash = false }: Partial<TypeBoxValidatorOptions> = {}
+): ValidateFunction<Static<T>> {
+    return (input: unknown) => {
+        let compiler = typeCompilers.get(schema);
+        if (!compiler) {
+            compiler = TypeCompiler.Compile(schema);
+            typeCompilers.set(schema, TypeCompiler.Compile(schema));
+        }
+
+        const errors: Record<string, string[]> = {};
+        for (const error of compiler.Errors(input)) {
+            let path = error.path.length === 0 ? '/' : error.path;
+            if (stripLeadingSlash) {
+                path = path.substring(1);
+            }
+            if (!errors[path]) {
+                errors[path] = [ValueErrorType[error.type]];
+            } else {
+                errors[path].push(ValueErrorType[error.type]);
+            }
+        }
+        return isEmptyObject(errors) ? { ok: true, data: input } : { ok: false, errors };
+    };
 }
 
 function addError(

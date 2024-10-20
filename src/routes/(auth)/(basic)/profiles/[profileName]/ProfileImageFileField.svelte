@@ -11,7 +11,7 @@
 </script>
 
 <Label for="imageUrl" class="max-w-full">
-    <p class="mb-1">Profile picture (optional)</p>
+    <p class="mb-1">Profile picture</p>
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class="c-input text-center p-4"

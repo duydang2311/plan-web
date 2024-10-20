@@ -14,6 +14,7 @@
         "@melt-ui/pp": "^0.3.2",
         "@melt-ui/svelte": "^0.83.0",
         "@mobily/ts-belt": "^4.0.0-rc.5",
+        "@sinclair/typebox": "^0.33.17",
         "@sveltejs/adapter-node": "^5.2.8",
         "@sveltejs/kit": "^2.7.1",
         "@sveltejs/vite-plugin-svelte": "^4.0.0",
