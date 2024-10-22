@@ -69,7 +69,7 @@ export const handle: Handle = async ({
 };
 
 function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
-    Layer.sync(
+    locals.appLive = Layer.sync(
         ApiClient,
         () =>
             new HttpApiClient({
