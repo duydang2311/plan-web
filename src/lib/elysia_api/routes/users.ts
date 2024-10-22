@@ -56,8 +56,8 @@ export const users = baseApp({ prefix: '/users' })
             const params = {
                 timestamp,
                 transformation: 'c_fill,h_256,w_256',
-                public_id: `${user.sub}/profile-image`,
-                notification_url: `https://6f9f-2402-800-63a9-df42-1dac-b273-7952-9e5b.ngrok-free.app/api/users/${user.sub}/profile/image-uploaded`
+                public_id: `${user.id}/profile-image`,
+                notification_url: `https://6f9f-2402-800-63a9-df42-1dac-b273-7952-9e5b.ngrok-free.app/api/users/${user.id}/profile/image-uploaded`
             };
             const signature = utils.api_sign_request(params, env.CLOUDINARY_API_SECRET);
 

@@ -6,7 +6,7 @@ import { UniversalHttpClient } from '~/lib/services/universal_http_client';
 import { CloudinaryLive, ErrorFnLive } from '../contexts';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
 
-export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ cookie, runtime }) => {
+export const requireAuth = baseApp().derive({ as: 'scoped' }, ({ cookie, store: { runtime } }) => {
     return Effect.gen(function* () {
         const sessionId = cookie['plan_session'].value;
         if (!sessionId) {
