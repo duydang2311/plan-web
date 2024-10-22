@@ -57,7 +57,6 @@ export const actions: Actions = {
     'create-profile': ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
-            console.log(decodeCreateProfile(formData));
             const validation = yield* ActionResponse.Validation(
                 validateCreateProfile(decodeCreateProfile(formData))
             );
