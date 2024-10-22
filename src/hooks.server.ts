@@ -4,6 +4,7 @@ import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
+import { app } from './lib/elysia_api/server';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -12,7 +13,7 @@ if (!env.JWT_PUBLIC_KEY) throw new ReferenceError('JWT_PUBLIC_KEY must be provid
 
 export const handle: Handle = async ({
     event,
-    event: { locals, route, cookies, fetch },
+    event: { request, locals, route, cookies, fetch },
     resolve
 }) => {
     const routeId = route.id;
@@ -22,7 +23,7 @@ export const handle: Handle = async ({
             routeId.charCodeAt(2) === 112 && // p
             routeId.charCodeAt(3) === 105) // i
     ) {
-        return await resolve(event);
+        return app.handle(request);
     }
 
     initLocals(locals, fetch);
