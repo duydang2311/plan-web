@@ -11,5 +11,5 @@ export const AssetType = Type.Object({
     publicId: Type.String(),
     resourceType: Type.String(),
     format: Type.String(),
-    version: Type.Number()
+    version: Type.String()
 });

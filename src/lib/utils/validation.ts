@@ -1,6 +1,6 @@
 import type { Static, TSchema } from '@sinclair/typebox';
 import { TypeCheck, TypeCompiler } from '@sinclair/typebox/compiler';
-import { ValueErrorType } from '@sinclair/typebox/value';
+import { Value, ValueErrorType } from '@sinclair/typebox/value';
 import { isEmptyObject } from './commons';
 
 interface ErrorFunction {
@@ -28,19 +28,21 @@ type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
 
 type ValidateFunction<T> = (input: T, props: ValidatorProps) => void;
 type AsyncValidateFunction<T> = (input: T, props: ValidatorProps) => PromiseLike<void>;
+
 interface TypeBoxValidatorOptions {
-    stripLeadingSlash: boolean;
+    stripLeadingSlash?: boolean;
+    convert?: boolean;
 }
 
 export function validator<T extends TSchema>(
     schema: T,
-    options?: Partial<TypeBoxValidatorOptions>
+    options?: TypeBoxValidatorOptions
 ): Validator<Static<T>>;
 export function validator<T>(validate: AsyncValidateFunction<unknown>): AsyncValidator<T>;
 export function validator<T>(validate: ValidateFunction<unknown>): Validator<T>;
 export function validator(
     validate: ValidateFunction<unknown> | AsyncValidateFunction<unknown> | TSchema,
-    options?: Partial<TypeBoxValidatorOptions>
+    options?: TypeBoxValidatorOptions
 ) {
     if (typeof validate === 'function') {
         return (input: unknown) => validateInternal(input, validate);
@@ -79,15 +81,18 @@ export function extend<T, TNew = T>(
 const typeCompilers = new Map<TSchema, TypeCheck<TSchema>>();
 function validatorFromType<T extends TSchema>(
     schema: T,
-    { stripLeadingSlash = false }: Partial<TypeBoxValidatorOptions> = {}
-): ValidateFunction<Static<T>> {
-    return (input: unknown) => {
+    { stripLeadingSlash = false, convert = false }: TypeBoxValidatorOptions = {}
+): Validator<Static<T>> {
+    return (input) => {
         let compiler = typeCompilers.get(schema);
         if (!compiler) {
             compiler = TypeCompiler.Compile(schema);
             typeCompilers.set(schema, TypeCompiler.Compile(schema));
         }
 
+        if (convert) {
+            input = Value.Convert(schema, input);
+        }
         const errors: Record<string, string[]> = {};
         for (const error of compiler.Errors(input)) {
             let path = error.path.length === 0 ? '/' : error.path;

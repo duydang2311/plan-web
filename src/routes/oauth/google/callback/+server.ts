@@ -80,19 +80,12 @@ export const GET: RequestHandler = async ({ cookies, url, fetch, locals: { runti
         return pipe(authExit.cause, Cause.failureOption, Option.getOrThrow);
     }
 
-    cookies.set('access_token', authExit.value.accessToken, {
+    cookies.set('plan_session', authExit.value.sessionId, {
         path: '/',
         httpOnly: true,
         secure: true,
         sameSite: 'lax',
-        maxAge: authExit.value.accessTokenMaxAge
-    });
-    cookies.set('refresh_token', authExit.value.refreshToken, {
-        path: '/',
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        maxAge: authExit.value.refreshTokenMaxAge
+        maxAge: authExit.value.sessionMaxAge
     });
     return new Response(null, { status: 302, headers: { Location: '/' } });
 };
@@ -125,10 +118,8 @@ const signInWithGoogle = (idToken: string) =>
         }
         return yield* EndpointResponse.JSON(() =>
             response.json<{
-                accessToken: string;
-                refreshToken: string;
-                accessTokenMaxAge: number;
-                refreshTokenMaxAge: number;
+                sessionId: string;
+                sessionMaxAge: number;
             }>()
         );
     });

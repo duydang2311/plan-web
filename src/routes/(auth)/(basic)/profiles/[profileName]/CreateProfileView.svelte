@@ -2,26 +2,26 @@
     import { enhance } from '$app/forms';
     import { pipe } from '@baetheus/fun/fn';
     import { lorelei } from '@dicebear/collection';
+    import { useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
     import { addToast, Button, Field, Icon, Input, Label, TextArea } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { Asset } from '~/lib/models/asset';
     import { TE } from '~/lib/utils/functional';
     import type { ValidationResult } from '~/lib/utils/validation';
     import CropDialog from './CropDialog.svelte';
     import ProfileImageFileField from './ProfileImageFileField.svelte';
     import { decodeCreateProfile, validateCreateProfile } from './utils';
 
-    const { userId }: { userId: string } = $props();
+    const { queryKey, userId }: { queryKey: unknown[]; userId: string } = $props();
     const { httpClient } = useRuntime();
+    const queryClient = useQueryClient();
     let defaultSrc = $state.raw<string>();
     let imageFile = $state<File | Blob | null>(null);
     let imageFileInfo = $state<{ name: string; bytes: number } | null>(null);
     let validation = $state<ValidationResult>();
     let createAvatar: (typeof import('@dicebear/core'))['createAvatar'] | undefined = undefined;
     let cropDialogOpen = writable(false);
-    let imageAsset: Asset | null = null;
     const errors = $derived(validation != null && !validation.ok ? validation.errors : {});
 
     onMount(() => {
@@ -38,24 +38,97 @@
             scale: 120,
             translateY: 5
         }).toDataUri();
+
+    const upload = async (file: File | Blob) => {
+        const either = await pipe(
+            TE.fromPromise(() => httpClient.get('/api/users/profiles/image-signed-upload'))(),
+            TE.flatMap((a) =>
+                a.ok
+                    ? TE.fromPromise(() =>
+                          a.json<{
+                              url: string;
+                              timestamp: number;
+                              public_id: string;
+                              api_key: string;
+                              transformation: string;
+                              signature: string;
+                              notification_url: string;
+                          }>()
+                      )()
+                    : TE.leftVoid
+            )
+        )();
+
+        if (either.tag === 'Left') {
+            addToast({
+                data: {
+                    title: 'Profile image failed to upload',
+                    description: errorDescription1
+                }
+            });
+            return;
+        }
+
+        const { url, ...body } = either.right;
+        const formData = new FormData();
+        formData.set('timestamp', body.timestamp + '');
+        formData.set('public_id', body.public_id);
+        formData.set('api_key', body.api_key);
+        formData.set('transformation', body.transformation);
+        formData.set('signature', body.signature);
+        formData.set('notification_url', body.notification_url);
+        formData.set('file', file);
+
+        const uploadEither = await pipe(
+            TE.fromPromise(() => fetch(url, { method: 'post', body: formData }))(),
+            TE.flatMap((a) =>
+                a.ok
+                    ? TE.fromPromise(() =>
+                          a.json<{
+                              resource_type: string;
+                              format: string;
+                              public_id: string;
+                              version: number;
+                          }>()
+                      )()
+                    : TE.leftVoid
+            )
+        )();
+        if (uploadEither.tag === 'Left') {
+            addToast({
+                data: {
+                    title: 'Profile image failed to upload',
+                    description: errorDescription2
+                }
+            });
+            return;
+        }
+
+        addToast({
+            data: {
+                title: 'Profile image uploaded',
+                description:
+                    'You should see your new profile image now or try refreshing the page in a few seconds.'
+            }
+        });
+    };
 </script>
 
 {#snippet errorDescription(text: string)}
     <p>{text}</p>
     <p class="text-base-fg-ghost mt-2 text-sm">
-        If the problem still persists, please try again without a profile picture.
+        If the problem still persists, please try again without a profile image.
     </p>
 {/snippet}
 
 {#snippet errorDescription1()}
-    {@render errorDescription('We could not request a profile picture upload from the server.')}
+    {@render errorDescription('We could not request a profile image upload from the server.')}
 {/snippet}
 
 {#snippet errorDescription2()}
-    {@render errorDescription('An error occurred while uploading your profile picture.')}
+    {@render errorDescription('An error occurred while uploading your profile image.')}
 {/snippet}
 
-{JSON.stringify(validation)}
 <main class="lg:max-w-paragraph-lg mx-auto grow content-center w-full">
     <p class="text-h6 mb-12 text-base-fg-ghost text-center">
         It seems like you don't have a profile yet!
@@ -76,88 +149,15 @@
         action="?/create-profile"
         enctype="multipart/form-data"
         class="space-y-8 mt-8"
-        use:enhance={async (e) => {
-            if (imageFile && !imageAsset) {
-                const either = await pipe(
-                    TE.fromPromise(() =>
-                        httpClient.get('/api/users/profiles/image-signed-upload')
-                    )(),
-                    TE.flatMap((a) =>
-                        a.ok
-                            ? TE.fromPromise(() =>
-                                  a.json<{
-                                      url: string;
-                                      timestamp: number;
-                                      public_id: string;
-                                      api_key: string;
-                                      transformation: string;
-                                      signature: string;
-                                  }>()
-                              )()
-                            : TE.leftVoid
-                    )
-                )();
-
-                if (either.tag === 'Left') {
-                    e.cancel();
-                    addToast({
-                        data: {
-                            title: 'Profile picture failed to upload',
-                            description: errorDescription1
-                        }
-                    });
-                    return;
-                }
-
-                const { url, ...body } = either.right;
-                const formData = new FormData();
-                formData.set('timestamp', body.timestamp + '');
-                formData.set('public_id', body.public_id);
-                formData.set('api_key', body.api_key);
-                formData.set('transformation', body.transformation);
-                formData.set('signature', body.signature);
-                formData.set('file', imageFile);
-
-                const uploadEither = await pipe(
-                    TE.fromPromise(() => fetch(url, { method: 'post', body: formData }))(),
-                    TE.flatMap((a) =>
-                        a.ok
-                            ? TE.fromPromise(() =>
-                                  a.json<{
-                                      resource_type: string;
-                                      format: string;
-                                      public_id: string;
-                                      version: number;
-                                  }>()
-                              )()
-                            : TE.leftVoid
-                    )
-                )();
-                if (uploadEither.tag === 'Left') {
-                    e.cancel();
-                    addToast({
-                        data: {
-                            title: 'Profile picture failed to upload',
-                            description: errorDescription2
-                        }
-                    });
-                    return;
-                }
-
-                imageAsset = {
-                    publicId: uploadEither.right.public_id,
-                    resourceType: uploadEither.right.resource_type,
-                    format: uploadEither.right.format,
-                    version: uploadEither.right.version
-                };
+        use:enhance={async () => {
+            if (imageFile) {
+                upload(imageFile);
             }
 
-            if (imageAsset) {
-                e.formData.set('image.publicId', imageAsset.publicId);
-                e.formData.set('image.resourceType', imageAsset.resourceType);
-                e.formData.set('image.format', imageAsset.format);
-                e.formData.set('image.version', imageAsset.version + '');
-            }
+            return async ({ update }) => {
+                await update({ reset: true, invalidateAll: false });
+                await queryClient.invalidateQueries({ queryKey });
+            };
         }}
         oninput={(e) => {
             const target = e.target as HTMLInputElement;
@@ -197,7 +197,6 @@
                     placeholder="John Smith"
                     errors={errors['displayName']}
                 />
-                <!-- <Errors errors={errors['displayName']} /> -->
             </Field>
         </div>
 
@@ -209,7 +208,6 @@
                         if (file) {
                             imageFile = file;
                             imageFileInfo = { name: file.name, bytes: file.size };
-                            imageAsset = null;
                             $cropDialogOpen = true;
                         }
                     }}

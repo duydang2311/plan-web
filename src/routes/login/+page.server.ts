@@ -9,10 +9,8 @@ import type { Actions } from './$types';
 import { decode, validate } from './utils';
 
 interface SignInResponse {
-    accessToken: string;
-    refreshToken: string;
-    accessTokenMaxAge: number;
-    refreshTokenMaxAge: number;
+    sessionId: string;
+    sessionMaxAge: number;
 }
 
 export const actions = {
@@ -47,20 +45,13 @@ export const actions = {
             ),
             Either.match({
                 onLeft: (l) => l,
-                onRight: ({ accessToken, refreshToken, accessTokenMaxAge, refreshTokenMaxAge }) => {
-                    cookies.set('access_token', accessToken, {
+                onRight: ({ sessionId, sessionMaxAge }) => {
+                    cookies.set('plan_session', sessionId, {
                         path: '/',
                         httpOnly: true,
                         secure: true,
                         sameSite: 'lax',
-                        maxAge: accessTokenMaxAge
-                    });
-                    cookies.set('refresh_token', refreshToken, {
-                        path: '/',
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'lax',
-                        maxAge: refreshTokenMaxAge
+                        maxAge: sessionMaxAge
                     });
                     return redirect(302, '/');
                 }
