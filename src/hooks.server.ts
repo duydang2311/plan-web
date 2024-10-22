@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
-import { Layer, ManagedRuntime, pipe } from 'effect';
+import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
@@ -25,6 +25,8 @@ export const handle: Handle = async ({
         return await resolve(event);
     }
 
+    initLocals(locals, fetch);
+
     const isAuthRoute = routeId.includes('(auth)');
     const isAuthOptionalRoute = routeId.includes('(auth-optional)');
     if (isAuthRoute || isAuthOptionalRoute) {
@@ -33,44 +35,49 @@ export const handle: Handle = async ({
             return redirect(302, '/login');
         }
 
-        locals.user = { id: '' };
-        locals.appLive = pipe(
-            Layer.sync(
-                ApiClient,
-                () =>
-                    new KitBasicHttpApiClient({
-                        httpClient: new UniversalHttpClient({
-                            baseUrl: env.API_BASE_URL,
-                            version: env.API_VERSION,
-                            fetch
-                        }),
-                        cookies
-                    })
-            )
+        const exit = await ApiClient.pipe(
+            Effect.flatMap((a) => a.get(`sessions/${sessionId}`)),
+            Effect.filterOrFail((a) => a.ok),
+            Effect.flatMap((a) => Effect.tryPromise(() => a.json<{ userId: string }>())),
+            locals.runtime.runPromiseExit
         );
-        locals.runtime = ManagedRuntime.make(locals.appLive);
-    } else {
-        initLocals(locals, fetch);
-    }
 
-    const response = await resolve(event);
-    await locals.runtime?.dispose();
-    return response;
-};
+        if (Exit.isFailure(exit)) {
+            return redirect(302, '/login');
+        }
 
-function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
-    locals.appLive = Layer.mergeAll(
-        Layer.sync(
+        locals.user = { id: exit.value.userId };
+        locals.appLive = Layer.sync(
             ApiClient,
             () =>
-                new HttpApiClient({
+                new KitBasicHttpApiClient({
                     httpClient: new UniversalHttpClient({
                         baseUrl: env.API_BASE_URL,
                         version: env.API_VERSION,
                         fetch
-                    })
+                    }),
+                    cookies
                 })
-        )
+        );
+        locals.runtime = ManagedRuntime.make(locals.appLive);
+    }
+
+    const response = await resolve(event);
+    await locals.runtime.dispose();
+    return response;
+};
+
+function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
+    Layer.sync(
+        ApiClient,
+        () =>
+            new HttpApiClient({
+                httpClient: new UniversalHttpClient({
+                    baseUrl: env.API_BASE_URL,
+                    version: env.API_VERSION,
+                    fetch
+                })
+            })
     );
     locals.runtime = ManagedRuntime.make(locals.appLive);
 }

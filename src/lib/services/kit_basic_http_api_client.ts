@@ -2,7 +2,6 @@ import { Effect } from 'effect';
 import { ApiError } from '../models/errors';
 import { HttpApiClient } from './api_client.server';
 import type { HttpClient, HttpClientFetchRequestInit } from './http_client';
-import type { Cookie } from 'elysia';
 import type { Cookies } from '@sveltejs/kit';
 
 export class KitBasicHttpApiClient extends HttpApiClient {
