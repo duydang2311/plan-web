@@ -4,7 +4,6 @@ import type { DeepPick } from 'ts-essentials';
 import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
 import type { TeamInvitation } from '~/lib/models/team';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { authenticateOrRefresh, decodeAccessToken } from '~/lib/utils/auth.server';
 import { ActionResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
@@ -16,25 +15,16 @@ import {
 
 export const load: PageServerLoad = async ({
     depends,
-    cookies,
     isDataRequest,
-    locals: { runtime }
+    locals: { runtime, user }
 }) => {
-    const accessTokenExit = await runtime.runPromiseExit(
-        Effect.gen(function* (_) {
-            const { accessToken } = yield* authenticateOrRefresh(cookies);
-            return yield* decodeAccessToken(accessToken);
-        })
-    );
-
-    if (Exit.isFailure(accessTokenExit)) {
+    if (!user) {
         return;
     }
 
     depends('fetch:home');
-    const payload = accessTokenExit.value;
     const teamInvitationList = runtime
-        .runPromiseExit(getTeamInvitations(payload.sub))
+        .runPromiseExit(getTeamInvitations(user.id))
         .then((a) =>
             Exit.isFailure(a)
                 ? paginatedList<TeamInvitation>()
@@ -42,7 +32,7 @@ export const load: PageServerLoad = async ({
         );
 
     return {
-        user: { id: payload.sub },
+        user,
         teamInvitationList: isDataRequest ? teamInvitationList : await teamInvitationList
     };
 };
