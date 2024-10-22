@@ -13,7 +13,7 @@ import { workspaceStatuses } from './routes/workspace-statuses';
 import { workspaces } from './routes/workspaces';
 
 const baseApp = new Elysia({ prefix: '/api' })
-    .decorate(
+    .state(
         'runtime',
         ManagedRuntime.make(
             Layer.mergeAll(
