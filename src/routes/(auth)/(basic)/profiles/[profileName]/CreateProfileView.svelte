@@ -1,11 +1,18 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { pipe } from '@baetheus/fun/fn';
-    import { lorelei } from '@dicebear/collection';
     import { useQueryClient } from '@tanstack/svelte-query';
-    import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Field, Icon, Input, Label, TextArea } from '~/lib/components';
+    import {
+        addToast,
+        Avatar,
+        Button,
+        Field,
+        Icon,
+        Input,
+        Label,
+        TextArea
+    } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { TE } from '~/lib/utils/functional';
     import type { ValidationResult } from '~/lib/utils/validation';
@@ -16,28 +23,12 @@
     const { queryKey, userId }: { queryKey: unknown[]; userId: string } = $props();
     const { httpClient } = useRuntime();
     const queryClient = useQueryClient();
-    let defaultSrc = $state.raw<string>();
     let imageFile = $state<File | Blob | null>(null);
     let imageFileInfo = $state<{ name: string; bytes: number } | null>(null);
     let validation = $state<ValidationResult>();
-    let createAvatar: (typeof import('@dicebear/core'))['createAvatar'] | undefined = undefined;
     let cropDialogOpen = writable(false);
+    let name = $state.raw('');
     const errors = $derived(validation != null && !validation.ok ? validation.errors : {});
-
-    onMount(() => {
-        import('@dicebear/core').then(({ createAvatar: _createAvatar }) => {
-            createAvatar = _createAvatar;
-            defaultSrc = createAvatarDataUri('');
-        });
-    });
-
-    const createAvatarDataUri = (seed: string) =>
-        createAvatar?.(lorelei, {
-            seed,
-            hairColor: ['fca201', '1770ff', '090909', 'f0442e', '6add1f'],
-            scale: 120,
-            translateY: 5
-        }).toDataUri();
 
     const upload = async (file: File | Blob) => {
         const either = await pipe(
@@ -134,10 +125,11 @@
         It seems like you don't have a profile yet!
     </p>
     <div class="flex gap-8 items-center mx-auto w-fit">
-        <img
-            src={imageFile != null ? URL.createObjectURL(imageFile) : defaultSrc}
-            class="rounded-full aspect-square object-cover max-w-full h-28 border border-base-fg-2 bg-base-1"
-            alt="profile"
+        <Avatar
+            alt=""
+            src={imageFile != null ? URL.createObjectURL(imageFile) : undefined}
+            seed={name}
+            class="w-28"
         />
         <div class="text-pretty">
             <h1>Set up your profile</h1>
@@ -179,12 +171,7 @@
                     id="name"
                     name="name"
                     placeholder="john.smith123"
-                    oninput={(e) => {
-                        if (!createAvatar || imageFile) {
-                            return;
-                        }
-                        defaultSrc = createAvatarDataUri(e.currentTarget.value);
-                    }}
+                    bind:value={name}
                     errors={errors['name']}
                 />
             </Field>

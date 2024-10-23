@@ -32,3 +32,7 @@ export class ValidationError extends Data.TaggedError('ValidationError')<{
 export class UnauthorizedError extends Data.TaggedError('UnauthorizedError') {
     public static readonly instance = new UnauthorizedError();
 }
+
+export class InvalidAssetError extends Data.TaggedError('InvalidAssetError') {
+    public static readonly instance = new InvalidAssetError();
+}

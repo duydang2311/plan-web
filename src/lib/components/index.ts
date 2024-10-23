@@ -30,3 +30,4 @@ export { default as StaticErrors } from './StaticErrors.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as IconButton } from './IconButton.svelte';
 export { default as Select } from './Select.svelte';
+export { default as Avatar } from './Avatar.svelte';

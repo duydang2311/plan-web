@@ -20,13 +20,14 @@
     let initial = $state.snapshot(value);
     let dirty = $state(false);
 
-    $effect(() => {
+    $effect.pre(() => {
         if (!dirty && value !== initial) {
             dirty = true;
         }
     });
 
     const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
+    $inspect(dirty, props.name);
 </script>
 
 <input

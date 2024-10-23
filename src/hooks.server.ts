@@ -5,6 +5,7 @@ import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
 import { app } from './lib/elysia_api/server';
+import { CloudinaryLive } from './lib/elysia_api/contexts';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -47,17 +48,20 @@ export const handle: Handle = async ({
         }
 
         locals.user = { id: exit.value.userId };
-        locals.appLive = Layer.sync(
-            ApiClient,
-            () =>
-                new KitBasicHttpApiClient({
-                    httpClient: new UniversalHttpClient({
-                        baseUrl: env.API_BASE_URL,
-                        version: env.API_VERSION,
-                        fetch
-                    }),
-                    cookies
-                })
+        locals.appLive = Layer.mergeAll(
+            Layer.sync(
+                ApiClient,
+                () =>
+                    new KitBasicHttpApiClient({
+                        httpClient: new UniversalHttpClient({
+                            baseUrl: env.API_BASE_URL,
+                            version: env.API_VERSION,
+                            fetch
+                        }),
+                        cookies
+                    })
+            ),
+            CloudinaryLive
         );
         locals.runtime = ManagedRuntime.make(locals.appLive);
     }
@@ -68,16 +72,19 @@ export const handle: Handle = async ({
 };
 
 function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
-    locals.appLive = Layer.sync(
-        ApiClient,
-        () =>
-            new HttpApiClient({
-                httpClient: new UniversalHttpClient({
-                    baseUrl: env.API_BASE_URL,
-                    version: env.API_VERSION,
-                    fetch
+    locals.appLive = Layer.mergeAll(
+        Layer.sync(
+            ApiClient,
+            () =>
+                new HttpApiClient({
+                    httpClient: new UniversalHttpClient({
+                        baseUrl: env.API_BASE_URL,
+                        version: env.API_VERSION,
+                        fetch
+                    })
                 })
-            })
+        ),
+        CloudinaryLive
     );
     locals.runtime = ManagedRuntime.make(locals.appLive);
 }

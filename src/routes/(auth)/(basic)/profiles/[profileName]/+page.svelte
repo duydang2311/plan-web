@@ -7,6 +7,7 @@
     import type { PageData } from './$types';
     import type { LocalUser } from './+page.server';
     import CreateProfileView from './CreateProfileView.svelte';
+    import ProfileView from './ProfileView.svelte';
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['profiles', { profileName: $page.params['profileName'] }];
@@ -30,19 +31,17 @@
                 ),
                 TE.match(
                     () => null,
-                    (r) => r
+                    (r) => r as LocalUser
                 )
             )();
-        },
-        // staleTime: 331,
-        // refetchInterval: 331
+        }
     });
 </script>
 
 {#if $query.data == null}
     Loading...
-{:else if $query.data.profile == null}
+{:else if $query.data.profile != null}
     <CreateProfileView {queryKey} userId={$query.data.id} />
 {:else}
-    {JSON.stringify($query.data)}
+    <ProfileView user={$query.data} />
 {/if}

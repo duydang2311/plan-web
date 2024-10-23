@@ -21,7 +21,7 @@ const config = {
             '~': 'src'
         },
         csp: {
-            mode: 'nonce',
+            mode: 'auto',
             directives: {
                 'script-src': ['self', 'unsafe-eval']
             }
