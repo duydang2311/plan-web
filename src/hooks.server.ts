@@ -9,7 +9,6 @@ import { app } from './lib/elysia_api/server';
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
 if (!env.API_VERSION) throw new ReferenceError('API_VERSION must be provided');
-if (!env.JWT_PUBLIC_KEY) throw new ReferenceError('JWT_PUBLIC_KEY must be provided');
 
 export const handle: Handle = async ({
     event,
