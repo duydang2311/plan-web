@@ -8,5 +8,6 @@ export interface User {
 
 export interface UserProfile {
     name: string;
+    displayName: string;
     image: Partial<Asset>;
 }

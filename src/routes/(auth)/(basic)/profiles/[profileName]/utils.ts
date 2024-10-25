@@ -30,26 +30,23 @@ export const decodeCreateProfile = (formData: FormData) => {
 };
 
 export const validateCreateProfile = validator(
-    Type.Object(
-        {
-            userId: Type.String(),
-            name: Type.RegExp('^[a-zA-Z0-9]+$'),
-            displayName: Type.RegExp('^[a-zA-Z\\s]+$'),
-            image: Type.Optional(
-                Type.Union([
-                    Type.Object({
-                        publicId: Type.String(),
-                        resourceType: Type.String(),
-                        format: Type.String(),
-                        version: Type.Number()
-                    }),
-                    Type.Null()
-                ])
-            ),
-            bio: Type.Optional(Type.String()),
-            socialLinks: Type.Optional(Type.Array(Type.String({ format: 'url' })))
-        },
-        { additionalProperties: false }
-    ),
+    Type.Object({
+        userId: Type.String(),
+        name: Type.RegExp('^[a-zA-Z0-9]+$'),
+        displayName: Type.RegExp('^[a-zA-Z\\s]+$'),
+        image: Type.Optional(
+            Type.Union([
+                Type.Object({
+                    publicId: Type.String(),
+                    resourceType: Type.String(),
+                    format: Type.String(),
+                    version: Type.Number()
+                }),
+                Type.Null()
+            ])
+        ),
+        bio: Type.Optional(Type.String()),
+        socialLinks: Type.Optional(Type.Array(Type.String({ format: 'url' })))
+    }),
     { convert: true, stripLeadingSlash: true }
 );

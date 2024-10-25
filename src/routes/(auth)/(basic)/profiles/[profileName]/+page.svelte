@@ -20,10 +20,10 @@
                 return null;
             }
 
-            return await pipe(
+            const a = await pipe(
                 TE.fromPromise(() =>
                     httpClient.get(`/api/users/${user.id}`, {
-                        query: { select: 'Profile.Name,Profile.Image' }
+                        query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
                     })
                 )(),
                 TE.flatMap((a) =>
@@ -31,17 +31,18 @@
                 ),
                 TE.match(
                     () => null,
-                    (r) => r as LocalUser
+                    (r) => ({ ...r, id: user.id })
                 )
             )();
+            return a;
         }
     });
 </script>
 
 {#if $query.data == null}
     Loading...
-{:else if $query.data.profile != null}
+{:else if $query.data.profile == null}
     <CreateProfileView {queryKey} userId={$query.data.id} />
 {:else}
-    <ProfileView user={$query.data} />
+    <ProfileView profile={$query.data.profile} />
 {/if}

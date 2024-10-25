@@ -23,8 +23,8 @@ export interface ValidateFail {
 }
 
 export type ValidationResult<T = unknown> = ValidateOk<T> | ValidateFail;
-type Validator<T> = (input: unknown) => ValidationResult<T>;
-type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
+export type Validator<T> = (input: unknown) => ValidationResult<T>;
+export type AsyncValidator<T> = (input: unknown) => PromiseLike<ValidationResult<T>>;
 
 type ValidateFunction<T> = (input: T, props: ValidatorProps) => void;
 type AsyncValidateFunction<T> = (input: T, props: ValidatorProps) => PromiseLike<void>;
@@ -99,6 +99,8 @@ function validatorFromType<T extends TSchema>(
             if (stripLeadingSlash) {
                 path = path.substring(1);
             }
+            const slashIndex = path.indexOf('/');
+            path = path.substring(0, slashIndex === -1 ? undefined : slashIndex);
             if (!errors[path]) {
                 errors[path] = [ValueErrorType[error.type]];
             } else {

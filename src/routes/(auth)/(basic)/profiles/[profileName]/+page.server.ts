@@ -6,11 +6,13 @@ import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { decodeCreateProfile, validateCreateProfile } from './utils';
 import { urlFromAsset } from '~/lib/utils/cloudinary';
+import type { Cloudinary } from '~/lib/services/cloudinary.server';
 
 export type RemoteUser = Pick<User, 'id' | 'profile'>;
 export type LocalUser = Omit<RemoteUser, 'profile'> & {
     profile?: {
         name: string;
+        displayName: string;
         imageUrl?: string;
     };
 };
@@ -26,26 +28,17 @@ export const load: PageServerLoad = async ({
     if (params.profileName === 'me') {
         const promise = Effect.gen(function* () {
             const response = yield* LoadResponse.Fetch(() =>
-                fetch(`/api/users/${user.id}?select=Profile.Name,Profile.Image`, {
-                    method: 'get'
-                })
+                fetch(
+                    `/api/users/${user.id}?select=Profile.Name,Profile.DisplayName,Profile.Image`,
+                    {
+                        method: 'get'
+                    }
+                )
             );
-            const json = yield* LoadResponse.JSON(() => response.json<RemoteUser>());
-            const imageUrl = json.profile
-                ? yield* urlFromAsset(json.profile.image).pipe(
-                      Effect.orElseSucceed(() => undefined)
-                  )
-                : undefined;
-            return {
-                ...json,
-                id: user.id,
-                profile: json.profile
-                    ? {
-                          name: json.profile.name,
-                          imageUrl
-                      }
-                    : undefined
-            } as LocalUser;
+            const { profile } = yield* LoadResponse.JSON(() =>
+                response.json<Omit<RemoteUser, 'id'>>()
+            );
+            return yield* dataFromRemoteUser({ id: user.id, profile });
         }).pipe(
             Effect.catchAll(() => Effect.succeed(null)),
             runtime.runPromise
@@ -59,26 +52,15 @@ export const load: PageServerLoad = async ({
     const exit = await Effect.gen(function* () {
         const response = yield* LoadResponse.Fetch(() =>
             fetch(
-                `/api/users/profile-name/${params.profileName}?select=Id,Profile.Name,Profile.Image`,
+                `/api/users/profile-name/${params.profileName}?select=Id,Profile.Name,Profile.DisplayName,Profile.Image`,
                 {
                     method: 'get'
                 }
             )
         );
-        const json = yield* LoadResponse.JSON(() => response.json<RemoteUser>());
+        const user = yield* LoadResponse.JSON(() => response.json<RemoteUser>());
 
-        const imageUrl = json.profile
-            ? yield* urlFromAsset(json.profile.image).pipe(Effect.orElseSucceed(() => undefined))
-            : undefined;
-        return {
-            ...json,
-            profile: json.profile
-                ? {
-                      name: json.profile.name,
-                      imageUrl
-                  }
-                : undefined
-        } as LocalUser;
+        return yield* dataFromRemoteUser(user);
     }).pipe(runtime.runPromiseExit);
 
     return Exit.match(exit, {
@@ -105,3 +87,23 @@ export const actions: Actions = {
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
+
+const dataFromRemoteUser = ({
+    id,
+    profile
+}: RemoteUser): Effect.Effect<LocalUser, never, Cloudinary> =>
+    profile
+        ? Effect.gen(function* () {
+              const { image, ...rest } = profile;
+              const imageUrl = profile.image
+                  ? yield* urlFromAsset(profile.image).pipe(Effect.orElseSucceed(() => undefined))
+                  : undefined;
+              return {
+                  id,
+                  profile: {
+                      ...rest,
+                      imageUrl
+                  }
+              };
+          })
+        : Effect.succeed({ id });

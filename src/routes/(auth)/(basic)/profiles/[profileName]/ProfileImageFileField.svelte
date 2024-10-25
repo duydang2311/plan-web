@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
     import { Label } from '~/lib/components';
+    import { createField } from '~/lib/utils/form.svelte';
 
     interface Props {
         onInput: (file?: File) => void;
@@ -8,7 +9,23 @@
     }
 
     const { onInput, children }: Props = $props();
+    const field = createField();
 </script>
+
+<input
+    use:field
+    type="file"
+    id="imageUrl"
+    name="imageUrl"
+    accept="image/*"
+    oninput={(e) => {
+        const files = e.currentTarget.files;
+        onInput(files?.[0]);
+        e.currentTarget.value = '';
+        return false;
+    }}
+    class="c-input--file opacity-0 w-0 h-0 absolute"
+/>
 
 <Label for="imageUrl" class="max-w-full">
     <p class="mb-1">Profile picture</p>
@@ -49,16 +66,3 @@
         {@render children()}
     </div>
 </Label>
-<input
-    type="file"
-    id="imageUrl"
-    name="imageUrl"
-    accept="image/*"
-    oninput={(e) => {
-        const files = e.currentTarget.files;
-        onInput(files?.[0]);
-        e.currentTarget.value = '';
-        return false;
-    }}
-    hidden
-/>

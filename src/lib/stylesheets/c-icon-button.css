@@ -1,5 +1,5 @@
 .c-icon-button {
-    border-radius: theme('borderRadius[sm]');
+    border-radius: theme('borderRadius[DEFAULT]');
     padding: theme('padding[0.5]');
     transition:
         transform 120ms ease-in-out,

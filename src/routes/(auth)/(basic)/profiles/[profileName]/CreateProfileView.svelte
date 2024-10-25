@@ -7,28 +7,37 @@
         addToast,
         Avatar,
         Button,
+        Errors,
         Field,
         Icon,
+        IconButton,
         Input,
         Label,
         TextArea
     } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { createForm, formValidator, type HelperField } from '~/lib/utils/form.svelte';
     import { TE } from '~/lib/utils/functional';
-    import type { ValidationResult } from '~/lib/utils/validation';
     import CropDialog from './CropDialog.svelte';
     import ProfileImageFileField from './ProfileImageFileField.svelte';
-    import { decodeCreateProfile, validateCreateProfile } from './utils';
+    import { validateCreateProfile } from './utils';
 
     const { queryKey, userId }: { queryKey: unknown[]; userId: string } = $props();
     const { httpClient } = useRuntime();
     const queryClient = useQueryClient();
     let imageFile = $state<File | Blob | null>(null);
     let imageFileInfo = $state<{ name: string; bytes: number } | null>(null);
-    let validation = $state<ValidationResult>();
     let cropDialogOpen = writable(false);
-    let name = $state.raw('');
-    const errors = $derived(validation != null && !validation.ok ? validation.errors : {});
+    const form = createForm({
+        validator: formValidator(validateCreateProfile)
+    });
+    const fields = $state({
+        userId: form.createField({ name: 'userId', initialValue: userId }),
+        name: form.createField({ name: 'name' }),
+        displayName: form.createField({ name: 'displayName' }),
+        bio: form.createField({ name: 'bio' })
+    });
+    const socialLinks = $state<HelperField[]>([]);
 
     const upload = async (file: File | Blob) => {
         const either = await pipe(
@@ -128,7 +137,7 @@
         <Avatar
             alt=""
             src={imageFile != null ? URL.createObjectURL(imageFile) : undefined}
-            seed={name}
+            seed={fields.name.state.value}
             class="w-28"
         />
         <div class="text-pretty">
@@ -141,7 +150,15 @@
         action="?/create-profile"
         enctype="multipart/form-data"
         class="space-y-8 mt-8"
-        use:enhance={async () => {
+        use:form
+        use:enhance={async (e) => {
+            form.validate();
+            if (!form.isValid()) {
+                console.log(form.getErrors());
+                e.cancel();
+                return;
+            }
+
             if (imageFile) {
                 upload(imageFile);
             }
@@ -151,39 +168,41 @@
                 await queryClient.invalidateQueries({ queryKey });
             };
         }}
-        oninput={(e) => {
-            const target = e.target as HTMLInputElement;
-            if (!target?.ariaInvalid) {
-                return;
-            }
-            validation = validateCreateProfile(decodeCreateProfile(new FormData(e.currentTarget)));
-        }}
-        onchange={(e) => {
-            validation = validateCreateProfile(decodeCreateProfile(new FormData(e.currentTarget)));
-        }}
     >
-        <input type="hidden" hidden name="userId" value={userId} />
+        <input
+            type="hidden"
+            hidden
+            name={fields.userId.state.name}
+            value={fields.userId.state.value}
+        />
         <div class="flex flex-wrap gap-4">
             <Field class="grow">
                 <Label for="name">User name</Label>
                 <Input
+                    useField={fields.name}
                     type="text"
                     id="name"
-                    name="name"
+                    name={fields.name.state.name}
                     placeholder="john.smith123"
-                    bind:value={name}
-                    errors={errors['name']}
+                    required
+                    pattern="[A-Za-z0-9]+"
+                    bind:value={fields.name.state.value}
                 />
+                <Errors errors={fields.name.state.errors} />
             </Field>
             <Field class="grow">
                 <Label for="displayName">Display name</Label>
                 <Input
+                    useField={fields.displayName}
                     type="text"
                     id="displayName"
-                    name="displayName"
+                    name={fields.displayName.state.name}
                     placeholder="John Smith"
-                    errors={errors['displayName']}
+                    required
+                    pattern="[a-zA-Z\s]+"
+                    bind:value={fields.displayName.state.value}
                 />
+                <Errors errors={fields.displayName.state.errors} />
             </Field>
         </div>
 
@@ -230,28 +249,60 @@
             <Field class="w-full">
                 <Label for="bio">Bio</Label>
                 <TextArea
+                    useField={fields.bio}
                     id="bio"
                     name="bio"
                     placeholder="Add your bio..."
                     rows={4}
                     class="resize-none"
-                    errors={errors['bio']}
+                    bind:value={fields.bio.state.value}
                 />
+                <Errors errors={fields.bio.state.errors} />
             </Field>
-            <Field class="w-full">
-                <Label for="socialLink">Social links</Label>
-                <div class="space-y-4">
-                    <Field>
-                        <Input
-                            type="text"
-                            id="socialLinks/0"
-                            name="socialLinks"
-                            placeholder="https://"
-                            errors={errors['socialLinks/0']}
-                        />
-                    </Field>
+            <fieldset class="w-full">
+                <legend class="c-label w-full flex gap-2 items-center mb-1">
+                    <span>Social links</span>
+                    <IconButton
+                        type="button"
+                        onclick={() => {
+                            socialLinks.push(form.createField({ name: 'socialLinks' }));
+                        }}
+                        title="Add social link"
+                    >
+                        <Icon name="plus" />
+                    </IconButton>
+                </legend>
+                <div class="space-y-2">
+                    {#each socialLinks as socialLink, i}
+                        <Field>
+                            <div class="relative">
+                                <Input
+                                    useField={socialLink}
+                                    type="text"
+                                    id="socialLinks/{i}"
+                                    name="socialLinks"
+                                    placeholder="https://"
+                                    class="pr-10"
+                                    bind:value={socialLink.state.value}
+                                    required
+                                    pattern={'(?:https?|wss?|ftp)://(?:S+(?::S*)?@)?(?:(?!(?:10|127)(?:.d{1,3}){3})(?!(?:169.254|192.168)(?:.d{1,3}){2})(?!172.(?:1[6-9]|2d|3[0-1])(?:.d{1,3}){2})(?:[1-9]d?|1dd|2[01]d|22[0-3])(?:.(?:1?d{1,2}|2[0-4]d|25[0-5])){2}(?:.(?:[1-9]d?|1dd|2[0-4]d|25[0-4]))|(?:(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)(?:.(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)*(?:.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::d{2,5})?(?:/[^s]*)?'}
+                                />
+                                <IconButton
+                                    type="button"
+                                    variant="negative"
+                                    onclick={() => {
+                                        socialLinks.splice(i, 1);
+                                    }}
+                                    class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                >
+                                    <Icon name="minus" />
+                                </IconButton>
+                            </div>
+                            <Errors errors={socialLink.state.errors} />
+                        </Field>
+                    {/each}
                 </div>
-            </Field>
+            </fieldset>
         </fieldset>
         <div class="flex gap-4 justify-end">
             <Button type="reset" variant="base" outline class="w-fit">Reset</Button>

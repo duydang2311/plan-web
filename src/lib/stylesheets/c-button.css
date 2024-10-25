@@ -24,7 +24,7 @@
     padding: theme('size[2]') theme('size[4]');
     font-weight: 500;
     border: none;
-    border-radius: theme('borderRadius.md');
+    border-radius: theme('borderRadius.lg');
     transition:
         background-color 50ms ease-in-out,
         color 50ms ease-in-out,
