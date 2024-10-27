@@ -15,7 +15,6 @@ export const validate = validator<{
         return error('title', 'string');
     }
 
-    console.log(input);
     const qualifiedTitle = input.title.trim();
     if (!qualifiedTitle.length) {
         return error('title', 'string');
