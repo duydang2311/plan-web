@@ -1,14 +1,16 @@
 <script lang="ts">
-    import { createQuery } from '@tanstack/svelte-query';
-    import type { PageData } from './$types';
     import { invalidate } from '$app/navigation';
-    import { IconButton, Icon, Row, Table, Th, THead, Pagination, Link } from '~/lib/components';
-    import { DateTime } from 'luxon';
     import { page } from '$app/stores';
+    import { createQuery } from '@tanstack/svelte-query';
+    import { DateTime } from 'luxon';
+    import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import type { PageData } from './$types';
+    import DeleteButton from './DeleteButton.svelte';
 
     const { data }: { data: PageData } = $props();
+    const queryKey = ['projects'];
     const query = createQuery({
-        queryKey: ['projects'],
+        queryKey,
         queryFn: async () => {
             await invalidate('fetch:projects');
             return data.projects;
@@ -63,14 +65,7 @@
                         </td>
                         <td>
                             <div class="flex flex-wrap gap-2">
-                                <IconButton
-                                    type="button"
-                                    variant="negative"
-                                    title="Remove member"
-                                    class="w-fit"
-                                >
-                                    <Icon name="trash" />
-                                </IconButton>
+                                <DeleteButton {queryKey} projectId={id} />
                             </div>
                         </td>
                     </Row>

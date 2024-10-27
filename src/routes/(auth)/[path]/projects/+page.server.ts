@@ -4,7 +4,10 @@ import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { ActionResponse } from '~/lib/utils/kit';
+import { validator } from '~/lib/utils/validation';
+import { Type } from '~/lib/utils/typebox';
 
 interface Project {
     id: string;
@@ -72,3 +75,24 @@ export const load: PageServerLoad = async ({
         projects: exit.value
     };
 };
+
+export const actions: Actions = {
+    'delete-project': ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(validateDeleteProject(formData));
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`projects/${validation.data.projectId}`)
+            );
+        }).pipe(
+            Effect.catchAll((e) => Effect.succeed({ deleteProject: e })),
+            runtime.runPromise
+        );
+    }
+};
+
+const validateDeleteProject = validator(
+    Type.Object({
+        projectId: Type.String()
+    })
+);
