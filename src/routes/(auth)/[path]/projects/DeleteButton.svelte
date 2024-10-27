@@ -69,7 +69,7 @@
                                 })
                             );
                         }
-                        return ({ result }) => {
+                        return async ({ result }) => {
                             if (result.type !== 'success') {
                                 queryClient.setQueryData(queryKey, old);
                                 addToast({
@@ -78,14 +78,15 @@
                                         description: failure
                                     }
                                 });
-                                return;
+                            } else {
+                                addToast({
+                                    data: {
+                                        title: 'Failed to delete',
+                                        description: success
+                                    }
+                                });
                             }
-                            addToast({
-                                data: {
-                                    title: 'Failed to delete',
-                                    description: success
-                                }
-                            });
+                            await queryClient.invalidateQueries({ queryKey });
                         };
                     }}
                 >
