@@ -1,12 +1,10 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { D } from '@mobily/ts-belt';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
-    import { hasProperty } from '~/lib/utils/commons';
-    import type { ValidationResult } from '~/lib/utils/validation';
+    import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import type { ActionData, PageData } from './$types';
     import { validate } from './utils';
 
@@ -28,17 +26,22 @@
     };
 
     let { form, data }: { form: ActionData; data: PageData } = $props();
-    let fields = $state({
-        workspaceId: data.workspace.id,
-        name: '',
-        identifier: '',
-        description: ''
-    });
     let status = $state<'submitting' | null>(null);
-    let validation: ValidationResult | undefined;
     let dirty = $state(false);
 
     const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
+    const helperForm = createForm({
+        validator: formValidator(validate)
+    });
+    const fields = {
+        workspaceId: helperForm.createField({
+            name: 'workspaceId',
+            initialValue: data.workspace.id
+        }),
+        name: helperForm.createField({ name: 'name' }),
+        identifier: helperForm.createField({ name: 'identifier' }),
+        description: helperForm.createField({ name: 'description' })
+    };
 
     function nameToIdentifier(name: string) {
         return name
@@ -58,19 +61,10 @@
     <form
         method="post"
         class="space-y-2"
-        onchange={() => {
-            validation = validate(fields);
-            form = validation.ok
-                ? null
-                : {
-                      errors: D.filterWithKey(
-                          validation.errors,
-                          (k) => hasProperty(fields, k) && !!fields[k]
-                      ) as typeof validation.errors
-                  };
-        }}
+        use:helperForm
         use:enhance={(e) => {
-            if (!validation?.ok) {
+            helperForm.validate();
+            if (!helperForm.isValid()) {
                 e.cancel();
                 return;
             }
@@ -81,66 +75,80 @@
             };
         }}
     >
-        <input type="hidden" name="workspaceId" value={fields.workspaceId} />
+        <input
+            type="hidden"
+            name={fields.workspaceId.state.name}
+            value={fields.workspaceId.state.value}
+        />
         <div class="flex gap-4 flex-wrap">
             <fieldset class="space-y-1 grow">
                 <Label for="name">Name</Label>
                 <Input
+                    useField={fields.name}
                     id="name"
-                    name="name"
+                    name={fields.name.state.name}
                     autofocus
                     required
-                    aria-invalid={errors['name'] ? 'true' : undefined}
-                    bind:value={fields.name}
+                    bind:value={fields.name.state.value}
                     oninput={() => {
                         if (!dirty) {
-                            fields.identifier = nameToIdentifier(fields.name);
+                            fields.identifier.state.value = nameToIdentifier(
+                                fields.name.state.value
+                            );
                         }
                     }}
                 />
+                <Errors errors={fields.name.state.errors} />
             </fieldset>
             <fieldset class="space-y-1 grow basis-48">
                 <Label for="identifier">Identifier</Label>
                 <Input
+                    useField={fields.identifier}
                     id="identifier"
-                    name="identifier"
+                    name={fields.identifier.state.name}
                     autofocus
                     required
-                    aria-invalid={errors['identifier'] ? 'true' : undefined}
-                    bind:value={fields.identifier}
+                    bind:value={fields.identifier.state.value}
                     oninput={() => {
-                        if (fields.identifier === '') {
+                        if (fields.identifier.state.value === '') {
                             dirty = false;
-                        } else if (fields.identifier !== nameToIdentifier(fields.name)) {
+                        } else if (
+                            fields.identifier.state.value !==
+                            nameToIdentifier(fields.name.state.value)
+                        ) {
                             dirty = true;
                         }
                     }}
                     onblur={() => {
-                        if (!dirty && fields.identifier === '') {
-                            fields.identifier = nameToIdentifier(fields.name);
+                        if (!dirty && fields.identifier.state.value === '') {
+                            fields.identifier.state.value = nameToIdentifier(
+                                fields.name.state.value
+                            );
                         }
                     }}
                     class="lowercase"
                 />
-                <Errors errors={errors['identifier']} errorMap={errorMap.identifier} />
                 <p class="text-base-fg-3">
                     <small
                         >The identifier (e.g. {fields.identifier.length
-                            ? fields.identifier.toLocaleLowerCase()
+                            ? fields.identifier.state.value.toLocaleLowerCase()
                             : 'project-abc'}) of the project to be displayed in the URL.</small
                     >
                 </p>
+                <Errors errors={fields.identifier.state.errors} errorMap={errorMap.identifier} />
             </fieldset>
         </div>
         <fieldset class="space-y-1">
             <Label for="description">Description (optional)</Label>
             <Input
+                useField={fields.description}
                 id="description"
-                name="description"
+                name={fields.description.state.name}
                 autofocus
                 aria-invalid={errors['description'] ? 'true' : undefined}
-                bind:value={fields.description}
+                bind:value={fields.description.state.value}
             />
+            <Errors errors={fields.description.state.errors} />
         </fieldset>
         <Button variant="primary" class="!mt-4 capitalize w-fit" disabled={status === 'submitting'}>
             Create project

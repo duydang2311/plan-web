@@ -1,17 +1,14 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { Editor } from '@tiptap/core';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
-    import TextArea from '~/lib/components/TextArea.svelte';
-    import { hasProperty } from '~/lib/utils/commons';
-    import type { ValidationResult } from '~/lib/utils/validation';
+    import Tiptap from '~/lib/components/Tiptap.svelte';
+    import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import type { ActionData, PageData } from './$types';
     import { validate } from './utils';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
-    import { Editor } from '@tiptap/core';
-    import { D } from '@mobily/ts-belt';
 
     const errorMap = {
         root: {
@@ -31,16 +28,29 @@
     };
 
     let { form, data }: { form: ActionData; data: PageData } = $props();
-    let fields = $state({
-        teamId: data.team.id,
-        title: '',
-        description: null
-    });
     let status = $state<'submitting' | null>(null);
-    let validation: ValidationResult | undefined;
     let editor = $state.raw<Editor>();
+    const helperForm = createForm({ validator: formValidator(validate) });
+    const fields = {
+        teamId: helperForm.createField({ name: 'teamId', initialValue: data.team.id }),
+        title: helperForm.createField({ name: 'title' }),
+        description: helperForm.createField({ name: 'description' })
+    };
 
-    const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
+    $effect(() => {
+        if (!editor) {
+            return;
+        }
+        editor.on('transaction', ({ editor }) => {
+            fields.description.state.value = editor.getText();
+        });
+    });
+
+    $effect(() => {
+        if (form?.errors) {
+            helperForm.setErrors(form.errors);
+        }
+    });
 </script>
 
 <main class="max-w-screen-lg mx-auto p-8 space-y-8 max-h-full overflow-auto">
@@ -55,19 +65,15 @@
     <form
         method="post"
         class="space-y-4"
-        onchange={() => {
-            validation = validate({ ...fields, description: editor!.getHTML() });
-            form = validation.ok
-                ? null
-                : {
-                      errors: D.filterWithKey(
-                          validation.errors,
-                          (k) => hasProperty(fields, k) && !!fields[k]
-                      ) as typeof validation.errors
-                  };
-        }}
+        use:helperForm
         use:enhance={(e) => {
-            if (!validation?.ok) {
+            if (!editor) {
+                e.cancel();
+                return;
+            }
+
+            helperForm.validate();
+            if (!helperForm.isValid()) {
                 e.cancel();
                 return;
             }
@@ -83,28 +89,21 @@
             };
         }}
     >
-        <input type="hidden" name="teamId" value={fields.teamId} />
+        <input type="hidden" name={fields.teamId.state.name} value={fields.teamId.state.value} />
         <fieldset class="space-y-1 grow">
-            <Label for="name">Issue title</Label>
+            <Label for="title">Issue title</Label>
             <Input
+                useField={fields.title}
                 id="title"
-                name="title"
+                name={fields.title.state.name}
+                bind:value={fields.title.state.value}
                 autofocus
                 required
-                aria-invalid={errors['title'] ? 'true' : undefined}
-                bind:value={fields.title}
             />
+            <Errors errors={fields.title.state.errors} />
         </fieldset>
         <fieldset class="space-y-1 grow">
             <Label for="description">Issue description (optional)</Label>
-            <noscript>
-                <TextArea
-                    id="description"
-                    name="description"
-                    rows={8}
-                    bind:value={fields.description!}
-                />
-            </noscript>
             <div>
                 <Tiptap
                     bind:editor
@@ -114,11 +113,13 @@
                     }}
                 />
             </div>
-            <Errors errors={errors['description']} errorMap={errorMap.description} />
+            <Errors errors={fields.description.state.errors} errorMap={errorMap.description} />
         </fieldset>
         <Button variant="primary" class="!mt-4 w-fit" disabled={status === 'submitting'}>
             Create issue
         </Button>
     </form>
-    <Errors errors={errors['root']} errorMap={errorMap.root} />
+    {#if form?.errors}
+        <Errors errors={form.errors.root} errorMap={errorMap.root} />
+    {/if}
 </main>

@@ -1,27 +1,18 @@
 @layer base {
     :root {
-        --c-input-border: color-mix(in srgb, var(--theme-base-border) 95%, var(--theme-base-fg-1));
-        --c-input-border-hover: color-mix(
+        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
+        --_color-border-hover: color-mix(
             in srgb,
-            var(--theme-base-border) 75%,
-            var(--theme-base-fg-1)
+            var(--theme-base-border) 60%,
+            var(--theme-base-fg-2)
         );
-        --c-input-ring-opacity: 15%;
-        --c-input-border-focus: color-mix(
-            in srgb,
-            var(--theme-primary-3) var(--c-input-ring-opacity),
-            transparent
-        );
-    }
-
-    :root[data-theme='dark'] {
-        --c-input-ring-opacity: 40%;
+        --_color-border-focus: var(--theme-base-fg-2);
     }
 
     .c-input {
         width: 100%;
         padding: theme('size[2]') theme('size[2]');
-        border: theme('borderWidth.DEFAULT') solid var(--c-input-border);
+        border: theme('borderWidth.DEFAULT') solid var(--_color-border);
         border-radius: theme('borderRadius.md');
         outline: none;
         transition:
@@ -29,17 +20,16 @@
             background-color 75ms ease-in-out,
             border-color 75ms ease-in-out,
             box-shadow 75ms ease-in-out;
-        box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
 
         &:hover {
-            border-color: color-mix(in srgb, var(--theme-base-border) 75%, var(--color-fg));
+            border-color: var(--_color-border-hover);
         }
 
         &:focus-visible {
-            border-color: color-mix(in srgb, var(--theme-base-border) 50%, var(--color-fg));
+            border-color: var(--_color-border-focus);
             box-shadow:
                 0 0 0 1px color-mix(in srgb, var(--theme-base-border) 40%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
+                0 1px 2px rgb(0 0 0 / 0.1);
         }
 
         &::placeholder {
@@ -47,37 +37,19 @@
         }
 
         &[aria-invalid] {
-            border-color: color-mix(in srgb, var(--theme-negative-1) 60%, var(--color-bg));
-            box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-negative-1) 20%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
-
-            &:hover,
-            &:focus-visible {
-                border-color: var(--theme-negative-1);
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-negative-1) 40%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
-            }
-        }
-
-        &[data-dirty]:not([aria-invalid]) {
-            border-color: color-mix(in srgb, var(--theme-positive-1) 60%, var(--color-bg));
-            box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-positive-3) 10%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
+            border-color: color-mix(in srgb, var(--theme-negative-1) 70%, var(--color-bg));
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-negative-3) 20%, var(--color-bg));
 
             &:hover {
-                border-color: color-mix(in srgb, var(--theme-positive-1) 80%, var(--color-bg));
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-positive-3) 20%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
+                border-color: color-mix(in srgb, var(--theme-negative-1) 90%, var(--color-bg));
+                box-shadow: 0 0 0 1px
+                    color-mix(in srgb, var(--theme-negative-3) 20%, var(--color-bg));
             }
+
             &:focus-visible {
-                border-color: var(--theme-positive-1);
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-positive-3) 30%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
+                border-color: var(--theme-negative-1);
+                box-shadow: 0 0 0 1px
+                    color-mix(in srgb, var(--theme-negative-3) 40%, var(--color-bg));
             }
         }
     }
@@ -85,43 +57,22 @@
     .c-input--file {
         &:focus-visible + label > div {
             border-color: color-mix(in srgb, var(--theme-base-border) 50%, var(--color-fg));
-            box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-base-border) 40%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-base-border) 40%, var(--color-bg));
         }
 
         &[aria-invalid] + label > div {
-            border-color: color-mix(in srgb, var(--theme-negative-1) 60%, var(--color-bg));
-            box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-negative-1) 20%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
-
-            &:hover,
-            &:focus-visible {
-                border-color: var(--theme-negative-1);
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-negative-1) 40%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
-            }
-        }
-
-        &[data-dirty]:not([aria-invalid]) + label > div {
-            border-color: color-mix(in srgb, var(--theme-positive-1) 60%, var(--color-bg));
-            box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-positive-1) 20%, var(--color-bg)),
-                0 3px 2px rgb(0 0 0 / 0.05);
+            border-color: color-mix(in srgb, var(--theme-negative-1) 70%, var(--color-bg));
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-negative-3) 20%, var(--color-bg));
 
             &:hover {
-                border-color: color-mix(in srgb, var(--theme-positive-1) 80%, var(--color-bg));
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-positive-1) 40%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
+                border-color: color-mix(in srgb, var(--theme-negative-1) 90%, var(--color-bg));
+                box-shadow: 0 0 0 1px
+                    color-mix(in srgb, var(--theme-negative-3) 20%, var(--color-bg));
             }
             &:focus-visible {
-                border-color: var(--theme-positive-1);
-                box-shadow:
-                    0 0 0 1px color-mix(in srgb, var(--theme-positive-1) 40%, var(--color-bg)),
-                    0 3px 2px rgb(0 0 0 / 0.05);
+                border-color: var(--theme-negative-1);
+                box-shadow: 0 0 0 1px
+                    color-mix(in srgb, var(--theme-negative-3) 40%, var(--color-bg));
             }
         }
     }

@@ -3,7 +3,7 @@
     import { tsap } from '../utils/transition';
 
     interface Props {
-        errors?: string[];
+        errors?: string[] | null;
         errorMap?: Record<string, string>;
         class?: string;
     }
@@ -11,13 +11,13 @@
     const { errors = [], errorMap, ...props }: Props = $props();
 </script>
 
-{#if errors.length > 0}
+{#if errors && errors.length}
     <div
         in:tsap={(node, gsap) =>
             gsap.from(node, {
                 height: 0,
                 overflow: 'hidden',
-                clearProps: 'overflow, height',
+                clearProps: 'overflow,height',
                 duration: 0.15,
                 ease: 'circ.out'
             })}
@@ -25,6 +25,7 @@
             gsap.to(node, {
                 height: 0,
                 overflow: 'hidden',
+                clearProps: 'overflow,height',
                 duration: 0.15,
                 ease: 'circ.in'
             })}

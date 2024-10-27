@@ -1,17 +1,15 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { D } from '@mobily/ts-belt';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
+    import Icon from '~/lib/components/Icon.svelte';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
     import Link from '~/lib/components/Link.svelte';
     import LogoType from '~/lib/components/LogoType.svelte';
-    import { hasProperty } from '~/lib/utils/commons';
-    import type { ValidationResult } from '~/lib/utils/validation';
+    import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import type { ActionData } from './$types';
-    import { decode, validate } from './utils';
-    import Icon from '~/lib/components/Icon.svelte';
+    import { validate } from './utils';
 
     const errorMap = {
         root: {
@@ -22,7 +20,8 @@
         email: {
             required: 'Enter an email address',
             email: 'Enter a valid email address',
-            email_not_found: 'The email address has not been registered'
+            email_not_found: 'The email address has not been registered',
+            invalid_credentials: 'The email address or password could not be verified'
         },
         password: {
             required: 'Enter a password',
@@ -32,14 +31,21 @@
     };
 
     let { form }: { form: ActionData } = $props();
-    let fields = $state({
-        email: '',
-        password: ''
-    });
     let status = $state<'submitting' | null>(null);
-    let validation: ValidationResult | undefined;
+    const helperForm = createForm({
+        validator: formValidator(validate)
+    });
+    const fields = {
+        email: helperForm.createField({ name: 'email' }),
+        password: helperForm.createField({ name: 'password' })
+    };
+    const rootErrors = $derived(form?.errors.root);
 
-    const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
+    $effect(() => {
+        if (form) {
+            helperForm.setErrors(form.errors);
+        }
+    });
 </script>
 
 <main class="px-8 py-16">
@@ -51,20 +57,10 @@
                 method="post"
                 action="?/sign-in"
                 class="space-y-6 w-full"
-                onchange={({ currentTarget }) => {
-                    const input = decode(new FormData(currentTarget));
-                    validation = validate(input);
-                    form = validation.ok
-                        ? null
-                        : {
-                              errors: D.filterWithKey(
-                                  validation.errors,
-                                  (k) => hasProperty(input, k) && !!input[k]
-                              ) as typeof validation.errors
-                          };
-                }}
+                use:helperForm
                 use:enhance={(e) => {
-                    if (!validation?.ok) {
+                    helperForm.validate();
+                    if (!helperForm.isValid()) {
                         e.cancel();
                         return;
                     }
@@ -76,25 +72,19 @@
                     };
                 }}
             >
-                <Errors errors={errors['root']} errorMap={errorMap.root} class="text-center" />
+                <Errors errors={rootErrors} errorMap={errorMap.root} class="text-center" />
                 <div class="space-y-1">
                     <Label for="email" class="block">Email address</Label>
                     <Input
+                        useField={fields.email}
                         type="email"
                         id="email"
-                        name="email"
+                        name={fields.email.state.name}
+                        bind:value={fields.email.state.value}
                         autofocus
                         required
-                        aria-invalid={errors['email']?.filter((x) => x !== 'invalid_credentials')
-                            .length
-                            ? 'true'
-                            : undefined}
-                        bind:value={fields.email}
                     />
-                    <Errors
-                        errors={errors['email']?.filter((x) => x !== 'invalid_credentials')}
-                        errorMap={errorMap.email}
-                    />
+                    <Errors errors={fields.email.state.errors} errorMap={errorMap.email} />
                 </div>
                 <div class="space-y-1">
                     <div class="flex justify-between flex-wrap gap-2">
@@ -107,15 +97,15 @@
                         </Link>
                     </div>
                     <Input
+                        useField={fields.password}
                         type="password"
                         id="password"
-                        name="password"
+                        name={fields.password.state.name}
+                        bind:value={fields.password.state.value}
                         autofocus
                         required
-                        aria-invalid={errors['password'] ? 'true' : undefined}
-                        bind:value={fields.password}
                     />
-                    <Errors errors={errors['password']} errorMap={errorMap.password} />
+                    <Errors errors={fields.password.state.errors} errorMap={errorMap.password} />
                 </div>
                 <Button disabled={status === 'submitting'}>Sign in</Button>
             </form>

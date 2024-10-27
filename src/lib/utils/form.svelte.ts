@@ -1,6 +1,8 @@
-import type { Action } from 'svelte/action';
-import type { Validator } from './validation';
 import { A, D, pipe } from '@mobily/ts-belt';
+import { untrack } from 'svelte';
+import type { Action } from 'svelte/action';
+import { isEmptyObject } from './commons';
+import type { Validator } from './validation';
 
 let count = 0;
 
@@ -30,6 +32,7 @@ export interface HelperForm {
     createField: (options?: CreateFieldOptions) => HelperField;
     validate: () => void;
     getErrors: () => { [k in string]: string[] };
+    setErrors: (errors: { [k in string]: string[] }) => void;
     isValid: () => boolean;
     reset: () => void;
 }
@@ -37,7 +40,9 @@ export interface HelperForm {
 export type HelperField = Action & {
     state: HelperFieldState;
     reset: () => void;
-    validate: () => void;
+    validate: () => string[] | null;
+    setErrors: (errors?: string[]) => void;
+    getNode: () => HTMLElement | null;
 };
 
 class HelperFieldState {
@@ -46,7 +51,7 @@ class HelperFieldState {
     public dirty = $state.raw(false);
     public touched = $state.raw(false);
     public value = $state.raw('');
-    public errors = $state.raw<string[]>();
+    public errors = $state.raw<string[] | null>(null);
 
     public constructor(initial?: {
         name?: string;
@@ -61,7 +66,7 @@ class HelperFieldState {
         this.dirty = initial?.dirty ?? false;
         this.touched = initial?.touched ?? false;
         this.value = initial?.value ?? '';
-        this.errors = initial?.errors;
+        this.errors = initial?.errors ?? null;
     }
 
     public get name() {
@@ -78,45 +83,95 @@ export const createForm = ({ validator }: CreateFormOptions = {}) => {
     const fieldsMap = new Map<string, HelperField>();
     const isValid = () =>
         fields.every(({ state: { errors } }) => errors == null || errors.length === 0);
+    const getErrors = () =>
+        Object.fromEntries(
+            form.fields
+                .filter((a) => a.state.errors != null && a.state.errors.length > 0)
+                .map((a) => [a.state.name, a.state.errors])
+        ) as {
+            [k in string]: string[];
+        };
+    const validate = () => {
+        let anyErrors = false;
+        const r: { [k in string]: string[] } = {};
+        for (const field of fields) {
+            const errors = field.validate();
+            if (errors) {
+                anyErrors = true;
+                r[field.state.name] = errors;
+            }
+        }
+
+        if (anyErrors) {
+            return r;
+        }
+
+        if (validator) {
+            const fieldErrors: { [k in string]: string[] } = {};
+            validator(form, {
+                error: (name, ...errors) => {
+                    if (!fieldErrors[name]) {
+                        fieldErrors[name] = errors;
+                    } else {
+                        fieldErrors[name].push(...errors);
+                    }
+                }
+            });
+            return isEmptyObject(fieldErrors) ? null : fieldErrors;
+        }
+        return null;
+    };
+
+    const handleBlur = () => {
+        const errors = validate();
+        if (errors) {
+            for (const [k, v] of Object.entries(errors)) {
+                const field = fieldsMap.get(k);
+                if (!field) {
+                    continue;
+                }
+
+                const node = field.getNode();
+                if (!node || !node.hasAttribute('data-dirty')) {
+                    continue;
+                }
+                field.setErrors(v);
+            }
+        }
+    };
     const form: HelperForm = {
         fields,
         createField: (options?: CreateFieldOptions) => {
-            const field = createField(options);
+            const __field = createField(options);
+            const field = Object.assign((node: HTMLElement) => {
+                const ret = __field(node);
+                node.addEventListener('blur', handleBlur);
+                return {
+                    destroy: () => {
+                        ret.destroy();
+                        node.removeEventListener('blur', handleBlur);
+                    }
+                };
+            }, __field);
             fields.push(field);
             fieldsMap.set(field.state.name, field);
             return field;
         },
         validate: () => {
-            for (const field of form.fields) {
-                field.validate();
+            const errors = validate();
+            for (const [name, field] of fieldsMap) {
+                field.setErrors(errors?.[name]);
             }
-            if (isValid() && validator) {
-                const fieldErrors: { [k in string]: string[] } = {};
-                validator(form, {
-                    error: (name, ...errors) => {
-                        if (!fieldErrors[name]) {
-                            fieldErrors[name] = errors;
-                        } else {
-                            fieldErrors[name].push(...errors);
-                        }
-                    }
-                });
-                for (const [name, errors] of Object.entries(fieldErrors)) {
-                    const field = fieldsMap.get(name);
-                    if (field) {
-                        field.state.errors = errors;
-                    }
+        },
+        getErrors,
+        setErrors: (errors) => {
+            for (const [k, v] of Object.entries(errors)) {
+                const field = fieldsMap.get(k);
+                if (field) {
+                    field.setErrors(v);
                 }
             }
         },
-        getErrors: () =>
-            Object.fromEntries(
-                form.fields
-                    .filter((a) => a.state.errors != null && a.state.errors.length > 0)
-                    .map((a) => [a.state.name, a.state.errors])
-            ) as {
-                [k in string]: string[];
-            },
         isValid,
         reset: () => {
             for (const field of form.fields) {
@@ -141,7 +196,7 @@ export const createForm = ({ validator }: CreateFormOptions = {}) => {
 export const createField = <T extends CreateFieldOptions>(options?: T) => {
     const {
         name,
-        initialValue,
+        initialValue = '',
         validator,
         hint,
         validateOnDirty = false,
@@ -150,7 +205,7 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
     const state = new HelperFieldState({ name, value: initialValue, hint });
     const reset = () => {
         state.dirty = false;
-        state.errors = undefined;
+        state.errors = null;
         state.touched = false;
         state.value = initialValue ?? '';
         if (capturedNode) {
@@ -162,28 +217,37 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
 
     const validate = () => {
         if (!capturedNode) {
-            return;
+            return null;
         }
 
-        let valid = capturedNode.checkValidity();
-        if (!valid) {
-            state.errors = pickValidityErrors(capturedNode.validity);
+        if (capturedNode instanceof HTMLInputElement && !capturedNode.checkValidity()) {
+            return pickValidityErrors(capturedNode.validity);
         } else if (validator) {
             const arr: string[] = [];
             validator(state, { error: (errors) => errorFn(arr, errors) });
-            state.errors = arr;
-            valid = arr.length > 0;
-        } else {
-            state.errors = undefined;
+            return arr;
         }
-        toggleAttribute(capturedNode, 'aria-invalid', !valid);
+        return null;
     };
 
-    let capturedNode: HTMLInputElement | null = null;
+    const setErrors = (errors?: string[] | null) => {
+        if (!capturedNode) {
+            return;
+        }
+        if (errors && errors.length) {
+            state.errors = errors;
+            toggleAttribute(capturedNode, 'aria-invalid', true);
+        } else {
+            state.errors = null;
+            toggleAttribute(capturedNode, 'aria-invalid', false);
+        }
+    };
+
+    let capturedNode: HTMLElement | null = null;
     let dirty = false;
 
     const field = Object.assign(
-        (node: HTMLInputElement) => {
+        (node: HTMLElement) => {
             capturedNode = node;
 
             const handleInput = () => {
@@ -194,10 +258,25 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
                     state.touched = true;
                     toggleAttribute(node, 'data-touched', true);
                 }
+                if (!state.dirty) {
+                    state.dirty = true;
+                    toggleAttribute(node, 'data-dirty', true);
+                }
                 if (node.hasAttribute('aria-invalid') || validateOnDirty) {
-                    validate();
+                    setErrors(validate());
                 }
             };
+
+            $effect.pre(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                state.value;
+                untrack(() => {
+                    if (!state.dirty && state.value !== initialValue) {
+                        state.dirty = true;
+                        toggleAttribute(node, 'data-dirty', true);
+                    }
+                });
+            });
 
             const handleBlur = () => {
                 if (!state.touched) {
@@ -223,7 +302,13 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
                 }
             };
         },
-        { state, reset, validate }
+        {
+            state,
+            reset,
+            validate,
+            getNode: () => capturedNode,
+            setErrors
+        }
     );
     return field;
 };

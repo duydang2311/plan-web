@@ -107,8 +107,7 @@
         addToast({
             data: {
                 title: 'Profile image uploaded',
-                description:
-                    'You should see your new profile image now or try refreshing the page in a few seconds.'
+                description: 'It often takes us a few seconds to update your profile image.'
             }
         });
     };
@@ -154,7 +153,6 @@
         use:enhance={async (e) => {
             form.validate();
             if (!form.isValid()) {
-                console.log(form.getErrors());
                 e.cancel();
                 return;
             }

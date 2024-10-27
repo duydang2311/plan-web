@@ -1,22 +1,35 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { page } from '$app/stores';
+    import { isRecord } from '@baetheus/fun/refinement';
     import { melt } from '@melt-ui/svelte';
     import { useQueryClient } from '@tanstack/svelte-query';
     import { fade } from 'svelte/transition';
+    import invariant from 'tiny-invariant';
     import { Button, Dialog, Errors, Field, Input, Label } from '~/lib/components';
+    import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
-    import { type ValidationResult } from '~/lib/utils/validation';
-    import { decodeAddStatus, validateAddStatus } from './utils';
-    import { page } from '$app/stores';
+    import { validateAddStatus } from './utils';
 
     const { workspaceId, onClose }: { workspaceId: string; onClose: () => void } = $props();
     const queryKey = ['workspace-statuses', { workspaceId: workspaceId }];
     const queryClient = useQueryClient();
-    let validation = $state<ValidationResult>();
-    const errors = $derived(
-        ($page.form?.['addStatus']?.errors as Record<string, string[]> | undefined) ??
-            (validation != null && !validation.ok ? validation.errors : null)
-    );
+    const form = createForm({
+        validator: formValidator(validateAddStatus)
+    });
+    const fields = {
+        workspaceId: form.createField({ name: 'workspaceId', initialValue: workspaceId }),
+        value: form.createField({ name: 'value' }),
+        description: form.createField({ name: 'description' })
+    };
+
+    $effect(() => {
+        const errors = $page.form?.['addStatus']?.errors as Record<string, string[]> | undefined;
+        if (errors) {
+            invariant(isRecord(errors), 'errors must be a record');
+            form.setErrors(errors);
+        }
+    });
 </script>
 
 <Dialog
@@ -41,7 +54,7 @@
                 in:tsap|global={dialog.in()}
                 out:tsap|global={dialog.out()}
                 use:melt={content}
-                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border"
+                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border outline-none"
             >
                 <div>
                     <p use:melt={title} class="text-h4 font-medium">Add a new status</p>
@@ -53,16 +66,14 @@
                     class="space-y-4"
                     method="post"
                     action="?/add-status"
-                    oninput={(e) => {
-                        validation = validateAddStatus(
-                            decodeAddStatus(new FormData(e.currentTarget))
-                        );
-                    }}
+                    use:form
                     use:enhance={(e) => {
-                        if (validation == null || !validation.ok) {
+                        form.validate();
+                        if (!form.isValid()) {
                             e.cancel();
                             return;
                         }
+
                         return async ({ result, update }) => {
                             if (result.type === 'success') {
                                 await queryClient.invalidateQueries({ queryKey });
@@ -71,25 +82,39 @@
                         };
                     }}
                 >
-                    <input type="hidden" name="workspaceId" value={workspaceId} />
+                    <input
+                        use:fields.workspaceId
+                        type="hidden"
+                        name={fields.workspaceId.state.name}
+                        value={fields.workspaceId.state.value}
+                    />
                     <Field>
                         <Label for="value">Name</Label>
                         <Input
+                            useField={fields.value}
                             id="value"
-                            name="value"
                             type="text"
-                            aria-invalid={errors?.['value'] != null}
+                            name={fields.value.state.name}
+                            required
+                            pattern="[a-zA-Z0-9\s]+"
+                            bind:value={fields.value.state.value}
                         />
-                        <Errors errors={errors?.['value']} />
+                        <Errors errors={fields.value.state.errors} />
                     </Field>
                     <Field>
                         <Label for="desc">Description (optional)</Label>
-                        <Input id="desc" name="description" type="text" />
-                        <Errors errors={errors?.['description']} />
+                        <Input
+                            useField={fields.description}
+                            id="desc"
+                            type="text"
+                            name={fields.description.state.name}
+                            bind:value={fields.description.state.value}
+                        />
+                        <Errors errors={fields.description.state.errors} />
                     </Field>
                     <div class="flex justify-end gap-4 !mt-8">
                         <Button variant="base" outline class="w-fit" melt={close}>Cancel</Button>
-                        <Button outline disabled={errors != null} class="w-fit">Create</Button>
+                        <Button outline class="w-fit">Create</Button>
                     </div>
                 </form>
             </div>

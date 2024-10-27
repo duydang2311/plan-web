@@ -1,21 +1,17 @@
 @layer base {
     :root {
-        --c-button-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
-        --c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
-
-        --c-button-base-bg: var(--theme-base-1);
-        --c-button-base-border: color-mix(
-            in oklch,
-            var(--theme-base-border) 80%,
-            var(--theme-base-1)
-        );
+        --_color-bg: var(--theme-base-1);
+        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
+        --_color-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
+        --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
     }
 
     :root[data-theme='dark'] {
-        --c-button-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
-        --c-button-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
+        --_color-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
+        --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
 
-        --c-button-base-bg: color-mix(in oklch, var(--theme-base-1) 98%, var(--theme-base-fg-1));
+        --_color-bg: color-mix(in srgb, var(--theme-base-1) 98%, var(--theme-base-fg-1));
+        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
     }
 }
 
@@ -68,8 +64,8 @@
         }
 
         &:disabled {
-            color: var(--c-button-text-disabled);
-            background-color: var(--c-button-bg-disabled);
+            color: var(--_color-text-disabled);
+            background-color: var(--_color-bg-disabled);
         }
 
         &:focus-visible {
@@ -117,8 +113,8 @@
         }
 
         &:disabled {
-            color: var(--c-button-text-disabled);
-            background-color: var(--c-button-bg-disabled);
+            color: var(--_color-text-disabled);
+            background-color: var(--_color-bg-disabled);
         }
 
         &:focus-visible {
@@ -166,8 +162,8 @@
         }
 
         &:disabled {
-            color: var(--c-button-text-disabled);
-            background-color: var(--c-button-bg-disabled);
+            color: var(--_color-text-disabled);
+            background-color: var(--_color-bg-disabled);
         }
 
         &:focus-visible {
@@ -192,7 +188,7 @@
         }
 
         &:disabled {
-            color: var(--c-button-text-disabled);
+            color: var(--_color-text-disabled);
         }
     }
 
@@ -202,7 +198,7 @@
     }
 
     &:where(.c-button--filled) {
-        background-color: var(--c-button-base-bg);
+        background-color: var(--_color-bg);
 
         &:hover {
             background-color: var(--theme-base-hover);
@@ -213,8 +209,8 @@
         }
 
         &:disabled {
-            color: var(--c-button-text-disabled);
-            background-color: var(--c-button-bg-disabled);
+            color: var(--_color-text-disabled);
+            background-color: var(--_color-bg-disabled);
         }
 
         &:focus-visible {
@@ -224,7 +220,7 @@
     }
 
     &:where(.c-button--outline) {
-        border: 1px solid var(--c-button-base-border);
+        border: 1px solid var(--_color-border);
     }
 }
 
