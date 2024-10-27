@@ -46,13 +46,13 @@
     </div>
 
     <div class="mt-4 text-pretty">
-        <p use:melt={$title(id)} class="font-medium text-h5">
+        <h2 use:melt={$title(id)} class="text-h6 font-semibold mb-2">
             {#if typeof data.title === 'string'}
                 {data.title}
             {:else}
                 {@render data.title()}
             {/if}
-        </p>
+        </h2>
         <div use:melt={$description(id)}>
             {#if typeof data.description === 'string'}
                 {data.description}

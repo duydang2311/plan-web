@@ -84,36 +84,34 @@
                         Revoke
                     </Button>
                     {#if $open}
-                        <div use:melt={content} class="p-4">
-                            <Popover class="relative text-balance">
-                                <PopoverArrow melt={arrow}></PopoverArrow>
-                                <h1 class="text-h4 mb-4">Revoke team invitation?</h1>
-                                <p>
-                                    The user <strong>{data.member.email}</strong> will no longer be able
-                                    to join the team for now.
-                                </p>
-                                <form
-                                    method="post"
-                                    action="?/revoke-invitation"
-                                    class="flex justify-end gap-4 mt-4"
-                                    use:enhance={submit}
+                        <Popover melt={content} class="text-pretty w-96">
+                            <PopoverArrow melt={arrow} />
+                            <h2 class="mb-2">Revoke team invitation?</h2>
+                            <p>
+                                The user <strong>{data.member.email}</strong> will no longer be able
+                                to join the team for now.
+                            </p>
+                            <form
+                                method="post"
+                                action="?/revoke-invitation"
+                                class="flex justify-end gap-4 mt-4"
+                                use:enhance={submit}
+                            >
+                                <input type="hidden" name="teamId" value={data.teamId} />
+                                <input type="hidden" name="memberId" value={data.member.id} />
+                                <Button type="button" variant="base" class="w-fit" melt={close}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="negative"
+                                    class="w-fit"
+                                    disabled={isSubmitting}
                                 >
-                                    <input type="hidden" name="teamId" value={data.teamId} />
-                                    <input type="hidden" name="memberId" value={data.member.id} />
-                                    <Button type="button" variant="base" class="w-fit" melt={close}>
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        variant="negative"
-                                        class="w-fit"
-                                        disabled={isSubmitting}
-                                    >
-                                        Revoke
-                                    </Button>
-                                </form>
-                            </Popover>
-                        </div>
+                                    Revoke
+                                </Button>
+                            </form>
+                        </Popover>
                     {/if}
                 {/snippet}
             </PopoverBuilder>

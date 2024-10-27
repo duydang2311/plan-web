@@ -1,6 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { melt } from '@melt-ui/svelte';
     import { useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
     import {
@@ -14,7 +13,6 @@
     } from '~/lib/components';
     import type { WorkspaceStatus } from '~/lib/models/status';
     import type { PageData } from './$types';
-    import { popover, tsap } from '~/lib/utils/transition';
 
     const {
         queryKey,
@@ -57,59 +55,55 @@
             <Icon name="trash" />
         </IconButton>
         {#if $open}
-            <div in:tsap={popover.in} out:tsap={popover.out} use:melt={content} class="p-4">
-                <Popover class="relative text-pretty">
-                    <PopoverArrow melt={arrow}></PopoverArrow>
-                    <p class="text-h4 mb-2">Delete the status?</p>
-                    <p>
-                        The status <strong>{status.value}</strong> will be deleted from your workspace.
-                    </p>
-                    <form
-                        method="post"
-                        action="?/delete-status"
-                        class="flex justify-end gap-4 mt-4"
-                        use:enhance={async () => {
-                            await queryClient.cancelQueries({ queryKey });
-                            const old =
-                                queryClient.getQueryData<Awaited<PageData['statusList']>>(queryKey);
-                            if (old) {
-                                queryClient.setQueryData(queryKey, {
-                                    items: old.items.filter((a) => a.id !== status.id),
-                                    totalCount: old.totalCount - 1
+            <Popover melt={content} class="text-pretty w-96">
+                <PopoverArrow melt={arrow}></PopoverArrow>
+                <h2 class="mb-2">Delete the status?</h2>
+                <p>
+                    The status <strong>{status.value}</strong> will be deleted from your workspace.
+                </p>
+                <form
+                    method="post"
+                    action="?/delete-status"
+                    class="flex justify-end gap-4 mt-4"
+                    use:enhance={async () => {
+                        await queryClient.cancelQueries({ queryKey });
+                        const old =
+                            queryClient.getQueryData<Awaited<PageData['statusList']>>(queryKey);
+                        if (old) {
+                            queryClient.setQueryData(queryKey, {
+                                items: old.items.filter((a) => a.id !== status.id),
+                                totalCount: old.totalCount - 1
+                            });
+                        }
+
+                        return async ({ result }) => {
+                            if (result.type !== 'success') {
+                                queryClient.setQueryData(queryKey, old);
+                                addToast({
+                                    data: {
+                                        title: 'Could not delete status',
+                                        description: errorDescription
+                                    }
+                                });
+                            } else {
+                                addToast({
+                                    data: {
+                                        title: 'Status has been deleted',
+                                        description: successDescription
+                                    }
                                 });
                             }
-
-                            return async ({ result }) => {
-                                if (result.type !== 'success') {
-                                    queryClient.setQueryData(queryKey, old);
-                                    addToast({
-                                        data: {
-                                            title: 'Could not delete status',
-                                            description: errorDescription
-                                        }
-                                    });
-                                } else {
-                                    addToast({
-                                        data: {
-                                            title: 'Status has been deleted',
-                                            description: successDescription
-                                        }
-                                    });
-                                }
-                                await queryClient.invalidateQueries({ queryKey });
-                            };
-                        }}
-                    >
-                        <input type="hidden" name="statusId" value={status.id} />
-                        <Button type="button" variant="base" outline class="w-fit" melt={close}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" variant="negative" outline class="w-fit">
-                            Delete
-                        </Button>
-                    </form>
-                </Popover>
-            </div>
+                            await queryClient.invalidateQueries({ queryKey });
+                        };
+                    }}
+                >
+                    <input type="hidden" name="statusId" value={status.id} />
+                    <Button type="button" variant="base" outline class="w-fit" melt={close}>
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
+                </form>
+            </Popover>
         {/if}
     {/snippet}
 </PopoverBuilder>

@@ -18,7 +18,7 @@
 .c-button {
     width: 100%;
     padding: theme('size[2]') theme('size[4]');
-    font-weight: 500;
+    font-weight: 600;
     border: none;
     border-radius: theme('borderRadius.lg');
     transition:

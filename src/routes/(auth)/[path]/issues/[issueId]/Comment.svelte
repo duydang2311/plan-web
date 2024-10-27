@@ -1,12 +1,12 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { page } from '$app/stores';
-    import { melt } from '@melt-ui/svelte';
     import { type InfiniteData, useQueryClient } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
     import { DateTime } from 'luxon';
     import { writable } from 'svelte/store';
+    import { Popover } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
@@ -14,7 +14,6 @@
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import { popover, tsap } from '~/lib/utils/transition';
 
     let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
         $props();
@@ -136,21 +135,15 @@
                         Delete
                     </Button>
                     {#if $open}
-                        <div
-                            in:tsap={popover.in}
-                            out:tsap={popover.out}
-                            class="c-popover"
-                            use:melt={content}
-                        >
+                        <Popover melt={content} class="text-pretty w-96">
                             <PopoverArrow melt={arrow} />
                             <div>
-                                <p class="font-medium text-h5 text-base-fg-1">
-                                    Confirm comment deletion
-                                </p>
-                                <p class="mt-2">Proceed to delete this comment?</p>
+                                <h2 class="mb-2">Delete comment?</h2>
+                                <p>The comment will be permanently deleted and cannot be undone.</p>
                                 <div class="flex w-fit ml-auto gap-2 mt-4">
-                                    <Button type="button" variant="base" melt={close}>Cancel</Button
-                                    >
+                                    <Button type="button" variant="base" outline melt={close}>
+                                        Cancel
+                                    </Button>
                                     <form
                                         method="post"
                                         action="?/delete-comment"
@@ -200,11 +193,13 @@
                                             name="issueCommentId"
                                             value={comment.id}
                                         />
-                                        <Button type="submit" variant="negative">Delete</Button>
+                                        <Button type="submit" outline variant="negative"
+                                            >Delete</Button
+                                        >
                                     </form>
                                 </div>
                             </div>
-                        </div>
+                        </Popover>
                     {/if}
                 {/snippet}
             </PopoverBuilder>
