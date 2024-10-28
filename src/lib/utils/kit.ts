@@ -25,13 +25,12 @@ export const LoadResponse = {
         pipe(
             Effect.tryPromise({
                 try: f,
-                catch: () =>
-                    Effect.fail({
-                        _tag: 'FetchError',
-                        status: 500,
-                        code: 'fetch',
-                        message: 'Fetch failed'
-                    })
+                catch: () => ({
+                    _tag: 'FetchError',
+                    status: 500,
+                    code: 'fetch',
+                    message: 'Fetch failed'
+                })
             }),
             Effect.flatMap((a) => (!a.ok ? LoadResponse.HTTPError(a) : Effect.succeed(a)))
         ),

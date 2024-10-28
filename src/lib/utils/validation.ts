@@ -99,7 +99,7 @@ function validatorFromType<T extends TSchema>(
             if (stripLeadingSlash) {
                 path = path.substring(1);
             }
-            const slashIndex = path.indexOf('/');
+            const slashIndex = path.indexOf('/', stripLeadingSlash ? 0 : 1);
             path = path.substring(0, slashIndex === -1 ? undefined : slashIndex);
             if (!errors[path]) {
                 errors[path] = [ValueErrorType[error.type]];

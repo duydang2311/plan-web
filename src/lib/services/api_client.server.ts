@@ -16,7 +16,9 @@ export class ApiClient extends Context.Tag('ApiClient')<
 >() {}
 
 export class HttpApiClient implements Context.Tag.Service<ApiClient> {
-    public constructor(private readonly _options: { httpClient: HttpClient }) {}
+    public constructor(
+        private readonly _options: { httpClient: Context.Tag.Service<HttpClient> }
+    ) {}
 
     public fetch(
         path: string,

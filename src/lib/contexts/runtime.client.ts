@@ -10,9 +10,10 @@ import { get } from 'svelte/store';
 import type { HttpClient } from '../services/http_client';
 import { NATSRealtime, type Realtime } from '../services/realtime.client';
 import { UniversalHttpClient } from '../services/universal_http_client';
+import type { Context } from 'effect';
 
 interface Runtime {
-    readonly httpClient: HttpClient;
+    readonly httpClient: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
 }
 

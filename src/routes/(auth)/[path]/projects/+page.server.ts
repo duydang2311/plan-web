@@ -1,15 +1,15 @@
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { paginatedQuery, queryParams } from '~/lib/utils/url';
-import type { Actions, PageServerLoad } from './$types';
-import { ActionResponse } from '~/lib/utils/kit';
-import { validator } from '~/lib/utils/validation';
+import { HttpClient } from '~/lib/services/http_client';
+import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { Type } from '~/lib/utils/typebox';
+import { paginatedQuery, queryParams } from '~/lib/utils/url';
+import { validator } from '~/lib/utils/validation';
+import type { Actions, PageServerLoad } from './$types';
 
-interface Project {
+export interface LocalProject {
     id: string;
     name: string;
     identifier: string;
@@ -28,38 +28,26 @@ export const load: PageServerLoad = async ({
     const {
         workspace: { id }
     } = await parent();
-    const query = queryParams(url, { page: 1, size: 20, order: null });
-    const exitPromise = runtime.runPromiseExit(
-        pipe(
-            Effect.gen(function* () {
-                const api = yield* ApiClient;
-                const response = yield* api.get(`workspaces/${id}/projects`, {
-                    query: {
-                        ...query,
-                        select: 'Id, Name, Identifier, CreatedTime, UpdatedTime'
-                    }
-                });
-                if (!response.ok) {
-                    return yield* Effect.fail(HttpError.from(response));
-                }
 
-                return yield* Effect.tryPromise(() => response.json<PaginatedList<Project>>());
-            }),
-            Effect.catchTags({
-                ApiError: (e) => Effect.fail({ status: 500, code: e.code, message: e.message }),
-                HttpError: (e) =>
-                    Effect.fail({ status: e.status, code: e.status + '', message: e.message }),
-                UnknownException: (e) =>
-                    Effect.fail({ status: 500, code: 'unknown', message: e.message })
+    const query = {
+        ...queryParams(url, { page: 1, size: 20, order: null }),
+        select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
+    };
+    const exitPromise = Effect.gen(function* () {
+        const httpClient = yield* HttpClient;
+        const response = yield* LoadResponse.Fetch(() =>
+            httpClient.get(`workspaces/${id}/projects`, {
+                query: paginatedQuery(query)
             })
-        )
-    );
+        );
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
+    }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
         return {
-            query: paginatedQuery(query),
+            query,
             projects: exitPromise.then((a) =>
-                Exit.isFailure(a) ? paginatedList<Project>() : a.value
+                Exit.isFailure(a) ? paginatedList<LocalProject>() : a.value
             )
         };
     }
@@ -80,19 +68,26 @@ export const actions: Actions = {
     'delete-project': ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
-            const validation = yield* ActionResponse.Validation(validateDeleteProject(formData));
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteProject(decodeDeleteProject(formData))
+            );
             yield* ActionResponse.HTTP(
                 (yield* ApiClient).delete(`projects/${validation.data.projectId}`)
             );
         }).pipe(
-            Effect.catchAll((e) => Effect.succeed({ deleteProject: e })),
+            Effect.catchAll((e) => Effect.succeed(fail(e.status, { deleteProject: e.data }))),
             runtime.runPromise
         );
     }
 };
 
+const decodeDeleteProject = (formData: FormData) => ({
+    projectId: formData.get('projectId')
+});
+
 const validateDeleteProject = validator(
     Type.Object({
         projectId: Type.String()
-    })
+    }),
+    { stripLeadingSlash: true }
 );

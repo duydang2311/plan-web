@@ -52,13 +52,13 @@
             <Popover melt={content} class="text-pretty w-96">
                 <PopoverArrow melt={arrow} />
                 <h2 class="mb-2">Delete project?</h2>
-                <p>Would you like to delete the project? The deletion cannot be reverted.</p>
+                <p>Would you like to delete the project? This action cannot be undone.</p>
                 <form
                     method="post"
                     action="?/delete-project"
                     class="flex gap-2 flex-wrap mt-4 justify-end"
                     use:enhance={async () => {
-                        await queryClient.invalidateQueries({ queryKey });
+                        await queryClient.cancelQueries({ queryKey });
                         const old = queryClient.getQueryData<PaginatedList<Project>>(queryKey);
                         if (old) {
                             queryClient.setQueryData(
@@ -70,19 +70,19 @@
                             );
                         }
                         return async ({ result }) => {
-                            if (result.type !== 'success') {
-                                queryClient.setQueryData(queryKey, old);
+                            if (result.type === 'success') {
                                 addToast({
                                     data: {
                                         title: 'Project deleted',
-                                        description: failure
+                                        description: success
                                     }
                                 });
                             } else {
+                                queryClient.setQueryData(queryKey, old);
                                 addToast({
                                     data: {
-                                        title: 'Failed to delete',
-                                        description: success
+                                        title: 'Project not deleted',
+                                        description: failure
                                     }
                                 });
                             }
@@ -90,13 +90,11 @@
                         };
                     }}
                 >
-                    <input type="hidden" value={project.id} />
+                    <input type="hidden" name="projectId" value={project.id} />
                     <Button type="button" variant="base" outline melt={close} class="w-fit">
                         Cancel
                     </Button>
-                    <Button type="submit" variant="negative" outline melt={close} class="w-fit">
-                        Delete
-                    </Button>
+                    <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
                 </form>
             </Popover>
         {/if}

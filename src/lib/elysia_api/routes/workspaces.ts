@@ -5,6 +5,7 @@ import { ApiClient } from '~/lib/services/api_client.server';
 import { requireAuth } from '../hooks/require_auth';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
 import { queryParamsDict } from '../utils/url';
+import { paginatedQuery } from '~/lib/utils/url';
 
 export const workspaces = baseApp({ prefix: '/workspaces' })
     .use(requireAuth)
@@ -21,5 +22,24 @@ export const workspaces = baseApp({ prefix: '/workspaces' })
                 response.json<PaginatedList<WorkspaceStatus>>()
             );
             return Response.json(json, { status: 200 });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
+    .get('/:id/projects', ({ params, query, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(`workspaces/${params.id}/projects`, {
+                    query: paginatedQuery(
+                        queryParamsDict(query, {
+                            page: 1,
+                            offset: 0,
+                            size: 20,
+                            order: null,
+                            select: null
+                        })
+                    )
+                })
+            );
+            const json = yield* ElysiaResponse.JSON(() => response.json());
+            return Response.json(json, { status: response.status });
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     });

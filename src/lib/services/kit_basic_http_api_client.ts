@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import { Context, Effect } from 'effect';
 import { ApiError } from '../models/errors';
 import { HttpApiClient } from './api_client.server';
 import type { HttpClient, HttpClientFetchRequestInit } from './http_client';
@@ -7,7 +7,10 @@ import type { Cookies } from '@sveltejs/kit';
 export class KitBasicHttpApiClient extends HttpApiClient {
     private readonly _cookies: Cookies;
 
-    public constructor(_options: { httpClient: HttpClient; cookies: Cookies }) {
+    public constructor(_options: {
+        httpClient: Context.Tag.Service<HttpClient>;
+        cookies: Cookies;
+    }) {
         super(_options);
         this._cookies = _options.cookies;
     }

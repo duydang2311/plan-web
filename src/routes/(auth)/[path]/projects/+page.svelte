@@ -1,19 +1,42 @@
 <script lang="ts">
-    import { invalidate } from '$app/navigation';
     import { page } from '$app/stores';
+    import { pipe } from '@baetheus/fun/fn';
     import { createQuery } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
     import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { TE } from '~/lib/utils/functional';
     import type { PageData } from './$types';
+    import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
+    import { paginatedQuery } from '~/lib/utils/url';
 
     const { data }: { data: PageData } = $props();
+    const { httpClient } = useRuntime();
     const queryKey = ['projects'];
     const query = createQuery({
         queryKey,
-        queryFn: async () => {
-            await invalidate('fetch:projects');
-            return data.projects;
+        queryFn: () => {
+            return pipe(
+                TE.fromPromise(() =>
+                    httpClient.get(`/api/workspaces/${data.workspace.id}/projects`, {
+                        query: {
+                            ...data.query,
+                            select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
+                        }
+                    })
+                )(),
+                TE.flatMap((a) =>
+                    a.ok
+                        ? TE.fromPromise(() => a.json<PaginatedList<LocalProject>>())()
+                        : TE.fail(a)
+                ),
+                TE.match(
+                    () => paginatedList<LocalProject>(),
+                    (r) => r
+                )
+            )();
         }
     });
 </script>
@@ -65,7 +88,7 @@
                         </td>
                         <td>
                             <div class="flex flex-wrap gap-2">
-                                <DeleteButton {queryKey} projectId={id} />
+                                <DeleteButton {queryKey} project={{ id, name }} />
                             </div>
                         </td>
                     </Row>
@@ -74,7 +97,7 @@
         </tbody>
     </Table>
     {#if $query.data}
-        <Pagination query={data.query} list={$query.data}>
+        <Pagination query={paginatedQuery(data.query)} list={$query.data}>
             {#snippet label({ from, to, totalCount })}
                 Displaying {from} - {to} out of {totalCount} members.
             {/snippet}

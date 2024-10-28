@@ -6,6 +6,7 @@ import 'unplugin-icons/types/svelte';
 import type { Api } from './lib/api/server';
 import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
+import type { HttpClient } from './lib/services/http_client';
 
 // for information about these interfaces
 declare global {
@@ -17,8 +18,8 @@ declare global {
         }
 
         interface Locals {
-            runtime: ManagedRuntime<ApiClient | Cloudinary, never>;
-            appLive: Layer<ApiClient | Cloudinary>;
+            runtime: ManagedRuntime<HttpClient | ApiClient | Cloudinary, never>;
+            appLive: Layer<HttpClient | ApiClient | Cloudinary>;
             user: {
                 id: string;
             };

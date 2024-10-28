@@ -1,11 +1,12 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
+import { CloudinaryLive } from './lib/elysia_api/contexts';
+import { app } from './lib/elysia_api/server';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
+import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
-import { app } from './lib/elysia_api/server';
-import { CloudinaryLive } from './lib/elysia_api/contexts';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -50,6 +51,14 @@ export const handle: Handle = async ({
         locals.user = { id: exit.value.userId };
         locals.appLive = Layer.mergeAll(
             Layer.sync(
+                HttpClient,
+                () =>
+                    new UniversalHttpClient({
+                        baseUrl: '/api',
+                        fetch
+                    })
+            ),
+            Layer.sync(
                 ApiClient,
                 () =>
                     new KitBasicHttpApiClient({
@@ -73,6 +82,14 @@ export const handle: Handle = async ({
 
 function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
     locals.appLive = Layer.mergeAll(
+        Layer.sync(
+            HttpClient,
+            () =>
+                new UniversalHttpClient({
+                    baseUrl: '/api',
+                    fetch
+                })
+        ),
         Layer.sync(
             ApiClient,
             () =>

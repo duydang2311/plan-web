@@ -1,6 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { melt } from '@melt-ui/svelte';
     import { useQueryClient } from '@tanstack/svelte-query';
     import clsx from 'clsx';
     import { writable } from 'svelte/store';

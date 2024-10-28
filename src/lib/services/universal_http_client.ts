@@ -1,9 +1,10 @@
-import type { HttpClientOptions, HttpClientFetchRequestInit } from './http_client';
+import type { Context } from 'effect';
+import type { HttpClientOptions, HttpClientFetchRequestInit, HttpClient } from './http_client';
 
 type RequestRecord = Record<string, unknown>;
 type RequestArray = unknown[];
 
-export class UniversalHttpClient {
+export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
     public constructor(
         private readonly _options: HttpClientOptions & {
             fetch: typeof fetch;
