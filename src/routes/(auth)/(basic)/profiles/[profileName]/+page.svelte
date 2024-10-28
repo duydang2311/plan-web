@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { pipe } from '@baetheus/fun/fn';
-    import { insert, omit } from '@baetheus/fun/record';
+    import { D } from '@mobily/ts-belt';
     import { createQuery } from '@tanstack/svelte-query';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { urlFromAsset } from '~/lib/utils/cloudinary';
@@ -33,17 +33,18 @@
                 ),
                 TE.map(
                     (a) =>
-                        ({
-                            ...a,
-                            id: user.id,
-                            profile: a.profile
-                                ? pipe(
-                                      a.profile,
-                                      omit('image'),
-                                      insert(urlFromAsset(cloudinary)(a.profile.image))('imageUrl')
-                                  )
-                                : undefined
-                        }) as LocalUser
+                        pipe(
+                            a,
+                            D.update('profile', (a) =>
+                                a
+                                    ? pipe(
+                                          a,
+                                          D.deleteKey('image'),
+                                          D.set('imageUrl', urlFromAsset(cloudinary)(a.image))
+                                      )
+                                    : undefined
+                            )
+                        ) as LocalUser
                 ),
                 TE.match(
                     () => null,
