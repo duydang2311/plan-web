@@ -5,7 +5,7 @@ import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { decodeCreateProfile, validateCreateProfile } from './utils';
-import { urlFromAsset } from '~/lib/utils/cloudinary';
+import { urlFromAsset } from '~/lib/utils/cloudinary.server';
 import type { Cloudinary } from '~/lib/services/cloudinary.server';
 
 export type RemoteUser = Pick<User, 'id' | 'profile'>;
