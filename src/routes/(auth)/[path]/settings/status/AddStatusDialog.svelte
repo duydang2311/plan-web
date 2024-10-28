@@ -7,8 +7,10 @@
     import { fade } from 'svelte/transition';
     import invariant from 'tiny-invariant';
     import { Button, Dialog, Errors, Field, Input, Label } from '~/lib/components';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
+    import type { LocalWorkspaceStatus } from './+page.server';
     import { validateAddStatus } from './utils';
 
     const { workspaceId, onClose }: { workspaceId: string; onClose: () => void } = $props();
@@ -22,6 +24,7 @@
         value: form.createField({ name: 'value' }),
         description: form.createField({ name: 'description' })
     };
+    let status = $state<'submit' | null>(null);
 
     $effect(() => {
         const errors = $page.form?.['addStatus']?.errors as Record<string, string[]> | undefined;
@@ -67,18 +70,44 @@
                     method="post"
                     action="?/add-status"
                     use:form
-                    use:enhance={(e) => {
+                    use:enhance={async (e) => {
                         form.validate();
                         if (!form.isValid()) {
                             e.cancel();
                             return;
                         }
 
-                        return async ({ result, update }) => {
-                            if (result.type === 'success') {
-                                await queryClient.invalidateQueries({ queryKey });
+                        status = 'submit';
+                        await queryClient.cancelQueries({ queryKey });
+                        const old =
+                            queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(queryKey);
+                        if (old) {
+                            queryClient.setQueryData(
+                                queryKey,
+                                paginatedList<LocalWorkspaceStatus>({
+                                    items: [
+                                        ...old.items,
+                                        {
+                                            id: Number.MAX_SAFE_INTEGER,
+                                            rank: Number.MAX_SAFE_INTEGER,
+                                            value: fields.value.state.value,
+                                            description: fields.description.state.value,
+                                            color: '',
+                                            isDefault: false
+                                        }
+                                    ],
+                                    totalCount: old.totalCount + 1
+                                })
+                            );
+                        }
+                        return async ({ result, formElement }) => {
+                            status = null;
+                            if (result.type !== 'success') {
+                                queryClient.setQueryData(queryKey, old);
                             }
-                            await update({ invalidateAll: false, reset: true });
+
+                            formElement.reset();
+                            await queryClient.invalidateQueries({ queryKey });
                         };
                     }}
                 >
@@ -114,7 +143,7 @@
                     </Field>
                     <div class="flex justify-end gap-4 !mt-8">
                         <Button variant="base" outline class="w-fit" melt={close}>Cancel</Button>
-                        <Button outline class="w-fit">Create</Button>
+                        <Button outline class="w-fit" disabled={status === 'submit'}>Create</Button>
                     </div>
                 </form>
             </div>
