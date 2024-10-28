@@ -1,17 +1,19 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { pipe } from '@baetheus/fun/fn';
+    import { insert, omit } from '@baetheus/fun/record';
     import { createQuery } from '@tanstack/svelte-query';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { urlFromAsset } from '~/lib/utils/cloudinary';
     import { TE } from '~/lib/utils/functional';
     import type { PageData } from './$types';
-    import type { LocalUser } from './+page.server';
+    import type { LocalUser, RemoteUser } from './+page.server';
     import CreateProfileView from './CreateProfileView.svelte';
     import ProfileView from './ProfileView.svelte';
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['profiles', { profileName: $page.params['profileName'] }];
-    const { httpClient } = useRuntime();
+    const { httpClient, cloudinary } = useRuntime();
     const query = createQuery({
         queryKey,
         queryFn: async () => {
@@ -27,11 +29,25 @@
                     })
                 )(),
                 TE.flatMap((a) =>
-                    a.ok ? TE.fromPromise(() => a.json<LocalUser>())() : TE.leftVoid
+                    a.ok ? TE.fromPromise(() => a.json<RemoteUser>())() : TE.leftVoid
+                ),
+                TE.map(
+                    (a) =>
+                        ({
+                            ...a,
+                            id: user.id,
+                            profile: a.profile
+                                ? pipe(
+                                      a.profile,
+                                      omit('image'),
+                                      insert(urlFromAsset(cloudinary)(a.profile.image))('imageUrl')
+                                  )
+                                : undefined
+                        }) as LocalUser
                 ),
                 TE.match(
                     () => null,
-                    (r) => ({ ...r, id: user.id })
+                    (r) => r
                 )
             )();
             return a;

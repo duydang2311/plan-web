@@ -11,10 +11,13 @@ import type { HttpClient } from '../services/http_client';
 import { NATSRealtime, type Realtime } from '../services/realtime.client';
 import { UniversalHttpClient } from '../services/universal_http_client';
 import type { Context } from 'effect';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { env } from '$env/dynamic/public';
 
 interface Runtime {
     readonly httpClient: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
+    readonly cloudinary: Cloudinary;
 }
 
 export function setRuntime() {
@@ -36,6 +39,17 @@ export function setRuntime() {
             new UniversalHttpClient({
                 baseUrl: get(page).url.origin,
                 fetch: globalThis.fetch
+            })
+    );
+    defineLazyProperty(
+        runtime,
+        'cloudinary',
+        () =>
+            new Cloudinary({
+                cloud: {
+                    cloudName: env.PUBLIC_CLOUDINARY_CLOUD_NAME
+                },
+                url: { secure: true }
             })
     );
     return setContext('runtime', runtime as Runtime);

@@ -5,6 +5,7 @@
         "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
         "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
         "@baetheus/fun": "npm:@jsr/baetheus__fun",
+        "@cloudinary/url-gen": "^1.21.0",
         "@dicebear/collection": "^9.2.2",
         "@dicebear/core": "^9.2.2",
         "@eslint/js": "^9.13.0",
