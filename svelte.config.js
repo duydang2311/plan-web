@@ -25,6 +25,9 @@ const config = {
             directives: {
                 'script-src': ['self', 'unsafe-eval']
             }
+        },
+        csrf: {
+            checkOrigin: false
         }
     },
     compilerOptions: {
