@@ -12,7 +12,13 @@
     const meltAction = $derived(melt ? melt.action : () => {});
 </script>
 
-<div class="lg:pr-2" {...melt} use:meltAction in:tsap={popover.in} out:tsap={popover.out}>
+<div
+    class="lg:pr-2 outline-none"
+    {...melt}
+    use:meltAction
+    in:tsap|global={popover.in}
+    out:tsap|global={popover.out}
+>
     <div {...props} class={clsx('c-popover', props.class)}>
         {@render props.children?.()}
     </div>

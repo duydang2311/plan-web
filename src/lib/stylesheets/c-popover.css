@@ -10,10 +10,6 @@
         max-width: 100%;
         @apply shadow;
 
-        &:focus {
-            outline: none;
-        }
-
         & h2 {
             --font-size-h2: var(--font-size-h4);
             font-weight: 600;
