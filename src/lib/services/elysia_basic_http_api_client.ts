@@ -1,14 +1,14 @@
-import { Effect } from 'effect';
+import { Context, Effect } from 'effect';
+import type { Cookie } from 'elysia';
 import { ApiError } from '../models/errors';
 import { HttpApiClient } from './api_client.server';
 import type { HttpClient, HttpClientFetchRequestInit } from './http_client';
-import type { Cookie } from 'elysia';
 
 export class ElysiaBasicHttpApiClient extends HttpApiClient {
     private readonly _cookie: Record<string, Cookie<string | undefined>>;
 
     public constructor(_options: {
-        httpClient: HttpClient;
+        httpClient: Context.Tag.Service<HttpClient>;
         cookie: Record<string, Cookie<string | undefined>>;
     }) {
         super(_options);

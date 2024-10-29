@@ -1,3 +1,4 @@
+import type { Context } from 'effect';
 import type { Effect } from 'effect/Effect';
 import type { ApiError } from '../models/errors';
 import { HttpApiClient } from './api_client.server';
@@ -6,7 +7,10 @@ import type { HttpClient, HttpClientFetchRequestInit } from './http_client';
 export class BearerHttpApiClient extends HttpApiClient {
     private readonly _accessToken: string;
 
-    public constructor(_options: { httpClient: HttpClient; accessToken: string }) {
+    public constructor(_options: {
+        httpClient: Context.Tag.Service<HttpClient>;
+        accessToken: string;
+    }) {
         super(_options);
         this._accessToken = _options.accessToken;
     }
