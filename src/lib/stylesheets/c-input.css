@@ -1,5 +1,5 @@
 @layer base {
-    :root {
+    .c-input {
         --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
         --_color-border-hover: color-mix(
             in srgb,

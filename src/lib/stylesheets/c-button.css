@@ -1,12 +1,12 @@
 @layer base {
-    :root {
+    .c-button {
         --_color-bg: var(--theme-base-1);
         --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
         --_color-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
         --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
     }
 
-    :root[data-theme='dark'] {
+    :root[data-theme='dark'] .c-button {
         --_color-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
         --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
 
