@@ -17,6 +17,10 @@
             box-shadow 75ms 50ms ease-in-out;
         @apply ring-1;
     }
+
+    &:focus-visible {
+        outline: none;
+    }
 }
 
 .c-icon-button--base {
@@ -30,6 +34,10 @@
 
     &:active {
         color: var(--theme-base-fg-3);
+    }
+
+    &:focus-visible {
+        @apply ring ring-base-border ring-offset-1 ring-offset-base-1;
     }
 }
 
@@ -46,5 +54,9 @@
 
     &:active {
         color: var(--theme-negative-3);
+    }
+
+    &:focus-visible {
+        @apply ring ring-negative-3 ring-offset-1 ring-offset-base-1;
     }
 }

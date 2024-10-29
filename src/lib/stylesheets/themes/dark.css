@@ -15,11 +15,11 @@
     --theme-base-1: oklch(from var(--color-bg) calc(l + 0.02) c h);
     --theme-base-2: var(--color-bg);
     --theme-base-3: oklch(from var(--color-bg) calc(l + 0.06) c h);
-    --theme-base-hover: color-mix(in oklch, var(--color-bg) 93%, var(--color-fg));
-    --theme-base-active: color-mix(in oklch, var(--color-bg) 91%, var(--color-fg));
+    --theme-base-hover: color-mix(in srgb, var(--color-bg) 94%, var(--color-fg));
+    --theme-base-active: color-mix(in srgb, var(--color-bg) 92%, var(--color-fg));
     --theme-base-fg-1: var(--color-fg);
-    --theme-base-fg-ghost: color-mix(in oklch, var(--color-fg) 40%, var(--color-bg));
-    --theme-base-fg-disabled: color-mix(in oklch, var(--theme-base-fg-1) 20%, var(--theme-base-1));
+    --theme-base-fg-ghost: color-mix(in srgb, var(--color-fg) 40%, var(--color-bg));
+    --theme-base-fg-disabled: color-mix(in srgb, var(--theme-base-fg-1) 20%, var(--theme-base-1));
     --theme-base-border: oklch(from var(--color-bg) calc(l + 0.1) c h);
 
     --theme-primary-1: var(--color-brand);
@@ -28,6 +28,7 @@
     --theme-primary-fg-1: var(--color-bg);
     --theme-primary-fg-2: oklch(from var(--color-bg) calc(l - var(--l-step) * 2) c h);
     --theme-primary-fg-3: oklch(from var(--color-bg) calc(l - var(--l-step) * 4) c h);
+    --theme-negative-border: color-mix(in srgb, var(--color-negative) 85%, var(--color-fg));
 
     --theme-negative-1: var(--color-negative);
     --theme-negative-2: oklch(from var(--color-negative) calc(l + var(--l-step)) c h);

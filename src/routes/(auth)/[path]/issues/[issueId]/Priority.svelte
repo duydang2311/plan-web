@@ -103,7 +103,7 @@
     }}
 >
     {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
-        <Button type="button" variant="base" class="flex gap-4 items-center" melt={trigger}>
+        <Button type="button" variant="base" outline class="flex gap-4 items-center" melt={trigger}>
             <Icon name={getPriorityIcon($selected.value)} />
             <span>
                 {getPriorityLabel($selected.value)}

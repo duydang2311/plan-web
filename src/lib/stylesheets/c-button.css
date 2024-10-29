@@ -1,17 +1,23 @@
 @layer base {
     .c-button {
-        --_color-bg: var(--theme-base-1);
+        --_color-bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--color-fg));
         --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
         --_color-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
         --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
+        --_shadow: none;
     }
 
     :root[data-theme='dark'] .c-button {
         --_color-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
         --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
 
-        --_color-bg: color-mix(in srgb, var(--theme-base-1) 98%, var(--theme-base-fg-1));
-        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
+        --_color-bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--color-fg));
+        --_color-border: var(--theme-base-border);
+
+        &.c-button--filled {
+            /* --_color-border: color-mix(in srgb, var(--theme-base-1) 100%, var(--theme-base-fg-1)); */
+            --_shadow: 0 1px 1px rgb(0 0 0 / 0.4);
+        }
     }
 }
 
@@ -25,9 +31,7 @@
         background-color 50ms ease-in-out,
         color 50ms ease-in-out,
         box-shadow 50ms ease-out;
-    &.c-button--filled {
-        box-shadow: 0 1px 1px rgb(0 0 0 / 0.05);
-    }
+    box-shadow: var(--_shadow);
 }
 
 .c-button--primary {
@@ -83,11 +87,11 @@
     &:where(:not(.c-button--filled)) {
         color: var(--theme-negative-1);
         &:not(:disabled):hover {
-            background-color: color-mix(in oklch, var(--theme-negative-1) 5%, transparent);
+            background-color: color-mix(in srgb, var(--theme-negative-1) 5%, transparent);
         }
 
         &:not(:disabled):active {
-            background-color: color-mix(in oklch, var(--theme-negative-1) 8%, transparent);
+            background-color: color-mix(in srgb, var(--theme-negative-1) 8%, transparent);
         }
 
         &:disabled {
@@ -132,11 +136,11 @@
     &:where(:not(.c-button--filled)) {
         color: var(--theme-positive-1);
         &:not(:disabled):hover {
-            background-color: color-mix(in oklch, var(--theme-positive-1) 5%, transparent);
+            background-color: color-mix(in srgb, var(--theme-positive-1) 5%, transparent);
         }
 
         &:not(:disabled):active {
-            background-color: color-mix(in oklch, var(--theme-positive-1) 8%, transparent);
+            background-color: color-mix(in srgb, var(--theme-positive-1) 8%, transparent);
         }
 
         &:disabled {
@@ -194,7 +198,7 @@
 
     &:where(:focus-visible) {
         outline: none;
-        @apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
+        @apply ring ring-base-border ring-offset-1 ring-offset-base-1 outline-none;
     }
 
     &:where(.c-button--filled) {
@@ -215,7 +219,7 @@
 
         &:focus-visible {
             outline: none;
-            @apply ring ring-base-3 ring-offset-1 ring-offset-base-1 outline-none;
+            @apply ring ring-base-border ring-offset-1 ring-offset-base-1 outline-none;
         }
     }
 

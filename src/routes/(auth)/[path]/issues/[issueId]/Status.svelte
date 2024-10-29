@@ -111,6 +111,7 @@
         <Button
             type="button"
             variant="base"
+            outline
             class="flex gap-4 items-center data-[state=open]:bg-base-active"
             melt={trigger}
         >
