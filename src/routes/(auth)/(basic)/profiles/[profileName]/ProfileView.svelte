@@ -8,7 +8,7 @@
 <main class="max-w-screen-lg mx-auto content-center p-8 h-screen">
     <div class="text-center">
         <Avatar
-            alt="A profile picture of {profile.name}"
+            alt={profile.name}
             src={profile.imageUrl}
             seed={profile.name}
             class="w-32 rounded-full"
