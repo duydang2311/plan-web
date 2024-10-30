@@ -62,8 +62,8 @@
             });
         }
     });
-    let open = $state(false);
-    let selected = writable<SelectOption<string>>(roles.find((x) => x.value === data.role.name));
+    const open = writable(false);
+    const selected = writable<SelectOption<string>>(roles.find((x) => x.value === data.role.name));
 
     $effect(() => {
         if ($mutation.isPending) {
@@ -75,6 +75,7 @@
 
 <Select
     options={createSelectProps<string, false>({
+        open,
         forceVisible: true,
         positioning: { placement: 'bottom', fitViewport: true, sameWidth: true },
         selected,
@@ -91,7 +92,6 @@
             return next;
         }
     })}
-    bind:open
 >
     {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
         <Button

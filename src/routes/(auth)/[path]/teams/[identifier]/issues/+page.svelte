@@ -27,13 +27,13 @@
             href: fluentSearchParams($page.url).set('layout', 'board').toString()
         }
     ]);
-    let layoutOpen = $state(false);
-    let selectedLayout = writable<SelectOption<string>>(
+    const layoutOpen = writable(false);
+    const selectedLayout = writable<SelectOption<string>>(
         untrack(() => {
             return $page.url.searchParams.get('layout') === 'board' ? layouts[1] : layouts[0];
         })
     );
-    let selectedLayoutIcon = $derived<'rows' | 'columns'>(
+    const selectedLayoutIcon = $derived<'rows' | 'columns'>(
         $selectedLayout.value === 'table' ? 'rows' : 'columns'
     );
 </script>
@@ -43,8 +43,8 @@
         <p>Filter</p>
         <div class="flex gap-4 items-center">
             <Select
-                bind:open={layoutOpen}
                 options={createSelectProps<string, false>({
+                    open: layoutOpen,
                     selected: selectedLayout,
                     positioning: {
                         fitViewport: true,

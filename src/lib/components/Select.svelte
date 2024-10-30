@@ -42,12 +42,7 @@
     lang="ts"
     generics="Value, Multiple extends boolean = false, S extends SelectSelected<Multiple, Value> = SelectSelected<Multiple, Value>"
 >
-    import {
-        createSelect,
-        createSync,
-        type CreateSelectProps,
-        type SelectSelected
-    } from '@melt-ui/svelte';
+    import { createSelect, type CreateSelectProps, type SelectSelected } from '@melt-ui/svelte';
     import type { Snippet } from 'svelte';
 
     interface Props {
@@ -85,21 +80,12 @@
     type IsSelected = Parameters<Parameters<typeof isSelected.subscribe>[0]>[0];
     type IsHighlighted = Parameters<Parameters<typeof isHighlighted.subscribe>[0]>[0];
 
-    let { children, open = $bindable(false), options }: Props = $props();
+    let { children, options }: Props = $props();
 
     const {
         elements: { trigger, menu, option, group, groupLabel, label, arrow, hiddenInput },
-        states,
         helpers: { isSelected, isHighlighted, closeMenu }
     } = createSelect<Value, Multiple, S>(options);
-
-    const sync = createSync({
-        open: states.open
-    });
-
-    $effect(() => {
-        sync.open(open, (v) => (open = v));
-    });
 </script>
 
 {@render children?.({
