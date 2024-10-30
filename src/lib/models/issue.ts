@@ -10,7 +10,7 @@ export interface Issue {
     description?: string;
     statusId?: number;
     status?: WorkspaceStatus;
-    orderByStatus: number;
+    statusRank: string;
     priority: IssuePriority;
 }
 

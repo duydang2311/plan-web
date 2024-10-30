@@ -3,7 +3,6 @@
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { orderBy } from 'natural-orderby';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
     import { addToast } from '~/lib/components';
@@ -11,6 +10,7 @@
     import type { Issue } from '~/lib/models/issue';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Status } from '~/lib/models/status';
+    import { compareRank, getRank } from '~/lib/utils/ranking';
     import type { PageData } from '../$types';
     import Board from './Board.svelte';
     import { validateDraggableIssueData } from './utils';
@@ -37,93 +37,91 @@
             target
         }: {
             issueId: string;
-            source: { statusId: number; orderByStatus: number };
+            source: { statusId: number; statusRank: string };
             target: {
-                orderByStatus: number;
+                statusRank: string;
                 statusId: number;
             };
         }) =>
-            httpClient.patch(`/api/issues/${issueId}/status`, {
-                body: { orderByStatus: target.orderByStatus, statusId: target.statusId }
+            httpClient.patch(`/api/issues/${issueId}`, {
+                body: { patch: { statusRank: target.statusRank, statusId: target.statusId } }
             }),
         onMutate: async ({ issueId, source, target }) => {
             await queryClient.cancelQueries({ queryKey });
-            const data = queryClient.getQueryData<Data>(queryKey);
-            invariant(data, 'data must not be null');
-            const lists: typeof data.issueLists = {};
+            const old = queryClient.getQueryData<Data>(queryKey);
+            invariant(old, 'old must not be null');
 
-            const sourceList = data.issueLists[source.statusId];
-            invariant(sourceList, 'sourceList must not be null');
-
+            const sourceList = old.issueLists[source.statusId];
+            const targetList = old.issueLists[target.statusId];
             const sourceIssue = sourceList.items.find((a) => a.id === issueId);
-            invariant(sourceIssue, 'sourceIssue must not be null');
+            invariant(sourceList, 'source list must not be null');
+            invariant(targetList, 'target list must not be null');
+            invariant(sourceIssue, 'source issue must not be null');
 
-            const mapItem = (a: Issue) =>
-                a.id === issueId
+            const data: Data =
+                source.statusId === target.statusId
                     ? {
-                          ...sourceIssue,
-                          statusId: target.statusId,
-                          orderByStatus: target.orderByStatus
-                      }
-                    : a.orderByStatus <= target.orderByStatus
-                      ? { ...a, orderByStatus: a.orderByStatus - 1 }
-                      : a;
-
-            for (const k in data.issueLists) {
-                const statusId = Number(k);
-                if (source.statusId === target.statusId) {
-                    lists[k] =
-                        statusId === source.statusId
-                            ? paginatedList({
-                                  items: orderBy(
-                                      data.issueLists[k].items.map(mapItem),
-                                      [(a) => a.orderByStatus, (a) => a.createdTime],
-                                      ['desc', 'desc']
-                                  )
+                          issueLists: {
+                              ...old.issueLists,
+                              [source.statusId]: paginatedList({
+                                  items: sourceList.items
+                                      .map((a) =>
+                                          a.id === issueId
+                                              ? {
+                                                    ...a,
+                                                    statusRank: target.statusRank
+                                                }
+                                              : a
+                                      )
+                                      .toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
+                                  totalCount: sourceList.totalCount
                               })
-                            : data.issueLists[k];
-                    continue;
-                }
+                          },
+                          statuses: old.statuses
+                      }
+                    : {
+                          issueLists: {
+                              ...old.issueLists,
+                              [source.statusId]: paginatedList({
+                                  items: sourceList.items.filter((a) => a.id !== issueId),
+                                  totalCount: sourceList.totalCount - 1
+                              }),
+                              [target.statusId]: paginatedList({
+                                  items: [...targetList.items, sourceIssue].toSorted((a, b) =>
+                                      compareRank(a.statusRank, b.statusRank)
+                                  ),
+                                  totalCount: targetList.totalCount + 1
+                              })
+                          },
+                          statuses: old.statuses
+                      };
 
-                if (statusId === source.statusId) {
-                    lists[k] = paginatedList({
-                        items: data.issueLists[k].items.filter((a) => a.id !== issueId)
-                    });
-                } else if (statusId === target.statusId) {
-                    lists[k] = paginatedList({
-                        items: orderBy(
-                            [sourceIssue, ...data.issueLists[k].items].map(mapItem),
-                            [(a) => a.orderByStatus, (a) => a.createdTime],
-                            ['desc', 'desc']
-                        )
-                    });
-                } else {
-                    lists[k] = data.issueLists[k];
-                }
-            }
-
-            queryClient.setQueryData<Data>(queryKey, {
-                statuses: data.statuses,
-                issueLists: lists
-            });
-            return { previous: data, sourceIssue, target };
+            queryClient.setQueryData(queryKey, data);
+            return { old, sourceIssue, target };
         },
         onSettled: async (response, error, { target }, context) => {
+            draggingIssueId = null;
             if ((error || !response?.ok) && context) {
-                const { previous, sourceIssue } = context;
-                queryClient.setQueryData(queryKey, previous);
+                const { old, sourceIssue } = context;
+                queryClient.setQueryData(queryKey, old);
+
                 const sourceStatus =
                     sourceIssue.statusId == null
-                        ? 'No status'
-                        : previous.statuses.find((a) => a.id === sourceIssue.statusId)!.value;
+                        ? null
+                        : old.statuses.find((a) => a.id === sourceIssue.statusId!);
                 const targetStatus =
                     target.statusId === -1
-                        ? 'No status'
-                        : previous.statuses.find((a) => a.id === target.statusId)!.value;
+                        ? null
+                        : old.statuses.find((a) => a.id === target.statusId!);
                 addToast({
                     data: {
-                        title: '',
-                        description: `Could not move issue ${sourceIssue.title} from ${sourceStatus} to ${targetStatus}.`
+                        title: 'Could not move issue',
+                        description: errorDescription,
+                        descriptionProps: {
+                            title: sourceIssue.title,
+                            from: sourceStatus?.value ?? 'No status',
+                            to: targetStatus?.value ?? 'No status'
+                        }
                     }
                 });
             }
@@ -131,65 +129,98 @@
         }
     });
 
+    let draggingIssueId = $state.raw<string | null>(null);
     onMount(() => {
         return monitorForElements({
             canMonitor: ({ source }) => validateDraggableIssueData(source.data).ok,
+            onDragStart: ({ source }) => {
+                invariant(typeof source.data['id'] === 'string', 'source.data.id must be string');
+                draggingIssueId = source.data['id'];
+            },
             onDrop: ({ source, location }) => {
-                if (location.current.dropTargets.length === 0) {
+                console.log('onDrop');
+                if (!$query.data || location.current.dropTargets.length === 0) {
+                    draggingIssueId = null;
                     return;
                 }
 
                 const target = location.current.dropTargets[0];
                 const targetStatusId = target.data['statusId'];
                 const sourceStatusId = source.data['statusId'];
-                const sourceOrderByStatus = source.data['orderByStatus'];
+                const sourceStatusRank = source.data['statusRank'];
 
                 invariant(typeof sourceStatusId === 'number', 'source.statusId must be number');
-                invariant(
-                    typeof sourceOrderByStatus === 'number',
-                    'source.orderByStatus must be number'
-                );
+                invariant(typeof sourceStatusRank === 'string', 'source.statusRank must be string');
                 invariant(typeof source.data['id'] === 'string', 'source.data.id must be string');
                 invariant(
                     typeof targetStatusId === 'number',
                     'target.data.statusId must be number'
                 );
 
-                const sourceData = { statusId: sourceStatusId, orderByStatus: sourceOrderByStatus };
+                const issueList = $query.data.issueLists[targetStatusId + ''];
+                const sourceData = { statusId: sourceStatusId, statusRank: sourceStatusRank };
                 if (target.data['type'] === 'board') {
-                    const targetOrderByStatus =
-                        $query.data?.issueLists[targetStatusId + '']?.items[0]?.orderByStatus ?? 0;
                     $mutation.mutate({
                         issueId: source.data['id'],
                         source: sourceData,
                         target: {
                             statusId: targetStatusId,
-                            orderByStatus: targetOrderByStatus
+                            statusRank: getRank(null, issueList.items[0]?.statusRank || null)
                         }
                     });
                     return;
                 }
 
-                const targetOrderByStatus = target.data['orderByStatus'];
+                const targetId = target.data['id'];
+                const targetStatusRank = target.data['statusRank'];
+                invariant(typeof targetId === 'string', 'target.data.id must be string');
                 invariant(
-                    typeof targetOrderByStatus === 'number',
-                    'target.data.orderByStatus must be number'
+                    typeof targetStatusRank === 'string',
+                    'target.data.statusRank must be string'
                 );
 
                 const edge = extractClosestEdge(target.data);
-                $mutation.mutate({
-                    issueId: source.data['id'],
-                    source: sourceData,
-                    target: {
-                        statusId: targetStatusId,
-                        orderByStatus:
-                            edge === 'top' ? targetOrderByStatus : targetOrderByStatus - 1
-                    }
-                });
+                if (edge === 'top') {
+                    const previousIndex = issueList.items.findIndex((a) => a.id === targetId);
+                    $mutation.mutate({
+                        issueId: source.data['id'],
+                        source: sourceData,
+                        target: {
+                            statusId: targetStatusId,
+                            statusRank: getRank(
+                                previousIndex === 0 || previousIndex === -1
+                                    ? null
+                                    : issueList.items[previousIndex - 1].statusRank || null,
+                                targetStatusRank || null
+                            )
+                        }
+                    });
+                } else {
+                    const nextIndex = issueList.items.findIndex((a) => a.id === targetId);
+                    $mutation.mutate({
+                        issueId: source.data['id'],
+                        source: sourceData,
+                        target: {
+                            statusId: targetStatusId,
+                            statusRank: getRank(
+                                targetStatusRank || null,
+                                nextIndex === issueList.items.length - 1 || nextIndex === -1
+                                    ? null
+                                    : issueList.items[nextIndex + 1].statusRank || null
+                            )
+                        }
+                    });
+                }
             }
         });
     });
 </script>
+
+{#snippet errorDescription({ title, from, to }: { title: string; from: string; to: string })}
+    An unexpected error has occured while moving <strong>{title}</strong> from
+    <strong>{from}</strong>
+    to <strong>{to}</strong>.
+{/snippet}
 
 <div class="flex flex-col grow justify-between overflow-hidden">
     <div class="grow overflow-x-auto overflow-y-hidden w-full">
@@ -197,7 +228,11 @@
             <ol class="flex h-full w-fit gap-4 p-4">
                 {#each [{ id: -1, value: 'No status', color: 'bg-base-3' }, ...$query.data.statuses] as status (status.id)}
                     {@const list = $query.data.issueLists[status.id]}
-                    <Board identifier={data.team.identifier} issues={list.items} {status} />
+                    <Board
+                        identifier={data.team.identifier}
+                        issues={list.items.filter((a) => a.id !== draggingIssueId)}
+                        {status}
+                    />
                 {/each}
             </ol>
         {/if}

@@ -1,10 +1,13 @@
 <script lang="ts" module>
     import gsap from 'gsap';
     import type { Snippet } from 'svelte';
+    import type { AddToastProps } from '@melt-ui/svelte';
 
-    export interface ToastData {
-        title: string | Snippet;
-        description: string | Snippet;
+    export interface ToastData<TProps = unknown, DProps = unknown> {
+        title: string | Snippet<[TProps]>;
+        description: string | Snippet<[DProps]>;
+        titleProps?: TProps;
+        descriptionProps?: DProps;
     }
 
     const {
@@ -14,7 +17,11 @@
         actions: { portal }
     } = createToaster<ToastData>();
 
-    export const addToast = helpers.addToast;
+    export const addToast = <TProps = unknown, DProps = unknown>(
+        props: AddToastProps<ToastData<TProps, DProps>>
+    ) => {
+        return helpers.addToast(props as AddToastProps<ToastData>);
+    };
 
     function flyIn(node: HTMLElement) {
         gsap.from(node, {

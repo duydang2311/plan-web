@@ -6,7 +6,10 @@
     import Icon from './Icon.svelte';
     import Button from './Button.svelte';
 
-    const { elements, toast }: { elements: ToastsElements; toast: Toast<ToastData> } = $props();
+    const {
+        elements,
+        toast
+    }: { elements: ToastsElements; toast: Toast<ToastData<unknown, unknown>> } = $props();
     const { content, title, description, close } = $derived(elements);
     const { data, id, getPercentage } = $derived(toast);
 
@@ -50,14 +53,14 @@
             {#if typeof data.title === 'string'}
                 {data.title}
             {:else}
-                {@render data.title()}
+                {@render data.title(data.titleProps)}
             {/if}
         </h2>
         <div use:melt={$description(id)}>
             {#if typeof data.description === 'string'}
                 {data.description}
             {:else}
-                {@render data.description()}
+                {@render data.description(data.descriptionProps)}
             {/if}
         </div>
     </div>

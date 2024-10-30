@@ -7,13 +7,12 @@
 <script lang="ts">
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
     import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-    import { flip } from 'svelte/animate';
+    import clsx from 'clsx';
     import type { Issue } from '~/lib/models/issue';
     import type { Status } from '~/lib/models/status';
     import { tsap } from '~/lib/utils/transition';
     import BoardIssue from './BoardIssue.svelte';
     import { validateDraggableIssueData } from './utils';
-    import clsx from 'clsx';
 
     const {
         identifier,
@@ -72,19 +71,18 @@
                 <li
                     in:tsap={(node, gsap) =>
                         gsap.from(node, {
-                            y: '-1rem',
+                            height: 0,
                             opacity: 0,
                             duration: 0.15,
                             ease: 'power1.inOut'
                         })}
                     out:tsap={(node, gsap) =>
                         gsap.to(node, {
-                            y: '-1rem',
+                            height: 0,
                             opacity: 0,
                             duration: 0.15,
                             ease: 'power1.inOut'
                         })}
-                    animate:flip={{ duration: 150 }}
                 >
                     <BoardIssue {identifier} {issue} />
                 </li>

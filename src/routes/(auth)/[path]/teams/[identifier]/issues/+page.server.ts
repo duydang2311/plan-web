@@ -1,10 +1,10 @@
 import { D } from '@mobily/ts-belt';
 import { Effect, Exit, pipe } from 'effect';
-import { orderBy } from 'natural-orderby';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { Workspace } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
+import { compareRank } from '~/lib/utils/ranking';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 
@@ -30,8 +30,8 @@ const loadBoardLayout = async ({
         queryParams(url, {
             page: 1,
             size: 20,
-            select: 'CreatedTime, UpdatedTime, Id, OrderNumber, Title, StatusId, OrderByStatus',
-            order: 'orderNumber'
+            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+            order: 'StatusRank'
         })
     );
     const exit = runtime
@@ -65,7 +65,7 @@ const loadTableLayout = async ({
         queryParams(url, {
             page: 1,
             size: 20,
-            select: 'CreatedTime, UpdatedTime, Id, OrderNumber, Title, StatusId, OrderByStatus',
+            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId',
             order: 'orderNumber'
         })
     );
@@ -126,10 +126,8 @@ const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) 
                             [
                                 id,
                                 paginatedList({
-                                    items: orderBy(
-                                        a.items,
-                                        [(a) => a.orderByStatus, (a) => a.createdTime],
-                                        ['desc', 'desc']
+                                    items: a.items.toSorted((a, b) =>
+                                        compareRank(a.statusRank, b.statusRank)
                                     ),
                                     totalCount: a.totalCount
                                 })
@@ -147,7 +145,7 @@ const getWorkspaceStatuses = (workspaceId: string) =>
     Effect.gen(function* () {
         const api = yield* ApiClient;
         const response = yield* api.get(`workspaces/${workspaceId}`, {
-            query: { select: 'new(Statuses)' }
+            query: { select: 'Statuses' }
         });
 
         if (!response.ok) {

@@ -43,6 +43,7 @@
         "eslint": "^9.13.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-svelte": "^2.46.0",
+        "fractional-indexing": "^3.2.0",
         "globals": "^15.11.0",
         "gsap": "^3.12.5",
         "isomorphic-dompurify": "^2.16.0",

@@ -1,9 +1,9 @@
 import { Effect } from 'effect';
+import { t } from 'elysia';
 import type { IssueComment } from '~/lib/models/issue_comment';
 import type { PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { paginatedQuery } from '~/lib/utils/url';
-import { validator } from '~/lib/utils/validation';
 import { requireAuth } from '../hooks/require_auth';
 import { baseApp, ElysiaResponse } from '../utils/elysia';
 import { queryParamsDict } from '../utils/url';
@@ -48,76 +48,22 @@ export const issues = baseApp({ prefix: '/issues' })
         '/:id',
         ({ params, body, runtime }) => {
             return Effect.gen(function* () {
-                const validation = yield* ElysiaResponse.Validation(validatePatchIssue(body));
                 const api = yield* ApiClient;
                 yield* ElysiaResponse.HTTP(
                     api.patch(`issues/${params.id}`, {
-                        body: validation.data
+                        body
                     })
                 );
                 return new Response(null, { status: 204 });
             }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
         },
-        { type: 'json' }
-    )
-    .patch(
-        '/:id/status',
-        ({ params, body, runtime }) => {
-            return Effect.gen(function* () {
-                const validation = yield* ElysiaResponse.Validation(validatePatchStatus(body));
-                const api = yield* ApiClient;
-                yield* ElysiaResponse.HTTP(
-                    api.patch(`issues/${params.id}/status`, {
-                        body: validation.data
-                    })
-                );
-                return new Response(null, { status: 204 });
-            }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
-        },
-        { type: 'json' }
+        {
+            body: t.Object({
+                patch: t.Object({
+                    priority: t.Optional(t.Number()),
+                    statusId: t.Optional(t.Number()),
+                    statusRank: t.Optional(t.String())
+                })
+            })
+        }
     );
-
-const validatePatchIssue = validator<{
-    patch: {
-        priority?: number;
-        statusId?: number;
-    };
-}>((input, { error }) => {
-    if (!input || typeof input !== 'object') {
-        return error('root', 'object');
-    }
-
-    if (!('patch' in input) || !input.patch || typeof input.patch !== 'object') {
-        return error('patch', 'object');
-    }
-
-    if (
-        'priority' in input.patch &&
-        (input.patch.priority == null || typeof input.patch.priority !== 'number')
-    ) {
-        return error('patch.priority', 'number');
-    }
-
-    if (
-        'statusId' in input.patch &&
-        (input.patch.statusId == null || typeof input.patch.statusId !== 'number')
-    ) {
-        return error('patch.statusId', 'number');
-    }
-});
-
-const validatePatchStatus = validator<{ orderByStatus?: number; statusId: number }>(
-    (input, { error }) => {
-        if (!input || typeof input !== 'object') {
-            return error('root', 'object');
-        }
-
-        if (!('statusId' in input) || typeof input.statusId !== 'number') {
-            return error('statusId', 'number');
-        }
-
-        if ('orderByStatus' in input && typeof input.orderByStatus !== 'number') {
-            return error('orderByStatus', 'number');
-        }
-    }
-);
