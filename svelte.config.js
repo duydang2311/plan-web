@@ -23,7 +23,12 @@ const config = {
         csp: {
             mode: 'auto',
             directives: {
-                'script-src': ['self', 'unsafe-eval']
+                'script-src': [
+                    'self',
+                    'unsafe-eval',
+                    'unsafe-hashes',
+                    'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I='
+                ]
             }
         },
         csrf: {
