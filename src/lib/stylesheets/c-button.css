@@ -15,7 +15,6 @@
         --_color-border: var(--theme-base-border);
 
         &.c-button--filled {
-            /* --_color-border: color-mix(in srgb, var(--theme-base-1) 100%, var(--theme-base-fg-1)); */
             --_shadow: 0 1px 1px rgb(0 0 0 / 0.4);
         }
     }
