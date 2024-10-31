@@ -1,40 +1,27 @@
 <script lang="ts">
-    import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/types';
-    import type { HTMLAttributes } from 'svelte/elements';
+    import clsx from 'clsx';
 
-    type Orientation = 'horizontal' | 'vertical';
+    interface Props {
+        edge: 'top' | 'bottom';
+        gap: number;
+        stroke?: number;
+        radius?: number;
+    }
 
-    const edgeToOrientationMap: Record<Edge, Orientation> = {
-        top: 'horizontal',
-        bottom: 'horizontal',
-        left: 'vertical',
-        right: 'vertical'
-    };
-
-    const orientationStyles: Record<Orientation, HTMLAttributes<HTMLElement>['class']> = {
-        horizontal:
-            'h-[--line-thickness] left-[--terminal-radius] rounded-r-full right-0 before:-translate-x-full',
-        vertical:
-            'w-[--line-thickness] top-[--terminal-radius] rounded-b-full bottom-0 before:-translate-y-full'
-    };
-
-    const edgeStyles: Record<Edge, HTMLAttributes<HTMLElement>['class']> = {
-        top: 'top-[--line-offset] before:top-[--offset-terminal]',
-        right: 'right-[--line-offset] before:right-[--offset-terminal]',
-        bottom: 'bottom-[--line-offset] before:bottom-[--offset-terminal]',
-        left: 'left-[--line-offset] before:left-[--offset-terminal]'
-    };
-
-    const strokeSize = 2;
-    const terminalSize = 8;
-    const offsetToAlignTerminalWithLine = (strokeSize - terminalSize) / 2;
-    const { edge, gap }: { edge: Edge; gap: string } = $props();
-    const lineOffset = $derived(`calc(-0.5 * (${gap} + ${strokeSize}px))`);
-    const orientation = $derived(edgeToOrientationMap[edge]);
+    const { edge, gap, stroke = 1, radius = 8 }: Props = $props();
+    const baseClassName =
+        'absolute z-10 inset-x-0 h-[--stroke] bg-primary-1 left-[calc(0.5*var(--radius))] ' +
+        "before:content-[''] before:absolute before:size-[var(--radius)] before:-left-[calc(var(--radius)-var(--stroke)*0.5)] before:top-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-[length:var(--stroke)] before:border-primary-1";
 </script>
 
 <div
-    style="--line-thickness: {strokeSize}px; --line-offset: {lineOffset}; --terminal-size: {terminalSize}px; --terminal-radius: {terminalSize /
-        2}px; --offset-terminal: {offsetToAlignTerminalWithLine}px;"
-    class={`absolute z-10 bg-primary-border pointer-events-none before:content-[''] before:w-[--terminal-size] before:h-[--terminal-size] box-border before:absolute before:border-[length:--line-thickness] before:border-solid before:border-primary-border before:rounded-full ${orientationStyles[orientation]} ${[edgeStyles[edge]]}`}
+    style:--stroke="{stroke}px"
+    style:--gap="{gap}px"
+    style:--offset="calc({gap}px / 2)"
+    style:--radius="{radius}px"
+    class={clsx(
+        baseClassName,
+        edge === 'top' && '-top-[var(--offset)] -translate-y-1/2',
+        edge === 'bottom' && '-bottom-[var(--offset)] translate-y-1/2'
+    )}
 ></div>

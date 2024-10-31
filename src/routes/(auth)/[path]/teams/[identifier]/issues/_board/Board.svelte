@@ -1,6 +1,6 @@
 <script lang="ts" module>
     const dragStatusClasses = {
-        dragover: 'bg-base-1 border-primary-border/20'
+        dragover: 'bg-base-3 border-primary-border/20'
     };
 </script>
 
@@ -59,29 +59,34 @@
 
 <li
     class={clsx(
-        'min-w-96 flex flex-col py-4 rounded-lg border transition ease-in-out duration-75',
-        dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2 border-base-border'
+        'min-w-96 flex flex-col py-4 rounded-lg transition ease-in-out duration-75',
+        dragStatus != null && dragStatusClasses[dragStatus]
     )}
     use:atlas={{ id: status.id }}
 >
-    <p class="text-h5 font-medium px-4">{status.value}</p>
+    <h2 class="text-h5 px-4">{status.value}</h2>
     <div class="scrollbar-3 grow overflow-x-hidden overflow-y-auto pt-2">
         <ol class="h-full px-4">
             {#each issues as issue (issue.id)}
                 <li
                     in:tsap={(node, gsap) =>
                         gsap.from(node, {
+                            overflow: 'hidden',
                             height: 0,
                             opacity: 0,
+                            scale: 0,
                             duration: 0.15,
-                            ease: 'power1.inOut'
+                            ease: 'power1.out',
+                            clearProps: 'overflow,height,opacity'
                         })}
                     out:tsap={(node, gsap) =>
                         gsap.to(node, {
+                            overflow: 'hidden',
                             height: 0,
                             opacity: 0,
                             duration: 0.15,
-                            ease: 'power1.inOut'
+                            ease: 'power1.in',
+                            clearProps: 'overflow,height,opacity'
                         })}
                 >
                     <BoardIssue {identifier} {issue} />

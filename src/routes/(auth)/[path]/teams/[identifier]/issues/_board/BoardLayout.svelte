@@ -138,7 +138,6 @@
                 draggingIssueId = source.data['id'];
             },
             onDrop: ({ source, location }) => {
-                console.log('onDrop');
                 if (!$query.data || location.current.dropTargets.length === 0) {
                     draggingIssueId = null;
                     return;
