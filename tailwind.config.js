@@ -94,6 +94,7 @@ export default withAnimations({
             })
         }
     },
+    darkMode: ['selector', '[data-theme="dark"]'],
     corePlugins: {
         preflight: false
     },

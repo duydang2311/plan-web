@@ -2,7 +2,7 @@
     --l-step: -0.05;
 
     --color-fg: oklch(98.11% 0.0013 286.37);
-    --color-bg: oklch(19.02% 0.0015 286.28);
+    --color-bg: oklch(20.02% 0.0015 286.28);
     --color-brand: oklch(70.11% 0.1673 288.9);
     --color-negative: oklch(70.65% 0.1875 16.21);
     --color-positive: oklch(67.05% 0.2256 142.04);
@@ -12,9 +12,9 @@
 :root[data-theme='dark'] {
     --theme-absolute-bg: oklch(0% 0 0);
 
-    --theme-base-1: oklch(from var(--color-bg) calc(l + 0.02) c h);
-    --theme-base-2: var(--color-bg);
-    --theme-base-3: oklch(from var(--color-bg) calc(l + 0.06) c h);
+    --theme-base-1: var(--color-bg);
+    --theme-base-2: color-mix(in srgb, var(--color-bg) 98.5%, var(--color-fg));
+    --theme-base-3: color-mix(in srgb, var(--color-bg) 97%, var(--color-fg));
     --theme-base-hover: color-mix(in srgb, var(--color-bg) 94%, var(--color-fg));
     --theme-base-active: color-mix(in srgb, var(--color-bg) 92%, var(--color-fg));
     --theme-base-fg-1: var(--color-fg);

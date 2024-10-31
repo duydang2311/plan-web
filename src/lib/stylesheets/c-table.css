@@ -1,11 +1,14 @@
 @layer base {
-    :root {
-        --theme-table-border: color-mix(
-            in oklch,
-            var(--theme-base-border) 40%,
-            var(--theme-base-1)
-        );
-        --theme-table-hover: color-mix(in oklch, var(--theme-base-border) 10%, var(--theme-base-1));
+    .c-table {
+        --_bg: var(--theme-base-1);
+        --_hover: var(--theme-base-3);
+        --_border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
+    }
+
+    :root[data-theme='dark'] .c-table {
+        --_bg: var(--theme-base-2);
+        --_hover: var(--theme-base-3);
+        --_border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
     }
 }
 
@@ -22,15 +25,15 @@
 
     :where(& > tbody > .c-table--row:hover),
     :where(& > div.c-table--tbody > .c-table--row:hover) {
-        background-color: var(--theme-table-hover);
+        background-color: var(--_hover);
     }
 }
 
 .c-table--thead {
     position: sticky;
     top: 0;
-    background-color: var(--theme-base-1);
-    border-bottom: 1px solid var(--theme-table-border);
+    background-color: var(--_bg);
+    border-bottom: 1px solid var(--_border);
 }
 
 .c-table--row {

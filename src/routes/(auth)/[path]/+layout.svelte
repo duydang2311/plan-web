@@ -35,7 +35,7 @@
     {/if}
 </svelte:head>
 
-<div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 lg:p-2 lg:pl-0">
+<div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 dark:bg-base-1 lg:p-2 lg:pl-0">
     <aside class="items-stretch px-4 py-2 space-y-4 min-w-60 lg:flex lg:flex-col hidden">
         <div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
             <Logo class="h-8 w-auto" />
@@ -98,7 +98,7 @@
         </div>
     </aside>
     <div
-        class="bg-base-1 grow grid grid-rows-[auto_1fr] max-h-screen lg:rounded-xl lg:border lg:border-base-border lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
+        class="bg-base-1 dark:bg-base-2 grow grid grid-rows-[auto_1fr] max-h-screen lg:rounded-xl lg:border lg:border-base-border lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
     >
         <Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
         <div class="transition-enforcement overflow-hidden">

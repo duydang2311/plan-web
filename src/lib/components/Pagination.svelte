@@ -145,7 +145,7 @@
 {/snippet}
 
 <div
-    class="rounded-b-xl bg-base-1/60 border-t border-t-[var(--theme-table-border)] backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+    class="rounded-b-xl bg-base-1/60 border-t border-t-base-border backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
 >
     <span class="text-base-fg-3 text-sm font-bold">
         {#if list.length === 0}

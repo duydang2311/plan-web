@@ -120,8 +120,8 @@
 <Row bind:ref class="relative transition ease-in-out">
     <td class="content-center pr-0 text-base-fg-ghost cursor-grab">
         <Icon name="draggable" />
-        {#if edge != null}
-            <DropIndicator {edge} gap="0px" />
+        {#if edge != null && (edge === 'top' || edge === 'bottom')}
+            <DropIndicator {edge} gap={0} />
         {/if}
     </td>
     <td class="whitespace-nowrap overflow-hidden text-ellipsis" title={status.value}>

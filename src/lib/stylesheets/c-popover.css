@@ -1,12 +1,18 @@
 @layer base {
     .c-popover {
-        --_color-border: color-mix(in srgb, var(--theme-base-border) 100%, var(--theme-base-fg-1));
-        --_color-bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--theme-base-fg-1));
+        --_border: var(--theme-base-border);
+        --_bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--theme-base-fg-1));
+    }
 
-        background-color: var(--_color-bg);
+    :root[data-theme='dark'] .c-popover {
+        --_bg: var(--theme-base-2);
+    }
+
+    .c-popover {
+        background-color: var(--_bg);
         padding: theme('padding[4]');
-        border: 1px solid var(--_color-border);
-        border-radius: theme('borderRadius[md]');
+        border: 1px solid var(--_border);
+        border-radius: theme('borderRadius[lg]');
         max-width: 100%;
         @apply shadow;
 
@@ -18,7 +24,7 @@
 
     .c-popover--arrow {
         --arrow-size: 0.7rem;
-        border-top: 1px solid var(--_color-border);
-        border-left: 1px solid var(--_color-border);
+        border-top: 1px solid var(--_border);
+        border-left: 1px solid var(--_border);
     }
 }

@@ -23,6 +23,8 @@
     import type { Issue } from '~/lib/models/issue';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
+    import { Link } from '~/lib/components';
+    import { page } from '$app/stores';
 
     interface Props {
         identifier: string;
@@ -133,7 +135,7 @@
     <div
         class={clsx(
             'relative w-full p-4 rounded-md border cursor-grab transition ease-in-out duration-75',
-            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 border-base-border'
+            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
@@ -146,7 +148,9 @@
             <Icon name="draggable" class="ml-auto h-4" />
         </div>
         <p class="font-medium leading-none">
-            {issue.title}
+            <Link href="/{$page.params['path']}/issues/{issue.orderNumber}">
+                {issue.title}
+            </Link>
         </p>
     </div>
 </div>
