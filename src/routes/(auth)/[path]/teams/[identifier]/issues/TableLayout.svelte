@@ -5,8 +5,9 @@
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
     import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
-    import type { PageData } from './$types';
     import { mapMaybePromise } from '~/lib/utils/promise';
+    import { createEffect } from '~/lib/utils/runes.svelte';
+    import type { PageData } from './$types';
 
     const { data }: { data: PageData } = $props();
     const queryClient = useQueryClient();
@@ -19,9 +20,14 @@
         }
     });
 
-    $effect(() => {
-        mapMaybePromise(data.issueList, (a) => queryClient.setQueryData(queryKey, a));
-    });
+    createEffect(
+        () => {
+            if (data.issueList !== $query.data) {
+                mapMaybePromise(data.issueList, (a) => queryClient.setQueryData(queryKey, a));
+            }
+        },
+        () => data.issueList
+    );
 </script>
 
 <div class="flex flex-col grow justify-between overflow-auto">

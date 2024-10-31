@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { pipe } from '@baetheus/fun/fn';
-    import { createQuery } from '@tanstack/svelte-query';
+    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
     import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -11,8 +11,11 @@
     import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
     import { paginatedQuery } from '~/lib/utils/url';
+    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { createEffect } from '~/lib/utils/runes.svelte';
 
     const { data }: { data: PageData } = $props();
+    const queryClient = useQueryClient();
     const { httpClient } = useRuntime();
     const queryKey = ['projects'];
     const query = createQuery({
@@ -39,6 +42,15 @@
             )();
         }
     });
+
+    createEffect(
+        () => {
+            if (data.projects !== $query.data) {
+                mapMaybePromise(data.projects, (a) => queryClient.setQueryData(queryKey, a));
+            }
+        },
+        () => data.projects
+    );
 </script>
 
 <main class="h-full flex flex-col justify-between overflow-auto">
