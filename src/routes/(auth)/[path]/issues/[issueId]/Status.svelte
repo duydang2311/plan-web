@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { pipe } from '@baetheus/fun/fn';
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
@@ -8,9 +9,8 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { WorkspaceStatus } from '~/lib/models/status';
-    import StatusOptions from './StatusOptions.svelte';
-    import { pipe } from '@baetheus/fun/fn';
     import { TE } from '~/lib/utils/functional';
+    import StatusOptions from './StatusOptions.svelte';
 
     interface Props {
         workspaceId: string;
@@ -34,14 +34,14 @@
                 TE.flatMap((a) =>
                     a.ok
                         ? TE.fromPromise(() =>
-                              a.json<{ status: Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> }>()
+                              a.json<{ status?: Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> }>()
                           )()
                         : TE.leftVoid
                 ),
                 TE.map(({ status }) => status),
                 TE.match(
                     () => null,
-                    (r) => r
+                    (r) => r ?? null
                 )
             )();
         }

@@ -43,7 +43,7 @@ export const load: PageLoad = async ({ parent, data, url, untrack, params }) => 
         prefetchPromises.push(
             queryClient.prefetchQuery({
                 queryKey: ['workspace-status', { issueId: data.issue.id }],
-                queryFn: () => data.issue.status
+                queryFn: () => data.issue.status ?? null
             })
         );
     }
