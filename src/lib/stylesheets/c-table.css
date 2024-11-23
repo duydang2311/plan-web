@@ -1,14 +1,13 @@
 @layer base {
     .c-table {
         --_bg: var(--theme-base-1);
-        --_hover: var(--theme-base-3);
-        --_border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
+        --_hover: var(--theme-base-2);
+        --_border: var(--theme-base-border-3);
     }
 
     :root[data-theme='dark'] .c-table {
         --_bg: var(--theme-base-2);
         --_hover: var(--theme-base-3);
-        --_border: color-mix(in oklch, var(--theme-base-border) 40%, var(--theme-base-1));
     }
 }
 

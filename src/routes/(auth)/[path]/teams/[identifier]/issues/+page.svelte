@@ -38,7 +38,7 @@
     );
 </script>
 
-<main class="divide-y divide-base-border h-full flex flex-col">
+<main class="divide-y divide-base-border-2 h-full flex flex-col">
     <div class="flex gap-4 justify-between items-center px-8 py-2">
         <p>Filter</p>
         <div class="flex gap-4 items-center">
@@ -72,7 +72,7 @@
                     {#if layoutOpen}
                         <ol
                             use:melt={menu}
-                            class="p-1 bg-base-1 border border-base-border rounded shadow-sm space-y-1 min-w-40"
+                            class="p-1 bg-base-1 border border-base-border-2 rounded shadow-sm space-y-1 min-w-40"
                         >
                             {#each layouts as layout (layout.value)}
                                 {@const opt = option(layout)}

@@ -35,7 +35,7 @@
             out:tsap={dialog.out()}
             class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-paragraph-lg focus:outline-none p-4"
         >
-            <div class="bg-base-1 rounded-lg w-full space-y-4 border border-base-border p-4">
+            <div class="bg-base-1 rounded-lg w-full space-y-4 border border-base-border-2 p-4">
                 <div>
                     <p class="text-h4 font-medium text-base-fg-1">Edit profile picture</p>
                     <p class="text-base-fg-3">
@@ -43,7 +43,7 @@
                     </p>
                 </div>
                 <div
-                    class="relative rounded overflow-hidden h-[32rem] bg-base-3 w-full border border-base-border"
+                    class="relative rounded overflow-hidden h-[32rem] bg-base-3 w-full border border-base-border-2"
                 >
                     {#if file}
                         <Cropper

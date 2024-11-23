@@ -79,20 +79,20 @@
         }
 
         // make sure not out of bound
-        if (start < 1) start = 2;
+        if (start <= 1) start = 2;
         if (end >= totalPages) end = totalPages - 1;
         if (end < start) return [];
+        console.log(start, end);
 
         // add half jump
         let arr = new Array(end - start + 1).fill(0).map((_, i) => start + i);
         const halfStart = Math.floor(start / 2);
+        const halfEnd = Math.floor(end + (totalPages - end) / 2);
         if (halfStart < start && halfStart > 1) {
             arr.unshift(halfStart);
         } else if (end + 1 < totalPages) {
             arr.push(end + 1);
-        }
-        const halfEnd = Math.floor(end + (totalPages - end) / 2);
-        if (halfEnd > end && halfEnd < totalPages) {
+        } else if (halfEnd > end && halfEnd < totalPages) {
             arr.push(halfEnd);
         } else if (start - 1 > 1) {
             arr.unshift(arr[0]);
@@ -128,7 +128,7 @@
             <div
                 bind:this={active}
                 data-flip-id="pagination"
-                class="absolute inset-0 bg-base-3 rounded-full"
+                class="absolute inset-0 bg-base-active rounded-full"
             ></div>
         {/if}
         <a
@@ -136,7 +136,7 @@
             href="{search}page={page}"
             class={clsx(
                 'relative block h-full content-center rounded-full py-1 transition ease-in-out',
-                query.page === page ? 'text-base-fg-2' : 'hover:bg-base-3'
+                query.page === page ? 'text-base-fg-2' : 'hover:bg-base-hover'
             )}
         >
             {page}
@@ -145,7 +145,7 @@
 {/snippet}
 
 <div
-    class="rounded-b-xl bg-base-1/60 border-t border-t-base-border backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+    class="rounded-b-xl bg-base-1/20 border-t border-t-base-border-3 backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
 >
     <span class="text-base-fg-3 text-sm font-bold">
         {#if list.length === 0}
@@ -172,7 +172,7 @@
                         'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
                         query.page === 1
                             ? 'pointer-events-none text-base-fg-3/40'
-                            : 'hover:bg-base-3'
+                            : 'hover:bg-base-hover'
                     )}
                 >
                     <Icon name="chevron-left" />
@@ -191,7 +191,7 @@
                         'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
                         query.page === totalPages
                             ? 'pointer-events-none text-base-fg-3/40'
-                            : 'hover:bg-base-3'
+                            : 'hover:bg-base-hover'
                     )}
                 >
                     <Icon name="chevron-right" />

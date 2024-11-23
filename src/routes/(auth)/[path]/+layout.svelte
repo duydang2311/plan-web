@@ -41,7 +41,7 @@
             <Logo class="h-8 w-auto" />
             <p class="block">plan</p>
         </div>
-        <hr class="-mx-4 text-base-border" />
+        <hr class="-mx-4 text-base-border-2" />
         <div class="flex flex-col justify-between grow">
             <ul class="font-medium group text-sm">
                 <Navigation
@@ -98,9 +98,9 @@
         </div>
     </aside>
     <div
-        class="bg-base-1 dark:bg-base-2 grow grid grid-rows-[auto_1fr] max-h-screen lg:rounded-xl lg:border lg:border-base-border lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
+        class="bg-base-1 dark:bg-base-2 grow grid grid-rows-[auto_1fr] max-h-screen lg:rounded-xl lg:border lg:border-base-border-2 lg:max-h-[calc(100vh-1rem)] lg:shadow-sm"
     >
-        <Breadcrumb class="px-8 py-2 border-b border-b-base-border" />
+        <Breadcrumb class="px-8 py-2 border-b border-b-base-border-2" />
         <div class="transition-enforcement overflow-hidden">
             {#key data.pathname.split('/', 3).join('')}
                 <div class="overflow-hidden" in:transitateIn>

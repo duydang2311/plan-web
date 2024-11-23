@@ -8,12 +8,12 @@
 <main class="max-w-screen-lg mx-auto content-center p-8 h-screen">
     <div class="text-center">
         <Avatar
-            alt={profile.name}
+            alt={profile.displayName}
             src={profile.imageUrl}
             seed={profile.name}
-            class="w-32 rounded-full"
+            class="w-48 rounded-full mb-2"
         />
-        <p class="font-bold text-base-fg-1">{profile.displayName}</p>
+        <h2 class="font-bold text-base-fg-1">{profile.displayName}</h2>
         <p class="text-base-fg-3">{profile.name}</p>
     </div>
 </main>

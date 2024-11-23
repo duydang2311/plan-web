@@ -68,7 +68,7 @@
                     <p class="text-center text-balance">
                         Fill in the form to create a new account.
                     </p>
-                    <hr class="text-base-border/40 max-w-[40ch] mt-2 mb-8 mx-auto" />
+                    <hr class="text-base-border-2/40 max-w-[40ch] mt-2 mb-8 mx-auto" />
                     <form
                         method="post"
                         class="space-y-6 w-full max-w-[40ch] mx-auto"
@@ -153,7 +153,7 @@
                                 and <Link href="#">Data Processing Agreement</Link>.
                             </small>
                         </p>
-                        <hr class="w-full text-base-border mx-auto" />
+                        <hr class="w-full text-base-border-2 mx-auto" />
                         <p>
                             <small>
                                 Already have an account?

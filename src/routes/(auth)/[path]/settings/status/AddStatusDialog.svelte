@@ -57,11 +57,11 @@
                 in:tsap|global={dialog.in()}
                 out:tsap|global={dialog.out()}
                 use:melt={content}
-                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border outline-none"
+                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border-2 outline-none"
             >
                 <div>
-                    <p use:melt={title} class="text-h4 font-medium">Add a new status</p>
-                    <p use:melt={description} class="text-base-fg-3 text-pretty">
+                    <h2 use:melt={title} class="font-medium">Add a new status</h2>
+                    <p use:melt={description} class="text-pretty">
                         Fill in the form below to create a new status for your entire workspace.
                     </p>
                 </div>

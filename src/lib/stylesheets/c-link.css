@@ -1,27 +1,23 @@
-@layer base {
-    :root {
-        --theme-link-fg: var(--theme-base-fg-2);
-        --theme-link-fg-hover: var(--theme-base-fg-1);
-        --theme-link-fg-active: var(--theme-base-fg-3);
-    }
-}
-
 .c-link {
-    color: var(--theme-link-fg);
+    --_fg: var(--theme-base-fg-2);
+    --_fg-hover: var(--theme-base-fg-1);
+    --_fg-active: var(--theme-base-fg-3);
+
+    color: var(--_fg);
     text-decoration: none;
     transition:
-        color 75ms ease-in-out,
-        box-shadow 100ms ease-in-out;
+        color 75ms ease-out,
+        box-shadow 100ms ease-out;
     border-radius: theme('borderRadius.DEFAULT');
     font-weight: 500;
 
     &:hover {
-        color: var(--theme-link-fg-hover);
+        color: var(--_fg-hover);
         text-decoration: underline;
     }
 
     &:active {
-        color: var(--theme-link-fg-active);
+        color: var(--_fg-active);
     }
 
     &:focus-visible {

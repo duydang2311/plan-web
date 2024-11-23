@@ -1,233 +1,112 @@
-@layer base {
-    .c-button {
-        --_color-bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--color-fg));
-        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
-        --_color-text-disabled: oklch(from var(--theme-base-1) calc(l - 0.3) c h);
-        --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l - 0.04) 0 h);
-        --_shadow: none;
-    }
-
-    :root[data-theme='dark'] .c-button {
-        --_color-text-disabled: oklch(from var(--theme-base-1) calc(l + 0.3) c h);
-        --_color-bg-disabled: oklch(from var(--theme-base-1) calc(l + 0.04) c h);
-
-        --_color-bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--color-fg));
-        --_color-border: var(--theme-base-border);
-
-        &.c-button--filled {
-            --_shadow: 0 1px 1px rgb(0 0 0 / 0.4);
-        }
-    }
-}
-
 .c-button {
+    --_bg: transparent;
+    --_bg-hover: color-mix(in srgb, var(--_fg) 5%, transparent);
+    --_bg-active: color-mix(in srgb, var(--_fg) 10%, transparent);
+    --_bg-disabled: transparent;
+    --_fg: var(--theme-base-fg-2);
+    --_fg-hover: var(--theme-base-fg-1);
+    --_fg-disabled: var(--theme-base-fg-disabled);
+    --_shadow: none;
+    --_border: var(--theme-base-border-2);
+    --_border-disabled: var(--theme-base-border-2);
+
     width: 100%;
     padding: theme('size[2]') theme('size[4]');
     font-weight: 600;
-    border: none;
     border-radius: theme('borderRadius.lg');
-    transition:
-        background-color 50ms ease-in-out,
-        color 50ms ease-in-out,
-        box-shadow 50ms ease-out;
+    color: var(--_fg);
     box-shadow: var(--_shadow);
-}
+    background-color: var(--_bg);
+    border: var(--_border);
+    transition:
+        background-color 75ms ease-out,
+        color 75ms ease-out,
+        box-shadow 75ms ease-out;
 
-.c-button--primary {
-    &:where(:not(.c-button--filled)) {
-        color: var(--theme-primary-1);
-        &:not(:disabled):hover {
-            background-color: var(--theme-base-hover);
+    &:where(:not(:disabled)) {
+        &.c-button--outline {
+            border: 1px solid var(--_border);
         }
-
-        &:not(:disabled):active {
-            background-color: var(--theme-base-active);
+        &:hover {
+            color: var(--_fg-hover);
+            background-color: var(--_bg-hover);
         }
-
-        &:disabled {
-            color: var(--theme-base-fg-disabled);
+        &:active {
+            background-color: var(--_bg-active);
         }
     }
 
-    &:where(:focus-visible) {
-        outline: none;
-        @apply ring ring-primary-3 ring-offset-1 ring-offset-base-1 outline-none;
+    &:where(:disabled) {
+        color: var(--_fg-disabled);
+        background-color: var(--_bg-disabled);
+        border: 1px solid var(--_border-disabled);
     }
 
     &:where(.c-button--filled) {
-        color: var(--theme-primary-fg-1);
-        background-color: var(--theme-primary-1);
-
-        &:hover {
-            background-color: var(--theme-primary-2);
-        }
-
-        &:active {
-            background-color: var(--theme-primary-3);
-        }
-
-        &:disabled {
-            color: var(--_color-text-disabled);
-            background-color: var(--_color-bg-disabled);
-        }
-
-        &:focus-visible {
-            outline: none;
-            @apply ring ring-primary-3 ring-offset-1 ring-offset-base-1 outline-none;
-        }
+        --_bg: var(--theme-base-1);
+        --_bg-hover: var(--theme-base-3);
+        --_bg-active: var(--theme-base-5);
+        --_bg-disabled: var(--theme-base-disabled);
     }
 
-    &:where(.c-button--outline) {
-        border: 1px solid var(--theme-primary-border);
+    &:where(:focus-visible) {
+        outline: 2px solid var(--_border);
+        outline-offset: 2px;
+    }
+
+    &:where(:root[data-theme='dark'] &) {
+        &.c-button--filled {
+            --_bg: var(--theme-base-2);
+            --_bg-hover: var(--theme-base-hover);
+            --_bg-active: var(--theme-base-active);
+        }
+    }
+}
+
+.c-button--primary {
+    --_fg: var(--theme-primary-2);
+    --_fg-hover: var(--theme-primary-1);
+    --_border: var(--theme-primary-border);
+
+    &.c-button--filled {
+        --_bg: var(--theme-primary-1);
+        --_fg: var(--theme-primary-fg-2);
+        --_fg-hover: var(--theme-primary-fg-1);
+        --_bg-hover: var(--theme-primary-hover);
+        --_bg-active: var(--theme-primary-active);
     }
 }
 
 .c-button--negative {
-    &:where(:not(.c-button--filled)) {
-        color: var(--theme-negative-1);
-        &:not(:disabled):hover {
-            background-color: color-mix(in srgb, var(--theme-negative-1) 5%, transparent);
-        }
+    --_fg: var(--theme-negative-2);
+    --_fg-hover: var(--theme-negative-1);
+    --_border: var(--theme-negative-border);
 
-        &:not(:disabled):active {
-            background-color: color-mix(in srgb, var(--theme-negative-1) 8%, transparent);
-        }
-
-        &:disabled {
-            color: var(--theme-base-fg-disabled);
-        }
-    }
-
-    &:where(:focus-visible) {
-        outline: none;
-        @apply ring ring-negative-3 ring-offset-1 ring-offset-base-1 outline-none;
-    }
-
-    &:where(.c-button--filled) {
-        color: var(--theme-negative-fg-1);
-        background-color: var(--theme-negative-1);
-
-        &:hover {
-            background-color: var(--theme-negative-2);
-        }
-
-        &:active {
-            background-color: var(--theme-negative-3);
-        }
-
-        &:disabled {
-            color: var(--_color-text-disabled);
-            background-color: var(--_color-bg-disabled);
-        }
-
-        &:focus-visible {
-            outline: none;
-            @apply ring ring-negative-3 ring-offset-1 ring-offset-base-1 outline-none;
-        }
-    }
-
-    &:where(.c-button--outline) {
-        border: 1px solid var(--theme-negative-border);
+    &.c-button--filled {
+        --_bg: var(--theme-negative-1);
+        --_fg: var(--theme-negative-fg-2);
+        --_fg-hover: var(--theme-negative-fg-1);
+        --_bg-hover: var(--theme-negative-hover);
+        --_bg-active: var(--theme-negative-active);
     }
 }
 
 .c-button--positive {
-    &:where(:not(.c-button--filled)) {
-        color: var(--theme-positive-1);
-        &:not(:disabled):hover {
-            background-color: color-mix(in srgb, var(--theme-positive-1) 5%, transparent);
-        }
+    --_fg: var(--theme-positive-2);
+    --_fg-hover: var(--theme-positive-1);
+    --_border: var(--theme-positive-border);
 
-        &:not(:disabled):active {
-            background-color: color-mix(in srgb, var(--theme-positive-1) 8%, transparent);
-        }
-
-        &:disabled {
-            color: var(--theme-base-fg-disabled);
-        }
-    }
-
-    &:where(:focus-visible) {
-        outline: none;
-        @apply ring ring-positive-3 ring-offset-1 ring-offset-base-1 outline-none;
-    }
-
-    &:where(.c-button--filled) {
-        color: var(--theme-positive-fg-1);
-        background-color: var(--theme-positive-1);
-
-        &:hover {
-            background-color: var(--theme-positive-2);
-        }
-
-        &:active {
-            background-color: var(--theme-positive-3);
-        }
-
-        &:disabled {
-            color: var(--_color-text-disabled);
-            background-color: var(--_color-bg-disabled);
-        }
-
-        &:focus-visible {
-            outline: none;
-            @apply ring ring-positive-3 ring-offset-1 ring-offset-base-1 outline-none;
-        }
-    }
-
-    &:where(.c-button--outline) {
-        border: 1px solid var(--theme-positive-border);
-    }
-}
-
-.c-button--base {
-    &:where(:not(.c-button--filled)) {
-        &:not(:disabled):hover {
-            background-color: var(--theme-base-hover);
-        }
-
-        &:not(:disabled):active {
-            background-color: var(--theme-base-active);
-        }
-
-        &:disabled {
-            color: var(--_color-text-disabled);
-        }
-    }
-
-    &:where(:focus-visible) {
-        outline: none;
-        @apply ring ring-base-border ring-offset-1 ring-offset-base-1 outline-none;
-    }
-
-    &:where(.c-button--filled) {
-        background-color: var(--_color-bg);
-
-        &:hover {
-            background-color: var(--theme-base-hover);
-        }
-
-        &:active {
-            background-color: var(--theme-base-active);
-        }
-
-        &:disabled {
-            color: var(--_color-text-disabled);
-            background-color: var(--_color-bg-disabled);
-        }
-
-        &:focus-visible {
-            outline: none;
-            @apply ring ring-base-border ring-offset-1 ring-offset-base-1 outline-none;
-        }
-    }
-
-    &:where(.c-button--outline) {
-        border: 1px solid var(--_color-border);
+    &.c-button--filled {
+        --_bg: var(--theme-positive-1);
+        --_fg: var(--theme-positive-fg-2);
+        --_fg-hover: var(--theme-positive-fg-1);
+        --_bg-hover: var(--theme-positive-hover);
+        --_bg-active: var(--theme-positive-active);
     }
 }
 
 .c-button--sm {
     font-size: theme('fontSize[sm]');
     padding-block: theme('padding[0.5]');
+    border-radius: theme('borderRadius[DEFAULT]');
 }

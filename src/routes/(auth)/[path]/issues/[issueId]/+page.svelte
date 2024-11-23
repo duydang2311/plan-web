@@ -164,7 +164,7 @@
     );
 </script>
 
-<main class="flex items-stretch h-full divide-x divide-base-border overflow-hidden">
+<main class="flex items-stretch h-full divide-x divide-base-border-2 overflow-hidden">
     <div class="grow relative h-full overflow-auto" bind:this={scrollEl} style="contain: strict;">
         <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
             <p class="font-bold content-center text-base-fg-1 text-h1">
@@ -190,7 +190,7 @@
                                     <div
                                         bind:this={virtualItemEls[idx]}
                                         data-index={row.index}
-                                        class="pt-4 pb-2 first:pt-4 border-b border-b-base-border"
+                                        class="pt-4 pb-2 first:pt-4 border-b border-b-base-border-2"
                                     >
                                         {#if row.index > comments.length - 1}
                                             <div in:fade>

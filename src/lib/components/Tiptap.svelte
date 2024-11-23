@@ -61,7 +61,7 @@
 </script>
 
 <div {...props} class={clsx('c-tiptap', props?.class)}>
-    <div class="bg-base-2 border-b border-b-base-border px-4 py-1 rounded-t-md overflow-hidden">
+    <div class="bg-base-2 border-b border-b-base-border-2 px-4 py-1 rounded-t-md overflow-hidden">
         <ul class="flex items-center gap-1 text-sm">
             <li>
                 <TiptapButton

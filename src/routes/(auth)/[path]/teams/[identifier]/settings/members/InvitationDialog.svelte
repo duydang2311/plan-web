@@ -162,7 +162,7 @@
                     duration: 200,
                     easing: circInOut
                 }}
-                class="bg-base-1 border border-base-border shadow-lg rounded-md p-4"
+                class="bg-base-1 border border-base-border-2 shadow-lg rounded-md p-4"
             >
                 <Icon name="user-plus" class="size-12 text-base-fg-1 mx-auto" />
                 <h1 use:melt={title} class="text-balance text-center text-h3">

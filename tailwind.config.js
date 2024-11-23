@@ -8,8 +8,8 @@ export default withAnimations({
     theme: {
         extend: {
             fontFamily: {
-                display: 'var(--font-display)',
-                body: 'var(--font-body)'
+                display: 'var(--font-family-display)',
+                body: 'var(--font-family-body)'
             },
             fontSize: {
                 h1: 'var(--font-size-h1)',
@@ -47,13 +47,17 @@ export default withAnimations({
                     1: 'oklch(from var(--theme-base-1) l c h / <alpha-value>)',
                     2: 'oklch(from var(--theme-base-2) l c h / <alpha-value>)',
                     3: 'oklch(from var(--theme-base-3) l c h / <alpha-value>)',
+                    4: 'oklch(from var(--theme-base-4) l c h / <alpha-value>)',
+                    5: 'oklch(from var(--theme-base-5) l c h / <alpha-value>)',
                     hover: 'oklch(from var(--theme-base-hover) l c h / <alpha-value>)',
                     active: 'oklch(from var(--theme-base-active) l c h / <alpha-value>)',
                     'fg-1': 'oklch(from var(--theme-base-fg-1) l c h / <alpha-value>)',
                     'fg-2': 'oklch(from var(--theme-base-fg-2) l c h / <alpha-value>)',
                     'fg-3': 'oklch(from var(--theme-base-fg-3) l c h / <alpha-value>)',
                     'fg-ghost': 'oklch(from var(--theme-base-fg-ghost) l c h / <alpha-value>)',
-                    border: 'oklch(from var(--theme-base-border) l c h / <alpha-value>)'
+                    'border-1': 'oklch(from var(--theme-base-border-1) l c h / <alpha-value>)',
+                    'border-2': 'oklch(from var(--theme-base-border-2) l c h / <alpha-value>)',
+                    'border-3': 'oklch(from var(--theme-base-border-3) l c h / <alpha-value>)'
                 }
             },
             typography: () => ({
@@ -84,7 +88,7 @@ export default withAnimations({
                         '--tw-prose-body': 'var(--theme-base-fg-2)',
                         '--tw-prose-bold': 'var(--theme-base-fg-2)',
                         '--tw-prose-links': 'var(--theme-base-fg-3)',
-                        '--tw-prose-hr': 'var(--theme-base-border)',
+                        '--tw-prose-hr': 'var(--theme-base-border-2)',
                         '--tw-prose-code': 'var(--theme-base-fg-1)',
                         '--tw-prose-pre-code': 'var(--theme-base-fg-1)',
                         '--tw-prose-pre-bg': 'var(--theme-base-3)',

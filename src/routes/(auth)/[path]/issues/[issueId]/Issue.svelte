@@ -28,7 +28,7 @@
     let editor = $state.raw<Editor>();
 </script>
 
-<div class="border-b border-b-base-border pb-2">
+<div class="border-b border-b-base-border-2 pb-2">
     <div class="max-w-full pt-4">
         {#if isEditing}
             <div in:slideIn out:slideOut class="not-prose">
@@ -119,14 +119,14 @@
             in:scaleIn
             out:scaleOut
             use:melt={content}
-            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border"
+            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border-2"
         >
-            <h4 use:melt={title}>Confirm issue deletion</h4>
+            <h4 use:melt={title}>Delete issue?</h4>
             <p>
                 Proceed to delete <span class="font-medium">"{issue.title}"</span>?
             </p>
             <div class="flex gap-4 w-fit ml-auto">
-                <Button variant="base" class="w-fit" filled={false} melt={close}>Cancel</Button>
+                <Button variant="base" class="w-fit" outline melt={close}>Cancel</Button>
                 <form
                     method="post"
                     action="?/delete-issue"
@@ -145,7 +145,7 @@
                     }}
                 >
                     <input type="hidden" name="issueId" value={$page.params['issueId']} />
-                    <Button variant="negative" class="w-fit">Delete</Button>
+                    <Button variant="negative" outline class="w-fit">Delete</Button>
                 </form>
             </div>
         </div>

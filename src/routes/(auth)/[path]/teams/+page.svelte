@@ -71,16 +71,15 @@
     });
 </script>
 
-<main class="divide-y divide-base-border h-full flex flex-col">
+<main class="divide-y divide-base-border-2 h-full flex flex-col">
     <div class="flex gap-4 justify-between items-center px-8 py-2">
         <p>Filter</p>
         <Button
             as="link"
             href="teams/new"
             variant="base"
-            outline
             size="sm"
-            class="w-fit flex items-center gap-1"
+            class="w-fit -mr-4 flex items-center gap-1"
         >
             <Icon name="plus" />
             Add team

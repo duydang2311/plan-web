@@ -112,7 +112,7 @@
             type="button"
             variant="base"
             outline
-            class="flex gap-4 items-center data-[state=open]:bg-base-active"
+            class="flex gap-4 items-center data-[state=open]:bg-base-3"
             melt={trigger}
         >
             {#if $selected == null}

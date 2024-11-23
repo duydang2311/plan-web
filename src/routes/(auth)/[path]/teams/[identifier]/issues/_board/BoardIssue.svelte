@@ -135,7 +135,7 @@
     <div
         class={clsx(
             'relative w-full p-4 rounded-md border cursor-grab transition ease-in-out duration-75',
-            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border'
+            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
@@ -162,7 +162,7 @@
             .height}px - 1rem);{navigator.userAgent.includes('Windows')
             ? ' max-width: 280px; max-height: 280px;'
             : ''}"
-        class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border"
+        class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border-2"
     >
         <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
             <p class="leading-none text-sm">

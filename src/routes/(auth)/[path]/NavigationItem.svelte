@@ -87,7 +87,7 @@
             props.class
         )}
     >
-        <a {href} class="grow flex p-2 items-center gap-2">
+        <a {href} class="grow flex p-2 items-center gap-2 font-display">
             <div class="transition-enforcement">
                 <Icon
                     name={activeIcon}
@@ -106,7 +106,7 @@
                     aria-hidden={isActive}
                 />
             </div>
-            <span>{label}</span>
+            <span class="font-display">{label}</span>
         </a>
         {@render children?.()}
     </div>

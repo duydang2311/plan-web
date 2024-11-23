@@ -19,12 +19,12 @@
 </script>
 
 {#if $query.data && $query.data.items.length > 0}
-    <div class="p-4 border border-base-border rounded-md">
+    <div class="p-4 border border-base-border-2 rounded-md">
         <h2>Team invitations</h2>
         <ul>
             {#each $query.data.items as invitation (invitation.id)}
                 <li
-                    class="flex items-center justify-between gap-4 p-4 border border-base-border rounded-md flex-wrap"
+                    class="flex items-center justify-between gap-4 p-4 border border-base-border-2 rounded-md flex-wrap"
                 >
                     <p class="text-h5 text-base-fg-1">
                         {invitation.team.name}

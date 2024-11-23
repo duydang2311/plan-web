@@ -1,18 +1,14 @@
 @layer base {
     .c-input {
-        --_color-border: color-mix(in srgb, var(--theme-base-border) 90%, var(--theme-base-fg-2));
-        --_color-border-hover: color-mix(
-            in srgb,
-            var(--theme-base-border) 60%,
-            var(--theme-base-fg-2)
-        );
-        --_color-border-focus: var(--theme-base-fg-2);
+        --_border: var(--theme-base-border-2);
+        --_border-hover: color-mix(in srgb, var(--theme-base-border-1) 96%, var(--theme-base-fg-1));
+        --_border-focus: var(--_border-hover);
     }
 
     .c-input {
         width: 100%;
         padding: theme('size[2]') theme('size[2]');
-        border: theme('borderWidth.DEFAULT') solid var(--_color-border);
+        border: theme('borderWidth.DEFAULT') solid var(--_border);
         border-radius: theme('borderRadius.md');
         outline: none;
         transition:
@@ -22,13 +18,13 @@
             box-shadow 75ms ease-in-out;
 
         &:hover {
-            border-color: var(--_color-border-hover);
+            border-color: var(--_border-hover);
         }
 
         &:focus-visible {
-            border-color: var(--_color-border-focus);
+            border-color: var(--_border-focus);
             box-shadow:
-                0 0 0 1px color-mix(in srgb, var(--theme-base-border) 40%, var(--color-bg)),
+                0 0 0 1px color-mix(in srgb, var(--theme-base-border-2) 40%, var(--color-bg)),
                 0 1px 2px rgb(0 0 0 / 0.1);
         }
 
@@ -56,8 +52,9 @@
 
     .c-input--file {
         &:focus-visible + label > div {
-            border-color: color-mix(in srgb, var(--theme-base-border) 50%, var(--color-fg));
-            box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-base-border) 40%, var(--color-bg));
+            border-color: color-mix(in srgb, var(--theme-base-border-2) 50%, var(--color-fg));
+            box-shadow: 0 0 0 1px
+                color-mix(in srgb, var(--theme-base-border-2) 40%, var(--color-bg));
         }
 
         &[aria-invalid] + label > div {

@@ -37,7 +37,7 @@
     }
 
     &:focus-visible {
-        @apply ring ring-base-border ring-offset-1 ring-offset-base-1;
+        @apply ring ring-base-border-2 ring-offset-1 ring-offset-base-1;
     }
 }
 

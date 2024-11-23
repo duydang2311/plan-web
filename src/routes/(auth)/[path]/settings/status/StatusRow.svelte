@@ -143,7 +143,7 @@
         style={navigator.userAgent.includes('Windows')
             ? 'max-width: 280px; max-height: 280px;'
             : undefined}
-        class="bg-base-1 rounded px-3 py-1 border border-base-border font-medium"
+        class="bg-base-1 rounded px-3 py-1 border border-base-border-2 font-medium"
     >
         {status.value}
     </div>

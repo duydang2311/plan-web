@@ -16,8 +16,8 @@
 <div class="max-xl:grid max-xl:grid-rows-[auto_1fr] h-full xl:flex xl:h-full">
     <div
         class="
-		max-xl:border-b max-xl:border-b-base-border max-xl:py-2 max-xl:px-6
-        xl:border-r xl:border-r-base-border"
+		max-xl:border-b max-xl:border-b-base-border-2 max-xl:py-2 max-xl:px-6
+        xl:border-r xl:border-r-base-border-2"
     >
         <Navigation
             items={[

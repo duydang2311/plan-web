@@ -35,7 +35,7 @@
         />
     </div>
 {/if}
-<main class="h-full flex flex-col divide divide-y divide-base-border">
+<main class="h-full flex flex-col divide divide-y divide-base-border-2">
     <div class="px-8 py-2 flex gap-4 justify-between items-center whitespace-nowrap">
         <div>
             <h1 class="sr-only">Manage team members</h1>

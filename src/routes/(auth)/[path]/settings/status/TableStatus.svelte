@@ -101,7 +101,7 @@
 
 <Table style="grid-template-columns: auto 1fr 1fr auto;">
     <THead class="relative">
-        <Row class="border-b border-b-base-border py-1">
+        <Row class="border-b border-b-base-border-2 py-1">
             <Th style="grid-column: 1 / -1;" class="px-0">
                 <div class="flex justify-between items-center gap-4">
                     <div class="relative">
@@ -119,6 +119,7 @@
                     <Button
                         filled={false}
                         class="flex gap-2 items-center w-fit min-w-max"
+                        size="sm"
                         onclick={onAddStatusClick}
                     >
                         <Icon name="plus" />

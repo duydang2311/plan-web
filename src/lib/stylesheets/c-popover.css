@@ -1,7 +1,7 @@
 @layer base {
     .c-popover {
-        --_border: var(--theme-base-border);
-        --_bg: color-mix(in srgb, var(--theme-base-1) 99%, var(--theme-base-fg-1));
+        --_border: var(--theme-base-border-1);
+        --_bg: var(--theme-base-1);
     }
 
     :root[data-theme='dark'] .c-popover {

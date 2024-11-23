@@ -114,7 +114,7 @@
         {#if open}
             <ol
                 use:melt={menu}
-                class="p-1 bg-base-1 border border-base-border rounded shadow-sm space-y-1"
+                class="p-1 bg-base-1 border border-base-border-2 rounded shadow-sm space-y-1"
             >
                 {#each roles as role (role.value)}
                     {@const opt = option(role)}

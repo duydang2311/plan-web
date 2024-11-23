@@ -122,7 +122,7 @@
             </form>
         </div>
         <div class="mt-8 space-y-4 text-center w-fit mx-auto">
-            <hr class="w-full text-base-border" />
+            <hr class="w-full text-base-border-2" />
             <p>
                 <small>
                     New user?

@@ -1,20 +1,22 @@
-@layer base {
-    .c-select--menu {
-        @apply p-1 bg-base-1 border border-base-border rounded shadow-sm space-y-1 min-w-40 cursor-default;
-    }
+.c-select--menu {
+    @apply p-1 bg-base-1 border border-base-border-1 rounded shadow-sm space-y-1 min-w-40 cursor-default;
+}
 
-    .c-select--option {
-        @apply relative pl-10 pr-2 py-2 rounded-md w-full flex items-center gap-2 text-base-fg-3;
+.c-select--option {
+    color: var(--theme-base-fg-4);
+    @apply relative pl-10 pr-2 py-2 rounded-md w-full flex items-center gap-2;
 
-        &[data-melt-select-option] {
-            &[data-highlighted],
-            &:hover {
-                @apply text-base-fg-1 bg-base-hover;
-            }
+    &:where([data-melt-select-option]) {
+        &[data-highlighted],
+        &:hover {
+            color: var(--theme-base-fg-1);
+            background-color: var(--theme-base-3);
+        }
 
-            &[aria-selected='true'] {
-                @apply bg-base-active text-base-fg-1 font-medium;
-            }
+        &[aria-selected='true'] {
+            color: var(--theme-base-fg-1);
+            background-color: var(--theme-base-4);
+            font-weight: 500;
         }
     }
 }

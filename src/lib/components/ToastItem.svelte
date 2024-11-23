@@ -36,7 +36,7 @@
 
 <div
     use:melt={$content(id)}
-    class="relative rounded-lg bg-base-1 border border-base-border shadow p-4 w-full"
+    class="relative rounded-lg bg-base-3 border border-base-border-1 shadow p-4 w-full"
 >
     <div
         use:melt={$progress}
