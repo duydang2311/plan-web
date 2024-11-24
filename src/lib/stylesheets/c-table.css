@@ -13,6 +13,7 @@
 
 .c-table {
     display: grid;
+    align-content: start;
 
     & > tbody,
     & > div.c-table--tbody,

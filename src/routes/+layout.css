@@ -41,16 +41,17 @@
 
         color-scheme: light dark;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 400;
         line-height: 1.5;
         font-synthesis: none;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         -webkit-text-size-adjust: 100%;
-        font-feature-settings:
+        /* fix for Chrome */
+        /* font-feature-settings:
             'liga' 1,
-            'calt' 1; /* fix for Chrome */
+            'calt' 1; */
 
         background-color: var(--theme-base-1);
         color: var(--theme-base-fg-2);
@@ -71,11 +72,11 @@
         --font-size-title: var(--font-size-h5);
     }
 
-    @supports (font-variation-settings: normal) {
+    /* @supports (font-variation-settings: normal) {
         :root {
             font-optical-sizing: auto;
         }
-    }
+    } */
 
     body {
         font-size: var(--font-size-p);
@@ -89,7 +90,7 @@
     h6 {
         color: theme('colors.base[fg-1]');
         font-family: var(--font-family-display);
-        font-weight: medium;
+        font-weight: 600;
     }
 
     h6 {
@@ -130,7 +131,7 @@
     }
 
     hr {
-        border-color: var(--theme-base-border-2);
+        border-color: var(--theme-base-border-3);
     }
 
     .scrollbar-3 {
