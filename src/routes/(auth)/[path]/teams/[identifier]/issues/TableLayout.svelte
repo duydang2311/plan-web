@@ -5,7 +5,7 @@
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
     import { Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
-    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import type { PageData } from './$types';
 
@@ -23,7 +23,7 @@
     createEffect(
         () => {
             if (data.issueList !== $query.data) {
-                mapMaybePromise(data.issueList, (a) => queryClient.setQueryData(queryKey, a));
+                unwrapMaybePromise(data.issueList)((a) => queryClient.setQueryData(queryKey, a));
             }
         },
         () => data.issueList

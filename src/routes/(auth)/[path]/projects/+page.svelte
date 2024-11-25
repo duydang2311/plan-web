@@ -11,7 +11,7 @@
     import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
     import { paginatedQuery } from '~/lib/utils/url';
-    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { createEffect } from '~/lib/utils/runes.svelte';
 
     const { data }: { data: PageData } = $props();
@@ -46,7 +46,7 @@
     createEffect(
         () => {
             if (data.projects !== $query.data) {
-                mapMaybePromise(data.projects, (a) => queryClient.setQueryData(queryKey, a));
+                unwrapMaybePromise(data.projects)((a) => queryClient.setQueryData(queryKey, a));
             }
         },
         () => data.projects
@@ -67,7 +67,14 @@
                 class="absolute left-0 top-1/2 translate-x-1/2 -translate-y-1/2 text-base-fg-ghost"
             />
         </div>
-        <Button as="link" href="/{$page.params['path']}/projects/new" variant="primary" filled={false} size="sm" class="w-fit flex gap-2 items-center">
+        <Button
+            as="link"
+            href="/{$page.params['path']}/projects/new"
+            variant="primary"
+            filled={false}
+            size="sm"
+            class="w-fit flex gap-2 items-center"
+        >
             <Icon name="plus" />
             Create Project
         </Button>
