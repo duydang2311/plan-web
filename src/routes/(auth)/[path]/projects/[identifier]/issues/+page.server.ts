@@ -12,6 +12,8 @@ interface ProjectIssue {
         title: string;
         createdTime: string;
         updatedTime: string;
+        orderNumber: number;
+        team: { identifier: string };
     };
     rank: string;
 }
@@ -34,7 +36,7 @@ export const load: PageServerLoad = async ({
                 api.get(`projects/${data.project.id}/issues`, {
                     query: {
                         ...query,
-                        select: 'Rank, Issue.Id, Issue.Title, Issue.CreatedTime, Issue.UpdatedTime'
+                        select: 'Rank, Issue.Id, Issue.Title, Issue.CreatedTime, Issue.UpdatedTime, Issue.OrderNumber, Issue.Team.Identifier'
                     }
                 })
             );
