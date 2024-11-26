@@ -57,7 +57,6 @@
                     <Button
                         type="button"
                         variant="base"
-                        outline
                         size="sm"
                         class="relative w-fit flex items-center gap-2 pr-10"
                         melt={trigger}
@@ -107,7 +106,6 @@
                 as="link"
                 href="/{$page.params['path']}/teams/{$page.params['identifier']}/issues/new"
                 variant="base"
-                outline
                 size="sm"
                 class="w-fit flex items-center gap-2"
             >

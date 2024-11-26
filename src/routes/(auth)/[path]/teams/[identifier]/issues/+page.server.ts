@@ -8,6 +8,13 @@ import { compareRank } from '~/lib/utils/ranking';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 
+export type LocalTableLayoutIssue = Pick<
+    Issue,
+    'id' | 'createdTime' | 'updatedTime' | 'title' | 'priority' | 'orderNumber'
+> & {
+    status?: { value: string };
+};
+
 export const load: PageServerLoad = (e) => {
     switch (e.url.searchParams.get('layout')) {
         case 'board':
@@ -26,14 +33,16 @@ const loadBoardLayout = async ({
 }: PageServerLoadEvent) => {
     depends('fetch:issues-board');
     const data = await parent();
-    const query = paginatedQuery(
-        queryParams(url, {
-            page: 1,
-            size: 20,
-            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
-            order: 'StatusRank'
-        })
-    );
+    const query = {
+        ...paginatedQuery(
+            queryParams(url, {
+                page: 1,
+                size: 20
+            })
+        ),
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+        order: 'StatusRank'
+    };
     const exit = runtime
         .runPromiseExit(
             Effect.gen(function* () {
@@ -61,14 +70,16 @@ const loadTableLayout = async ({
 }: PageServerLoadEvent) => {
     depends('fetch:issues');
     const data = await parent();
-    const query = paginatedQuery(
-        queryParams(url, {
-            page: 1,
-            size: 20,
-            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId',
-            order: 'orderNumber'
-        })
-    );
+    const query = {
+        ...paginatedQuery(
+            queryParams(url, {
+                page: 1,
+                size: 20,
+                order: 'orderNumber'
+            })
+        ),
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Status.Value,Status.Rank,Priority'
+    };
     const issueList = runtime
         .runPromiseExit(
             Effect.gen(function* () {
@@ -80,10 +91,12 @@ const loadTableLayout = async ({
                 if (!response.ok) {
                     return paginatedList<Issue>();
                 }
-                return yield* Effect.tryPromise(() => response.json<PaginatedList<Issue>>());
+                return yield* Effect.tryPromise(() =>
+                    response.json<PaginatedList<LocalTableLayoutIssue>>()
+                );
             })
         )
-        .then((a) => (Exit.isFailure(a) ? paginatedList<Issue>() : a.value));
+        .then((a) => (Exit.isFailure(a) ? paginatedList<LocalTableLayoutIssue>() : a.value));
 
     return {
         query,

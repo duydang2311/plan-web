@@ -23,3 +23,33 @@ export const IssuePriorities = {
     high: 3,
     urgent: 4
 } as const;
+
+export function getPriorityLabel(priority: IssuePriority) {
+    switch (priority) {
+        case IssuePriorities.none:
+            return 'No priority';
+        case IssuePriorities.low:
+            return 'Low';
+        case IssuePriorities.medium:
+            return 'Medium';
+        case IssuePriorities.high:
+            return 'High';
+        case IssuePriorities.urgent:
+            return 'Urgent';
+    }
+}
+
+export function getPriorityIcon(priority: IssuePriority) {
+    switch (priority) {
+        case IssuePriorities.none:
+            return 'priority-none';
+        case IssuePriorities.low:
+            return 'priority-low';
+        case IssuePriorities.medium:
+            return 'priority-medium';
+        case IssuePriorities.high:
+            return 'priority-high';
+        case IssuePriorities.urgent:
+            return 'priority-urgent';
+    }
+}

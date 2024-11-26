@@ -5,7 +5,12 @@
     import { writable } from 'svelte/store';
     import { addToast, Button, Icon, Select } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { IssuePriorities, type IssuePriority } from '~/lib/models/issue';
+    import {
+        getPriorityLabel,
+        getPriorityIcon,
+        IssuePriorities,
+        type IssuePriority
+    } from '~/lib/models/issue';
     import { select, tsap } from '~/lib/utils/transition';
 
     interface Props {
@@ -58,36 +63,6 @@
     const selected = writable<SelectOption<IssuePriority>>(
         items.find((a) => a.value === priority) ?? items[0]
     );
-
-    function getPriorityLabel(priority: IssuePriority) {
-        switch (priority) {
-            case IssuePriorities.none:
-                return 'No priority';
-            case IssuePriorities.low:
-                return 'Low';
-            case IssuePriorities.medium:
-                return 'Medium';
-            case IssuePriorities.high:
-                return 'High';
-            case IssuePriorities.urgent:
-                return 'Urgent';
-        }
-    }
-
-    function getPriorityIcon(priority: IssuePriority) {
-        switch (priority) {
-            case IssuePriorities.none:
-                return 'priority-none';
-            case IssuePriorities.low:
-                return 'priority-low';
-            case IssuePriorities.medium:
-                return 'priority-medium';
-            case IssuePriorities.high:
-                return 'priority-high';
-            case IssuePriorities.urgent:
-                return 'priority-urgent';
-        }
-    }
 </script>
 
 <Select

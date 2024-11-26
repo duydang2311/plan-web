@@ -67,7 +67,7 @@
                     <div transition:scale={{ duration: 150, easing: sineInOut }}>
                         <Icon
                             name="arrows-up-down"
-                            class="transition ease-in-out text-base-fg-3/50 group-hover:text-current"
+                            class="transition ease-in-out text-base-fg-ghost group-hover:text-current"
                         />
                     </div>
                 {/if}

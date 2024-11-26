@@ -1,12 +1,14 @@
 @layer base {
     .c-table {
-        --_bg: var(--theme-base-1);
+        --_bg: transparent;
+        --_bg-2: transparent;
         --_hover: var(--theme-base-2);
         --_border: var(--theme-base-border-3);
     }
 
     :root[data-theme='dark'] .c-table {
-        --_bg: var(--theme-base-2);
+        --_bg: transparent;
+        --_bg-2: var(--theme-base-1);
         --_hover: var(--theme-base-3);
     }
 }
@@ -21,6 +23,10 @@
         display: grid;
         grid-column: 1 / -1;
         grid-template-columns: subgrid;
+    }
+
+    :where(& > tbody > .c-table--row:nth-child(2n + 1)) {
+        background-color: var(--_bg-2);
     }
 
     :where(& > tbody > .c-table--row:hover),

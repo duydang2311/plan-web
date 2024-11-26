@@ -160,7 +160,7 @@
             Displaying {query.offset + 1} - {query.offset + length} out of {list.totalCount} items.
         {/if}
     </span>
-    <ol class="flex items-stretch text-sm font-bold text-base-fg-3">
+    <ol class="flex items-stretch text-sm font-bold text-base-fg-5">
         {#if totalPages <= 1}
             {@render item(1)}
         {:else}
