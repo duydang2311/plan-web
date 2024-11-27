@@ -21,15 +21,9 @@
                 class="flex items-center text-base-fg-3 overflow-hidden text-nowrap"
                 in:tsap={(node, gsap) =>
                     gsap.from(node, {
-                        width: 0,
+                        opacity: 0,
                         duration: 0.2,
-                        ease: 'cubic.inOut'
-                    })}
-                out:tsap={(node, gsap) =>
-                    gsap.to(node, {
-                        width: 0,
-                        duration: 0.2,
-                        ease: 'cubic.inOut'
+                        ease: 'sine.out'
                     })}
             >
                 {#if notFirst}
