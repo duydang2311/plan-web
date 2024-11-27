@@ -16,15 +16,15 @@
     });
 
     function transitateIn(node: Element) {
-        gsap.from(node, {
+        const tween = gsap.from(node, {
             opacity: 0,
             y: '0.1rem',
-            scale: 0.995,
-            duration: 0.3,
-            ease: 'power2.out'
+            duration: 0.2,
+            ease: 'power2.out',
+            clearProps: 'y,scale,opacity'
         });
         return {
-            duration: 300
+            duration: tween.totalDuration() * 1000
         };
     }
 </script>
@@ -102,7 +102,7 @@
     >
         <Breadcrumb class="px-8 py-2 border-b border-b-base-border-2" />
         <div class="transition-enforcement overflow-hidden">
-            {#key data.pathname.split('/', 3).join('')}
+            {#key data.pathname}
                 <div class="overflow-hidden" in:transitateIn>
                     {@render children()}
                 </div>
