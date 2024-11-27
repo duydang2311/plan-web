@@ -123,7 +123,7 @@
                         {#each items as { createdTime, updatedTime, name, identifier }}
                             <Row>
                                 <td>
-                                    <Link href="/{$page.params['path']}/teams/{identifier}/issues">
+                                    <Link href="/{$page.params['path']}/issues?team={identifier}">
                                         {name}
                                     </Link>
                                 </td>

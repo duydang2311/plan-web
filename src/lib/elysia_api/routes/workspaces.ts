@@ -42,4 +42,28 @@ export const workspaces = baseApp({ prefix: '/workspaces' })
             const json = yield* ElysiaResponse.JSON(() => response.json());
             return Response.json(json, { status: response.status });
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
+    .get('/:id/teams/identifier/:identifier', ({ params, query, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(
+                    `workspaces/${params.id}/teams/identifier/${params.identifier}`,
+                    { query }
+                )
+            );
+            const json = yield* ElysiaResponse.JSON(() => response.json());
+            return Response.json(json, { status: response.status });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    })
+    .get('/:id/projects/identifier/:identifier', ({ params, query, runtime }) => {
+        return Effect.gen(function* () {
+            const response = yield* ElysiaResponse.HTTP(
+                (yield* ApiClient).get(
+                    `workspaces/${params.id}/projects/identifier/${params.identifier}`,
+                    { query }
+                )
+            );
+            const json = yield* ElysiaResponse.JSON(() => response.json());
+            return Response.json(json, { status: response.status });
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     });

@@ -4,13 +4,14 @@ import { ApiClient } from '~/lib/services/api_client.server';
 import type { LayoutServerLoad } from './$types';
 import { LoadResponse } from '~/lib/utils/kit';
 
-export const load: LayoutServerLoad = async ({ params, locals: { runtime } }) => {
+export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime } }) => {
     const exit = await runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
+                const data = yield* Effect.promise(() => parent());
                 const api = yield* ApiClient;
                 const response = yield* LoadResponse.HTTP(
-                    api.get(`projects/identifier/${params.identifier}`, {
+                    api.get(`workspaces/${data.workspace.id}/identifier/${params.identifier}`, {
                         query: { select: 'Id' }
                     })
                 );

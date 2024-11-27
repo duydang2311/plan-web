@@ -1,13 +1,13 @@
 @layer base {
     .c-table {
-        --_bg: transparent;
-        --_bg-2: transparent;
+        --_bg: var(--theme-base-1);
+        --_bg-2: var(--theme-base-1);
         --_hover: var(--theme-base-2);
         --_border: var(--theme-base-border-3);
     }
 
     :root[data-theme='dark'] .c-table {
-        --_bg: transparent;
+        --_bg: var(--theme-base-2);
         --_bg-2: var(--theme-base-1);
         --_hover: var(--theme-base-3);
     }

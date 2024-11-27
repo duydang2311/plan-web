@@ -31,9 +31,11 @@ export function queryParams<T extends Record<string, unknown>>(
     return obj;
 }
 
-export function paginatedQuery<T extends { page?: number; offset?: number; size: number }>(
+export function paginatedQuery<T extends { page?: number; offset?: number; size?: number }>(
     queryParams: T
 ) {
+    queryParams.page ??= 1;
+    queryParams.size ??= 20;
     if (queryParams.offset == null || queryParams.offset === 0) {
         queryParams.offset = queryParams.page
             ? (queryParams.page - 1) * queryParams.size

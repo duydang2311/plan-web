@@ -33,20 +33,16 @@
     <THead>
         <Row class="py-2">
             <Th sortable name="title" class="col-span-2">Title</Th>
-            <Th sortable name="status.rank">Created</Th>
+            <Th sortable name="status.rank">Status</Th>
             <Th sortable name="priority">Priority</Th>
             <Th sortable name="createdTime">Created</Th>
             <Th sortable name="updatedTime" class="max-md:hidden">Updated</Th>
         </Row>
     </THead>
     <tbody class={clsx(status === 'loading' && 'animate-twPulse')}>
-        {#if status === 'loading'}
+        {#if issues == null || issues.items.length === 0}
             <Row>
-                <td style="grid-column: 1 / -1;">Loading issues...</td>
-            </Row>
-        {:else if issues == null || issues.items.length === 0}
-            <Row>
-                <td style="grid-column: 1 / -1;">No issues yet.</td>
+                <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
             </Row>
         {:else}
             {#each issues.items as { id, createdTime, updatedTime, orderNumber, title, status, priority, identifier }}
@@ -68,7 +64,7 @@
                             <span class="text-base-fg-ghost">N/A</span>
                         {/if}
                     </td>
-                    <td class="content-center" title={getPriorityLabel(priority)}>
+                    <td title={getPriorityLabel(priority)}>
                         <Icon
                             name={getPriorityIcon(priority)}
                             class={priority == IssuePriorities.none
