@@ -157,7 +157,7 @@
                 totalCount: list.totalCount
             })}
         {:else}
-            Displaying {query.offset + 1} - {query.offset + length} out of {list.totalCount} items.
+            Displaying {query.offset + 1} - {query.offset + list.length} out of {list.totalCount} items.
         {/if}
     </span>
     <ol class="flex items-stretch text-sm font-bold text-base-fg-5">
