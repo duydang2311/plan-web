@@ -2,26 +2,31 @@
     import { page } from '$app/stores';
     import { createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { derived as derivedStore } from 'svelte/store';
+    import { Button, Icon, Pagination } from '~/lib/components';
     import IssueTable from '~/lib/components/issues/IssueTable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { paginatedQuery, queryParams } from '~/lib/utils/url';
+    import { unwrapMaybePromise } from '~/lib/utils/promise';
+    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { paginatedQuery, queryParams, stringifyQuery } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
-    import { createQueryKey } from './utils';
-    import { Button, Icon, Pagination } from '~/lib/components';
-    import { createEffect } from '~/lib/utils/runes.svelte';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
+    import { createQueryKey, createQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
     const { httpClient } = useRuntime();
     const queryClient = useQueryClient();
-    const queryKey = derivedStore(page, ($page) => createQueryKey($page.url));
+    const queryInfo = derivedStore(page, ($page) => ({
+        key: createQueryKey($page.url),
+        params: createQueryParams($page.url)
+    }));
     const query = createQuery(
-        derivedStore(queryKey, ($queryKey) => ({
-            queryKey: $queryKey,
+        derivedStore(queryInfo, ($queryInfo) => ({
+            queryKey: $queryInfo.key,
             queryFn: async () => {
-                const response = await httpClient.get(`/api/issues?${data.issueQueryParams}`);
+                const response = await httpClient.get(
+                    `/api/issues?${stringifyQuery($queryInfo.params)}`
+                );
                 return await response.json<PaginatedList<LocalIssue>>();
             }
         }))
@@ -30,21 +35,25 @@
 
     createEffect(
         () => {
-            unwrapMaybePromise(data.issueList)((a) => {
-                queryClient.setQueryData($queryKey, (b) => {
-                    console.log(b);
-                    return a;
-                });
+            unwrapMaybePromise(data.page)((a) => {
+                queryClient.setQueryData($queryInfo.key, a.issueList);
             });
         },
-        () => data.issueList
+        () => [data.page, $queryInfo]
     );
 </script>
 
 <main class="grid grid-rows-[auto_1fr_auto] h-full overflow-auto">
     <div class="px-6 py-1 flex justify-between border-b border-b-base-border-2">
         <div>Filter</div>
-        <Button variant="base" filled={false} size="sm" class="flex items-center gap-2 w-fit">
+        <Button
+            as="link"
+            href="/{$page.params['path']}/issues/new"
+            variant="base"
+            filled={false}
+            size="sm"
+            class="flex items-center gap-2 w-fit"
+        >
             <Icon name="plus" />
             Create issue
         </Button>

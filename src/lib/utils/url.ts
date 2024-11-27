@@ -51,6 +51,11 @@ export function fluentSearchParams(input: URL | URLSearchParams) {
     return new FluentSearchParams(input instanceof URL ? input.searchParams : input);
 }
 
+export const stringifyQuery = (record: Record<string, unknown>) =>
+    Object.entries(record)
+        .map(([k, v]) => `${k}=${v}`)
+        .join('&');
+
 class FluentSearchParams {
     private _searchParams: URLSearchParams;
 

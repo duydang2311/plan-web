@@ -1,9 +1,10 @@
-import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import { LoadResponse } from '~/lib/utils/kit';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-import { error } from '@sveltejs/kit';
+import { LoadResponse } from '~/lib/utils/kit';
+import { paginatedQuery, queryParams, stringifyQuery } from '~/lib/utils/url';
+import type { PageServerLoad } from './$types';
 
 export type LocalIssue = Pick<
     Issue,
@@ -20,59 +21,53 @@ export const load: PageServerLoad = async ({
     isDataRequest,
     locals: { runtime }
 }) => {
+    const data = await parent();
+    const query: Record<string, unknown> = {
+        ...paginatedQuery(
+            queryParams(url, {
+                page: 1,
+                size: 20,
+                order: null
+            })
+        ),
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Team.Identifier,Status.Value,Status.Rank,Priority'
+    };
+    const teamIdentifier = url.searchParams.get('team');
+    const projectIdentifier = url.searchParams.get('project');
     const exitPromise = Effect.gen(function* () {
-        const data = yield* Effect.promise(() => parent());
-        const teamIdentifier = url.searchParams.get('team');
-        const projectIdentifier = url.searchParams.get('project');
-
-        const searchParams = new URLSearchParams(url.searchParams);
-        searchParams.set(
-            'select',
-            'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Team.Identifier,Status.Value,Status.Rank,Priority'
-        );
         if (teamIdentifier) {
-            searchParams.delete('team');
-            const response = yield* LoadResponse.Fetch(() =>
-                fetch(
-                    `/api/workspaces/${data.workspace.id}/teams/identifier/${teamIdentifier}?select=Id`,
-                    { method: 'get' }
-                )
-            );
-            const json = yield* LoadResponse.JSON(() => response.json<{ id: string }>());
-            searchParams.set('teamId', json.id);
+            const teamId = yield* fetchTeamIdEffect(fetch, data.workspace.id, teamIdentifier);
+            query['teamId'] = teamId;
         }
 
         if (projectIdentifier) {
-            searchParams.delete('project');
-            const response = yield* LoadResponse.Fetch(() =>
-                fetch(
-                    `/api/workspaces/${data.workspace.id}/projects/identifier/${projectIdentifier}?select=Id`,
-                    { method: 'get' }
-                )
+            const projectId = yield* fetchProjectIdEffect(
+                fetch,
+                data.workspace.id,
+                projectIdentifier
             );
-            const json = yield* LoadResponse.JSON(() => response.json<{ id: string }>());
-            searchParams.set('projectId', json.id);
+            query['projectId'] = projectId;
         }
 
-        const issueQueryParams = searchParams.toString();
         const response = yield* LoadResponse.Fetch(() =>
-            fetch(`/api/issues?${searchParams.toString()}`)
+            fetch(`/api/issues?${stringifyQuery(query)}`)
         );
         return {
-            issueQueryParams,
-            issueList: yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>())
+            issueList: yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>()),
+            teamId: query['teamId'] as string | undefined
         };
     }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
-        return exitPromise.then((a) =>
-            Exit.isSuccess(a)
-                ? a.value
-                : {
-                      issueQueryParams: '',
-                      issueList: paginatedList<LocalIssue>()
-                  }
-        );
+        return {
+            page: exitPromise.then((a) =>
+                Exit.isSuccess(a)
+                    ? a.value
+                    : {
+                          issueList: paginatedList<LocalIssue>()
+                      }
+            )
+        };
     }
 
     const exit = await exitPromise;
@@ -84,5 +79,38 @@ export const load: PageServerLoad = async ({
         );
         return error(status, body);
     }
-    return exit.value;
+    return { page: exit.value };
+};
+
+const fetchTeamIdEffect = (
+    fetch: typeof globalThis.fetch,
+    workspaceId: string,
+    teamIdentifier: string
+) => {
+    return Effect.gen(function* () {
+        const response = yield* LoadResponse.Fetch(() =>
+            fetch(`/api/workspaces/${workspaceId}/teams/identifier/${teamIdentifier}?select=Id`, {
+                method: 'get'
+            })
+        );
+        const json = yield* LoadResponse.JSON(() => response.json<{ id: string }>());
+        return json.id;
+    });
+};
+
+const fetchProjectIdEffect = (
+    fetch: typeof globalThis.fetch,
+    workspaceId: string,
+    projectIdentifier: string
+) => {
+    return Effect.gen(function* () {
+        const response = yield* LoadResponse.Fetch(() =>
+            fetch(
+                `/api/workspaces/${workspaceId}/projects/identifier/${projectIdentifier}?select=Id`,
+                { method: 'get' }
+            )
+        );
+        const json = yield* LoadResponse.JSON(() => response.json<{ id: string }>());
+        return json.id;
+    });
 };
