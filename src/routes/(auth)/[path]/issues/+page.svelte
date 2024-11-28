@@ -20,6 +20,11 @@
         key: createQueryKey($page.url),
         params: createQueryParams($page.url)
     }));
+    const createIssueHref = $derived.by(() => {
+        const team = $page.url.searchParams.get('team');
+        const project = $page.url.searchParams.get('project');
+        return `/${$page.params['path']}/issues/new${stringifyQuery({ team, project }, { includeQuestionMark: true })}`;
+    });
     const query = createQuery(
         derivedStore(queryInfo, ($queryInfo) => ({
             queryKey: $queryInfo.key,
@@ -48,7 +53,7 @@
         <div>Filter</div>
         <Button
             as="link"
-            href="/{$page.params['path']}/issues/new"
+            href={createIssueHref}
             variant="base"
             filled={false}
             size="sm"

@@ -51,10 +51,14 @@ export function fluentSearchParams(input: URL | URLSearchParams) {
     return new FluentSearchParams(input instanceof URL ? input.searchParams : input);
 }
 
-export const stringifyQuery = (record: Record<string, unknown>) =>
-    Object.entries(record)
+export const stringifyQuery = (
+    record: Record<string, unknown>,
+    options?: { includeQuestionMark?: boolean }
+) =>
+    `${options?.includeQuestionMark ? '?' : ''}${Object.entries(record)
+        .filter(([, v]) => v != null)
         .map(([k, v]) => `${k}=${v}`)
-        .join('&');
+        .join('&')}`;
 
 class FluentSearchParams {
     private _searchParams: URLSearchParams;

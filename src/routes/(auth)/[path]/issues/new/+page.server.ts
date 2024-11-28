@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse } from '~/lib/utils/kit';
+import { stringifyQuery } from '~/lib/utils/url';
 import type { Actions } from './$types';
 import { decode, validate } from './utils';
 
@@ -26,15 +27,9 @@ export const actions: Actions = {
             );
         }
 
-        const redirectUrl = new URL(`/${params.path}/issues`, url.origin);
-        const team = url.searchParams.get('team');
-        const project = url.searchParams.get('project');
-        if (team) {
-            redirectUrl.searchParams.set('team', team);
-        }
-        if (project) {
-            redirectUrl.searchParams.set('project', project);
-        }
-        return redirect(302, redirectUrl);
+        return redirect(
+            302,
+            `/${params.path}/issues${stringifyQuery({ team: url.searchParams.get('team'), project: url.searchParams.get('project') }, { includeQuestionMark: true })}`
+        );
     }
 };
