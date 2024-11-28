@@ -1,6 +1,7 @@
+import { stringifyQuery } from '~/lib/utils/url';
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ parent, params }) => {
+export const load: LayoutLoad = async ({ parent, url, params }) => {
     const parentData = await parent();
     return {
         routes: [
@@ -9,7 +10,13 @@ export const load: LayoutLoad = async ({ parent, params }) => {
                 breadcrumb: true,
                 meta: {
                     title: 'Issues',
-                    href: `/${params.path}/issues`
+                    href: `/${params.path}/issues${stringifyQuery(
+                        {
+                            team: url.searchParams.get('team'),
+                            project: url.searchParams.get('project')
+                        },
+                        { includeQuestionMark: true }
+                    )}`
                 }
             }
         ]
