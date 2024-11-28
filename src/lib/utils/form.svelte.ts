@@ -41,7 +41,7 @@ export type HelperField = Action & {
     state: HelperFieldState;
     reset: () => void;
     validate: () => string[] | null;
-    setErrors: (errors?: string[]) => void;
+    setErrors: (errors?: string[] | null) => void;
     getNode: () => HTMLElement | null;
 };
 

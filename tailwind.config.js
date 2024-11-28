@@ -1,6 +1,7 @@
 import plugin from 'tailwindcss/plugin';
 import Typography from '@tailwindcss/typography';
 import { withAnimations } from 'animated-tailwindcss';
+import TailwindCSSMotion from 'tailwindcss-motion';
 
 /** @type {import('tailwindcss').Config} */
 export default withAnimations({
@@ -106,6 +107,7 @@ export default withAnimations({
         Typography,
         plugin(({ addComponents }) => {
             addComponents({ '.transition-enforcement': {} });
-        })
+        }),
+        TailwindCSSMotion
     ]
 });

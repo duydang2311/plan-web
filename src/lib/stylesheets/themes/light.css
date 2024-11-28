@@ -25,9 +25,9 @@
     --theme-base-fg-5: oklch(65% 0.0027 295.22);
     --theme-base-fg-ghost: oklch(80% 0.0027 295.22);
     --theme-base-fg-disabled: oklch(70% 0.0027 295.22);
-    --theme-base-border-1: oklch(84% 0.0027 295.22);
-    --theme-base-border-2: oklch(88% 0.0027 295.22);
-    --theme-base-border-3: oklch(94% 0.0027 295.22);
+    --theme-base-border-1: oklch(80% 0.0027 295.22);
+    --theme-base-border-2: oklch(84% 0.0027 295.22);
+    --theme-base-border-3: oklch(90% 0.0027 295.22);
 
     --theme-primary-1: oklch(48.32% 0.2931 274.22);
     --theme-primary-2: oklch(52.32% 0.2931 274.22);

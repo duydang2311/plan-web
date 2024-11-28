@@ -8,6 +8,7 @@ import { CloudinaryLive, ErrorFnLive } from './contexts';
 import { issueComments } from './routes/issue_comments';
 import { issues } from './routes/issues';
 import { teamMembers } from './routes/team_members';
+import { teams } from './routes/teams';
 import { users } from './routes/users';
 import { workspaceStatuses } from './routes/workspace-statuses';
 import { workspaces } from './routes/workspaces';
@@ -60,4 +61,5 @@ export const app = baseApp
     .use(issues)
     .use(issueComments)
     .use(teamMembers)
-    .use(workspaceStatuses);
+    .use(workspaceStatuses)
+    .use(teams);

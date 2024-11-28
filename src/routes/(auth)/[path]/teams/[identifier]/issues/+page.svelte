@@ -68,7 +68,7 @@
                             class="absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2"
                         />
                     </Button>
-                    {#if layoutOpen}
+                    {#if $layoutOpen}
                         <ol
                             use:melt={menu}
                             class="p-1 bg-base-1 border border-base-border-2 rounded shadow-sm space-y-1 min-w-40"

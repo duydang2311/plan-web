@@ -66,7 +66,6 @@
             ]
         >;
         options?: CreateSelectProps<Value, Multiple, S>;
-        open?: boolean;
     }
 
     type Trigger = Parameters<Parameters<typeof trigger.subscribe>[0]>[0];
