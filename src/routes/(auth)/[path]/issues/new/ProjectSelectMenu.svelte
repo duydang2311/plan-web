@@ -15,9 +15,9 @@
 
     const { httpClient } = useRuntime();
     const query = createQuery({
-        queryKey: ['teams', { workspaceId }],
+        queryKey: ['projects', { workspaceId }],
         queryFn: async () => {
-            const response = await httpClient.get(`/api/teams`, {
+            const response = await httpClient.get(`/api/projects`, {
                 query: { workspaceId, select: 'Id,Name' }
             });
 

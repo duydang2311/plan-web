@@ -3,7 +3,7 @@ import { validator } from '~/lib/utils/validation';
 
 export const validate = validator(
     Type.Object({
-        teamId: Type.String(),
+        projectId: Type.String(),
         title: Type.String(),
         description: Type.Optional(Type.String())
     }),
@@ -12,7 +12,7 @@ export const validate = validator(
 
 export const decode = (formData: FormData) =>
     ({
-        teamId: formData.get('teamId') ?? '',
+        projectId: formData.get('projectId') ?? '',
         title: formData.get('title') ?? '',
         description: formData.get('description')
     }) as const;

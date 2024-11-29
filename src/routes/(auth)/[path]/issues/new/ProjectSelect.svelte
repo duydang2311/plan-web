@@ -3,7 +3,7 @@
     import { writable, type Writable } from 'svelte/store';
     import { Button, Icon, Label, Select } from '~/lib/components';
     import { createSelectProps } from '~/lib/components/Select.svelte';
-    import TeamSelectMenu from './TeamSelectMenu.svelte';
+    import ProjectSelectMenu from './ProjectSelectMenu.svelte';
 
     const {
         workspaceId,
@@ -20,19 +20,23 @@
     })}
 >
     {#snippet children({ trigger, menu, option, helpers })}
-        <Label for={trigger.id}>Team</Label>
+        <Label for={trigger.id}>Project</Label>
         <Button
             type="button"
             variant="base"
             outline
-            class="relative flex items-center gap-2 pr-10 w-48"
+            class="relative flex items-center gap-2 pr-10"
             melt={trigger}
             autofocus
         >
             {#if $selected}
-                {$selected.label}
+                <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+                    {$selected.label}
+                </span>
             {:else}
-                <span class="text-base-fg-3"> Select a team </span>
+                <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+                    Select a project
+                </span>
             {/if}
             <Icon
                 name="chevron-up-down"
@@ -40,7 +44,7 @@
             />
         </Button>
         {#if $open}
-            <TeamSelectMenu {workspaceId} select={{ menu, option, helpers }} />
+            <ProjectSelectMenu {workspaceId} select={{ menu, option, helpers }} />
         {/if}
     {/snippet}
 </Select>

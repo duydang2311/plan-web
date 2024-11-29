@@ -9,7 +9,7 @@ export const createQueryParams = (url: URL) => {
                 order: null
             })
         ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Team.Identifier,Status.Value,Status.Rank,Priority'
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
     };
 };
 

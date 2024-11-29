@@ -54,11 +54,16 @@ export function fluentSearchParams(input: URL | URLSearchParams) {
 export const stringifyQuery = (
     record: Record<string, unknown>,
     options?: { includeQuestionMark?: boolean }
-) =>
-    `${options?.includeQuestionMark ? '?' : ''}${Object.entries(record)
-        .filter(([, v]) => v != null)
+) => {
+    const entries = Object.entries(record).filter(([, v]) => v != null);
+    if (entries.length === 0) {
+        return '';
+    }
+
+    return `${options?.includeQuestionMark ? '?' : ''}${entries
         .map(([k, v]) => `${k}=${v}`)
         .join('&')}`;
+};
 
 class FluentSearchParams {
     private _searchParams: URLSearchParams;

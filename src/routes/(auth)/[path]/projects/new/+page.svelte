@@ -16,11 +16,14 @@
             404: 'Could not connect to server'
         },
         name: {
-            required: 'Enter workspace name'
+            valueMissing: 'Enter project name',
+            required: 'Enter project name'
         },
         identifier: {
-            required: 'Enter workspace identifier',
-            maxLength: 'Enter workspace identifier with 5 characters at most',
+            valueMissing: 'Enter project identifier',
+            required: 'Enter project identifier',
+            maxLength: 'Enter project identifier with 5 characters at most',
+            StringMaxLength: 'Enter project identifier with 5 characters at most',
             invalid: 'The identifier has been reserved for internal usage'
         }
     };
@@ -47,7 +50,7 @@
         return name
             .replace(/[^A-Za-z0-9\s-]/g, '')
             .replace(/\s/g, '-')
-            .toLocaleLowerCase();
+            .toLocaleUpperCase('en');
     }
 </script>
 
@@ -95,10 +98,11 @@
                             fields.identifier.state.value = nameToIdentifier(
                                 fields.name.state.value
                             );
+                            fields.identifier.setErrors(fields.identifier.validate());
                         }
                     }}
                 />
-                <Errors errors={fields.name.state.errors} />
+                <Errors errors={fields.name.state.errors} errorMap={errorMap.name} />
             </fieldset>
             <fieldset class="space-y-1 grow basis-48">
                 <Label for="identifier">Identifier</Label>
@@ -108,6 +112,7 @@
                     name={fields.identifier.state.name}
                     autofocus
                     required
+                    maxlength={5}
                     bind:value={fields.identifier.state.value}
                     oninput={() => {
                         if (fields.identifier.state.value === '') {
@@ -126,12 +131,11 @@
                             );
                         }
                     }}
-                    class="lowercase"
                 />
                 <p class="text-base-fg-3">
                     <small
                         >The identifier (e.g. {fields.identifier.length
-                            ? fields.identifier.state.value.toLocaleLowerCase()
+                            ? fields.identifier.state.value.toLocaleUpperCase()
                             : 'project-abc'}) of the project to be displayed in the URL.</small
                     >
                 </p>

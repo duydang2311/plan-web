@@ -23,9 +23,10 @@
         queryFn: () => {
             return pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/workspaces/${data.workspace.id}/projects`, {
+                    httpClient.get(`/api/projects`, {
                         query: {
                             ...data.query,
+                            workspaceId: data.workspace.id,
                             select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
                         }
                     })

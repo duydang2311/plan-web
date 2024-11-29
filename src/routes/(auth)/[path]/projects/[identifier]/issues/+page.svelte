@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { createQuery } from '@tanstack/svelte-query';
-    import type { PageData } from './$types';
     import { invalidate } from '$app/navigation';
-    import { Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { createQuery } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
+    import { Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import type { PageData } from './$types';
 
     const { data }: { data: PageData } = $props();
 
@@ -36,7 +36,7 @@
                     <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
                 </Row>
             {:else}
-                {#each $query.data.items as { issue: { id, title, createdTime, updatedTime, orderNumber, team: { identifier } } } (id)}
+                {#each $query.data.items as { issue: { id, title, createdTime, updatedTime, orderNumber, project: { identifier } } } (id)}
                     <Row>
                         <td>
                             <div

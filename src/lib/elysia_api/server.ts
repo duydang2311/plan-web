@@ -7,6 +7,7 @@ import { UniversalHttpClient } from '../services/universal_http_client';
 import { CloudinaryLive, ErrorFnLive } from './contexts';
 import { issueComments } from './routes/issue_comments';
 import { issues } from './routes/issues';
+import { projects } from './routes/projects';
 import { teamMembers } from './routes/team_members';
 import { teams } from './routes/teams';
 import { users } from './routes/users';
@@ -62,4 +63,5 @@ export const app = baseApp
     .use(issueComments)
     .use(teamMembers)
     .use(workspaceStatuses)
-    .use(teams);
+    .use(teams)
+    .use(projects);

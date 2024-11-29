@@ -66,7 +66,7 @@
     <IssueTable
         issues={$query.data
             ? {
-                  items: $query.data.items.map((a) => ({ ...a, identifier: a.team.identifier })),
+                  items: $query.data.items.map((a) => ({ ...a, identifier: a.project.identifier })),
                   totalCount: $query.data.totalCount
               }
             : undefined}

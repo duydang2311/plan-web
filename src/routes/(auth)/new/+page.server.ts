@@ -6,7 +6,7 @@ import type { Actions } from './$types';
 import { decode, validate } from './utils';
 
 export const actions: Actions = {
-    default: async ({ request, cookies, locals: { runtime } }) => {
+    default: async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(
             Effect.gen(function* ($) {
                 const formData = yield* Effect.promise(() => request.formData());
@@ -20,10 +20,7 @@ export const actions: Actions = {
                         const apiClient = yield* ApiClient;
                         const response = yield* $(
                             apiClient.post('workspaces', {
-                                body: validation.data,
-                                headers: {
-                                    Authorization: `Bearer ${cookies.get('access_token')}`
-                                }
+                                body: validation.data
                             }),
                             Effect.catchTag('ApiError', (e) =>
                                 Effect.fail(fail(400, { errors: { root: [e.code] } }))

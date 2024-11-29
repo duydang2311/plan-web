@@ -5,12 +5,13 @@ import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { LoadResponse } from '~/lib/utils/kit';
 import { paginatedQuery, queryParams, stringifyQuery } from '~/lib/utils/url';
 import type { PageServerLoad } from './$types';
+import { createQueryParams } from './utils';
 
 export type LocalIssue = Pick<
     Issue,
     'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'priority'
 > & {
-    team: { identifier: string };
+    project: { identifier: string };
     status?: { value: string; rank: string };
 };
 
@@ -22,31 +23,20 @@ export const load: PageServerLoad = async ({
     locals: { runtime }
 }) => {
     const data = await parent();
-    const query: Record<string, unknown> = {
-        ...paginatedQuery(
-            queryParams(url, {
-                page: 1,
-                size: 20,
-                order: null
-            })
-        ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Team.Identifier,Status.Value,Status.Rank,Priority'
-    };
+    const query: Record<string, unknown> = createQueryParams(url);
     const teamIdentifier = url.searchParams.get('team');
     const projectIdentifier = url.searchParams.get('project');
     const exitPromise = Effect.gen(function* () {
         if (teamIdentifier) {
-            const teamId = yield* fetchTeamIdEffect(fetch, data.workspace.id, teamIdentifier);
-            query['teamId'] = teamId;
+            query['teamId'] = yield* fetchTeamIdEffect(fetch, data.workspace.id, teamIdentifier);
         }
 
         if (projectIdentifier) {
-            const projectId = yield* fetchProjectIdEffect(
+            query['projectId'] = yield* fetchProjectIdEffect(
                 fetch,
                 data.workspace.id,
                 projectIdentifier
             );
-            query['projectId'] = projectId;
         }
 
         const response = yield* LoadResponse.Fetch(() =>

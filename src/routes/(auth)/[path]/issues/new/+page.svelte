@@ -11,7 +11,7 @@
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import type { ActionData, PageData } from './$types';
-    import TeamSelect from './TeamSelect.svelte';
+    import ProjectSelect from './ProjectSelect.svelte';
     import { validate } from './utils';
 
     const errorMap = {
@@ -22,8 +22,8 @@
             404: 'Could not connect to server',
             403: 'Could not create issue due to lack of privileges'
         },
-        teamId: {
-            valueMissing: 'Select a team'
+        projectId: {
+            valueMissing: 'Select a project'
         },
         title: {
             string: 'Enter issue title',
@@ -40,8 +40,8 @@
     let editor = $state.raw<Editor>();
     const helperForm = createForm({ validator: formValidator(validate) });
     const fields = {
-        teamId: helperForm.createField({
-            name: 'teamId'
+        projectId: helperForm.createField({
+            name: 'projectId'
         }),
         title: helperForm.createField({ name: 'title' }),
         description: helperForm.createField({ name: 'description' })
@@ -66,8 +66,8 @@
     createEffect(
         () => {
             if ($selected) {
-                fields.teamId.state.value = $selected.value;
-                fields.teamId.setErrors(fields.teamId.validate());
+                fields.projectId.state.value = $selected.value;
+                fields.projectId.setErrors(fields.projectId.validate());
             }
         },
         () => $selected
@@ -107,19 +107,19 @@
         }}
     >
         <div class="flex gap-4 flex-wrap">
-            <fieldset class="space-y-1">
-                <TeamSelect workspaceId={data.workspace.id} {selected} />
+            <fieldset class="space-y-1 min-w-60 w-60 max-sm:basis-full">
+                <ProjectSelect workspaceId={data.workspace.id} {selected} />
                 <input
-                    use:fields.teamId
+                    use:fields.projectId
                     type="text"
-                    name={fields.teamId.state.name}
+                    name={fields.projectId.state.name}
                     value={$selected?.value}
                     required
                     hidden
                 />
-                <Errors errors={fields.teamId.state.errors} errorMap={errorMap.teamId} />
+                <Errors errors={fields.projectId.state.errors} errorMap={errorMap.projectId} />
             </fieldset>
-            <fieldset class="space-y-1 grow">
+            <fieldset class="space-y-1 flex-1">
                 <Label for="title">Title</Label>
                 <Input
                     useField={fields.title}

@@ -30,14 +30,15 @@ export const load: PageServerLoad = async ({
     } = await parent();
 
     const query = {
-        ...queryParams(url, { page: 1, size: 20, order: null }),
-        select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
+        ...paginatedQuery(queryParams(url, { page: 1, size: 20, order: null })),
+        select: 'Id,Name,Identifier,CreatedTime,UpdatedTime',
+        workspaceId: id
     };
     const exitPromise = Effect.gen(function* () {
         const httpClient = yield* HttpClient;
         const response = yield* LoadResponse.Fetch(() =>
-            httpClient.get(`workspaces/${id}/projects`, {
-                query: paginatedQuery(query)
+            httpClient.get(`projects`, {
+                query
             })
         );
         return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
