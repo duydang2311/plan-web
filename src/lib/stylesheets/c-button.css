@@ -11,9 +11,9 @@
     --_border-disabled: var(--theme-base-border-2);
 
     width: 100%;
-    padding: theme('size[2]') theme('size[4]');
+    padding: theme('size[2]') theme('size[5]');
     font-weight: 600;
-    border-radius: theme('borderRadius.lg');
+    border-radius: theme('borderRadius[md]');
     color: var(--_fg);
     box-shadow: var(--_shadow);
     background-color: var(--_bg);
@@ -107,6 +107,6 @@
 
 .c-button--sm {
     font-size: theme('fontSize[sm]');
-    padding-block: theme('padding[0.5]');
+    padding: theme('padding[0.5]') theme('padding[3]');
     border-radius: theme('borderRadius[DEFAULT]');
 }
