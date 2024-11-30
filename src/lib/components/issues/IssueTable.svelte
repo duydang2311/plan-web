@@ -10,6 +10,7 @@
         type Issue
     } from '~/lib/models/issue';
     import type { PaginatedList } from '~/lib/models/paginatedList';
+    import { stringifyQuery } from '~/lib/utils/url';
 
     interface Props {
         issues?: PaginatedList<
@@ -27,6 +28,15 @@
     }
 
     const { issues, status }: Props = $props();
+    const issueQueryString = $derived(
+        stringifyQuery(
+            {
+                team: $page.url.searchParams.get('team'),
+                project: $page.url.searchParams.get('project')
+            },
+            { includeQuestionMark: true }
+        )
+    );
 </script>
 
 <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
@@ -55,7 +65,9 @@
                         </div>
                     </td>
                     <td>
-                        <Link href="/{$page.params['path']}/issues/{id}">{title}</Link>
+                        <Link href="/{$page.params['path']}/issues/{id}{issueQueryString}">
+                            {title}
+                        </Link>
                     </td>
                     <td>
                         {#if status?.value}
