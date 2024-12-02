@@ -2,7 +2,6 @@ import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
 import { CloudinaryLive } from './lib/elysia_api/contexts';
-import { app } from './lib/elysia_api/server';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
@@ -14,7 +13,7 @@ if (!env.API_VERSION) throw new ReferenceError('API_VERSION must be provided');
 
 export const handle: Handle = async ({
     event,
-    event: { request, locals, route, cookies, fetch },
+    event: { request, url, locals, route, cookies, fetch },
     resolve
 }) => {
     const routeId = route.id;
@@ -24,7 +23,14 @@ export const handle: Handle = async ({
             routeId.charCodeAt(2) === 112 && // p
             routeId.charCodeAt(3) === 105) // i
     ) {
-        return app.handle(request);
+        if (!request.headers.has('Authorization')) {
+            const session = cookies.get('plan_session');
+            if (session) {
+                request.headers.set('Authorization', `Basic ${cookies.get('plan_session')}`);
+            }
+        }
+        const version = url.pathname.at(-1) === '/' ? 'v1' : '/v1';
+        return globalThis.fetch(`${env.API_ORIGIN}${url.pathname}${version}${url.search}`, request);
     }
 
     initLocals(locals, fetch);
