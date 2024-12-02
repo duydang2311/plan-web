@@ -1,78 +1,75 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { derived as derivedStore } from 'svelte/store';
-    import { Button, Icon, Pagination } from '~/lib/components';
-    import IssueTable from '~/lib/components/issues/IssueTable.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
-    import { createEffect } from '~/lib/utils/runes.svelte';
-    import { paginatedQuery, queryParams, stringifyQuery } from '~/lib/utils/url';
+    import type { SelectOption } from '@melt-ui/svelte';
+    import { untrack } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { Button, Icon } from '~/lib/components';
+    import Input from '~/lib/components/Input.svelte';
+    import { fluentSearchParams, stringifyQuery } from '~/lib/utils/url';
     import type { PageData } from './$types';
-    import type { LocalIssue } from './+page.server';
-    import { createQueryKey, createQueryParams } from './utils';
+    import TableLayout from './TableLayout.svelte';
+    import ViewLayoutSelect from './ViewLayoutSelect.svelte';
 
     const { data }: { data: PageData } = $props();
-    const { httpClient } = useRuntime();
-    const queryClient = useQueryClient();
-    const queryInfo = derivedStore(page, ($page) => ({
-        key: createQueryKey($page.url),
-        params: createQueryParams($page.url)
-    }));
-    const createIssueHref = $derived.by(() => {
-        const team = $page.url.searchParams.get('team');
-        const project = $page.url.searchParams.get('project');
-        return `/${$page.params['path']}/issues/new${stringifyQuery({ team, project }, { includeQuestionMark: true })}`;
+    const filterQueryParams = $derived({
+        team: $page.url.searchParams.get('team'),
+        project: $page.url.searchParams.get('project')
     });
-    const query = createQuery(
-        derivedStore(queryInfo, ($queryInfo) => ({
-            queryKey: $queryInfo.key,
-            queryFn: async () => {
-                const response = await httpClient.get(
-                    `/api/issues?${stringifyQuery($queryInfo.params)}`
-                );
-                return await response.json<PaginatedList<LocalIssue>>();
-            }
-        }))
+    const createIssueHref = $derived(
+        `/${$page.params['path']}/issues/new${stringifyQuery(filterQueryParams, { includeQuestionMark: true })}`
     );
-    const paginationQuery = $derived(paginatedQuery(queryParams($page.url, { page: 1, size: 20 })));
-
-    createEffect(
-        () => {
-            unwrapMaybePromise(data.page)((a) => {
-                queryClient.setQueryData($queryInfo.key, a.issueList);
-            });
+    const layouts = $derived([
+        {
+            label: 'Table',
+            value: 'table',
+            icon: 'rows' as const,
+            href: fluentSearchParams($page.url).delete('layout').toString()
         },
-        () => [data.page, $queryInfo]
+        {
+            label: 'Board',
+            value: 'board',
+            icon: 'columns' as const,
+            href: fluentSearchParams($page.url).set('layout', 'board').toString()
+        }
+    ]);
+    const selectedLayout = writable<SelectOption<string>>(
+        untrack(() => layouts[data.layout === 'board' ? 1 : 0])
     );
 </script>
 
 <main class="grid grid-rows-[auto_1fr_auto] h-full overflow-auto">
-    <div class="px-6 py-1 flex justify-between border-b border-b-base-border-2">
-        <div>Filter</div>
-        <Button
-            as="link"
-            href={createIssueHref}
-            variant="base"
-            filled={false}
-            size="sm"
-            class="flex items-center gap-2 w-fit"
-        >
-            <Icon name="plus" />
-            Create issue
-        </Button>
+    <div class="flex justify-between border-b border-b-base-border-2">
+        <div class="flex items-stretch first:*:pl-0 divide-x divide-base-border-2 grow">
+            {#if filterQueryParams.project != null}
+                <div class="min-w-32">
+                    <ViewLayoutSelect {layouts} selected={selectedLayout} />
+                </div>
+            {/if}
+            <div class="grow">
+                <div class="relative">
+                    <Input
+                        type="text"
+                        placeholder="Type to search issue..."
+                        class="pl-8 w-full h-full text-sm border-none rounded focus:shadow-none"
+                    />
+                    <Icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2" />
+                </div>
+            </div>
+        </div>
+        <div class="border-l border-l-base-border-2 flex items-center">
+            <Button
+                as="link"
+                href={createIssueHref}
+                variant="base"
+                filled={false}
+                class="flex items-center gap-2 rounded-none w-fit h-full pr-6 text-sm whitespace-nowrap text-ellipsis overflow-hidden"
+            >
+                <Icon name="plus" />
+                Create issue
+            </Button>
+        </div>
     </div>
-    <IssueTable
-        issues={$query.data
-            ? {
-                  items: $query.data.items.map((a) => ({ ...a, identifier: a.project.identifier })),
-                  totalCount: $query.data.totalCount
-              }
-            : undefined}
-        status={$query.isFetching ? 'loading' : undefined}
-    />
-    {#if $query.data}
-        <Pagination {...paginationQuery} list={$query.data} />
+    {#if $selectedLayout.value === 'table'}
+        <TableLayout {data} />
     {/if}
 </main>

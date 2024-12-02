@@ -13,10 +13,30 @@ export const createQueryParams = (url: URL) => {
     };
 };
 
-export const createQueryKey = (url: URL) => {
-    const queryKey: unknown[] = [
+export const createBoardQueryParams = (url: URL) => {
+    return {
+        ...paginatedQuery(
+            queryParams(url, {
+                page: 1,
+                size: 20,
+                order: null
+            })
+        ),
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+        order: 'StatusRank'
+    };
+};
+
+export const createQueryKey = (
+    url: URL,
+    { team, project, layout }: { team?: string; project?: string; layout?: string } = {}
+) => {
+    return [
         'issues',
-        { team: url.searchParams.get('team'), project: url.searchParams.get('project') }
-    ];
-    return queryKey;
+        {
+            team: team ?? url.searchParams.get('team'),
+            project: project ?? url.searchParams.get('project'),
+            layout: layout ?? (url.searchParams.get('layout') === 'board' ? 'board' : 'table')
+        }
+    ] as const;
 };

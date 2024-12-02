@@ -5,10 +5,20 @@ import { createQueryKey } from './utils';
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { queryClient } = await parent();
 
-    queryClient.prefetchQuery({
-        queryKey: createQueryKey(url),
-        queryFn: () => mapMaybePromise(data.page, (a) => a.issueList)
-    });
+    const queryKey = createQueryKey(url);
+    switch (data.layout) {
+        case 'board':
+            await queryClient.prefetchQuery({
+                queryKey,
+                queryFn: () => mapMaybePromise(data.page, (a) => a.issueLists)
+            });
+            break;
+        default:
+            await queryClient.prefetchQuery({
+                queryKey,
+                queryFn: () => mapMaybePromise(data.page, (a) => a.issueList)
+            });
+    }
 
     return data;
 };

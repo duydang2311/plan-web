@@ -7,7 +7,8 @@ export const load: LayoutLoad = () => {
         defaultOptions: {
             queries: {
                 enabled: browser,
-                staleTime: 60 * 1000
+                staleTime: 60 * 1000,
+                experimental_prefetchInRender: true
             }
         }
     });
