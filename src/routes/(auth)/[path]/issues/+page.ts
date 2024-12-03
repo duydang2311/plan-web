@@ -1,12 +1,13 @@
 import { mapMaybePromise } from '~/lib/utils/promise';
 import type { PageLoad } from './$types';
 import { createQueryKey } from './utils';
+import { prefetchQuery } from '~/lib/utils/query';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { queryClient } = await parent();
 
     const queryKey = createQueryKey(url);
-    switch (data.layout) {
+    switch (data.tag) {
         case 'board':
             await queryClient.prefetchQuery({
                 queryKey,
@@ -14,7 +15,7 @@ export const load: PageLoad = async ({ parent, url, data }) => {
             });
             break;
         default:
-            await queryClient.prefetchQuery({
+            await prefetchQuery(queryClient)({
                 queryKey,
                 queryFn: () => mapMaybePromise(data.page, (a) => a.issueList)
             });

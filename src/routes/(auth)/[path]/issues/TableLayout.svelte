@@ -6,11 +6,11 @@
     import IssueTable from '~/lib/components/issues/IssueTable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
-    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { mapMaybePromise, unwrapMaybePromise } from '~/lib/utils/promise';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
     import { createQueryKey, createQueryParams } from './utils';
+    import { createEffect } from '~/lib/utils/runes.svelte';
 
     const { data }: { data: PageData } = $props();
     const { api } = useRuntime();
@@ -23,22 +23,31 @@
         derivedStore(queryInfo, ($queryInfo) => ({
             queryKey: $queryInfo.key,
             queryFn: async () => {
-                const response = await api.get(`issues`, { query: $queryInfo.params });
+                if (data.tag !== 'table') {
+                    return null;
+                }
+                const query = await mapMaybePromise(data.page, (a) => {
+                    return {
+                        ...$queryInfo.params,
+                        projectId: a.projectId,
+                        teamId: a.teamId
+                    };
+                });
+                const response = await api.get(`issues`, { query });
                 return await response.json<PaginatedList<LocalIssue>>();
-            },
-            refetchInterval: 1000
+            }
         }))
     );
 
     createEffect(
         () => {
-            if (data.layout === 'table') {
+            if (data.tag === 'table') {
                 unwrapMaybePromise(data.page)((a) => {
                     queryClient.setQueryData($queryInfo.key, a.issueList);
                 });
             }
         },
-        () => [data.layout, data.page, $queryInfo]
+        () => data.page
     );
 </script>
 

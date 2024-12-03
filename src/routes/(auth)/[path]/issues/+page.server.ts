@@ -7,7 +7,6 @@ import type { WorkspaceStatus } from '~/lib/models/status';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import { compareRank } from '~/lib/utils/ranking';
-import { stringifyQuery } from '~/lib/utils/url';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createQueryParams } from './utils';
 
@@ -19,13 +18,17 @@ export type LocalIssue = Pick<
     status?: { value: string; rank: string };
 };
 
+export type LocalBoardIssue = Pick<
+    Issue,
+    'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'statusId' | 'statusRank'
+>;
+
 export const load: PageServerLoad = (e) => {
     return e.url.searchParams.get('layout') === 'board' ? loadBoardLayout(e) : loadTableLayout(e);
 };
 
 const loadTableLayout = async ({
     url,
-    fetch,
     parent,
     isDataRequest,
     locals: { runtime }
@@ -43,21 +46,22 @@ const loadTableLayout = async ({
             query['projectId'] = yield* fetchProjectIdEffect(data.workspace.id, projectIdentifier);
         }
         const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
-        return {
+        return table({
             issueList: yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>()),
-            teamId: query['teamId'] as string | undefined
-        };
+            teamId: query['teamId'] as string,
+            projectId: query['projectId'] as string
+        });
     }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
         return {
-            layout: 'table' as const,
+            tag: 'table' as const,
             page: exitPromise.then((a) =>
                 Exit.isSuccess(a)
                     ? a.value
-                    : {
+                    : table({
                           issueList: paginatedList<LocalIssue>()
-                      }
+                      })
             )
         };
     }
@@ -71,7 +75,7 @@ const loadTableLayout = async ({
         );
         return error(status, body);
     }
-    return { layout: 'table' as const, page: exit.value };
+    return { tag: 'table' as const, page: exit.value };
 };
 
 const loadBoardLayout = async ({
@@ -100,19 +104,24 @@ const loadBoardLayout = async ({
             query,
             statuses.map((a) => a.id)
         );
-        return { statuses, issueLists };
+        return board({
+            statuses,
+            issueLists,
+            teamId: query['teamId'] as string,
+            projectId: query['projectId'] as string
+        });
     }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
         return {
-            layout: 'board' as const,
+            tag: 'board' as const,
             page: exitPromise.then((a) =>
                 Exit.isSuccess(a)
                     ? a.value
-                    : {
+                    : board({
                           statuses: [],
                           issueLists: {}
-                      }
+                      })
             )
         };
     }
@@ -128,7 +137,7 @@ const loadBoardLayout = async ({
     }
 
     return {
-        layout: 'board' as const,
+        tag: 'board' as const,
         page: exit.value
     };
 };
@@ -187,7 +196,7 @@ const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) 
         return yield* Effect.all(
             pairs.map(([id, response]) =>
                 pipe(
-                    LoadResponse.JSON(() => response.json<PaginatedList<Issue>>()),
+                    LoadResponse.JSON(() => response.json<PaginatedList<LocalBoardIssue>>()),
                     Effect.map(
                         (a) =>
                             [
@@ -221,3 +230,16 @@ const getWorkspaceStatuses = (workspaceId: string) =>
             response.json<{ statuses?: WorkspaceStatus[] }>().then((a) => a.statuses)
         );
     });
+
+const table = (data: {
+    issueList: PaginatedList<LocalIssue>;
+    teamId?: string;
+    projectId?: string;
+}) => data;
+
+const board = (data: {
+    statuses: WorkspaceStatus[];
+    issueLists: Record<string, PaginatedList<LocalBoardIssue>>;
+    teamId?: string;
+    projectId?: string;
+}) => data;
