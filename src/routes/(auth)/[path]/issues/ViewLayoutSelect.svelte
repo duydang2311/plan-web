@@ -4,6 +4,7 @@
     import { Button, Icon, Select } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
     import { createSelectProps } from '~/lib/components/Select.svelte';
+    import { select, tsap } from '~/lib/utils/transition';
 
     const {
         layouts,
@@ -31,7 +32,8 @@
             fitViewport: true,
             sameWidth: false,
             placement: 'bottom-start'
-        }
+        },
+        forceVisible: true
     })}
 >
     {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
@@ -50,7 +52,7 @@
             />
         </Button>
         {#if $open}
-            <ol use:melt={menu} class="c-select--menu">
+            <ol use:melt={menu} class="c-select--menu" in:tsap={select.in} out:tsap={select.out}>
                 {#each layouts as layout (layout.value)}
                     {@const opt = option(layout)}
                     {@const selected = isSelected(layout.value)}

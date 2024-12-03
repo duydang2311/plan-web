@@ -34,6 +34,10 @@
         &:active {
             background-color: var(--_bg-active);
         }
+        &[data-state='open'] {
+            color: var(--_fg-hover);
+            background-color: var(--_bg-hover);
+        }
     }
 
     &:where(:disabled) {
@@ -49,17 +53,17 @@
         --_bg-disabled: var(--theme-base-disabled);
     }
 
-    &:where(:focus-visible) {
-        outline: 2px solid var(--_border);
-        outline-offset: 2px;
-    }
-
     &:where(:root[data-theme='dark'] &) {
         &.c-button--filled {
             --_bg: var(--theme-base-3);
             --_bg-hover: var(--theme-base-4);
             --_bg-active: var(--theme-base-active);
         }
+    }
+
+    &:where(:focus-visible) {
+        outline: 2px solid var(--_border);
+        outline-offset: 2px;
     }
 }
 

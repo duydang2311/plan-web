@@ -108,13 +108,7 @@
     }}
 >
     {#snippet children({ trigger, menu, option, helpers })}
-        <Button
-            type="button"
-            variant="base"
-            outline
-            class="flex gap-4 items-center data-[state=open]:bg-base-3"
-            melt={trigger}
-        >
+        <Button type="button" variant="base" outline class="flex gap-4 items-center" melt={trigger}>
             {#if $selected == null}
                 No status
             {:else}

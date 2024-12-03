@@ -2,6 +2,7 @@
     import { enhance } from '$app/forms';
     import { type SelectOption } from '@melt-ui/svelte';
     import { Editor } from '@tiptap/core';
+    import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
@@ -9,6 +10,7 @@
     import Label from '~/lib/components/Label.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
+    import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import type { ActionData, PageData } from './$types';
     import ProjectSelect from './ProjectSelect.svelte';
@@ -46,7 +48,21 @@
         title: helperForm.createField({ name: 'title' }),
         description: helperForm.createField({ name: 'description' })
     };
-    const selected = writable<SelectOption<string>>();
+    const selected = writable<SelectOption<string>>(
+        untrack(() =>
+            data.page?.project && !(data.page.project instanceof Promise)
+                ? { label: data.page.project.name, value: data.page.project.id }
+                : undefined
+        )
+    );
+
+    if (data.page?.project instanceof Promise) {
+        unwrapMaybePromise(data.page.project)((a) => {
+            if (a) {
+                $selected = { label: a.name, value: a.id };
+            }
+        });
+    }
 
     $effect(() => {
         if (!editor) {

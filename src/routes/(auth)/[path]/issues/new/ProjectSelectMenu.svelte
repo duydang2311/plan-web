@@ -6,10 +6,11 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';
+    import { select, tsap } from '~/lib/utils/transition';
 
     const {
         workspaceId,
-        select
+        select: props
     }: { workspaceId: string; select: Pick<SelectChildrenProps, 'menu' | 'option' | 'helpers'> } =
         $props();
 
@@ -24,8 +25,8 @@
             return await response.json<PaginatedList<Team>>();
         }
     });
-    const menu = $derived(select.menu);
-    const option = $derived(select.option);
+    const menu = $derived(props.menu);
+    const option = $derived(props.option);
     const teams = $derived(
         $query.data != null
             ? $query.data.items.map((a) => ({
@@ -36,7 +37,7 @@
     );
 </script>
 
-<ol use:melt={menu} class="c-select--menu">
+<ol use:melt={menu} class="c-select--menu" in:tsap={select.in} out:tsap={select.out}>
     {#if $query.isFetching}
         {#each { length: 4 } as _}
             <li class="animate-twPulse rounded h-8 w-full bg-base-3"></li>
@@ -44,7 +45,7 @@
     {:else if teams != null}
         {#each teams as team (team.value)}
             {@const opt = option(team)}
-            {@const selected = select.helpers.isSelected(team.value)}
+            {@const selected = props.helpers.isSelected(team.value)}
             <li use:melt={opt} class="c-select--option">
                 <div>
                     {#if selected}

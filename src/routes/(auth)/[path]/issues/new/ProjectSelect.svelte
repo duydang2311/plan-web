@@ -16,7 +16,8 @@
 <Select
     options={createSelectProps<string, false>({
         open,
-        selected
+        selected,
+        forceVisible: true
     })}
 >
     {#snippet children({ trigger, menu, option, helpers })}
@@ -24,6 +25,7 @@
         <Button
             type="button"
             variant="base"
+            filled={false}
             outline
             class="relative flex items-center gap-2 pr-10"
             melt={trigger}
