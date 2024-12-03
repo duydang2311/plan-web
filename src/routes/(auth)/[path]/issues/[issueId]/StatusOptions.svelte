@@ -33,14 +33,14 @@
         option,
         helpers: { isSelected }
     } = $derived(selectProps);
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
 
     const query = createQuery({
         queryKey: ['workspace-statuses', { workspaceId }],
         queryFn: () => {
             return pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/workspaces/${workspaceId}/statuses`, {
+                    api.get(`workspaces/${workspaceId}/statuses`, {
                         query: { select: 'Id,Rank,Value,Icon', order: 'Rank' }
                     })
                 )(),

@@ -42,10 +42,7 @@ const loadTableLayout = async ({
         if (projectIdentifier) {
             query['projectId'] = yield* fetchProjectIdEffect(data.workspace.id, projectIdentifier);
         }
-
-        const response = yield* LoadResponse.Fetch(() =>
-            fetch(`/api/issues${stringifyQuery(query, { includeQuestionMark: true })}`)
-        );
+        const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
         return {
             issueList: yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>()),
             teamId: query['teamId'] as string | undefined

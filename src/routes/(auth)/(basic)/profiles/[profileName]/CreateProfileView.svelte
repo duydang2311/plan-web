@@ -23,7 +23,7 @@
     import { validateCreateProfile } from './utils';
 
     const { queryKey, userId }: { queryKey: unknown[]; userId: string } = $props();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const queryClient = useQueryClient();
     let imageFile = $state<File | Blob | null>(null);
     let imageFileInfo = $state<{ name: string; bytes: number } | null>(null);
@@ -41,23 +41,25 @@
 
     const upload = async (file: File | Blob) => {
         const either = await pipe(
-            TE.fromPromise(() => httpClient.get('/api/users/profiles/image-signed-upload'))(),
+            TE.fromPromise(() => api.get('users/profiles/signed-upload'))(),
             TE.flatMap((a) =>
                 a.ok
                     ? TE.fromPromise(() =>
                           a.json<{
                               url: string;
                               timestamp: number;
-                              public_id: string;
-                              api_key: string;
+                              publicId: string;
+                              apiKey: string;
                               transformation: string;
                               signature: string;
-                              notification_url: string;
+                              notificationUrl: string;
                           }>()
                       )()
                     : TE.leftVoid
             )
         )();
+
+        console.log(either);
 
         if (either.tag === 'Left') {
             addToast({
@@ -72,11 +74,11 @@
         const { url, ...body } = either.right;
         const formData = new FormData();
         formData.set('timestamp', body.timestamp + '');
-        formData.set('public_id', body.public_id);
-        formData.set('api_key', body.api_key);
+        formData.set('public_id', body.publicId);
+        formData.set('api_key', body.apiKey);
         formData.set('transformation', body.transformation);
         formData.set('signature', body.signature);
-        formData.set('notification_url', body.notification_url);
+        formData.set('notification_url', body.notificationUrl);
         formData.set('file', file);
 
         const uploadEither = await pipe(

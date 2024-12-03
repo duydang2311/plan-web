@@ -13,11 +13,11 @@
     }: { workspaceId: string; select: Pick<SelectChildrenProps, 'menu' | 'option' | 'helpers'> } =
         $props();
 
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const query = createQuery({
         queryKey: ['projects', { workspaceId }],
         queryFn: async () => {
-            const response = await httpClient.get(`/api/projects`, {
+            const response = await api.get(`projects`, {
                 query: { workspaceId, select: 'Id,Name' }
             });
 

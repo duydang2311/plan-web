@@ -30,7 +30,7 @@
         }
     });
     const queryClient = useQueryClient();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({
             issueId,
@@ -43,7 +43,7 @@
                 statusId: number;
             };
         }) =>
-            httpClient.patch(`/api/issues/${issueId}`, {
+            api.patch(`issues/${issueId}`, {
                 body: { patch: { statusRank: target.statusRank, statusId: target.statusId } }
             }),
         onMutate: async ({ issueId, source, target }) => {

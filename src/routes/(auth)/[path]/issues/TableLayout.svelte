@@ -8,13 +8,12 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { createEffect } from '~/lib/utils/runes.svelte';
-    import { stringifyQuery } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
     import { createQueryKey, createQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const queryClient = useQueryClient();
     const queryInfo = derivedStore(page, ($page) => ({
         key: createQueryKey($page.url, { layout: 'table' }),
@@ -24,11 +23,10 @@
         derivedStore(queryInfo, ($queryInfo) => ({
             queryKey: $queryInfo.key,
             queryFn: async () => {
-                const response = await httpClient.get(
-                    `/api/issues?${stringifyQuery($queryInfo.params)}`
-                );
+                const response = await api.get(`issues`, { query: $queryInfo.params });
                 return await response.json<PaginatedList<LocalIssue>>();
-            }
+            },
+            refetchInterval: 1000
         }))
     );
 

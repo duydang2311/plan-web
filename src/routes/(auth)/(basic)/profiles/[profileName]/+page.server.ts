@@ -20,20 +20,16 @@ export type LocalUser = Omit<RemoteUser, 'profile'> & {
 export const load: PageServerLoad = async ({
     depends,
     locals: { user, runtime },
-    fetch,
     isDataRequest,
     params
 }) => {
     depends('fetch:profiles');
     if (params.profileName === 'me') {
         const promise = Effect.gen(function* () {
-            const response = yield* LoadResponse.Fetch(() =>
-                fetch(
-                    `/api/users/${user.id}?select=Profile.Name,Profile.DisplayName,Profile.Image`,
-                    {
-                        method: 'get'
-                    }
-                )
+            const response = yield* LoadResponse.HTTP(
+                (yield* ApiClient).get(`users/${user.id}`, {
+                    query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
+                })
             );
             const { profile } = yield* LoadResponse.JSON(() =>
                 response.json<Omit<RemoteUser, 'id'>>()
@@ -50,13 +46,10 @@ export const load: PageServerLoad = async ({
     }
 
     const exit = await Effect.gen(function* () {
-        const response = yield* LoadResponse.Fetch(() =>
-            fetch(
-                `/api/users/profile-name/${params.profileName}?select=Id,Profile.Name,Profile.DisplayName,Profile.Image`,
-                {
-                    method: 'get'
-                }
-            )
+        const response = yield* LoadResponse.HTTP(
+            (yield* ApiClient).get(`users/profile-name/${params.profileName}`, {
+                query: { select: 'Id,Profile.Name,Profile.DisplayName,Profile.Image' }
+            })
         );
         const user = yield* LoadResponse.JSON(() => response.json<RemoteUser>());
 

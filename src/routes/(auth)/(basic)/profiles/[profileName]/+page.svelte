@@ -13,7 +13,7 @@
 
     const { data }: { data: PageData } = $props();
     const queryKey = ['profiles', { profileName: $page.params['profileName'] }];
-    const { httpClient, cloudinary } = useRuntime();
+    const { api, cloudinary } = useRuntime();
     const query = createQuery({
         queryKey,
         queryFn: async () => {
@@ -24,7 +24,7 @@
 
             const a = await pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/users/${user.id}`, {
+                    api.get(`users/${user.id}`, {
                         query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
                     })
                 )(),

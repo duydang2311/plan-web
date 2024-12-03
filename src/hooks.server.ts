@@ -29,8 +29,7 @@ export const handle: Handle = async ({
                 request.headers.set('Authorization', `Basic ${cookies.get('plan_session')}`);
             }
         }
-        const version = url.pathname.at(-1) === '/' ? 'v1' : '/v1';
-        return globalThis.fetch(`${env.API_ORIGIN}${url.pathname}${version}${url.search}`, request);
+        return globalThis.fetch(`${env.API_ORIGIN}${url.pathname}${url.search}`, request);
     }
 
     initLocals(locals, fetch);

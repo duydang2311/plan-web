@@ -18,7 +18,7 @@
     }
 
     const { workspaceId, issueId }: Props = $props();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const queryClient = useQueryClient();
     const open = writable(false);
     const queryKey = ['workspace-status', { issueId }];
@@ -27,7 +27,7 @@
         queryFn: () => {
             return pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/issues/${issueId}`, {
+                    api.get(`issues/${issueId}`, {
                         query: { select: 'Status.Id,Status.Value,Status.Icon' }
                     })
                 )(),
@@ -48,7 +48,7 @@
     });
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
-            httpClient.patch(`/api/issues/${issueId}`, { body: { patch: { statusId } } }),
+            api.patch(`issues/${issueId}`, { body: { patch: { statusId } } }),
         onMutate: async ({ statusId }) => {
             await queryClient.cancelQueries({ queryKey });
             const oldStatus = queryClient.getQueryData<WorkspaceStatus>(queryKey);

@@ -16,14 +16,14 @@
 
     const { data }: { data: PageData } = $props();
     const queryClient = useQueryClient();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const queryKey = ['projects'];
     const query = createQuery({
         queryKey,
         queryFn: () => {
             return pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/projects`, {
+                    api.get(`projects`, {
                         query: {
                             ...data.query,
                             workspaceId: data.workspace.id,

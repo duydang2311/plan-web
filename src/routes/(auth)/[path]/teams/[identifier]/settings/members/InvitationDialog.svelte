@@ -47,7 +47,7 @@
     };
 
     const { team, form, ...props }: Props = $props();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     let search = $state.raw('');
     const queryOptions = writable<
         CreateQueryOptions<
@@ -78,7 +78,7 @@
                     queryFn: () => {
                         return pipe(
                             TE.fromPromise(() =>
-                                httpClient.get('/api/users/search', {
+                                api.get('users/search', {
                                     query: { query: search, size: 5 }
                                 })
                             )(),

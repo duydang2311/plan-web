@@ -21,7 +21,7 @@
 
     let { data }: Props = $props();
     let status = $state<'pending-long' | null>(null);
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const queryKey = $derived(['team-members', { teamId: $page.data['team'].id }]);
     const queryClient = useQueryClient();
     const roles = ['Administrator', 'Manager', 'Member', 'Guest'].map((a) => ({
@@ -30,7 +30,7 @@
     }));
     const mutation = createMutation({
         mutationFn: (role: string) =>
-            httpClient.put(`/api/teams/${data.teamId}/members/${data.member.id}`, {
+            api.put(`teams/${data.teamId}/members/${data.member.id}`, {
                 body: { roleName: role }
             }),
         onMutate: async (role) => {

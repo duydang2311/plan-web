@@ -2,7 +2,6 @@ import { error, fail } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { HttpClient } from '~/lib/services/http_client';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { Type } from '~/lib/utils/typebox';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
@@ -35,9 +34,8 @@ export const load: PageServerLoad = async ({
         workspaceId: id
     };
     const exitPromise = Effect.gen(function* () {
-        const httpClient = yield* HttpClient;
-        const response = yield* LoadResponse.Fetch(() =>
-            httpClient.get(`projects`, {
+        const response = yield* LoadResponse.HTTP(
+            (yield* ApiClient).get(`projects`, {
                 query
             })
         );

@@ -23,10 +23,10 @@
         }
     });
     const queryClient = useQueryClient();
-    const { httpClient } = useRuntime();
+    const { api } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ statusId, rank }: { statusId: number; rank: number }) => {
-            return httpClient.patch(`/api/workspace-statuses/${statusId}`, {
+            return api.patch(`workspace-statuses/${statusId}`, {
                 body: { patch: { rank } }
             });
         },

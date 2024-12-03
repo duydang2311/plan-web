@@ -1,21 +1,19 @@
-import { page } from '$app/stores';
+import { env } from '$env/dynamic/public';
 import {
     PUBLIC_REALTIME_PASSWORD,
     PUBLIC_REALTIME_SERVER,
     PUBLIC_REALTIME_USERNAME
 } from '$env/static/public';
+import { Cloudinary } from '@cloudinary/url-gen';
 import defineLazyProperty from 'define-lazy-prop';
+import type { Context } from 'effect';
 import { getContext, setContext } from 'svelte';
-import { get } from 'svelte/store';
 import type { HttpClient } from '../services/http_client';
 import { NATSRealtime, type Realtime } from '../services/realtime.client';
 import { UniversalHttpClient } from '../services/universal_http_client';
-import type { Context } from 'effect';
-import { Cloudinary } from '@cloudinary/url-gen';
-import { env } from '$env/dynamic/public';
 
 interface Runtime {
-    readonly httpClient: Context.Tag.Service<HttpClient>;
+    readonly api: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
     readonly cloudinary: Cloudinary;
 }
@@ -34,10 +32,11 @@ export function setRuntime() {
     );
     defineLazyProperty(
         runtime,
-        'httpClient',
+        'api',
         () =>
             new UniversalHttpClient({
-                baseUrl: get(page).url.origin,
+                baseUrl: `${globalThis.origin}/api`,
+                version: 'v1',
                 fetch: globalThis.fetch
             })
     );

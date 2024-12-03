@@ -1,5 +1,6 @@
 import type { Context } from 'effect';
 import type { HttpClientOptions, HttpClientFetchRequestInit, HttpClient } from './http_client';
+import { stringifyQuery } from '../utils/url';
 
 type RequestRecord = Record<string, unknown>;
 type RequestArray = unknown[];
@@ -46,10 +47,7 @@ export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
     private _buildUrl(path: string, query?: RequestRecord) {
         const url = `${this._options.baseUrl ? `${this._options.baseUrl}/` : ''}${trim(path, '/')}${this._options.version ? `/${this._options.version}` : ''}`;
         if (query) {
-            return `${url}?${Object.entries(query)
-                .filter(([, v]) => v)
-                .map(([k, v]) => `${k}=${v}`)
-                .join('&')}`;
+            return `${url}${stringifyQuery(query, { includeQuestionMark: true })}`;
         }
         return url;
     }

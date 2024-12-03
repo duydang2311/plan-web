@@ -23,7 +23,7 @@
     import Status from './Status.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
-    const { realtime, httpClient } = useRuntime();
+    const { realtime, api } = useRuntime();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
     const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
     const query = createInfiniteQuery({
@@ -31,7 +31,7 @@
         queryFn: ({ pageParam }) => {
             return pipe(
                 TE.fromPromise(() =>
-                    httpClient.get(`/api/issues/${$page.params['issueId']}/comments`, {
+                    api.get(`issues/${$page.params['issueId']}/comments`, {
                         query: {
                             offset: pageParam,
                             size: commentQuery.size,
