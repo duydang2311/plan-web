@@ -11,9 +11,12 @@ export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime
                 const data = yield* Effect.promise(() => parent());
                 const api = yield* ApiClient;
                 const response = yield* LoadResponse.HTTP(
-                    api.get(`workspaces/${data.workspace.id}/identifier/${params.identifier}`, {
-                        query: { select: 'Id' }
-                    })
+                    api.get(
+                        `workspaces/${data.workspace.id}/projects/identifier/${params.identifier}`,
+                        {
+                            query: { select: 'Id' }
+                        }
+                    )
                 );
                 return yield* LoadResponse.JSON(() => response.json<{ id: string }>());
             })
