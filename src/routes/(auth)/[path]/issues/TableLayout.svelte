@@ -1,31 +1,32 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { derived as derivedStore } from 'svelte/store';
+    import { derived as derivedStore, toStore } from 'svelte/store';
+    import invariant from 'tiny-invariant';
     import { Pagination } from '~/lib/components';
     import IssueTable from '~/lib/components/issues/IssueTable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { mapMaybePromise, unwrapMaybePromise } from '~/lib/utils/promise';
+    import { createEffect } from '~/lib/utils/runes.svelte';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
     import { createQueryKey, createQueryParams } from './utils';
-    import { createEffect } from '~/lib/utils/runes.svelte';
 
     const { data }: { data: PageData } = $props();
     const { api } = useRuntime();
     const queryClient = useQueryClient();
-    const queryInfo = derivedStore(page, ($page) => ({
+    const queryInfo = derivedStore([page, toStore(() => data.tag)], ([$page, $tag]) => ({
+        tag: $tag,
         key: createQueryKey($page.url, { layout: 'table' }),
         params: createQueryParams($page.url)
     }));
     const query = createQuery(
         derivedStore(queryInfo, ($queryInfo) => ({
             queryKey: $queryInfo.key,
+            enabled: $queryInfo.tag === 'table',
             queryFn: async () => {
-                if (data.tag !== 'table') {
-                    return null;
-                }
+                invariant($queryInfo.tag !== 'table', "tag must be 'table'");
                 const query = await mapMaybePromise(data.page, (a) => {
                     return {
                         ...$queryInfo.params,

@@ -33,7 +33,7 @@
         }
     ]);
     const selectedLayout = writable<SelectOption<string>>(
-        untrack(() => layouts[data.layout === 'board' ? 1 : 0])
+        untrack(() => layouts[data.tag === 'board' ? 1 : 0])
     );
 </script>
 
