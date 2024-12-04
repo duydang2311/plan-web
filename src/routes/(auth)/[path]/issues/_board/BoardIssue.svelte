@@ -22,7 +22,6 @@
     import clsx from 'clsx';
     import { Link } from '~/lib/components';
     import Icon from '~/lib/components/Icon.svelte';
-    import type { Issue } from '~/lib/models/issue';
     import type { LocalBoardIssue } from '../+page.server';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
@@ -139,7 +138,6 @@
             dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
         )}
     >
-        {issue.statusRank}
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={8} radius={8} stroke={2} />
         {/if}
