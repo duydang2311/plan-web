@@ -9,6 +9,7 @@
     import type { PageData } from './$types';
     import TableLayout from './TableLayout.svelte';
     import ViewLayoutSelect from './ViewLayoutSelect.svelte';
+    import BoardLayout from './_board/BoardLayout.svelte';
 
     const { data }: { data: PageData } = $props();
     const filterQueryParams = $derived({
@@ -71,5 +72,7 @@
     </div>
     {#if $selectedLayout.value === 'table'}
         <TableLayout {data} />
+    {:else if $selectedLayout.value === 'board'}
+        <BoardLayout {data} />
     {/if}
 </main>

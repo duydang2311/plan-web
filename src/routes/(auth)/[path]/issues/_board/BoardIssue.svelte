@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+    import { page } from '$app/stores';
     import {
         attachClosestEdge,
         type Edge,
@@ -19,16 +20,16 @@
     import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types';
     import clsx from 'clsx';
+    import { Link } from '~/lib/components';
     import Icon from '~/lib/components/Icon.svelte';
     import type { Issue } from '~/lib/models/issue';
+    import type { LocalBoardIssue } from '../+page.server';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
-    import { Link } from '~/lib/components';
-    import { page } from '$app/stores';
 
     interface Props {
         identifier: string;
-        issue: Issue;
+        issue: LocalBoardIssue;
     }
 
     const { identifier, issue }: Props = $props();

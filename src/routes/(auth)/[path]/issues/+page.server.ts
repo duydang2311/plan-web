@@ -23,6 +23,13 @@ export type LocalBoardIssue = Pick<
     'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'statusId' | 'statusRank'
 >;
 
+export interface PageBoardData {
+    statuses: WorkspaceStatus[];
+    issueLists: Record<string, PaginatedList<LocalBoardIssue>>;
+    teamId?: string;
+    project?: { id: string; identifier: string };
+}
+
 export const load: PageServerLoad = (e) => {
     return e.url.searchParams.get('layout') === 'board' ? loadBoardLayout(e) : loadTableLayout(e);
 };
@@ -95,8 +102,19 @@ const loadBoardLayout = async ({
             query['teamId'] = yield* fetchTeamIdEffect(data.workspace.id, teamIdentifier);
         }
 
+        let project: { id: string; identifier: string } | undefined;
         if (projectIdentifier) {
             query['projectId'] = yield* fetchProjectIdEffect(data.workspace.id, projectIdentifier);
+            const response = yield* LoadResponse.HTTP(
+                (yield* ApiClient).get(
+                    `workspaces/${data.workspace.id}/projects/identifier/${projectIdentifier}`,
+                    { query: { select: 'Id,Identifier' } }
+                )
+            );
+            project = yield* LoadResponse.JSON(() =>
+                response.json<{ id: string; identifier: string }>()
+            );
+            query['projectId'] = project.id;
         }
 
         const statuses = (yield* getWorkspaceStatuses(data.workspace.id)) ?? [];
@@ -108,7 +126,7 @@ const loadBoardLayout = async ({
             statuses,
             issueLists,
             teamId: query['teamId'] as string,
-            projectId: query['projectId'] as string
+            project
         });
     }).pipe(runtime.runPromiseExit);
 
@@ -237,9 +255,4 @@ const table = (data: {
     projectId?: string;
 }) => data;
 
-const board = (data: {
-    statuses: WorkspaceStatus[];
-    issueLists: Record<string, PaginatedList<LocalBoardIssue>>;
-    teamId?: string;
-    projectId?: string;
-}) => data;
+const board = (data: PageBoardData) => data;
