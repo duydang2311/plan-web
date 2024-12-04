@@ -59,8 +59,6 @@
             )
         )();
 
-        console.log(either);
-
         if (either.tag === 'Left') {
             addToast({
                 data: {

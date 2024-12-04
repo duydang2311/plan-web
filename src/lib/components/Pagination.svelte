@@ -82,7 +82,6 @@
         if (start <= 1) start = 2;
         if (end >= totalPages) end = totalPages - 1;
         if (end < start) return [];
-        console.log(start, end);
 
         // add half jump
         let arr = new Array(end - start + 1).fill(0).map((_, i) => start + i);

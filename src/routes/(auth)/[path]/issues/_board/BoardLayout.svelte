@@ -1,9 +1,11 @@
 <script lang="ts">
     import { invalidate } from '$app/navigation';
+    import { page } from '$app/stores';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
+    import { derived as derivedStore, toStore } from 'svelte/store';
     import invariant from 'tiny-invariant';
     import { addToast } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -11,20 +13,23 @@
     import { compareRank, getRank } from '~/lib/utils/ranking';
     import type { PageData } from '../$types';
     import type { PageBoardData } from '../+page.server';
+    import { createQueryKey } from '../utils';
     import Board from './Board.svelte';
     import { validateDraggableIssueData } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const queryKey = ['issues', { layout: 'board' }];
-    const query = createQuery({
-        queryKey,
-        enabled: data.tag === 'board',
-        queryFn: async () => {
-            invariant(data.tag === 'board', "tag must be 'board'");
-            await invalidate('fetch:issues-board');
-            return await data.page;
-        }
-    });
+    const queryKey = $derived(createQueryKey($page.url, { layout: 'board' }));
+    const query = createQuery(
+        derivedStore([page, toStore(() => data)], ([$page, $data]) => ({
+            queryKey: createQueryKey($page.url, { layout: 'board' }),
+            enabled: $data.tag === 'board',
+            queryFn: async () => {
+                invariant($data.tag === 'board', "tag must be 'board'");
+                await invalidate('fetch:issues-board');
+                return (await data.page) as PageBoardData;
+            }
+        }))
+    );
     const queryClient = useQueryClient();
     const { api } = useRuntime();
     const mutation = createMutation({
@@ -84,9 +89,14 @@
                                   totalCount: sourceList.totalCount - 1
                               }),
                               [target.statusId]: paginatedList({
-                                  items: [...targetList.items, sourceIssue].toSorted((a, b) =>
-                                      compareRank(a.statusRank, b.statusRank)
-                                  ),
+                                  items: [
+                                      ...targetList.items,
+                                      {
+                                          ...sourceIssue,
+                                          statusRank: target.statusRank,
+                                          statusId: target.statusId
+                                      }
+                                  ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
                                   totalCount: targetList.totalCount + 1
                               })
                           }

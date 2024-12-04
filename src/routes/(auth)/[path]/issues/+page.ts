@@ -10,7 +10,7 @@ export const load: PageLoad = async ({ parent, url, data }) => {
         case 'board':
             await queryClient.prefetchQuery({
                 queryKey,
-                queryFn: () => mapMaybePromise(data.page, (a) => a.issueLists)
+                queryFn: () => mapMaybePromise(data.page, (a) => a)
             });
             break;
         default:

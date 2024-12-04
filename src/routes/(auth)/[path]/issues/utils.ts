@@ -5,11 +5,11 @@ export const createQueryParams = (url: URL) => {
         ...paginatedQuery(
             queryParams(url, {
                 page: 1,
-                size: 20,
-                order: null
+                size: 20
             })
         ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority',
+        order: 'OrderNumber'
     };
 };
 
@@ -18,12 +18,11 @@ export const createBoardQueryParams = (url: URL) => {
         ...paginatedQuery(
             queryParams(url, {
                 page: 1,
-                size: 20,
-                order: null
+                size: 20
             })
         ),
         select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
-        order: 'StatusRank'
+        order: 'StatusRank,OrderNumber'
     };
 };
 

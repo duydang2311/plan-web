@@ -37,10 +37,10 @@
     let dragStatus = $state<'dragover' | null>(null);
     let preview = $state<{ container: HTMLElement; rect: DOMRect } | null>(null);
 
-    function atlas(node: HTMLElement, state: Issue) {
+    function atlas(node: HTMLElement, state: LocalBoardIssue) {
         let cleanup: CleanupFn | undefined = undefined;
 
-        function update(state: Issue) {
+        function update(state: LocalBoardIssue) {
             cleanup?.();
             const previous = {
                 style: { opacity: node.style.opacity }
@@ -139,6 +139,7 @@
             dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
         )}
     >
+        {issue.statusRank}
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={8} radius={8} stroke={2} />
         {/if}
