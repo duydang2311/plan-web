@@ -83,6 +83,6 @@ class FluentSearchParams {
     }
 
     toString() {
-        return `?${this._searchParams.toString()}`;
+        return this._searchParams.size === 0 ? '' : `?${this._searchParams.toString()}`;
     }
 }
