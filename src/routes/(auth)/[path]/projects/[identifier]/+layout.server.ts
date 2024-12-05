@@ -1,24 +1,26 @@
 import { error } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
-import type { LayoutServerLoad } from './$types';
 import { LoadResponse } from '~/lib/utils/kit';
+import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime } }) => {
+    const data = await parent();
     const exit = await runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
-                const data = yield* Effect.promise(() => parent());
                 const api = yield* ApiClient;
                 const response = yield* LoadResponse.HTTP(
                     api.get(
                         `workspaces/${data.workspace.id}/projects/identifier/${params.identifier}`,
                         {
-                            query: { select: 'Id' }
+                            query: { select: 'Id,Name' }
                         }
                     )
                 );
-                return yield* LoadResponse.JSON(() => response.json<{ id: string }>());
+                return yield* LoadResponse.JSON(() =>
+                    response.json<{ id: string; name: string }>()
+                );
             })
         )
     );

@@ -1,17 +1,17 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { gsap } from 'gsap';
     import type { Snippet } from 'svelte';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import Logo from '~/lib/components/Logo.svelte';
     import type { LayoutData } from './$types';
     import Navigation from './Navigation.svelte';
-    import { gsap } from 'gsap';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const route = $derived.by(() => {
-        const route = $page.data.routes?.at(-1);
-        if (route?.breadcrumb) {
-            return route;
+        const last = $page.data.routes?.at(-1);
+        if (last?.breadcrumb === true) {
+            return last;
         }
     });
 
@@ -31,7 +31,7 @@
 
 <svelte:head>
     {#if route}
-        <title>{route.meta.title}</title>
+        <title>{route.meta.title ?? 'Untitled'}</title>
     {/if}
 </svelte:head>
 

@@ -28,10 +28,10 @@
     import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
     import { Icon, Row } from '~/lib/components';
     import { createEffect } from '~/lib/utils/runes.svelte';
-    import DropIndicator from '../../teams/[identifier]/issues/_board/DropIndicator.svelte';
     import type { LocalWorkspaceStatus } from './+page.server';
     import DeleteStatus from './DeleteStatus.svelte';
     import { toDraggleStatusData, validateDraggleStatusData } from './utils';
+    import DropIndicator from '../../projects/[identifier]/issues/_board/DropIndicator.svelte';
 
     const { status, queryKey }: { status: LocalWorkspaceStatus; queryKey: unknown[] } = $props();
 

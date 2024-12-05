@@ -43,13 +43,15 @@
     &:where(:disabled) {
         color: var(--_fg-disabled);
         background-color: var(--_bg-disabled);
-        border: 1px solid var(--_border-disabled);
+        &.c-button--outline {
+            border: 1px solid var(--_border-disabled);
+        }
     }
 
     &:where(.c-button--filled) {
-        --_bg: var(--theme-base-1);
-        --_bg-hover: var(--theme-base-3);
-        --_bg-active: var(--theme-base-5);
+        --_bg: var(--theme-base-2);
+        --_bg-hover: var(--theme-base-4);
+        --_bg-active: var(--theme-base-active);
         --_bg-disabled: var(--theme-base-disabled);
     }
 
@@ -111,6 +113,6 @@
 
 .c-button--sm {
     font-size: theme('fontSize[sm]');
-    padding: theme('padding[0.5]') theme('padding[3]');
+    padding: theme('padding[1]') theme('padding[3]');
     border-radius: theme('borderRadius[DEFAULT]');
 }

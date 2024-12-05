@@ -1,13 +1,17 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { type SelectOption } from '@melt-ui/svelte';
     import { Editor } from '@tiptap/core';
+    import { writable } from 'svelte/store';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
+    import { createEffect } from '~/lib/utils/runes.svelte';
     import type { ActionData, PageData } from './$types';
+    import ProjectSelect from './ProjectSelect.svelte';
     import { validate } from './utils';
 
     const errorMap = {
@@ -18,8 +22,12 @@
             404: 'Could not connect to server',
             403: 'Could not create issue due to lack of privileges'
         },
+        projectId: {
+            valueMissing: 'Select a project'
+        },
         title: {
-            string: 'Enter issue title'
+            string: 'Enter issue title',
+            valueMissing: 'Enter issue title'
         },
         description: {
             string: 'Enter issue description',
@@ -32,10 +40,16 @@
     let editor = $state.raw<Editor>();
     const helperForm = createForm({ validator: formValidator(validate) });
     const fields = {
-        teamId: helperForm.createField({ name: 'teamId', initialValue: data.team.id }),
+        projectId: helperForm.createField({
+            name: 'projectId'
+        }),
         title: helperForm.createField({ name: 'title' }),
         description: helperForm.createField({ name: 'description' })
     };
+    const selected = writable<SelectOption<string>>({
+        label: data.project.name,
+        value: data.project.id
+    });
 
     $effect(() => {
         if (!editor) {
@@ -51,17 +65,23 @@
             helperForm.setErrors(form.errors);
         }
     });
+
+    createEffect(
+        () => {
+            if ($selected) {
+                fields.projectId.state.value = $selected.value;
+                fields.projectId.setErrors(fields.projectId.validate());
+            }
+        },
+        () => $selected
+    );
 </script>
 
-<main class="max-w-screen-lg mx-auto p-8 space-y-8 max-h-full overflow-auto">
-    <div>
-        <h2>Create a new issue</h2>
-        <p class="mb-4">
-            Create a new issue to manage separate cycles, workflows and notifications.
-        </p>
-        <hr />
+<main class="max-w-screen-lg mx-auto p-8 max-h-full overflow-auto">
+    <div class="border-b border-b-base-border-3 pb-1 mb-8">
+        <h2>Create issue</h2>
+        <p>Fill in the form below to create a new issue.</p>
     </div>
-
     <form
         method="post"
         class="space-y-4"
@@ -89,21 +109,33 @@
             };
         }}
     >
-        <input type="hidden" name={fields.teamId.state.name} value={fields.teamId.state.value} />
+        <div class="flex gap-4 flex-wrap">
+            <fieldset class="space-y-1 min-w-60 w-60 max-sm:basis-full">
+                <ProjectSelect workspaceId={data.workspace.id} {selected} />
+                <input
+                    use:fields.projectId
+                    type="text"
+                    name={fields.projectId.state.name}
+                    value={$selected?.value}
+                    required
+                    hidden
+                />
+                <Errors errors={fields.projectId.state.errors} errorMap={errorMap.projectId} />
+            </fieldset>
+            <fieldset class="space-y-1 flex-1">
+                <Label for="title">Title</Label>
+                <Input
+                    useField={fields.title}
+                    id="title"
+                    name={fields.title.state.name}
+                    bind:value={fields.title.state.value}
+                    required
+                />
+                <Errors errors={fields.title.state.errors} errorMap={errorMap.title} />
+            </fieldset>
+        </div>
         <fieldset class="space-y-1 grow">
-            <Label for="title">Issue title</Label>
-            <Input
-                useField={fields.title}
-                id="title"
-                name={fields.title.state.name}
-                bind:value={fields.title.state.value}
-                autofocus
-                required
-            />
-            <Errors errors={fields.title.state.errors} />
-        </fieldset>
-        <fieldset class="space-y-1 grow">
-            <Label for="description">Issue description (optional)</Label>
+            <Label for="description">Description (optional)</Label>
             <div>
                 <Tiptap
                     bind:editor
@@ -115,7 +147,7 @@
             </div>
             <Errors errors={fields.description.state.errors} errorMap={errorMap.description} />
         </fieldset>
-        <Button variant="primary" class="!mt-4 w-fit" disabled={status === 'submitting'}>
+        <Button variant="primary" class="w-fit" disabled={status === 'submitting'}>
             Create issue
         </Button>
     </form>

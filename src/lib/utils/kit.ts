@@ -1,6 +1,6 @@
 import { invalidate } from '$app/navigation';
 import { fail, json, type ActionFailure } from '@sveltejs/kit';
-import { Effect, pipe } from 'effect';
+import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { ApiError } from '../models/errors';
 import { flattenProblemDetails, validateProblemDetailsEffect } from './problem_details';
 import type { ValidateOk, ValidationResult } from './validation';
@@ -12,6 +12,19 @@ export function invalidateSome(...hrefs: string[]) {
 }
 
 export const LoadResponse = {
+    Failure: <A, E>(failure: Exit.Failure<A, E>) =>
+        failure.cause.pipe(
+            Cause.failureOption,
+            Option.getOrElse(
+                () =>
+                    ({
+                        _tag: 'UnknownError',
+                        status: 500,
+                        code: 'unknown',
+                        message: 'An unknown error occurred'
+                    }) as const
+            )
+        ),
     UnknownError: () =>
         Effect.fail({
             _tag: 'UnknownError',

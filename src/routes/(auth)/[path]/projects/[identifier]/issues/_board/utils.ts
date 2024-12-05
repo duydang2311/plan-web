@@ -1,8 +1,8 @@
-import type { Issue } from '~/lib/models/issue';
 import { Type } from '~/lib/utils/typebox';
 import { validator } from '~/lib/utils/validation';
+import type { LocalBoardIssue } from '../+page.server';
 
-export function toDraggableIssueData(issue: Issue) {
+export function toDraggableIssueData(issue: LocalBoardIssue) {
     return {
         type: 'issue',
         id: issue.id,

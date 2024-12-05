@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { page } from '$app/stores';
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
     import { Icon, Link, Row, Table, Th, THead } from '~/lib/components';
@@ -10,33 +9,24 @@
         type Issue
     } from '~/lib/models/issue';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { stringifyQuery } from '~/lib/utils/url';
+
+    type TableIssue = Pick<
+        Issue,
+        'createdTime' | 'updatedTime' | 'id' | 'title' | 'orderNumber' | 'priority'
+    > & {
+        identifier: string;
+        status?: {
+            value: string;
+        };
+    };
 
     interface Props {
-        issues?: PaginatedList<
-            Pick<
-                Issue,
-                'createdTime' | 'updatedTime' | 'id' | 'title' | 'orderNumber' | 'priority'
-            > & {
-                identifier: string;
-                status?: {
-                    value: string;
-                };
-            }
-        >;
+        buildIssueHref: (issue: TableIssue) => string;
+        issues?: PaginatedList<TableIssue>;
         status?: 'loading';
     }
 
-    const { issues, status }: Props = $props();
-    const issueQueryString = $derived(
-        stringifyQuery(
-            {
-                team: $page.url.searchParams.get('team'),
-                project: $page.url.searchParams.get('project')
-            },
-            { includeQuestionMark: true }
-        )
-    );
+    const { buildIssueHref, issues, status }: Props = $props();
 </script>
 
 <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
@@ -55,49 +45,49 @@
                 <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
             </Row>
         {:else}
-            {#each issues.items as { id, createdTime, updatedTime, orderNumber, title, status, priority, identifier }}
+            {#each issues.items as issue (issue.id)}
                 <Row>
                     <td>
                         <div
                             class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
                         >
-                            {identifier}-{orderNumber}
+                            {issue.identifier}-{issue.orderNumber}
                         </div>
                     </td>
                     <td>
-                        <Link href="/{$page.params['path']}/issues/{id}{issueQueryString}">
-                            {title}
+                        <Link href={buildIssueHref(issue)}>
+                            {issue.title}
                         </Link>
                     </td>
                     <td>
-                        {#if status?.value}
-                            {status.value}
+                        {#if issue.status?.value}
+                            {issue.status.value}
                         {:else}
                             <span class="text-base-fg-ghost">N/A</span>
                         {/if}
                     </td>
-                    <td title={getPriorityLabel(priority)}>
+                    <td title={getPriorityLabel(issue.priority)}>
                         <Icon
-                            name={getPriorityIcon(priority)}
-                            class={priority == IssuePriorities.none
+                            name={getPriorityIcon(issue.priority)}
+                            class={issue.priority == IssuePriorities.none
                                 ? 'text-base-fg-ghost'
                                 : undefined}
                         />
                     </td>
                     <td
-                        title={DateTime.fromISO(createdTime).toLocaleString(
+                        title={DateTime.fromISO(issue.createdTime).toLocaleString(
                             DateTime.DATETIME_SHORT
                         )}
                     >
-                        {DateTime.fromISO(createdTime).toRelative()}
+                        {DateTime.fromISO(issue.createdTime).toRelative()}
                     </td>
                     <td
                         class="max-md:hidden"
-                        title={DateTime.fromISO(updatedTime).toLocaleString(
+                        title={DateTime.fromISO(issue.updatedTime).toLocaleString(
                             DateTime.DATETIME_SHORT
                         )}
                     >
-                        {DateTime.fromISO(updatedTime).toRelative()}
+                        {DateTime.fromISO(issue.updatedTime).toRelative()}
                     </td>
                 </Row>
             {/each}

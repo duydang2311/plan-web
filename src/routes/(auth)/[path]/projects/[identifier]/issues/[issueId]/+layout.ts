@@ -1,14 +1,14 @@
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ params: { path }, parent }) => {
+export const load: LayoutLoad = async ({ parent, params, data }) => {
     return {
         routes: [
             ...(await parent()).routes,
             {
                 breadcrumb: true,
                 meta: {
-                    title: 'Projects',
-                    href: `/${path}/projects`
+                    title: data.issue.title,
+                    href: `/${params.path}/issues/${params.issueId}`
                 }
             }
         ]

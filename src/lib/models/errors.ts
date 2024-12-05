@@ -36,3 +36,7 @@ export class UnauthorizedError extends Data.TaggedError('UnauthorizedError') {
 export class InvalidAssetError extends Data.TaggedError('InvalidAssetError') {
     public static readonly instance = new InvalidAssetError();
 }
+
+export class NotFoundError extends Data.TaggedError('NotFoundError') {
+    public static readonly instance = new NotFoundError();
+}

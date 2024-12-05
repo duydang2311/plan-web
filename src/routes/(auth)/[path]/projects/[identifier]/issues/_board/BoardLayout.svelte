@@ -1,34 +1,35 @@
 <script lang="ts">
     import { invalidate } from '$app/navigation';
+    import { page } from '$app/stores';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
+    import { derived as derivedStore, toStore } from 'svelte/store';
     import invariant from 'tiny-invariant';
     import { addToast } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { Issue } from '~/lib/models/issue';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-    import type { Status } from '~/lib/models/status';
+    import { paginatedList } from '~/lib/models/paginatedList';
     import { compareRank, getRank } from '~/lib/utils/ranking';
     import type { PageData } from '../$types';
+    import type { PageBoardData } from '../+page.server';
+    import { createQueryKey } from '../utils';
     import Board from './Board.svelte';
     import { validateDraggableIssueData } from './utils';
 
-    interface Data {
-        statuses: Status[];
-        issueLists: Record<string, PaginatedList<Issue>>;
-    }
-
     const { data }: { data: PageData } = $props();
-    const queryKey = ['issues', { layout: 'board' }];
-    const query = createQuery<Data>({
-        queryKey,
-        queryFn: async () => {
-            await invalidate('fetch:issues-board');
-            return await data.board!;
-        }
-    });
+    const queryKey = $derived(createQueryKey($page.url)({ layout: 'board' }));
+    const query = createQuery(
+        derivedStore([toStore(() => queryKey), toStore(() => data)], ([$queryKey, $data]) => ({
+            queryKey: $queryKey,
+            enabled: $data.page.tag === 'board',
+            queryFn: async () => {
+                invariant($data.page.tag === 'board', "tag must be 'board'");
+                await invalidate('fetch:issues-board');
+                return (await data.page.streamed) as PageBoardData;
+            }
+        }))
+    );
     const queryClient = useQueryClient();
     const { api } = useRuntime();
     const mutation = createMutation({
@@ -48,7 +49,7 @@
             }),
         onMutate: async ({ issueId, source, target }) => {
             await queryClient.cancelQueries({ queryKey });
-            const old = queryClient.getQueryData<Data>(queryKey);
+            const old = queryClient.getQueryData<PageBoardData>(queryKey);
             invariant(old, 'old must not be null');
 
             const sourceList = old.issueLists[source.statusId];
@@ -58,9 +59,10 @@
             invariant(targetList, 'target list must not be null');
             invariant(sourceIssue, 'source issue must not be null');
 
-            const data: Data =
+            const data: PageBoardData =
                 source.statusId === target.statusId
                     ? {
+                          ...old,
                           issueLists: {
                               ...old.issueLists,
                               [source.statusId]: paginatedList({
@@ -76,10 +78,10 @@
                                       .toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
                                   totalCount: sourceList.totalCount
                               })
-                          },
-                          statuses: old.statuses
+                          }
                       }
                     : {
+                          ...old,
                           issueLists: {
                               ...old.issueLists,
                               [source.statusId]: paginatedList({
@@ -87,13 +89,17 @@
                                   totalCount: sourceList.totalCount - 1
                               }),
                               [target.statusId]: paginatedList({
-                                  items: [...targetList.items, sourceIssue].toSorted((a, b) =>
-                                      compareRank(a.statusRank, b.statusRank)
-                                  ),
+                                  items: [
+                                      ...targetList.items,
+                                      {
+                                          ...sourceIssue,
+                                          statusRank: target.statusRank,
+                                          statusId: target.statusId
+                                      }
+                                  ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
                                   totalCount: targetList.totalCount + 1
                               })
-                          },
-                          statuses: old.statuses
+                          }
                       };
 
             queryClient.setQueryData(queryKey, data);
@@ -223,12 +229,12 @@
 
 <div class="flex flex-col grow justify-between overflow-hidden">
     <div class="grow overflow-x-auto overflow-y-hidden w-full">
-        {#if $query.data}
+        {#if $query.data && $query.data.project}
             <ol class="flex h-full w-fit gap-4 p-4">
                 {#each [{ id: -1, value: 'No status', color: 'bg-base-3' }, ...$query.data.statuses] as status (status.id)}
                     {@const list = $query.data.issueLists[status.id]}
                     <Board
-                        identifier={data.team.identifier}
+                        identifier={$query.data.project.identifier}
                         issues={list.items.filter((a) => a.id !== draggingIssueId)}
                         {status}
                     />

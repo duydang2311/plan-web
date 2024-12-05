@@ -106,7 +106,7 @@
                         >
                         <td class="whitespace-nowrap overflow-hidden text-ellipsis">
                             <Link
-                                href="/{$page.params['path']}/issues?project={identifier}"
+                                href="/{$page.params['path']}/projects/{identifier}/issues"
                                 title={name}
                             >
                                 {name}

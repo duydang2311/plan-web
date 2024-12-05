@@ -1,6 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import { NotFoundError } from '~/lib/models/errors';
 import type { IssuePriority } from '~/lib/models/issue';
 import type { IssueComment } from '~/lib/models/issue_comment';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
@@ -39,7 +38,6 @@ interface Issue {
 
 export const load: PageServerLoad = async ({
     parent,
-    params,
     url,
     isDataRequest,
     locals: { runtime, user }
@@ -49,36 +47,15 @@ export const load: PageServerLoad = async ({
         'edit-desc': false
     });
     const exit = await Effect.gen(function* () {
-        const isId = params.issueId.length === 22;
-        if (!isId && isNaN(Number(params.issueId))) {
-            return yield* Effect.fail(NotFoundError.instance);
-        }
-
         const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(
-                isId
-                    ? `issues/${params.issueId}`
-                    : `workspaces/${data.workspace.id}/issues/orderNumber/${params.issueId}`,
-                {
-                    query: {
-                        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon'
-                    }
+            (yield* ApiClient).get(`issues/${data.issue.id}`, {
+                query: {
+                    select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon'
                 }
-            )
+            })
         );
         return yield* LoadResponse.JSON(() => response.json<Issue>());
-    }).pipe(
-        Effect.catchTags({
-            NotFoundError: (e) =>
-                Effect.fail({
-                    _tag: e._tag,
-                    status: 400,
-                    code: 'not_found',
-                    message: 'Could not find issue.'
-                } as const)
-        }),
-        runtime.runPromiseExit
-    );
+    }).pipe(runtime.runPromiseExit);
 
     if (Exit.isFailure(exit)) {
         const { status, ...body } = pipe(
@@ -177,7 +154,7 @@ export const actions: Actions = {
 
         return { comment: { success: true } };
     },
-    'edit-description': async ({ request, params, locals: { runtime } }) => {
+    'edit-description': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(
             pipe(
                 Effect.gen(function* () {
@@ -229,7 +206,7 @@ export const actions: Actions = {
             });
         }
 
-        return redirect(302, `/${params.path}/issues/${params.issueId}`);
+        return null;
     },
     'edit-comment': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(

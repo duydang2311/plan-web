@@ -51,7 +51,8 @@ type TsapCallback = (node: HTMLElement, gsap: typeof __gsap) => gsap.core.Animat
 export function tsap(node: HTMLElement, callback: TsapCallback) {
     const animation = callback(node, __gsap);
     return {
-        duration: animation.totalDuration() * 1000
+        duration: animation.totalDuration() * 1000,
+        delay: animation.delay() * 1000
     };
 }
 

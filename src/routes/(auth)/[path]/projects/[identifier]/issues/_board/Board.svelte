@@ -8,9 +8,9 @@
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
     import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import clsx from 'clsx';
-    import type { Issue } from '~/lib/models/issue';
     import type { Status } from '~/lib/models/status';
     import { tsap } from '~/lib/utils/transition';
+    import type { LocalBoardIssue } from '../+page.server';
     import BoardIssue from './BoardIssue.svelte';
     import { validateDraggableIssueData } from './utils';
 
@@ -20,7 +20,7 @@
         status
     }: {
         identifier: string;
-        issues: readonly Issue[];
+        issues: readonly LocalBoardIssue[];
         status: Pick<Status, 'id' | 'value' | 'color'>;
     } = $props();
     let dragStatus = $state<'dragover' | null>(null);
