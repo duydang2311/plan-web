@@ -10,10 +10,13 @@
     import { derived as derivedStore, toStore } from 'svelte/store';
     import { Virtualizer } from 'virtua/svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { IssueComment } from '~/lib/models/issue_comment';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
+    import type { LocalComment } from './+page.server';
     import Comment from './Comment.svelte';
+    import { fade } from 'svelte/transition';
+    import SkeletonComment from './SkeletonComment.svelte';
+    import { cubicInOut } from 'svelte/easing';
 
     interface Props {
         authorId: string;
@@ -25,7 +28,7 @@
     const { authorId, issueId, size, scrollRef }: Props = $props();
     const { api } = useRuntime();
     const queryKey = $derived(['comments', { issueId: issueId, size }]);
-    const query: CreateInfiniteQueryResult<InfiniteData<PaginatedList<IssueComment>>> =
+    const query: CreateInfiniteQueryResult<InfiniteData<PaginatedList<LocalComment>>> =
         createInfiniteQuery(
             derivedStore(
                 [toStore(() => issueId), toStore(() => queryKey), toStore(() => size)],
@@ -38,13 +41,13 @@
                                     query: {
                                         offset: pageParam,
                                         size: $size,
-                                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+                                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.DisplayName'
                                     }
                                 })
                             )(),
                             TE.flatMap((r) =>
                                 r.ok
-                                    ? TE.fromPromise(() => r.json<PaginatedList<IssueComment>>())()
+                                    ? TE.fromPromise(() => r.json<PaginatedList<LocalComment>>())()
                                     : TE.leftVoid
                             ),
                             TE.flatMap((r) => (r.items.length === 0 ? TE.leftVoid : TE.right(r))),
@@ -82,26 +85,43 @@
 </script>
 
 <div bind:this={ref}>
-    {#if scrollRef}
-        <Virtualizer
-            startMargin={ref?.offsetTop ?? 0}
-            data={$query.data?.pages.filter((a) => a != null).flatMap((a) => a.items) ?? []}
-            getKey={(item) => item.id}
-            {scrollRef}
-            onscroll={(e) => {
-                if (!ref || fetching || !$query.hasNextPage) {
-                    return;
-                }
-                if (e + scrollRef.offsetHeight + 500 > ref.offsetTop + ref.offsetHeight) {
-                    fetchNext();
-                }
-            }}
-        >
-            {#snippet children(comment)}
-                <div class="pt-4 pb-2 first:pt-4 border-b border-b-base-border-2">
-                    <Comment {comment} {issueId} isAuthor={comment.authorId === authorId} {size} />
-                </div>
-            {/snippet}
-        </Virtualizer>
-    {/if}
+    <div class="transition-enforcement">
+        {#if scrollRef && $query.data}
+            <div
+                transition:fade={{ duration: 200, easing: cubicInOut }}
+                class:animate-twPulse={$query.isFetching}
+            >
+                <Virtualizer
+                    startMargin={ref?.offsetTop ?? 0}
+                    data={$query.data.pages.filter((a) => a != null).flatMap((a) => a.items) ?? []}
+                    getKey={(item) => item.id}
+                    {scrollRef}
+                    onscroll={(e) => {
+                        if (!ref || fetching || !$query.hasNextPage) {
+                            return;
+                        }
+                        if (e + scrollRef.offsetHeight + 500 > ref.offsetTop + ref.offsetHeight) {
+                            fetchNext();
+                        }
+                    }}
+                >
+                    {#snippet children(comment)}
+                        <div class="mt-4 pb-1 border-b border-b-base-border-3">
+                            <Comment
+                                {comment}
+                                {issueId}
+                                isAuthor={comment.author.id === authorId}
+                                {size}
+                            />
+                        </div>
+                    {/snippet}
+                </Virtualizer>
+            </div>
+        {:else}
+            <div transition:fade={{ duration: 200, easing: cubicInOut }} class="mt-4 space-y-8">
+                <SkeletonComment />
+                <SkeletonComment />
+            </div>
+        {/if}
+    </div>
 </div>

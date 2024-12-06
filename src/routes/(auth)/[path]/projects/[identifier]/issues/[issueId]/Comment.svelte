@@ -5,36 +5,48 @@
     import DOMPurify from 'isomorphic-dompurify';
     import { DateTime } from 'luxon';
     import { writable } from 'svelte/store';
-    import { Icon, Popover } from '~/lib/components';
+    import { Avatar, Icon, Popover } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { addToast } from '~/lib/components/Toaster.svelte';
-    import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
+    import type { LocalComment } from './+page.server';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { Resize } from '@cloudinary/url-gen/actions';
 
     let {
         comment,
         issueId,
         isAuthor,
         size
-    }: { comment: IssueComment; issueId: string; isAuthor: boolean; size: number } = $props();
+    }: { comment: LocalComment; issueId: string; isAuthor: boolean; size: number } = $props();
     const queryKey = ['comments', { issueId, size }];
     const queryClient = useQueryClient();
+    const { cloudinary } = useRuntime();
     let editing = $state(false);
     let editor = $state.raw<Editor>();
     const open = writable(false);
 </script>
 
 <div class="rounded-md">
-    <div class="flex items-start gap-2">
-        <div class="size-12 bg-primary-1 rounded-full"></div>
+    <div class="flex items-center gap-2">
+        <Avatar
+            seed={comment.author.email}
+            src={imageFromAsset(cloudinary)(comment.author.profile?.image)
+                ?.resize(Resize.fill(48, 48))
+                .toURL()}
+            class="size-12"
+        />
         <div>
-            <p class="font-display font-bold">User</p>
-            <p class="text-base-fg-3">
-                <small>
-                    {DateTime.fromISO(comment.createdTime).toLocaleString(DateTime.DATETIME_SHORT)}
+            <p class="font-bold font-display text-base-fg-1">
+                {comment.author.profile?.displayName ?? 'N/A'}
+            </p>
+            <p>
+                <small class="text-base-fg-5">
+                    {DateTime.fromISO(comment.createdTime).toRelative()}
                 </small>
             </p>
         </div>
@@ -52,7 +64,7 @@
                     }
                     editing = false;
                     const oldData =
-                        queryClient.getQueryData<InfiniteData<PaginatedList<IssueComment>, number>>(
+                        queryClient.getQueryData<InfiniteData<PaginatedList<LocalComment>, number>>(
                             queryKey
                         );
                     if (oldData) {
@@ -167,7 +179,7 @@
                                             const oldData =
                                                 queryClient.getQueryData<
                                                     InfiniteData<
-                                                        PaginatedList<IssueComment>,
+                                                        PaginatedList<LocalComment>,
                                                         number
                                                     >
                                                 >(queryKey);

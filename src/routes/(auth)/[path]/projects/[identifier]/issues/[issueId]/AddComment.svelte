@@ -4,10 +4,10 @@
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
     import { Button, Icon, Tiptap } from '~/lib/components';
-    import type { IssueComment } from '~/lib/models/issue_comment';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { ValidationResult } from '~/lib/utils/validation';
     import { clientValidate } from './utils.client';
+    import type { LocalComment } from './+page.server';
 
     const { userId, size, issueId }: { userId: string; issueId: string; size: number } = $props();
     const queryClient = useQueryClient();
@@ -46,19 +46,25 @@
         const html = editor.getHTML();
         const queryKey = ['comments', { issueId, size }];
         const oldData =
-            queryClient.getQueryData<InfiniteData<PaginatedList<IssueComment>, number>>(queryKey);
+            queryClient.getQueryData<InfiniteData<PaginatedList<LocalComment>, number>>(queryKey);
         queryClient.setQueryData<
-            InfiniteData<PaginatedList<IssueComment> & { nextOffset: number | null }, number>
+            InfiniteData<PaginatedList<LocalComment> & { nextOffset: number | null }, number>
         >(queryKey, (a) => {
             if (!a) return a;
             let data: typeof a = undefined!;
             const totalCount = (a.pages.find((a) => a != null)?.totalCount ?? 0) + 1;
-            const lastPage = a.pages[a.pages.length - 1] ?? paginatedList<IssueComment>();
+            const lastPage = a.pages[a.pages.length - 1] ?? paginatedList<LocalComment>();
             const optimisticComment = {
                 content: html,
                 createdTime: DateTime.now().toISO(),
                 updatedTime: DateTime.now().toISO(),
-                authorId: userId,
+                author: {
+                    id: userId,
+                    email: userId,
+                    profile: {
+                        displayName: 'You'
+                    }
+                },
                 id: Math.random() + '',
                 $optimistic: true
             };
@@ -99,10 +105,12 @@
         });
         e.formData.set('content', html);
         return async ({ result }) => {
+            console.time('ok');
             if (result.type !== 'success') {
                 queryClient.setQueryData(queryKey, oldData);
             }
             await queryClient.invalidateQueries({ queryKey });
+            console.timeEnd('ok');
         };
     }}
 >

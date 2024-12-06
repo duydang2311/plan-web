@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
+import type { Asset } from '~/lib/models/asset';
 import type { IssuePriority } from '~/lib/models/issue';
-import type { IssueComment } from '~/lib/models/issue_comment';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
@@ -34,6 +34,21 @@ export interface LocalIssue {
     statusId?: string;
     status?: {
         value: string;
+    };
+}
+
+export interface LocalComment {
+    createdTime: string;
+    updatedTime: string;
+    id: string;
+    content: string;
+    author: {
+        id: string;
+        email: string;
+        profile?: {
+            displayName: string;
+            image?: Partial<Asset>;
+        };
     };
 }
 
@@ -80,16 +95,22 @@ export const load: PageServerLoad = async ({
                     query: {
                         offset: 0,
                         size: commentQuery.offset + commentQuery.size,
-                        select: 'CreatedTime,UpdatedTime,Id,Content,AuthorId'
+                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.DisplayName'
                     }
                 });
                 if (!response.ok) {
-                    return yield* Effect.succeed(paginatedList<IssueComment>());
+                    return yield* Effect.succeed(paginatedList<LocalComment>());
                 }
-                return yield* Effect.tryPromise(() => response.json<PaginatedList<IssueComment>>());
+                const json = yield* Effect.tryPromise(() =>
+                    response.json<PaginatedList<LocalComment>>()
+                );
+                return {
+                    ...json,
+                    nextOffset: json.items.length >= json.totalCount ? null : json.items.length
+                };
             })
         )
-        .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<IssueComment>()));
+        .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<LocalComment>()));
 
     return {
         page: {
@@ -152,8 +173,7 @@ export const actions: Actions = {
                 comment: { errors: failure.errors as Record<string, string[]> }
             });
         }
-
-        return { comment: { success: true } };
+        return null;
     },
     'edit-description': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(

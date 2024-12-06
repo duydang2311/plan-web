@@ -63,7 +63,7 @@
             </div>
             <hr class="my-8 -mx-4" />
             <div class="max-w-paragraph-lg w-full mx-auto">
-                <p class="font-bold text-base-fg-1 text-h4">Activity</p>
+                <h2 class="mb-4">Activity</h2>
                 <Comments
                     authorId={data.page.user.id}
                     issueId={data.page.issue.id}

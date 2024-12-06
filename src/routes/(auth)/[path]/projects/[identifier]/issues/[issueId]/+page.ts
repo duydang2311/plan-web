@@ -23,13 +23,7 @@ export const load: PageLoad = async ({ parent, data, url, untrack }) => {
         prefetchPromises.push(
             queryClient.prefetchInfiniteQuery({
                 queryKey: ['comments', { issueId: data.page.issue.id, size: commentQuery.size }],
-                queryFn: async () => {
-                    const list = await data.page.comment.list;
-                    return {
-                        ...list,
-                        nextOffset: list.items.length
-                    };
-                },
+                queryFn: () => data.page.comment.list,
                 initialPageParam: 0
             })
         );
@@ -74,6 +68,6 @@ export const load: PageLoad = async ({ parent, data, url, untrack }) => {
         );
     }
 
-    await Promise.all(prefetchPromises);
+    // await Promise.all(prefetchPromises);
     return data;
 };
