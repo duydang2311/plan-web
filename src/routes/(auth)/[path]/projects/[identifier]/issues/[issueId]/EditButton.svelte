@@ -14,7 +14,7 @@
     variant="base"
     size="sm"
     disabled={editing}
-    class="flex gap-2 items-center bg-base-3"
+    class="flex gap-2 items-center"
     onclick={onClick}
 >
     <Icon name="edit" />

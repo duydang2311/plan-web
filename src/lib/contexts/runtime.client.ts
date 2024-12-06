@@ -11,11 +11,13 @@ import { getContext, setContext } from 'svelte';
 import type { HttpClient } from '../services/http_client';
 import { NATSRealtime, type Realtime } from '../services/realtime.client';
 import { UniversalHttpClient } from '../services/universal_http_client';
+import { type QueryClient, useQueryClient } from '@tanstack/svelte-query';
 
 interface Runtime {
     readonly api: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
     readonly cloudinary: Cloudinary;
+    readonly queryClient: QueryClient;
 }
 
 export function setRuntime() {
@@ -51,6 +53,7 @@ export function setRuntime() {
                 url: { secure: true }
             })
     );
+    defineLazyProperty(runtime, 'queryClient', () => useQueryClient());
     return setContext('runtime', runtime as Runtime);
 }
 

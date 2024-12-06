@@ -24,7 +24,7 @@ export const load: PageLoad = async ({ parent, data, url, untrack, params }) => 
             queryClient.prefetchInfiniteQuery({
                 queryKey: ['comments', { issueId: params.issueId, size: commentQuery.size }],
                 queryFn: async () => {
-                    const list = await data.comment.list;
+                    const list = await data.page.comment.list;
                     return {
                         ...list,
                         nextOffset: list.items.length
@@ -37,26 +37,26 @@ export const load: PageLoad = async ({ parent, data, url, untrack, params }) => 
 
     if (
         !queryClient.isFetching({
-            queryKey: ['workspace-status', { issueId: data.issue.id }]
+            queryKey: ['workspace-status', { issueId: data.page.issue.id }]
         })
     ) {
         prefetchPromises.push(
             queryClient.prefetchQuery({
-                queryKey: ['workspace-status', { issueId: data.issue.id }],
-                queryFn: () => data.issue.status ?? null
+                queryKey: ['workspace-status', { issueId: data.page.issue.id }],
+                queryFn: () => data.page.issue.status ?? null
             })
         );
     }
 
     if (
         !queryClient.isFetching({
-            queryKey: ['priority', { issueId: data.issue.id }]
+            queryKey: ['priority', { issueId: data.page.issue.id }]
         })
     ) {
         prefetchPromises.push(
             queryClient.prefetchQuery({
-                queryKey: ['priority', { issueId: data.issue.id }],
-                queryFn: () => data.issue.priority
+                queryKey: ['priority', { issueId: data.page.issue.id }],
+                queryFn: () => data.page.issue.priority
             })
         );
     }

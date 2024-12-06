@@ -111,3 +111,9 @@ export function decodeDeleteComment(formData: FormData) {
         issueCommentId: formData.get('issueCommentId')
     };
 }
+
+export const createFetchIssueQuery = () => {
+    return {
+        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon'
+    };
+};

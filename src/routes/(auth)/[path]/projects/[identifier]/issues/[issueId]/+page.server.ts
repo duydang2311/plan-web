@@ -9,6 +9,7 @@ import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { Actions, PageServerLoad } from './$types';
 import {
+    createFetchIssueQuery,
     decode,
     decodeDeleteComment,
     decodeDeleteIssue,
@@ -21,7 +22,7 @@ import {
     validateEditDescription
 } from './utils';
 
-interface Issue {
+export interface LocalIssue {
     id: string;
     createdTime: string;
     updatedTime: string;
@@ -49,12 +50,10 @@ export const load: PageServerLoad = async ({
     const exit = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
             (yield* ApiClient).get(`issues/${data.issue.id}`, {
-                query: {
-                    select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon'
-                }
+                query: createFetchIssueQuery()
             })
         );
-        return yield* LoadResponse.JSON(() => response.json<Issue>());
+        return yield* LoadResponse.JSON(() => response.json<LocalIssue>());
     }).pipe(runtime.runPromiseExit);
 
     if (Exit.isFailure(exit)) {
@@ -93,14 +92,16 @@ export const load: PageServerLoad = async ({
         .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<IssueComment>()));
 
     return {
-        user,
-        issue: exit.value,
-        isAuthor: exit.value.authorId === user.id,
-        comment: {
-            query: commentQuery,
-            list: isDataRequest ? commentList : await commentList
-        },
-        isEditing: query['edit-desc']
+        page: {
+            user,
+            issue: exit.value,
+            isAuthor: exit.value.authorId === user.id,
+            comment: {
+                query: commentQuery,
+                list: isDataRequest ? commentList : await commentList
+            },
+            isEditing: query['edit-desc']
+        }
     };
 };
 

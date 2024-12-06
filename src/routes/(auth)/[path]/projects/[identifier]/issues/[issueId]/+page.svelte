@@ -170,16 +170,10 @@
 <main class="flex items-stretch h-full divide-x divide-base-border-2 overflow-hidden">
     <div class="grow relative h-full overflow-auto" bind:this={scrollEl} style="contain: strict;">
         <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
-            <p class="font-bold content-center text-base-fg-1 text-h1">
-                {data.issue.title}
-                <span class="text-base-fg-3/60 font-normal">
-                    #{data.issue.orderNumber}
-                </span>
-            </p>
             <Issue
                 {form}
                 {editing}
-                issue={data.issue}
+                issueId={data.page.issue.id}
                 onCancel={() => {
                     editing = false;
                 }}
@@ -187,7 +181,7 @@
                     editing = false;
                 }}
             />
-            <p class="mt-8 font-bold text-base-fg-1 text-h4">Activity</p>
+            <p class="mt-12 font-bold text-base-fg-1 text-h4">Activity</p>
             <div bind:this={virtualListEl}>
                 {#if $virtualizer}
                     <div
@@ -218,7 +212,7 @@
                                             {@const comment = comments[row.index]}
                                             <Comment
                                                 {comment}
-                                                isAuthor={comment.authorId === data.user.id}
+                                                isAuthor={comment.authorId === data.page.user.id}
                                                 size={commentQuery.size}
                                             />
                                         {/if}
@@ -229,8 +223,8 @@
                     </div>
                 {/if}
             </div>
-            <div class="mt-8">
-                <AddComment userId={data.user.id} size={commentQuery.size} />
+            <div class="mt-4">
+                <AddComment userId={data.page.user.id} size={commentQuery.size} />
             </div>
         </div>
     </div>
@@ -238,8 +232,8 @@
         <div>
             <h2 class="text-base-fg-3 mb-2 text-base">Properties</h2>
             <div class="space-y-2">
-                <Status workspaceId={data.workspace.id} issueId={data.issue.id} />
-                <Priority issueId={data.issue.id} />
+                <Status workspaceId={data.workspace.id} issueId={data.page.issue.id} />
+                <Priority issueId={data.page.issue.id} />
             </div>
         </div>
         <div>
@@ -251,7 +245,7 @@
                         editing = !editing;
                     }}
                 />
-                <DeleteButton issue={data.issue} />
+                <DeleteButton issue={data.page.issue} />
             </div>
         </div>
     </div>
