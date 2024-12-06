@@ -52,7 +52,7 @@
         --_bg: var(--theme-base-2);
         --_bg-hover: var(--theme-base-4);
         --_bg-active: var(--theme-base-active);
-        --_bg-disabled: var(--theme-base-disabled);
+        --_bg-disabled: var(--theme-base-2);
     }
 
     &:where(:root[data-theme='dark'] &) {
