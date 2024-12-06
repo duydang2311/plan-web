@@ -117,12 +117,13 @@
         />
         <Button
             variant="primary"
-            class="absolute p-1 bottom-2 right-3 block ml-auto w-fit"
+            size="sm"
             filled={false}
-            outline
+            class="absolute bottom-2 right-3 ml-auto w-fit flex gap-2 items-center"
             disabled={validation && !validation.ok}
         >
             <Icon name="arrow-up" />
+            Send
         </Button>
     </div>
 </form>

@@ -204,7 +204,7 @@
         <div
             use:tiptap
             class={clsx(
-                'transition-opacity duration-500 ease-in-out',
+                'transition-opacity ease-out',
                 status !== 'ready' ? 'opacity-0' : 'opacity-100'
             )}
         ></div>

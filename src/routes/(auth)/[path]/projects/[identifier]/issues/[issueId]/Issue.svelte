@@ -41,12 +41,14 @@
 </script>
 
 {#if $query.data}
-    <p class="font-bold content-center text-base-fg-1 text-h1">
-        {$query.data.title}
-        <span class="text-base-fg-3/60 font-normal">
+    <div class="flex gap-4">
+        <h1>
+            {$query.data.title}
+        </h1>
+        <span class="text-base-fg-ghost font-light text-h1">
             #{$query.data.orderNumber}
         </span>
-    </p>
+    </div>
     <div class="max-w-full mt-2 transition-enforcement">
         {#if editing}
             <div>

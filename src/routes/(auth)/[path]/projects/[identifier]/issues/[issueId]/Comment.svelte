@@ -5,7 +5,7 @@
     import DOMPurify from 'isomorphic-dompurify';
     import { DateTime } from 'luxon';
     import { writable } from 'svelte/store';
-    import { Popover } from '~/lib/components';
+    import { Icon, Popover } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import PopoverBuilder from '~/lib/components/PopoverBuilder.svelte';
@@ -27,7 +27,7 @@
     const open = writable(false);
 </script>
 
-<div class="max-w-full rounded-md">
+<div class="rounded-md">
     <div class="flex items-start gap-2">
         <div class="size-12 bg-primary-1 rounded-full"></div>
         <div>
@@ -94,18 +94,27 @@
                         type="button"
                         variant="base"
                         size="sm"
-                        filled={false}
                         onclick={() => {
                             editing = false;
                         }}
+                        class="flex gap-2 items-center w-fit"
                     >
+                        <Icon name="x-mark" />
                         Cancel
                     </Button>
-                    <Button type="submit" variant="primary" size="sm" filled={false}>Save</Button>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        class="flex gap-2 items-center w-fit"
+                    >
+                        <Icon name="check" />
+                        Save
+                    </Button>
                 </div>
             </form>
         {:else}
-            <div class="prose">
+            <div class="prose max-w-full">
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html DOMPurify.sanitize(comment.content, { USE_PROFILES: { html: true } })}
             </div>
@@ -118,11 +127,13 @@
                 filled={false}
                 variant="base"
                 size="sm"
-                class="w-fit"
+                class="flex gap-2 items-center w-fit"
                 onclick={() => {
                     editing = true;
                 }}
+                disabled={editing === true}
             >
+                <Icon name="edit" />
                 Edit
             </Button>
             <PopoverBuilder options={{ open, forceVisible: true }}>
@@ -132,9 +143,10 @@
                         filled={false}
                         variant="negative"
                         size="sm"
-                        class="w-fit"
+                        class="flex gap-2 items-center w-fit"
                         melt={trigger}
                     >
+                        <Icon name="trash" />
                         Delete
                     </Button>
                     {#if $open}

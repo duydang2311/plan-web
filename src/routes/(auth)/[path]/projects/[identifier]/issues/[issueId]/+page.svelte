@@ -169,67 +169,73 @@
 
 <main class="flex items-stretch h-full divide-x divide-base-border-2 overflow-hidden">
     <div class="grow relative h-full overflow-auto" bind:this={scrollEl} style="contain: strict;">
-        <div class="flex flex-col min-h-full relative mx-auto max-w-paragraph-lg p-4">
-            <Issue
-                {form}
-                {editing}
-                issueId={data.page.issue.id}
-                onCancel={() => {
-                    editing = false;
-                }}
-                onSubmit={() => {
-                    editing = false;
-                }}
-            />
-            <p class="mt-12 font-bold text-base-fg-1 text-h4">Activity</p>
-            <div bind:this={virtualListEl}>
-                {#if $virtualizer}
-                    <div
-                        style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;"
-                    >
-                        {#if items}
-                            <div
-                                style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
-                                    ? items[0].start - $virtualizer.options.scrollMargin
-                                    : 0}px);"
-                            >
-                                {#each items as row, idx (comments[row.index]?.id ?? 'load-more')}
-                                    <div
-                                        bind:this={virtualItemEls[idx]}
-                                        data-index={row.index}
-                                        class="pt-4 pb-2 first:pt-4 border-b border-b-base-border-2"
-                                    >
-                                        {#if row.index > comments.length - 1}
-                                            <div in:fade>
-                                                {#if $query.hasNextPage}
-                                                    <Spinner
-                                                        class="size-8 text-primary-1 mx-auto"
-                                                    />
-                                                    Loading more...
-                                                {/if}
-                                            </div>
-                                        {:else}
-                                            {@const comment = comments[row.index]}
-                                            <Comment
-                                                {comment}
-                                                issueId={data.page.issue.id}
-                                                isAuthor={comment.authorId === data.page.user.id}
-                                                size={commentQuery.size}
-                                            />
-                                        {/if}
-                                    </div>
-                                {/each}
-                            </div>
-                        {/if}
-                    </div>
-                {/if}
-            </div>
-            <div class="mt-4">
-                <AddComment
-                    userId={data.page.user.id}
+        <div class="flex flex-col min-h-full relative p-4">
+            <div class="max-w-paragraph-lg w-full mx-auto">
+                <Issue
+                    {form}
+                    {editing}
                     issueId={data.page.issue.id}
-                    size={commentQuery.size}
+                    onCancel={() => {
+                        editing = false;
+                    }}
+                    onSubmit={() => {
+                        editing = false;
+                    }}
                 />
+            </div>
+            <hr class="my-8 -mx-4" />
+            <div class="max-w-paragraph-lg w-full mx-auto">
+                <p class="font-bold text-base-fg-1 text-h4">Activity</p>
+                <div bind:this={virtualListEl}>
+                    {#if $virtualizer}
+                        <div
+                            style="position: relative; height: {$virtualizer.getTotalSize()}px; width: 100%;"
+                        >
+                            {#if items}
+                                <div
+                                    style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({items[0]
+                                        ? items[0].start - $virtualizer.options.scrollMargin
+                                        : 0}px);"
+                                >
+                                    {#each items as row, idx (comments[row.index]?.id ?? 'load-more')}
+                                        <div
+                                            bind:this={virtualItemEls[idx]}
+                                            data-index={row.index}
+                                            class="pt-4 pb-2 first:pt-4 border-b border-b-base-border-2"
+                                        >
+                                            {#if row.index > comments.length - 1}
+                                                <div in:fade>
+                                                    {#if $query.hasNextPage}
+                                                        <Spinner
+                                                            class="size-8 text-primary-1 mx-auto"
+                                                        />
+                                                        Loading more...
+                                                    {/if}
+                                                </div>
+                                            {:else}
+                                                {@const comment = comments[row.index]}
+                                                <Comment
+                                                    {comment}
+                                                    issueId={data.page.issue.id}
+                                                    isAuthor={comment.authorId ===
+                                                        data.page.user.id}
+                                                    size={commentQuery.size}
+                                                />
+                                            {/if}
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
+                <div class="mt-4">
+                    <AddComment
+                        userId={data.page.user.id}
+                        issueId={data.page.issue.id}
+                        size={commentQuery.size}
+                    />
+                </div>
             </div>
         </div>
     </div>
