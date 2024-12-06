@@ -1,16 +1,15 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { useQueryClient, type InfiniteData } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
+    import { DateTime } from 'luxon';
     import { Button, Icon, Tiptap } from '~/lib/components';
+    import type { IssueComment } from '~/lib/models/issue_comment';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { ValidationResult } from '~/lib/utils/validation';
     import { clientValidate } from './utils.client';
-    import { useQueryClient, type InfiniteData } from '@tanstack/svelte-query';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-    import type { IssueComment } from '~/lib/models/issue_comment';
-    import { DateTime } from 'luxon';
 
-    const { userId, size }: { userId: string; size: number } = $props();
+    const { userId, size, issueId }: { userId: string; issueId: string; size: number } = $props();
     const queryClient = useQueryClient();
     let editor = $state.raw<Editor>();
     let validation = $state<ValidationResult>();
@@ -21,7 +20,7 @@
         function handle({ editor }: { editor: Editor }) {
             validation = clientValidate({
                 editor,
-                issueId: $page.params['issueId']
+                issueId
             });
         }
 
@@ -45,7 +44,7 @@
             return;
         }
         const html = editor.getHTML();
-        const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
+        const queryKey = ['comments', { issueId, size }];
         const oldData =
             queryClient.getQueryData<InfiniteData<PaginatedList<IssueComment>, number>>(queryKey);
         queryClient.setQueryData<
@@ -107,7 +106,7 @@
         };
     }}
 >
-    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+    <input type="hidden" name="issueId" value={issueId} />
     <div class="relative">
         <Tiptap
             bind:editor

@@ -27,13 +27,13 @@
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const { realtime, api } = useRuntime();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
-    const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
+    const queryKey = ['comments', { issueId: data.page.issue.id, size: commentQuery.size }];
     const query = createInfiniteQuery({
         queryKey,
         queryFn: ({ pageParam }) => {
             return pipe(
                 TE.fromPromise(() =>
-                    api.get(`issues/${$page.params['issueId']}/comments`, {
+                    api.get(`issues/${data.page.issue.id}/comments`, {
                         query: {
                             offset: pageParam,
                             size: commentQuery.size,
@@ -212,6 +212,7 @@
                                             {@const comment = comments[row.index]}
                                             <Comment
                                                 {comment}
+                                                issueId={data.page.issue.id}
                                                 isAuthor={comment.authorId === data.page.user.id}
                                                 size={commentQuery.size}
                                             />
@@ -224,7 +225,11 @@
                 {/if}
             </div>
             <div class="mt-4">
-                <AddComment userId={data.page.user.id} size={commentQuery.size} />
+                <AddComment
+                    userId={data.page.user.id}
+                    issueId={data.page.issue.id}
+                    size={commentQuery.size}
+                />
             </div>
         </div>
     </div>

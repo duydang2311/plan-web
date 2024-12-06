@@ -1,7 +1,7 @@
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ parent, data, url, untrack, params }) => {
+export const load: PageLoad = async ({ parent, data, url, untrack }) => {
     const { queryClient } = await untrack(() => parent());
     const commentQuery = paginatedQuery(
         queryParams(
@@ -17,12 +17,12 @@ export const load: PageLoad = async ({ parent, data, url, untrack, params }) => 
 
     if (
         !queryClient.isFetching({
-            queryKey: ['comments', { issueId: params.issueId, size: commentQuery.size }]
+            queryKey: ['comments', { issueId: data.page.issue.id, size: commentQuery.size }]
         })
     ) {
         prefetchPromises.push(
             queryClient.prefetchInfiniteQuery({
-                queryKey: ['comments', { issueId: params.issueId, size: commentQuery.size }],
+                queryKey: ['comments', { issueId: data.page.issue.id, size: commentQuery.size }],
                 queryFn: async () => {
                     const list = await data.page.comment.list;
                     return {
@@ -57,6 +57,19 @@ export const load: PageLoad = async ({ parent, data, url, untrack, params }) => 
             queryClient.prefetchQuery({
                 queryKey: ['priority', { issueId: data.page.issue.id }],
                 queryFn: () => data.page.issue.priority
+            })
+        );
+    }
+
+    if (
+        !queryClient.isFetching({
+            queryKey: ['issues', { issueId: data.page.issue.id }]
+        })
+    ) {
+        prefetchPromises.push(
+            queryClient.prefetchQuery({
+                queryKey: ['issues', { issueId: data.page.issue.id }],
+                queryFn: () => data.page.issue
             })
         );
     }

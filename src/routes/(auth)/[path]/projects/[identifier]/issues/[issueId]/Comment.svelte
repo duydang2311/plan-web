@@ -1,6 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
     import { type InfiniteData, useQueryClient } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
@@ -15,9 +14,13 @@
     import type { IssueComment } from '~/lib/models/issue_comment';
     import { type PaginatedList } from '~/lib/models/paginatedList';
 
-    let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
-        $props();
-    const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
+    let {
+        comment,
+        issueId,
+        isAuthor,
+        size
+    }: { comment: IssueComment; issueId: string; isAuthor: boolean; size: number } = $props();
+    const queryKey = ['comments', { issueId, size }];
     const queryClient = useQueryClient();
     let editing = $state(false);
     let editor = $state.raw<Editor>();
@@ -193,9 +196,9 @@
                                             name="issueCommentId"
                                             value={comment.id}
                                         />
-                                        <Button type="submit" outline variant="negative"
-                                            >Delete</Button
-                                        >
+                                        <Button type="submit" outline variant="negative">
+                                            Delete
+                                        </Button>
                                     </form>
                                 </div>
                             </div>
