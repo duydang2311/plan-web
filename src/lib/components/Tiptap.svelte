@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Editor } from '@tiptap/core';
+    import Link from '@tiptap/extension-link';
     import Placeholder from '@tiptap/extension-placeholder';
     import Underline from '@tiptap/extension-underline';
     import StarterKit from '@tiptap/starter-kit';
@@ -42,7 +43,22 @@
                 Placeholder.configure({
                     placeholder
                 }),
-                Underline
+                Underline,
+                Link.configure({
+                    protocols: ['http', 'https', 'mailto'],
+                    defaultProtocol: 'https',
+                    openOnClick: false,
+                    autolink: true,
+                    linkOnPaste: true,
+                    isAllowedUri: (url, ctx) =>
+                        ctx.defaultValidate(url) &&
+                        ctx.protocols.some((a) =>
+                            url.startsWith(typeof a === 'string' ? a : a.scheme)
+                        ),
+                    HTMLAttributes: {
+                        class: 'c-link'
+                    }
+                })
             ],
             onTransaction: ({ editor: e }) => {
                 editor = undefined;
@@ -149,6 +165,36 @@
                     isActive={editor?.isActive('blockquote')}
                 >
                     <Icon name="quotes" />
+                </TiptapButton>
+            </li>
+            <li>
+                <TiptapButton
+                    onclick={() => {
+                        if (!editor) {
+                            return;
+                        }
+
+                        const previousUrl = editor.getAttributes('link').href;
+                        const url = window.prompt('URL', previousUrl);
+                        if (url == null) {
+                            return;
+                        }
+
+                        if (url.length === 0) {
+                            editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                            return;
+                        }
+
+                        editor
+                            .chain()
+                            .focus()
+                            .extendMarkRange('link')
+                            .setLink({ href: url.includes(':') ? url : 'https://' + url })
+                            .run();
+                    }}
+                    isActive={editor?.isActive('link')}
+                >
+                    <Icon name="link" />
                 </TiptapButton>
             </li>
         </ul>
