@@ -227,19 +227,21 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-<div class="flex flex-col grow justify-between overflow-hidden">
-    <div class="grow overflow-x-auto overflow-y-hidden w-full">
-        {#if $query.data && $query.data.project}
-            <ol class="flex h-full w-fit gap-4 p-4">
-                {#each [{ id: -1, value: 'No status', color: 'bg-base-3' }, ...$query.data.statuses] as status (status.id)}
-                    {@const list = $query.data.issueLists[status.id]}
-                    <Board
-                        identifier={$query.data.project.identifier}
-                        issues={list.items.filter((a) => a.id !== draggingIssueId)}
-                        {status}
-                    />
-                {/each}
-            </ol>
-        {/if}
+{#if data.page.tag === 'board'}
+    <div class="flex flex-col grow justify-between overflow-hidden">
+        <div class="grow overflow-x-auto overflow-y-hidden w-full">
+            {#if $query.data}
+                <ol class="flex h-full w-fit gap-4 p-4">
+                    {#each [{ id: -1, value: 'No status', color: 'bg-base-3' }, ...$query.data.statuses] as status (status.id)}
+                        {@const list = $query.data.issueLists[status.id]}
+                        <Board
+                            identifier={data.page.project.identifier}
+                            issues={list.items.filter((a) => a.id !== draggingIssueId)}
+                            {status}
+                        />
+                    {/each}
+                </ol>
+            {/if}
+        </div>
     </div>
-</div>
+{/if}

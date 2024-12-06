@@ -26,7 +26,7 @@ export type LocalBoardIssue = Pick<
 export interface PageBoardData {
     statuses: WorkspaceStatus[];
     issueLists: Record<string, PaginatedList<LocalBoardIssue>>;
-    project?: { id: string; identifier: string };
+    project: { identifier: string };
 }
 
 export const load: PageServerLoad = (e) => {
@@ -84,7 +84,6 @@ const loadBoardLayout = async ({
     parent,
     url,
     isDataRequest,
-    params,
     locals: { runtime }
 }: PageServerLoadEvent) => {
     const data = await parent();
@@ -92,12 +91,11 @@ const loadBoardLayout = async ({
 
     const fetchProject = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(
-                `workspaces/${data.workspace.id}/projects/identifier/${params.identifier}`,
-                { query: { select: 'Id,Identifier' } }
-            )
+            (yield* ApiClient).get(`projects/${data.project.id}`, {
+                query: { select: 'Identifier' }
+            })
         );
-        return yield* LoadResponse.JSON(() => response.json<{ id: string; identifier: string }>());
+        return yield* LoadResponse.JSON(() => response.json<{ identifier: string }>());
     }).pipe(runtime.runPromiseExit);
     if (Exit.isFailure(fetchProject)) {
         const { status, ...body } = LoadResponse.Failure(fetchProject);
@@ -125,6 +123,7 @@ const loadBoardLayout = async ({
                     Exit.isSuccess(a)
                         ? a.value
                         : {
+                              project: fetchProject.value,
                               statuses: [],
                               issueLists: {}
                           }

@@ -18,13 +18,13 @@
             label: 'Table',
             value: 'table',
             icon: 'rows' as const,
-            href: fluentSearchParams($page.url).delete('layout').toString()
+            href: $page.url.pathname + fluentSearchParams($page.url).delete('layout')
         },
         {
             label: 'Board',
             value: 'board',
             icon: 'columns' as const,
-            href: fluentSearchParams($page.url).set('layout', 'board').toString()
+            href: $page.url.pathname + fluentSearchParams($page.url).set('layout', 'board')
         }
     ]);
     const selectedLayout = writable<SelectOption<string>>(
