@@ -25,9 +25,7 @@
         <Button
             type="button"
             variant="base"
-            filled={false}
-            outline
-            class="relative flex items-center gap-2 pr-10"
+            class="relative flex items-center gap-2 pr-10 text-base"
             melt={trigger}
             autofocus
         >
