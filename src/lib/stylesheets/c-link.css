@@ -6,9 +6,8 @@
     color: var(--_fg);
     text-decoration: none;
     transition:
-        color 75ms ease-out,
-        box-shadow 100ms ease-out;
-    border-radius: theme('borderRadius.DEFAULT');
+        color 75ms var(--cubic-out),
+        box-shadow 100ms var(--cubic-out);
     font-weight: 500;
 
     &:hover {
@@ -22,5 +21,11 @@
 
     &:focus-visible {
         @apply ring ring-current outline-none;
+    }
+
+    &:where(.prose &) {
+        --_fg: var(--theme-info-1);
+        --_fg-hover: var(--theme-info-hover);
+        --_fg-active: var(--theme-info-active);
     }
 }

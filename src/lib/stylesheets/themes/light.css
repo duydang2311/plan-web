@@ -71,8 +71,17 @@
     --theme-positive-fg-4: oklch(83% 0.0054 142.04);
     --theme-positive-fg-5: oklch(78% 0.0054 142.04);
 
-    --theme-info-1: var(--color-info);
-    --theme-info-2: color-mix(in srgb, var(--color-info) 90%, var(--theme-base-1));
-    --theme-info-3: color-mix(in srgb, var(--color-info) 80%, var(--theme-base-1));
-    --theme-info-fg-1: var(--color-bg);
+    --theme-info-1: oklch(45.27% 0.1498 255.17);
+    --theme-info-2: oklch(49.27% 0.1498 255.17);
+    --theme-info-3: oklch(51.27% 0.1498 255.17);
+    --theme-info-4: oklch(53.27% 0.1498 255.17);
+    --theme-info-5: oklch(55.27% 0.1498 255.17);
+    --theme-info-hover: oklch(41.27% 0.1498 255.17);
+    --theme-info-active: oklch(39.27% 0.1498 255.17);
+    --theme-info-border: oklch(38.27% 0.1498 255.17);
+    --theme-info-fg-1: oklch(98% 0.0054 255.17);
+    --theme-info-fg-2: oklch(93% 0.0054 255.17);
+    --theme-info-fg-3: oklch(88% 0.0054 255.17);
+    --theme-info-fg-4: oklch(83% 0.0054 255.17);
+    --theme-info-fg-5: oklch(78% 0.0054 255.17);
 }
