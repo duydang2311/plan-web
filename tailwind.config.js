@@ -93,7 +93,8 @@ export default withAnimations({
                         '--tw-prose-code': 'var(--theme-base-fg-1)',
                         '--tw-prose-pre-code': 'var(--theme-base-fg-1)',
                         '--tw-prose-pre-bg': 'var(--theme-base-3)',
-                        '--tw-prose-quotes': 'var(--theme-base-fg-3)'
+                        '--tw-prose-quotes': 'var(--theme-base-fg-4)',
+                        '--tw-prose-quote-borders': 'var(--theme-base-5)'
                     }
                 }
             })
