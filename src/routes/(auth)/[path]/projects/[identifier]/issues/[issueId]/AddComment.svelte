@@ -105,12 +105,10 @@
         });
         e.formData.set('content', html);
         return async ({ result }) => {
-            console.time('ok');
             if (result.type !== 'success') {
                 queryClient.setQueryData(queryKey, oldData);
             }
             await queryClient.invalidateQueries({ queryKey });
-            console.timeEnd('ok');
         };
     }}
 >
