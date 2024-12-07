@@ -5,7 +5,7 @@ import { paginatedList } from '~/lib/models/paginatedList';
 import type { LocalIssue } from './+page.server';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
-    const { queryClient } = await parent();
+    const { project, queryClient } = await parent();
 
     const queryKey = createQueryKey(url)();
     switch (data.page.tag) {
@@ -17,7 +17,18 @@ export const load: PageLoad = async ({ parent, url, data }) => {
             break;
         default:
             await queryClient.prefetchQuery({
-                queryKey,
+                queryKey: [
+                    'issues',
+                    {
+                        layout: 'table',
+                        params: {
+                            projectId: project.id,
+                            offset: 0,
+                            size: 20,
+                            order: 'OrderNumber'
+                        }
+                    }
+                ],
                 queryFn: () =>
                     data.page.tag === 'table'
                         ? mapMaybePromise(data.page.streamed, (a) => a.issueList)

@@ -33,7 +33,13 @@ export const createQueryKey =
             'issues',
             {
                 project: project ?? url.searchParams.get('project'),
-                layout: layout ?? (url.searchParams.get('layout') === 'board' ? 'board' : 'table')
+                layout: layout ?? (url.searchParams.get('layout') === 'board' ? 'board' : 'table'),
+                params: {
+                    offset: 0,
+                    limit: 10,
+                    order: 'OrderNumber',
+                    select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+                }
             }
         ] as const;
     };

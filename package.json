@@ -34,6 +34,7 @@
         "@types/node": "^22.10.1",
         "@types/sortablejs": "^1.15.8",
         "@types/validator": "^13.12.2",
+        "@vincjo/datatables": "^2.2.0",
         "animated-tailwindcss": "^4.0.0",
         "autoprefixer": "^10.4.20",
         "cloudinary": "^2.5.1",

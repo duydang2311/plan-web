@@ -68,6 +68,6 @@ export const load: PageLoad = async ({ parent, data, url, untrack }) => {
         );
     }
 
-    // await Promise.all(prefetchPromises);
+    await Promise.all(prefetchPromises);
     return data;
 };

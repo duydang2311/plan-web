@@ -32,7 +32,7 @@
     );
 </script>
 
-<main class="grid grid-rows-[auto_1fr_auto] h-full overflow-auto">
+<main class="grid grid-rows-[auto_1fr] h-full overflow-auto">
     <div class="flex justify-between border-b border-b-base-border-2">
         <div class="flex items-stretch first:*:pl-0 divide-x divide-base-border-2 grow">
             <div class="min-w-32">

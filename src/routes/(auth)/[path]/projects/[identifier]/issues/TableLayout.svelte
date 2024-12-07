@@ -1,48 +1,74 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { derived as derivedStore, toStore } from 'svelte/store';
-    import invariant from 'tiny-invariant';
-    import { Pagination } from '~/lib/components';
-    import IssueTable from '~/lib/components/issues/IssueTable.svelte';
+    import { type State, TableHandler } from '@vincjo/datatables/server';
+    import { toStore } from 'svelte/store';
+    import IssueDatatable from '~/lib/components/issues/IssueDatatable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
-    import { createQueryKey, createQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
     const { api } = useRuntime();
     const queryClient = useQueryClient();
-    const queryInfo = derivedStore([page, toStore(() => data.page.tag)], ([$page, $tag]) => ({
-        tag: $tag,
-        key: createQueryKey($page.url)({ layout: 'table' }),
-        params: createQueryParams($page.url)
-    }));
+    const getParams = (state?: State<LocalIssue>) => {
+        let order = 'OrderNumber';
+        if (state?.sort) {
+            const field = state.sort.field === 'status' ? 'status.rank' : state.sort.field;
+            order = `${state.sort.direction === 'desc' ? '-' : ''}${field}`;
+        }
+        return {
+            projectId: data.project.id,
+            offset: state?.offset ?? 0,
+            size: state?.rowsPerPage ?? 20,
+            order
+        };
+    };
+    let tableState = $state<State<LocalIssue>>();
+    const queryKey = $derived([
+        'issues',
+        {
+            layout: 'table',
+            params: getParams(tableState)
+        }
+    ]);
     const query = createQuery(
-        derivedStore(queryInfo, ($queryInfo) => ({
-            queryKey: $queryInfo.key,
-            enabled: $queryInfo.tag === 'table',
+        toStore(() => ({
+            queryKey: queryKey,
             queryFn: async () => {
-                invariant(data.page.tag === 'table', "tag must be 'table'");
                 const response = await api.get(`issues`, {
                     query: {
-                        ...$queryInfo.params,
-                        projectId: data.project.id
+                        ...getParams(tableState),
+                        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
                     }
                 });
                 return await response.json<PaginatedList<LocalIssue>>();
             }
         }))
     );
+    const table = new TableHandler<LocalIssue>($query.data?.items, { rowsPerPage: 20 });
+    table.load(() => $query.promise.then((a) => a.items));
+    table.on('change', () => {
+        tableState = table.getState();
+    });
+
+    createEffect(
+        () => {
+            table.getState().setTotalRows($query.data?.totalCount ?? 0);
+            table.invalidate();
+        },
+        () => $query.data
+    );
 
     createEffect(
         () => {
             if (data.page.tag === 'table') {
                 unwrapMaybePromise(data.page.streamed)((a) => {
-                    queryClient.setQueryData($queryInfo.key, a.issueList);
+                    queryClient.setQueryData(queryKey, a.issueList);
+                    table.invalidate();
                 });
             }
         },
@@ -50,17 +76,8 @@
     );
 </script>
 
-<IssueTable
+<IssueDatatable
+    {table}
     buildIssueHref={({ orderNumber }) =>
         `/${$page.params.path}/projects/${$page.params.identifier}/issues/${orderNumber}`}
-    issues={$query.data
-        ? {
-              items: $query.data.items.map((a) => ({ ...a, identifier: a.project.identifier })),
-              totalCount: $query.data.totalCount
-          }
-        : undefined}
-    status={$query.isFetching ? 'loading' : undefined}
 />
-{#if $query.data}
-    <Pagination {...$queryInfo.params} list={$query.data} />
-{/if}
