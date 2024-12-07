@@ -93,6 +93,7 @@
                     />
                     <div class="absolute right-2 bottom-2 flex gap-2">
                         <Button
+                            type="button"
                             size="sm"
                             variant="base"
                             onclick={onCancel}
@@ -101,7 +102,12 @@
                             <Icon name="x-mark" />
                             Cancel
                         </Button>
-                        <Button size="sm" variant="primary" class="flex gap-2 items-center">
+                        <Button
+                            type="submit"
+                            size="sm"
+                            variant="primary"
+                            class="flex gap-2 items-center"
+                        >
                             <Icon name="check" />
                             Save
                         </Button>
