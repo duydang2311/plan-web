@@ -7,6 +7,7 @@
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import type { ActionData, PageData } from './$types';
     import { validate } from './utils';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
 
     const errorMap = {
         root: {
@@ -36,6 +37,7 @@
     const helperForm = createForm({
         validator: formValidator(validate)
     });
+    const { queryClient } = useRuntime();
     const fields = {
         workspaceId: helperForm.createField({
             name: 'workspaceId',
@@ -75,6 +77,9 @@
             return async ({ update }) => {
                 status = null;
                 await update();
+                await queryClient.invalidateQueries({
+                    queryKey: ['projects', { workspaceId: data.workspace.id }]
+                });
             };
         }}
     >
