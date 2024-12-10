@@ -6,8 +6,8 @@
     import { Button, Icon, Tiptap } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { ValidationResult } from '~/lib/utils/validation';
-    import { clientValidate } from './utils.client';
     import type { LocalComment } from './+page.server';
+    import { clientValidate } from './utils.client';
 
     const { userId, size, issueId }: { userId: string; issueId: string; size: number } = $props();
     const queryClient = useQueryClient();
@@ -103,9 +103,12 @@
             }
             return data;
         });
+
         e.formData.set('content', html);
+        editor.commands.clearContent();
         return async ({ result }) => {
             if (result.type !== 'success') {
+                editor?.commands.setContent(html);
                 queryClient.setQueryData(queryKey, oldData);
             }
             await queryClient.invalidateQueries({ queryKey });
