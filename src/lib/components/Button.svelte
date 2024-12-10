@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { AnyMeltElement } from '@melt-ui/svelte';
     import clsx from 'clsx';
+    import type { Action } from 'svelte/action';
     import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
     type Props = (
@@ -12,6 +13,7 @@
         outline?: boolean;
         size?: 'sm';
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
+        action?: Action;
     };
 
     const {
@@ -20,6 +22,7 @@
         outline = false,
         size,
         melt: useMelt,
+        action = () => {},
         children,
         ...props
     }: Props = $props();
@@ -39,6 +42,7 @@
         )}
         {...useMelt ?? {}}
         use:meltAction
+        use:action
     >
         {#if children}
             {@render children()}
@@ -57,6 +61,7 @@
         )}
         {...useMelt ?? {}}
         use:meltAction
+        use:action
     >
         {#if children}
             {@render children()}

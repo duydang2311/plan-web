@@ -31,6 +31,9 @@ export default withAnimations({
                     1: 'oklch(from var(--theme-primary-1) l c h / <alpha-value>)',
                     2: 'oklch(from var(--theme-primary-2) l c h / <alpha-value>)',
                     3: 'oklch(from var(--theme-primary-3) l c h / <alpha-value>)',
+                    'fg-1': 'oklch(from var(--theme-primary-fg-1) l c h / <alpha-value>)',
+                    'fg-2': 'oklch(from var(--theme-primary-fg-2) l c h / <alpha-value>)',
+                    'fg-3': 'oklch(from var(--theme-primary-fg-3) l c h / <alpha-value>)',
                     border: 'oklch(from var(--theme-primary-border) l c h / <alpha-value>)'
                 },
                 negative: {
@@ -52,6 +55,7 @@ export default withAnimations({
                     5: 'oklch(from var(--theme-base-5) l c h / <alpha-value>)',
                     hover: 'oklch(from var(--theme-base-hover) l c h / <alpha-value>)',
                     active: 'oklch(from var(--theme-base-active) l c h / <alpha-value>)',
+                    disabled: 'oklch(from var(--theme-base-disabled) l c h / <alpha-value>)',
                     'fg-1': 'oklch(from var(--theme-base-fg-1) l c h / <alpha-value>)',
                     'fg-2': 'oklch(from var(--theme-base-fg-2) l c h / <alpha-value>)',
                     'fg-3': 'oklch(from var(--theme-base-fg-3) l c h / <alpha-value>)',
@@ -61,6 +65,23 @@ export default withAnimations({
                     'border-1': 'oklch(from var(--theme-base-border-1) l c h / <alpha-value>)',
                     'border-2': 'oklch(from var(--theme-base-border-2) l c h / <alpha-value>)',
                     'border-3': 'oklch(from var(--theme-base-border-3) l c h / <alpha-value>)'
+                },
+                info: {
+                    1: 'oklch(from var(--theme-info-1) l c h / <alpha-value>)',
+                    2: 'oklch(from var(--theme-info-2) l c h / <alpha-value>)',
+                    3: 'oklch(from var(--theme-info-3) l c h / <alpha-value>)',
+                    4: 'oklch(from var(--theme-info-4) l c h / <alpha-value>)',
+                    5: 'oklch(from var(--theme-info-5) l c h / <alpha-value>)',
+                    hover: 'oklch(from var(--theme-info-hover) l c h / <alpha-value>)',
+                    active: 'oklch(from var(--theme-info-active) l c h / <alpha-value>)',
+                    disabled: 'oklch(from var(--theme-info-disabled) l c h / <alpha-value>)',
+                    border: 'oklch(from var(--theme-info-border) l c h / <alpha-value>)',
+                    'fg-1': 'oklch(from var(--theme-info-fg-1) l c h / <alpha-value>)',
+                    'fg-2': 'oklch(from var(--theme-info-fg-2) l c h / <alpha-value>)',
+                    'fg-3': 'oklch(from var(--theme-info-fg-3) l c h / <alpha-value>)',
+                    'fg-4': 'oklch(from var(--theme-info-fg-4) l c h / <alpha-value>)',
+                    'fg-5': 'oklch(from var(--theme-info-fg-5) l c h / <alpha-value>)',
+                    'fg-ghost': 'oklch(from var(--theme-info-fg-ghost) l c h / <alpha-value>)'
                 }
             },
             typography: () => ({

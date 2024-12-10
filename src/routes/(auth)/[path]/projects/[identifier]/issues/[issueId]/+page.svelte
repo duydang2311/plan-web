@@ -9,6 +9,7 @@
     import Issue from './Issue.svelte';
     import Priority from './Priority.svelte';
     import Status from './Status.svelte';
+    import SelectTeam from './SelectTeam.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
@@ -80,16 +81,17 @@
             </div>
         </div>
     </div>
-    <div class="hidden xl:block w-full max-w-60 p-4 h-full space-y-4">
+    <div class="hidden xl:block w-full max-w-60 p-4 h-full space-y-8">
         <div>
-            <h2 class="text-base-fg-3 mb-2 text-base">Properties</h2>
+            <h2 class="c-label mb-1">Properties</h2>
             <div class="space-y-2">
                 <Status workspaceId={data.workspace.id} issueId={data.page.issue.id} />
                 <Priority issueId={data.page.issue.id} />
             </div>
         </div>
+        <SelectTeam workspaceId={data.workspace.id} issueId={data.page.issue.id} />
         <div>
-            <h2 class="text-base-fg-3 mb-2 text-base">Actions</h2>
+            <h2 class="c-label mb-1">Actions</h2>
             <div class="space-y-2 gap-2 items-center">
                 <EditButton
                     {editing}

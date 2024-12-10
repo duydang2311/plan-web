@@ -26,6 +26,7 @@ export { default as Select } from './Select.svelte';
 export { default as Spinner } from './Spinner.svelte';
 export { default as StaticErrors } from './StaticErrors.svelte';
 export { default as Table } from './Table.svelte';
+export { default as TagsInputBuilder } from './TagsInputBuilder.svelte';
 export { default as TextArea } from './TextArea.svelte';
 export { default as Th } from './Th.svelte';
 export { default as THead } from './THead.svelte';

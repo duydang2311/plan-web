@@ -68,6 +68,13 @@ export const load: PageLoad = async ({ parent, data, url, untrack }) => {
         );
     }
 
+    prefetchPromises.push(
+        queryClient.prefetchQuery({
+            queryKey: ['issues', { issueId: data.page.issue.id, tag: 'select-team' }],
+            queryFn: () => data.page.issue.teams
+        })
+    );
+
     await Promise.all(prefetchPromises);
     return data;
 };

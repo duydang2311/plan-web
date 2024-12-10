@@ -21,6 +21,7 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
+import type { Team } from '~/lib/models/team';
 
 export interface LocalIssue {
     id: string;
@@ -31,6 +32,7 @@ export interface LocalIssue {
     description?: string;
     orderNumber: number;
     priority: IssuePriority;
+    teams: Pick<Team, 'id' | 'name' | 'identifier'>[];
     statusId?: string;
     status?: {
         value: string;

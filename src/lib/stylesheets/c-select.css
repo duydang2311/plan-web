@@ -1,21 +1,24 @@
 .c-select--menu {
-    @apply p-1 bg-base-1 border border-base-border-1 rounded shadow-sm space-y-1 min-w-40 cursor-default;
+    @apply p-1 bg-base-1 border border-base-border-1 rounded-md shadow-sm space-y-1 min-w-40 cursor-default;
 }
 
 .c-select--option {
     color: var(--theme-base-fg-4);
-    @apply relative pl-10 pr-2 py-2 rounded-md w-full flex items-center gap-2;
+    @apply relative pl-10 pr-2 py-1 rounded w-full flex items-center gap-2 font-medium;
+    transition:
+        color 75ms var(--cubic-out),
+        background-color 75ms var(--cubic-out);
 
     &:where([data-melt-select-option]) {
         &[data-highlighted],
         &:hover {
             color: var(--theme-base-fg-1);
-            background-color: var(--theme-base-3);
+            background-color: var(--theme-base-4);
         }
 
         &[aria-selected='true'] {
             color: var(--theme-base-fg-1);
-            background-color: var(--theme-base-4);
+            background-color: var(--theme-base-5);
             font-weight: 500;
         }
     }

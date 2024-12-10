@@ -49,7 +49,7 @@
             #{$query.data.orderNumber}
         </span>
     </div>
-    <div class="max-w-full mt-2 transition-enforcement">
+    <div class="max-w-full mt-6 transition-enforcement">
         {#if editing}
             <div>
                 <form
