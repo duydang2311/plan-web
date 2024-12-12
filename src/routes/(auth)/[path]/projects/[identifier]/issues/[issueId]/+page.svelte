@@ -10,6 +10,7 @@
     import Priority from './Priority.svelte';
     import Status from './Status.svelte';
     import SelectTeam from './SelectTeam.svelte';
+    import SelectAssignees from './SelectAssignees.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
@@ -89,6 +90,7 @@
                 <Priority issueId={data.page.issue.id} />
             </div>
         </div>
+        <SelectAssignees workspaceId={data.workspace.id} issueId={data.page.issue.id} />
         <SelectTeam workspaceId={data.workspace.id} issueId={data.page.issue.id} />
         <div>
             <h2 class="c-label mb-1">Actions</h2>

@@ -66,7 +66,12 @@
     );
 </script>
 
-<ol use:melt={menu} class="c-select--menu min-w-52" in:tsap={select.in} out:tsap={select.out}>
+<ol
+    use:melt={menu}
+    class="c-select--menu min-w-52 space-y-1"
+    in:tsap={select.in}
+    out:tsap={select.out}
+>
     {#if options}
         {#if options.length === 0}
             <li class="c-select--option px-2 text-base-fg-ghost">No teams available</li>

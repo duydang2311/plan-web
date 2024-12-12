@@ -1,59 +1,68 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { Resize } from '@cloudinary/url-gen/actions';
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
     import { toStore, writable } from 'svelte/store';
-    import { Button, Icon, Select } from '~/lib/components';
+    import { Avatar, Button, Icon, Select } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { Team } from '~/lib/models/team';
+    import type { User } from '~/lib/models/user';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { createEffect } from '~/lib/utils/runes.svelte';
-    import SelectTeamOptions from './SelectTeamOptions.svelte';
+    import SelectAssigneesOptions from './SelectAssigneesOptions.svelte';
 
     interface Props {
         workspaceId: string;
         issueId: string;
     }
 
-    type LocalSelectTeam = Pick<Team, 'id' | 'name' | 'identifier'>;
+    type LocalUser = Pick<User, 'id' | 'email'> & {
+        profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;
+    };
 
     const { workspaceId, issueId }: Props = $props();
-    const { api, queryClient } = useRuntime();
+    const { api, queryClient, cloudinary } = useRuntime();
     const open = writable(false);
-    const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-team' }]);
+    const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-assignees' }]);
     const selectedQuery = createQuery(
         toStore(() => ({
             queryKey: selectedQueryKey,
             queryFn: async () => {
                 const response = await api.get(`issues/${issueId}`, {
-                    query: { select: 'Teams.Id,Teams.Name,Teams.Identifier' }
+                    query: {
+                        select: 'Assignees.Id,Assignees.Email,Assignees.Profile.DisplayName,Assignees.Profile.Image'
+                    }
                 });
                 if (!response.ok) {
                     return null;
                 }
-                return await response.json<{ teams: LocalSelectTeam[] }>().then((a) => a.teams);
+                return await response.json<{ assignees: LocalUser[] }>().then((a) => a.assignees);
             }
         }))
     );
-    const selected = writable<(SelectOption<string> & { identifier?: string })[]>(
+    const selected = writable<(SelectOption<string> & { email: string; image?: string })[]>(
         $selectedQuery.data?.map((a) => ({
-            label: a.name,
+            label: a.profile?.displayName ?? a.email,
             value: a.id,
-            identifier: a.identifier
+            email: a.email,
+            image: a.profile
+                ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(64)).toURL()
+                : undefined
         })) ?? []
     );
     const addMutation = createMutation({
-        mutationFn: (variables: { teamId: string; issueId: string; teamName?: string }) =>
-            api.post(`team-issues`, { body: variables }),
-        onMutate: async ({ teamId, teamName }) => {
+        mutationFn: ({
+            issueId,
+            userId
+        }: {
+            issueId: string;
+            userId: string;
+            email: string;
+            image?: string;
+        }) => api.post(`issue-assignees`, { body: { issueId, userId } }),
+        onMutate: async (variables) => {
             await queryClient.cancelQueries({ queryKey: selectedQueryKey });
-            const old = queryClient.getQueryData<LocalSelectTeam[]>(selectedQueryKey);
-            queryClient.setQueryData(selectedQueryKey, [
-                ...(old ?? []),
-                {
-                    id: teamId,
-                    name: teamName ?? 'N/A'
-                }
-            ]);
+            const old = queryClient.getQueryData<LocalUser[]>(selectedQueryKey);
+            queryClient.setQueryData(selectedQueryKey, [...(old ?? []), variables]);
             return { old };
         },
         onSettled: async (data, error, _variables, context) => {
@@ -66,14 +75,14 @@
         }
     });
     const deleteMutation = createMutation({
-        mutationFn: ({ teamId, issueId }: { teamId: string; issueId: string }) =>
-            api.delete(`team-issues/${teamId}/${issueId}`),
-        onMutate: async ({ teamId }) => {
+        mutationFn: ({ issueId, userId }: { issueId: string; userId: string }) =>
+            api.delete(`issue-assignees/${issueId}/${userId}`),
+        onMutate: async ({ userId }) => {
             await queryClient.cancelQueries({ queryKey: selectedQueryKey });
-            const old = queryClient.getQueryData<LocalSelectTeam[]>(selectedQueryKey);
+            const old = queryClient.getQueryData<LocalUser[]>(selectedQueryKey);
             queryClient.setQueryData(
                 selectedQueryKey,
-                old?.filter((a) => a.id !== teamId)
+                old?.filter((a) => a.id !== userId)
             );
             return { old };
         },
@@ -91,9 +100,12 @@
         () => {
             if ($selectedQuery.data) {
                 $selected = $selectedQuery.data.map((a) => ({
-                    label: a.name,
+                    label: a.profile?.displayName ?? a.email,
                     value: a.id,
-                    identifier: a.identifier
+                    email: a.email,
+                    imageHref: a.profile
+                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(32))
+                        : null
                 }));
             }
         },
@@ -103,7 +115,7 @@
 
 <div>
     <div class="flex items-center gap-2 mb-2">
-        <h2 class="c-label">Teams</h2>
+        <h2 class="c-label">Assignees</h2>
         {#if $selected.length > 0}
             <span class="text-sm font-medium px-2 rounded-full bg-base-3 text-base-fg-3">
                 {$selected.length}
@@ -111,25 +123,19 @@
         {/if}
     </div>
     {#if $selected.length}
-        <ul class="flex gap-1 flex-wrap mb-3">
+        <ul class="space-y-2 mb-3">
             {#each $selected as option (option.value)}
-                {#if option.identifier}
-                    <li class="grow">
-                        <a
-                            href="/{$page.params.path}/teams/{option.identifier}"
-                            class="block w-full text-center rounded-full bg-base-2 dark:bg-base-3 text-base-fg-2 border border-base-border-2 px-2 text-ellipsis overflow-hidden text-sm font-medium
-                            hover:bg-base-4 hover:text-base-fg-1 active:bg-base-active"
-                        >
-                            {option.label}
-                        </a>
-                    </li>
-                {:else}
-                    <li
-                        class="grow text-center rounded-full bg-base-2 dark:bg-base-3 text-base-fg-1 border border-base-border-2 px-2 text-ellipsis overflow-hidden text-sm font-medium"
-                    >
+                <li class="flex gap-2 items-center">
+                    <Avatar
+                        title={option.label}
+                        seed={option.email}
+                        src={option.image}
+                        class="w-8"
+                    />
+                    <div class="text-ellipsis overflow-hidden">
                         {option.label}
-                    </li>
-                {/if}
+                    </div>
+                </li>
             {/each}
         </ul>
     {/if}
@@ -156,8 +162,9 @@
                     for (const a of added) {
                         $addMutation.mutate({
                             issueId,
-                            teamName: a.label,
-                            teamId: a.value
+                            userId: a.value,
+                            email: a.email,
+                            image: a.image
                         });
                     }
                 }
@@ -165,7 +172,7 @@
                     for (const a of removed) {
                         $deleteMutation.mutate({
                             issueId,
-                            teamId: a.value
+                            userId: a.value
                         });
                     }
                 }
@@ -182,10 +189,10 @@
                 class="flex items-center gap-2"
             >
                 <Icon name="plus" />
-                Add team
+                Add assignee
             </Button>
             {#if $open}
-                <SelectTeamOptions
+                <SelectAssigneesOptions
                     {workspaceId}
                     builders={{ menu, option }}
                     helpers={{ isSelected }}

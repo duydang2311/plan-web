@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals: { runtime }, parent }) => {
             Effect.gen(function* () {
                 const api = yield* ApiClient;
                 const response = yield* api.get(`teams/${data.team.id}`, {
-                    query: { select: 'new(Id, Name)' }
+                    query: { select: 'Id,Name' }
                 });
                 if (!response.ok) {
                     return yield* Effect.fail(new ApiError({ code: response.status + '' }));

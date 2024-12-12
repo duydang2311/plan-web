@@ -1,6 +1,7 @@
 import type { Asset } from './asset';
 
 export interface User {
+    createdTime: string;
     id: string;
     email: string;
     profile?: UserProfile;

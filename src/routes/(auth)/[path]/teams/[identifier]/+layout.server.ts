@@ -17,14 +17,14 @@ export const load: LayoutServerLoad = async ({
             let response: Response;
             if (id) {
                 response = yield* apiClient.get(`teams/${id}`, {
-                    query: { select: 'new(Id, Identifier, Name)' }
+                    query: { select: 'Id,Identifier,Name' }
                 });
             } else {
                 const data = yield* Effect.promise(() => parent());
                 response = yield* apiClient.get(
                     `workspaces/${data.workspace.id}/teams/identifier/${identifier}`,
                     {
-                        query: { select: 'new(Id, Identifier, Name)' }
+                        query: { select: 'Id,Identifier,Name' }
                     }
                 );
             }
