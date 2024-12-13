@@ -1,21 +1,69 @@
 <script lang="ts">
     import { createQuery } from '@tanstack/svelte-query';
-    import type { PageData } from './$types';
+    import type { ActionData, PageData } from './$types';
     import { invalidate } from '$app/navigation';
-    import { IconButton, Icon, Row, Table, Th, THead, Pagination } from '~/lib/components';
+    import {
+        IconButton,
+        Icon,
+        Row,
+        Table,
+        Th,
+        THead,
+        Pagination,
+        Button,
+        Input
+    } from '~/lib/components';
+    import InviteMemberDialog from './InviteMemberDialog.svelte';
+    import { toStore, writable } from 'svelte/store';
 
-    const { data }: { data: PageData } = $props();
-    const query = createQuery({
-        queryKey: ['workspace-members'],
-        queryFn: async () => {
-            await invalidate('fetch:workspace-members');
-            return data.members;
-        }
-    });
+    const { data, form }: { data: PageData; form: ActionData } = $props();
+    const query = createQuery(
+        toStore(() => ({
+            queryKey: ['workspace-members', { workspaceId: data.workspace.id }],
+            queryFn: async () => {
+                await invalidate('fetch:workspace-members');
+                return data.members;
+            }
+        }))
+    );
+    const showInviteMember = writable(false);
 </script>
 
-<main class="h-full flex flex-col justify-between overflow-auto">
-    <Table style="grid-template-columns: 1fr 1fr auto;">
+<InviteMemberDialog
+    workspaceId={data.workspace.id}
+    open={showInviteMember}
+    form={form?.inviteMember}
+/>
+
+<main class="grid grid-rows-[auto_1fr] h-full overflow-auto divide-y divide-base-border-2">
+    <div class="flex justify-between divide-x divide-base-border-2 first:*:pl-8 last:*:pr-8 *:px-2">
+        <div class="relative grow">
+            <Icon
+                name="search"
+                class="absolute left-8 top-1/2 -translate-y-1/2 text-base-fg-ghost"
+            />
+            <Input
+                type="text"
+                class="pl-8 border-none focus:shadow-none py-0 h-full"
+                placeholder="Search member"
+            />
+        </div>
+        <div class="!px-0 !py-0">
+            <Button
+                size="sm"
+                variant="base"
+                filled={false}
+                class="rounded-none w-fit h-full flex items-center gap-2 pr-8 pl-2 py-2"
+                onclick={() => {
+                    $showInviteMember = true;
+                }}
+            >
+                <Icon name="plus" />
+                Invite member
+            </Button>
+        </div>
+    </div>
+    <Table class="grid-cols-[1fr_1fr_auto]">
         <THead>
             <Row class="py-2">
                 <Th>Email address</Th>

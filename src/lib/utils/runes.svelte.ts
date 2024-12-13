@@ -73,3 +73,12 @@ export const when: (
         });
     }
 };
+
+export const watch = (depsFn: () => unknown) => {
+    return (fn: () => void | (() => void)) => {
+        $effect(() => {
+            depsFn();
+            untrack(() => fn());
+        });
+    };
+};

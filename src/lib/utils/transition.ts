@@ -56,7 +56,7 @@ export function tsap(node: HTMLElement, callback: TsapCallback) {
     };
 }
 
-export const select: { [k in 'in' | 'out']: TsapCallback } = {
+export const select: Record<'in' | 'out', TsapCallback> = {
     in: (node, gsap) =>
         gsap.from(node, {
             opacity: 0,
@@ -64,6 +64,7 @@ export const select: { [k in 'in' | 'out']: TsapCallback } = {
             y: '-0.5rem',
             duration: 0.15,
             force3D: true,
+            clearProps: 'opacity,scaleY,y',
             ease: 'circ.out'
         }),
     out: (node, gsap) =>
@@ -72,6 +73,7 @@ export const select: { [k in 'in' | 'out']: TsapCallback } = {
             y: '-0.5rem',
             duration: 0.075,
             force3D: true,
+            clearProps: 'opacity,scaleY,y',
             ease: 'circ.in'
         })
 };

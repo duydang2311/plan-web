@@ -1,10 +1,12 @@
-import { error } from '@sveltejs/kit';
+import { error, fail, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { ActionResponse } from '~/lib/utils/kit';
+import { decodeInviteMember, validateInviteMember } from './utils';
 
 interface WorkspaceMember {
     userId: string;
@@ -75,4 +77,27 @@ export const load: PageServerLoad = async ({
         query: paginatedQuery(query),
         members: exit.value
     };
+};
+
+export const actions: Actions = {
+    'invite-member': ({
+        request,
+        locals: { runtime }
+    }): Promise<ActionFailure<{ inviteMember: { errors: Record<string, string[]> } }> | null> => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateInviteMember(decodeInviteMember(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).post(`workspaces/${validation.data.workspaceId}/invitations`, {
+                    body: { userId: validation.data.userId }
+                })
+            );
+            return null;
+        }).pipe(
+            Effect.catchAll((a) => Effect.succeed(fail(a.status, { inviteMember: a.data }))),
+            runtime.runPromise
+        );
+    }
 };

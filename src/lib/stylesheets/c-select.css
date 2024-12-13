@@ -9,7 +9,8 @@
         color 75ms var(--cubic-out),
         background-color 75ms var(--cubic-out);
 
-    &:where([data-melt-select-option]) {
+    &:where([data-melt-select-option]),
+    &:where([data-melt-combobox-option]) {
         &[data-highlighted],
         &:hover {
             color: var(--theme-base-fg-1);

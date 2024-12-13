@@ -1,12 +1,12 @@
 <script
     lang="ts"
-    generics="Value, Multiple extends boolean = false, S extends ComboboxSelected<Multiple, Value> = ComboboxSelected<Multiple, Value>"
+    generics="Value, Multiple extends boolean = false, S extends _ComboboxSelected<Multiple, Value> = _ComboboxSelected<Multiple, Value>"
 >
     import {
         createCombobox,
         createSync,
-        type ComboboxSelected,
-        type CreateComboboxProps
+        type CreateComboboxProps,
+        type ComboboxSelected as _ComboboxSelected
     } from '@melt-ui/svelte';
     import type { Snippet } from 'svelte';
 
