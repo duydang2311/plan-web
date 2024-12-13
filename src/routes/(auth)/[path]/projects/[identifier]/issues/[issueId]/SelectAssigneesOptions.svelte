@@ -6,6 +6,7 @@
     import { toStore } from 'svelte/store';
     import { Avatar, Icon, Input, Spinner } from '~/lib/components';
     import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
+    import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { User } from '~/lib/models/user';
@@ -73,7 +74,6 @@
     when(
         () => $query.isFetching,
         () => {
-            console.log('set status pending');
             status = 'pending';
         },
         '1 second'
@@ -109,7 +109,7 @@
         class:animate-twPulse={$query.isFetching}
     >
         {#if status === 'pending'}
-            <Spinner class="absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <Spinner2 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-8" />
         {/if}
         {#if options}
             <ul class="space-y-1">
