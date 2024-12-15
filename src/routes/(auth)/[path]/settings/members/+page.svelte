@@ -50,10 +50,11 @@
         </div>
         <div class="!px-0 !py-0">
             <Button
-                size="sm"
                 variant="base"
+                size="sm"
                 filled={false}
-                class="rounded-none w-fit h-full flex items-center gap-2 pr-8 pl-2 py-2"
+                class="rounded-none w-fit h-full flex items-center gap-2 pr-8 py-2"
+                flat
                 onclick={() => {
                     $showInviteMember = true;
                 }}

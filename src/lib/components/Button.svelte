@@ -11,6 +11,7 @@
         variant?: 'base' | 'primary' | 'negative' | 'positive';
         filled?: boolean;
         outline?: boolean;
+        flat?: boolean;
         size?: 'sm';
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
         action?: Action;
@@ -24,6 +25,7 @@
         melt: useMelt,
         action = () => {},
         children,
+        flat,
         ...props
     }: Props = $props();
     const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
@@ -37,6 +39,7 @@
             `c-button--${variant}`,
             filled && 'c-button--filled',
             outline && 'c-button--outline',
+            flat && 'c-button--flat',
             size && 'c-button--sm',
             props.class
         )}

@@ -41,7 +41,9 @@
             type="button"
             variant="base"
             filled={false}
-            class="relative h-full flex items-center pl-6 gap-2 text-sm rounded-none"
+            size="sm"
+            flat
+            class="relative h-full flex items-center gap-2 pl-6"
             melt={trigger}
         >
             <Icon name={selectedLayoutIcon} />

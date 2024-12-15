@@ -84,8 +84,6 @@
             status = null;
         }
     );
-
-    $inspect(status);
 </script>
 
 <div

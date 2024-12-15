@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { CreateQueryResult } from '@tanstack/svelte-query';
     import { TableHandler } from '@vincjo/datatables/server';
     import { DateTime } from 'luxon';
     import {
@@ -13,6 +14,7 @@
     } from '~/lib/components';
     import type { Issue } from '~/lib/models/issue';
     import { getPriorityIcon, getPriorityLabel, IssuePriorities } from '~/lib/models/issue';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
 
     type T = $$Generic<TableIssue>;
     type TableIssue = Pick<
@@ -26,11 +28,12 @@
     };
 
     interface Props {
-        buildIssueHref: (row: T) => string;
+        query: CreateQueryResult<PaginatedList<TableIssue>>;
         table: TableHandler<T>;
+        buildIssueHref: (row: TableIssue) => string;
     }
 
-    const { buildIssueHref, table }: Props = $props();
+    const { query, table, buildIssueHref }: Props = $props();
 </script>
 
 <div class="grid grid-rows-[1fr_auto]">
@@ -46,13 +49,13 @@
                 </ThSort>
             </Row>
         </THead>
-        <tbody class:animate-twPulse={table.isLoading}>
-            {#if table.rows.length === 0}
+        <tbody class:animate-twPulse={$query.isFetching}>
+            {#if $query.data == null || $query.data.items.length === 0}
                 <Row>
                     <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
                 </Row>
             {:else}
-                {#each table.rows as row}
+                {#each $query.data.items as row}
                     <Row>
                         <td>
                             <div

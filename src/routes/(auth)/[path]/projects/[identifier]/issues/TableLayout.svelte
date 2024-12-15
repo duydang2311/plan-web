@@ -1,13 +1,13 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { createQuery, keepPreviousData, useQueryClient } from '@tanstack/svelte-query';
     import { type State, TableHandler } from '@vincjo/datatables/server';
     import { toStore } from 'svelte/store';
     import IssueDatatable from '~/lib/components/issues/IssueDatatable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { unwrapMaybePromise } from '~/lib/utils/promise';
-    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { watch } from '~/lib/utils/runes.svelte';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
 
@@ -46,38 +46,34 @@
                     }
                 });
                 return await response.json<PaginatedList<LocalIssue>>();
-            }
+            },
+            placeholderData: keepPreviousData
         }))
     );
-    const table = new TableHandler<LocalIssue>($query.data?.items, { rowsPerPage: 20 });
-    table.load(() => $query.promise.then((a) => a.items));
+    const table = new TableHandler<LocalIssue>($query.data?.items, {
+        rowsPerPage: 20,
+        totalRows: $query.data?.totalCount ?? 0
+    });
     table.on('change', () => {
         tableState = table.getState();
     });
 
-    createEffect(
-        () => {
-            table.getState().setTotalRows($query.data?.totalCount ?? 0);
-            table.invalidate();
-        },
-        () => $query.data
-    );
+    watch(() => $query.data)(() => {
+        table.totalRows = $query.data?.totalCount ?? 0;
+    });
 
-    createEffect(
-        () => {
-            if (data.page.tag === 'table') {
-                unwrapMaybePromise(data.page.streamed)((a) => {
-                    queryClient.setQueryData(queryKey, a.issueList);
-                    table.invalidate();
-                });
-            }
-        },
-        () => data.page
-    );
+    watch(() => data.page)(() => {
+        if (data.page.tag === 'table' && data.page.streamed instanceof Promise) {
+            unwrapMaybePromise(data.page.streamed)((a) => {
+                queryClient.setQueryData(queryKey, a.issueList);
+            });
+        }
+    });
 </script>
 
 <IssueDatatable
     {table}
+    {query}
     buildIssueHref={({ orderNumber }) =>
         `/${$page.params.path}/projects/${$page.params.identifier}/issues/${orderNumber}`}
 />

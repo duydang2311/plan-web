@@ -34,7 +34,7 @@
 
 <main class="grid grid-rows-[auto_1fr] h-full overflow-auto">
     <div class="flex justify-between border-b border-b-base-border-2">
-        <div class="flex items-stretch first:*:pl-0 divide-x divide-base-border-2 grow">
+        <div class="flex items-stretch divide-x divide-base-border-2 grow">
             <div class="min-w-32">
                 <ViewLayoutSelect {layouts} selected={selectedLayout} />
             </div>
@@ -55,7 +55,9 @@
                 href={createIssueHref}
                 variant="base"
                 filled={false}
-                class="flex items-center gap-2 rounded-none w-fit h-full pr-6 text-sm whitespace-nowrap text-ellipsis overflow-hidden"
+                size="sm"
+                flat
+                class="flex items-center gap-2 w-fit h-full pr-6 whitespace-nowrap text-ellipsis overflow-hidden"
             >
                 <Icon name="plus" />
                 Create issue
