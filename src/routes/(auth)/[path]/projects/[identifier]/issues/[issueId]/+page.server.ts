@@ -1,8 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { Asset } from '~/lib/models/asset';
-import type { IssuePriority } from '~/lib/models/issue';
+import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import type { Team } from '~/lib/models/team';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
@@ -21,23 +22,27 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
-import type { Team } from '~/lib/models/team';
+import type { User } from '~/lib/models/user';
+import type { WorkspaceStatus } from '~/lib/models/status';
 
-export interface LocalIssue {
-    id: string;
-    createdTime: string;
-    updatedTime: string;
-    authorId: string;
-    title: string;
-    description?: string;
-    orderNumber: number;
-    priority: IssuePriority;
+export type LocalIssue = Pick<
+    Issue,
+    | 'id'
+    | 'createdTime'
+    | 'updatedTime'
+    | 'authorId'
+    | 'title'
+    | 'description'
+    | 'orderNumber'
+    | 'priority'
+    | 'statusId'
+> & {
     teams: Pick<Team, 'id' | 'name' | 'identifier'>[];
-    statusId?: string;
-    status?: {
-        value: string;
+    assignees: Pick<User, 'id' | 'email'> & {
+        profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;
     };
-}
+    status?: Pick<WorkspaceStatus, 'value'>;
+};
 
 export interface LocalComment {
     createdTime: string;

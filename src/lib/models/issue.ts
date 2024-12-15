@@ -1,4 +1,5 @@
 import type { WorkspaceStatus } from './status';
+import type { User } from './user';
 
 export interface Issue {
     createdTime: string;
@@ -12,6 +13,7 @@ export interface Issue {
     status?: WorkspaceStatus;
     statusRank: string;
     priority: IssuePriority;
+    assignees: User[];
 }
 
 export type IssuePriority = (typeof IssuePriorities)[keyof typeof IssuePriorities];

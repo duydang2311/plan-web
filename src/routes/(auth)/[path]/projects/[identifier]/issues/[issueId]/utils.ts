@@ -114,6 +114,6 @@ export function decodeDeleteComment(formData: FormData) {
 
 export const createFetchIssueQuery = () => {
     return {
-        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon,Teams.Id,Teams.Name,Teams.Identifier'
+        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon,Teams.Id,Teams.Name,Teams.Identifier,Assignees.Id,Assignees.Email,Assignees.Profile.DisplayName,Assignees.Profile.Image'
     };
 };
