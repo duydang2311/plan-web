@@ -11,12 +11,12 @@
     --_border-disabled: var(--theme-base-border-2);
 
     width: 100%;
+    text-align: left;
     padding: theme('size[2]') theme('size[5]');
     font-weight: 600;
     color: var(--_fg);
     box-shadow: var(--_shadow);
     background-color: var(--_bg);
-    border: var(--_border);
     transition:
         background-color 75ms ease-out,
         color 75ms ease-out,
