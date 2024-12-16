@@ -1,20 +1,21 @@
 <script lang="ts">
-    import { createQuery } from '@tanstack/svelte-query';
-    import type { ActionData, PageData } from './$types';
     import { invalidate } from '$app/navigation';
+    import { createQuery } from '@tanstack/svelte-query';
+    import { toStore, writable } from 'svelte/store';
     import {
-        IconButton,
+        Button,
         Icon,
+        IconButton,
+        Input,
+        Pagination,
         Row,
         Table,
         Th,
-        THead,
-        Pagination,
-        Button,
-        Input
+        THead
     } from '~/lib/components';
+    import type { ActionData, PageData } from './$types';
     import InviteMemberDialog from './InviteMemberDialog.svelte';
-    import { toStore, writable } from 'svelte/store';
+    import SelectView from './SelectView.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const query = createQuery(
@@ -36,11 +37,17 @@
 />
 
 <main class="grid grid-rows-[auto_1fr] h-full overflow-auto divide-y divide-base-border-2">
-    <div class="flex justify-between divide-x divide-base-border-2 first:*:pl-8 last:*:pr-8 *:px-2">
+    <div class="flex divide-x divide-base-border-2">
+        <SelectView
+            options={[
+                { label: 'Active members', value: 'active', icon: 'users-solid', default: true },
+                { label: 'Pending members', value: 'pending', icon: 'user-plus' }
+            ]}
+        />
         <div class="relative grow">
             <Icon
                 name="search"
-                class="absolute left-8 top-1/2 -translate-y-1/2 text-base-fg-ghost"
+                class="absolute left-2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
             />
             <Input
                 type="text"
@@ -48,7 +55,7 @@
                 placeholder="Search member"
             />
         </div>
-        <div class="!px-0 !py-0">
+        <div>
             <Button
                 variant="base"
                 size="sm"
