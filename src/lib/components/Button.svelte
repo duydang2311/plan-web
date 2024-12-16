@@ -59,6 +59,7 @@
             `c-button--${variant}`,
             filled && 'c-button--filled',
             outline && 'c-button--outline',
+            flat && 'c-button--flat',
             size && 'c-button--sm',
             props.class
         )}
