@@ -2,25 +2,19 @@
     import { replaceState } from '$app/navigation';
     import { page } from '$app/stores';
     import { melt } from '@melt-ui/svelte';
-    import { untrack } from 'svelte';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import { Button, Icon, Select } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
     import { fluentSearchParams } from '~/lib/utils/url';
 
     interface Props {
         options: { label: string; value: string; icon: IconName; default?: boolean }[];
+        selected: Writable<{ label: string; value: string; icon: IconName; default?: boolean }>;
     }
 
-    const { options }: Props = $props();
+    const { options, selected }: Props = $props();
 
-    const view = $page.url.searchParams.get('view');
     const open = writable(false);
-    const selected = writable(
-        untrack(() =>
-            view ? options.find((a) => a.value === view) : options.find((a) => a.default === true)
-        )
-    );
     const selectedOption = $derived(options.find((a) => a.value === $selected.value));
 </script>
 

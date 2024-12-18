@@ -32,7 +32,6 @@
         "@types/eslint__js": "^8.42.3",
         "@types/luxon": "^3.4.2",
         "@types/node": "^22.10.2",
-        "@types/sortablejs": "^1.15.8",
         "@types/validator": "^13.12.2",
         "@vincjo/datatables": "^2.2.0",
         "animated-tailwindcss": "^4.0.0",

@@ -2,21 +2,22 @@ import { error, fail, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import type { Role } from '~/lib/models/role';
+import type { User } from '~/lib/models/user';
+import type { WorkspaceMember } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
+import { ActionResponse } from '~/lib/utils/kit';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { Actions, PageServerLoad } from './$types';
-import { ActionResponse } from '~/lib/utils/kit';
 import { decodeInviteMember, validateInviteMember } from './utils';
 
-interface WorkspaceMember {
-    userId: string;
-    user: {
-        email: string;
-    };
-    role: {
-        name: string;
-    };
-}
+export type LocalWorkspaceMember = Pick<
+    WorkspaceMember,
+    'createdTime' | 'updatedTime' | 'userId'
+> & {
+    user: Pick<User, 'email'>;
+    role: Pick<Role, 'name'>;
+};
 
 export const load: PageServerLoad = async ({
     parent,
@@ -37,7 +38,7 @@ export const load: PageServerLoad = async ({
                 const response = yield* api.get(`workspaces/${id}/members`, {
                     query: {
                         ...query,
-                        select: 'UserId, User.Email, Role.Name'
+                        select: 'CreatedTime,UpdatedTime,UserId,User.Email,Role.Name'
                     }
                 });
                 if (!response.ok) {
@@ -45,7 +46,7 @@ export const load: PageServerLoad = async ({
                 }
 
                 return yield* Effect.tryPromise(() =>
-                    response.json<PaginatedList<WorkspaceMember>>()
+                    response.json<PaginatedList<LocalWorkspaceMember>>()
                 );
             }),
             Effect.catchTags({
@@ -62,7 +63,7 @@ export const load: PageServerLoad = async ({
         return {
             query: paginatedQuery(query),
             members: exitPromise.then((a) =>
-                Exit.isFailure(a) ? paginatedList<WorkspaceMember>() : a.value
+                Exit.isFailure(a) ? paginatedList<LocalWorkspaceMember>() : a.value
             )
         };
     }

@@ -8,7 +8,9 @@ export interface Workspace {
 }
 
 export interface WorkspaceMember {
-    userRoleId: number;
+    createdTime: string;
+    updatedTime: string;
+    id: number;
     userId: string;
     user?: User;
     roleId: number;
