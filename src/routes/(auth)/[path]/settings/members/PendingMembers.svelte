@@ -10,8 +10,8 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { createSort, sortHelper } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
-    import type { LocalWorkspaceMember } from './+page.server';
-    import { workspaceMembersParams } from './utils';
+    import type { LocalWorkspaceInvitation } from './+page.server';
+    import { pendingMembersParams } from './utils';
 
     const { data }: { data: PageData } = $props();
     const { api } = useRuntime();
@@ -20,22 +20,20 @@
         onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
     });
     const params = $derived(
-        workspaceMembersParams({
+        pendingMembersParams({
             url: page.url,
+            workspaceId: data.workspace.id,
             order: sort.string
         })
     );
     const query = createQuery(
         toStore(() => ({
-            queryKey: [
-                'workspace-members',
-                { tag: 'active', workspaceId: data.workspace.id, params }
-            ],
+            queryKey: ['workspace-invitations', { tag: 'pending', params }],
             queryFn: async () => {
-                const response = await api.get(`workspaces/${data.workspace.id}/members`, {
+                const response = await api.get(`workspace-invitations`, {
                     query: params
                 });
-                return await response.json<PaginatedList<LocalWorkspaceMember>>();
+                return await response.json<PaginatedList<LocalWorkspaceInvitation>>();
             },
             placeholderData: keepPreviousData
         }))
@@ -43,23 +41,25 @@
 </script>
 
 <div class="grid grid-rows-[1fr_auto]">
-    <Table class="grid-cols-[1fr_1fr_auto_auto_auto]">
+    <Table class="grid-cols-[1fr_auto_auto]">
         <THead>
             <Row class="py-2 items-center">
-                <Th>Email address</Th>
-                <Th>Role</Th>
+                <Th>User</Th>
                 <ThSort2 field={sort.field('createdTime')}>Created time</ThSort2>
-                <ThSort2 field={sort.field('updatedTime')}>Updated time</ThSort2>
                 <Th>Actions</Th>
             </Row>
         </THead>
         <tbody>
-            {#if !$query.data || $query.data.items.length === 0}
+            {#if !$query.data}
                 <Row>
-                    <td class="col-span-full">No members yet.</td>
+                    <td class="col-span-full text-base-fg-ghost">Loading...</td>
+                </Row>
+            {:else if $query.data.items.length === 0}
+                <Row>
+                    <td class="col-span-full text-base-fg-ghost">No invitations available.</td>
                 </Row>
             {:else}
-                {#each $query.data.items as { userId, user, role, createdTime, updatedTime } (userId)}
+                {#each $query.data.items as { id, user, createdTime } (id)}
                     <Row>
                         <td
                             class="whitespace-nowrap overflow-hidden text-ellipsis"
@@ -69,21 +69,9 @@
                         </td>
                         <td
                             class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={role.name}
-                        >
-                            {role.name}
-                        </td>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
                             title={DateTime.fromISO(createdTime).toRelative()}
                         >
                             {DateTime.fromISO(createdTime).toRelative()}
-                        </td>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={DateTime.fromISO(updatedTime).toRelative()}
-                        >
-                            {DateTime.fromISO(updatedTime).toRelative()}
                         </td>
                         <td>
                             <div class="flex flex-wrap gap-2">
@@ -105,7 +93,7 @@
     {#if $query.data}
         <Pagination query={params} list={$query.data}>
             {#snippet label({ from, to, totalCount })}
-                Displaying {from} - {to} out of {totalCount} members.
+                Displaying {from} - {to} out of {totalCount} invitations.
             {/snippet}
         </Pagination>
     {/if}

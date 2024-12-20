@@ -3,13 +3,17 @@ import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { Role } from '~/lib/models/role';
-import type { User } from '~/lib/models/user';
-import type { WorkspaceMember } from '~/lib/models/workspace';
+import type { User, UserProfile } from '~/lib/models/user';
+import type { WorkspaceInvitation, WorkspaceMember } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { ActionResponse } from '~/lib/utils/kit';
-import { paginatedQuery, queryParams } from '~/lib/utils/url';
-import type { Actions, PageServerLoad } from './$types';
-import { decodeInviteMember, validateInviteMember } from './utils';
+import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
+import type { Actions, PageServerLoad, PageServerLoadEvent } from './$types';
+import {
+    decodeInviteMember,
+    pendingMembersParams,
+    validateInviteMember,
+    workspaceMembersParams
+} from './utils';
 
 export type LocalWorkspaceMember = Pick<
     WorkspaceMember,
@@ -19,27 +23,34 @@ export type LocalWorkspaceMember = Pick<
     role: Pick<Role, 'name'>;
 };
 
-export const load: PageServerLoad = async ({
+export type LocalWorkspaceInvitation = Pick<WorkspaceInvitation, 'createdTime' | 'id'> & {
+    user: Pick<User, 'id' | 'email'> & { profile?: Pick<UserProfile, 'displayName' | 'image'> };
+};
+
+export const load: PageServerLoad = (e) => {
+    switch (e.url.searchParams.get('view')) {
+        case 'pending':
+            return loadPendingMembersView(e);
+        default:
+            return loadActiveMembersView(e);
+    }
+};
+
+const loadActiveMembersView = async ({
     parent,
-    depends,
     url,
     isDataRequest,
     locals: { runtime }
-}) => {
-    depends('fetch:workspace-members');
+}: PageServerLoadEvent) => {
     const {
         workspace: { id }
     } = await parent();
-    const query = queryParams(url, { page: 1, size: 20, order: null });
     const exitPromise = runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
                 const api = yield* ApiClient;
                 const response = yield* api.get(`workspaces/${id}/members`, {
-                    query: {
-                        ...query,
-                        select: 'CreatedTime,UpdatedTime,UserId,User.Email,Role.Name'
-                    }
+                    query: workspaceMembersParams({ url })
                 });
                 if (!response.ok) {
                     return yield* Effect.fail(HttpError.from(response));
@@ -61,8 +72,7 @@ export const load: PageServerLoad = async ({
 
     if (isDataRequest) {
         return {
-            query: paginatedQuery(query),
-            members: exitPromise.then((a) =>
+            memberList: exitPromise.then((a) =>
                 Exit.isFailure(a) ? paginatedList<LocalWorkspaceMember>() : a.value
             )
         };
@@ -75,8 +85,51 @@ export const load: PageServerLoad = async ({
     }
 
     return {
-        query: paginatedQuery(query),
-        members: exit.value
+        memberList: exit.value
+    };
+};
+
+const loadPendingMembersView = async ({
+    parent,
+    url,
+    isDataRequest,
+    locals: { runtime }
+}: PageServerLoadEvent) => {
+    const {
+        workspace: { id }
+    } = await parent();
+    const exitPromise = runtime.runPromiseExit(
+        pipe(
+            Effect.gen(function* () {
+                const response = yield* LoadResponse.HTTP(
+                    (yield* ApiClient).get(`workspace-invitations`, {
+                        query: pendingMembersParams({ url, workspaceId: id })
+                    })
+                );
+
+                return yield* LoadResponse.JSON(() =>
+                    response.json<PaginatedList<LocalWorkspaceInvitation>>()
+                );
+            })
+        )
+    );
+
+    if (isDataRequest) {
+        return {
+            invitationList: exitPromise.then((a) =>
+                Exit.isFailure(a) ? paginatedList<LocalWorkspaceMember>() : a.value
+            )
+        };
+    }
+
+    const exit = await exitPromise;
+    if (Exit.isFailure(exit)) {
+        const { status, ...body } = LoadResponse.Failure(exit);
+        return error(status, body);
+    }
+
+    return {
+        invitationList: exit.value
     };
 };
 

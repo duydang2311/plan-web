@@ -1,4 +1,5 @@
 import type { PageLoad } from './$types';
+import { pendingMembersParams, workspaceMembersParams } from './utils';
 
 export const load: PageLoad = async ({ parent, data, url }) => {
     const { queryClient, workspace } = await parent();
@@ -6,6 +7,16 @@ export const load: PageLoad = async ({ parent, data, url }) => {
 
     switch (view) {
         case 'pending':
+            await queryClient.prefetchQuery({
+                queryKey: [
+                    'workspace-invitations',
+                    {
+                        tag: 'pending',
+                        params: pendingMembersParams({ url, workspaceId: workspace.id })
+                    }
+                ],
+                queryFn: () => data.invitationList
+            });
             break;
         default:
             await queryClient.prefetchQuery({
@@ -14,10 +25,10 @@ export const load: PageLoad = async ({ parent, data, url }) => {
                     {
                         tag: 'active',
                         workspaceId: workspace.id,
-                        order: url.searchParams.get('order')
+                        params: workspaceMembersParams({ url })
                     }
                 ],
-                queryFn: () => data.members
+                queryFn: () => data.memberList
             });
             break;
     }

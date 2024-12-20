@@ -18,3 +18,12 @@ export interface WorkspaceMember {
     workspaceId: string;
     workspace?: Workspace;
 }
+
+export interface WorkspaceInvitation {
+    createdTime: string;
+    id: number;
+    workspaceId: string;
+    workspace: Workspace;
+    userId: string;
+    user: User;
+}

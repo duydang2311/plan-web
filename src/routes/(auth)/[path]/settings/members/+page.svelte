@@ -6,6 +6,7 @@
     import ActiveMembers from './ActiveMembers.svelte';
     import InviteMemberDialog from './InviteMemberDialog.svelte';
     import SelectView from './SelectView.svelte';
+    import PendingMembers from './PendingMembers.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const showInviteMember = writable(false);
@@ -62,7 +63,9 @@
             </Button>
         </div>
     </div>
-    {#if $selectedView.value === 'active'}
+    {#if $selectedView.value === 'pending'}
+        <PendingMembers {data} />
+    {:else}
         <ActiveMembers {data} />
     {/if}
 </main>
