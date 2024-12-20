@@ -1,6 +1,6 @@
 <script lang="ts">
     import { replaceState } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { pipe } from '@baetheus/fun/fn';
     import {
         createInfiniteQuery,
@@ -54,10 +54,10 @@
                             TE.match(
                                 () => null,
                                 (r) => {
-                                    const url = new URL($page.url);
+                                    const url = new URL(page.url);
                                     const totalSize = pageParam + r.items.length;
                                     url.searchParams.set('offset', pageParam + '');
-                                    replaceState(url, $page.state);
+                                    replaceState(url, page.state);
                                     return {
                                         ...r,
                                         nextOffset: totalSize >= r.totalCount ? null : totalSize

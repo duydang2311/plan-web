@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { pipe } from '@baetheus/fun/fn';
     import { D } from '@mobily/ts-belt';
     import { createQuery } from '@tanstack/svelte-query';
@@ -12,7 +12,7 @@
     import ProfileView from './ProfileView.svelte';
 
     const { data }: { data: PageData } = $props();
-    const queryKey = ['profiles', { profileName: $page.params['profileName'] }];
+    const queryKey = ['profiles', { profileName: page.params['profileName'] }];
     const { api, cloudinary } = useRuntime();
     const query = createQuery({
         queryKey,

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import DOMPurify from 'isomorphic-dompurify';
     import Button from '~/lib/components/Button.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
@@ -8,12 +8,12 @@
     import type { ActionData } from './$types';
     import { scaleIn, scaleOut, slideIn, slideOut } from './transitions';
     import { fluentSearchParams } from '~/lib/utils/url';
-    import Dialog from '~/lib/components/Dialog.svelte';
     import { melt } from '@melt-ui/svelte';
     import type { Issue } from '~/lib/models/issue';
     import { fade } from 'svelte/transition';
     import { writable } from 'svelte/store';
     import { addToast } from '~/lib/components/Toaster.svelte';
+    import { DialogBuilder } from '~/lib/components';
 
     interface Props {
         form: ActionData;
@@ -22,8 +22,8 @@
     }
 
     const { isEditing, issue }: Props = $props();
-    const cancelHref = $derived(fluentSearchParams($page.url).delete('edit-desc').toString());
-    const editHref = $derived(fluentSearchParams($page.url).set('edit-desc', '').toString());
+    const cancelHref = $derived(fluentSearchParams(page.url).delete('edit-desc').toString());
+    const editHref = $derived(fluentSearchParams(page.url).set('edit-desc', '').toString());
     const open = writable(false);
     let editor = $state.raw<Editor>();
 </script>
@@ -45,7 +45,7 @@
                         e.formData.set('description', editor.getHTML());
                     }}
                 >
-                    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+                    <input type="hidden" name="issueId" value={page.params['issueId']} />
                     <Tiptap
                         bind:editor
                         name="description"
@@ -104,7 +104,7 @@
     </div>
 </div>
 
-<Dialog
+<DialogBuilder
     options={{
         open
     }}
@@ -144,13 +144,13 @@
                         };
                     }}
                 >
-                    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+                    <input type="hidden" name="issueId" value={page.params['issueId']} />
                     <Button variant="negative" outline class="w-fit">Delete</Button>
                 </form>
             </div>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>
 
 {#snippet description()}
     "<span class="font-medium">{issue.title}</span>" has been deleted.

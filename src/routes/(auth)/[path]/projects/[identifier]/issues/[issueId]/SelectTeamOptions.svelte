@@ -4,7 +4,7 @@
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
     import { Icon } from '~/lib/components';
-    import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
+    import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';

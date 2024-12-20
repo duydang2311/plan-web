@@ -1,12 +1,12 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { isRecord } from '@baetheus/fun/refinement';
     import { melt } from '@melt-ui/svelte';
     import { useQueryClient } from '@tanstack/svelte-query';
     import { fade } from 'svelte/transition';
     import invariant from 'tiny-invariant';
-    import { Button, Dialog, Errors, Field, Input, Label } from '~/lib/components';
+    import { Button, DialogBuilder, Errors, Field, Input, Label } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
@@ -27,7 +27,7 @@
     let status = $state<'submit' | null>(null);
 
     $effect(() => {
-        const errors = $page.form?.['addStatus']?.errors as Record<string, string[]> | undefined;
+        const errors = page.form?.['addStatus']?.errors as Record<string, string[]> | undefined;
         if (errors) {
             invariant(isRecord(errors), 'errors must be a record');
             form.setErrors(errors);
@@ -35,7 +35,7 @@
     });
 </script>
 
-<Dialog
+<DialogBuilder
     options={{
         defaultOpen: true,
         onOpenChange: ({ next }) => {
@@ -149,4 +149,4 @@
             </div>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
     import { toStore, writable } from 'svelte/store';
-    import { Button, Icon, Select } from '~/lib/components';
+    import { Button, Icon, SelectBuilder } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Team } from '~/lib/models/team';
     import { createEffect } from '~/lib/utils/runes.svelte';
@@ -116,7 +116,7 @@
                 {#if option.identifier}
                     <li class="grow">
                         <a
-                            href="/{$page.params.path}/teams/{option.identifier}"
+                            href="/{page.params.path}/teams/{option.identifier}"
                             class="block w-full text-center rounded-full bg-base-2 dark:bg-base-3 text-base-fg-2 border border-base-border-2 px-2 text-ellipsis overflow-hidden text-sm font-medium
                             hover:bg-base-4 hover:text-base-fg-1 active:bg-base-active"
                         >
@@ -133,7 +133,7 @@
             {/each}
         </ul>
     {/if}
-    <Select
+    <SelectBuilder
         options={{
             multiple: true,
             forceVisible: true,
@@ -192,5 +192,5 @@
                 />
             {/if}
         {/snippet}
-    </Select>
+    </SelectBuilder>
 </div>

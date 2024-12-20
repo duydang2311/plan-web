@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { gsap } from 'gsap';
     import type { Snippet } from 'svelte';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
@@ -9,7 +9,7 @@
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const route = $derived.by(() => {
-        const last = $page.data.routes?.at(-1);
+        const last = page.data.routes?.at(-1);
         if (last?.breadcrumb === true) {
             return last;
         }
@@ -47,19 +47,19 @@
                 <Navigation
                     items={[
                         {
-                            href: `/${$page.params['path']}`,
+                            href: `/${page.params['path']}`,
                             icon: 'home',
                             activeIcon: 'home-solid',
                             label: 'Home'
                         },
                         {
-                            href: `/${$page.params['path']}/projects`,
+                            href: `/${page.params['path']}/projects`,
                             icon: 'project-outline',
                             activeIcon: 'project',
                             label: 'Projects'
                         },
                         {
-                            href: `/${$page.params['path']}/teams`,
+                            href: `/${page.params['path']}/teams`,
                             icon: 'users',
                             activeIcon: 'users-solid',
                             label: 'Teams'
@@ -71,20 +71,20 @@
                 <Navigation
                     items={[
                         {
-                            href: `/${$page.params['path']}/settings`,
+                            href: `/${page.params['path']}/settings`,
                             icon: 'settings-outline',
                             activeIcon: 'settings',
                             label: 'Settings',
                             child: {
                                 items: [
                                     {
-                                        href: `/${$page.params['path']}/settings/status`,
+                                        href: `/${page.params['path']}/settings/status`,
                                         icon: 'circle-dashed-outline',
                                         activeIcon: 'circle-dashed',
                                         label: 'Status'
                                     },
                                     {
-                                        href: `/${$page.params['path']}/settings/members`,
+                                        href: `/${page.params['path']}/settings/members`,
                                         icon: 'users',
                                         activeIcon: 'users-solid',
                                         label: 'Members'

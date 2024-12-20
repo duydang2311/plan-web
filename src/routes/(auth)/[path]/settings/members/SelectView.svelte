@@ -1,9 +1,9 @@
 <script lang="ts">
     import { replaceState } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { melt } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, Select } from '~/lib/components';
+    import { Button, Icon, SelectBuilder } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
     import { fluentSearchParams } from '~/lib/utils/url';
 
@@ -18,7 +18,7 @@
     const selectedOption = $derived(options.find((a) => a.value === $selected.value));
 </script>
 
-<Select
+<SelectBuilder
     options={{
         open,
         selected,
@@ -28,13 +28,13 @@
         },
         onSelectedChange: ({ next }) => {
             const option = options.find((a) => a.value === next?.value)!;
-            const searchParams = fluentSearchParams($page.url);
+            const searchParams = fluentSearchParams(page.url);
             if (option == null || option.default) {
                 searchParams.delete('view');
             } else {
                 searchParams.set('view', option.value);
             }
-            replaceState(`${$page.url.pathname}${searchParams.toString()}`, {});
+            replaceState(`${page.url.pathname}${searchParams.toString()}`, {});
             return next;
         }
     }}
@@ -75,4 +75,4 @@
             </div>
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

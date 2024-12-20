@@ -1,6 +1,6 @@
 <script lang="ts">
     import { replaceState } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { A, pipe } from '@mobily/ts-belt';
     import { createInfiniteQuery } from '@tanstack/svelte-query';
     import { createVirtualizer } from '@tanstack/svelte-virtual';
@@ -24,14 +24,14 @@
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const { realtime, api } = useRuntime();
-    const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
-    const queryKey = ['comments', { issueId: $page.params['issueId'], size: commentQuery.size }];
+    const commentQuery = paginatedQuery(queryParams(page.url, { offset: 0, size: 10 }));
+    const queryKey = ['comments', { issueId: page.params['issueId'], size: commentQuery.size }];
     const query = createInfiniteQuery({
         queryKey,
         queryFn: ({ pageParam }) => {
             return pipe(
                 TE.fromPromise(() =>
-                    api.get(`issues/${$page.params['issueId']}/comments`, {
+                    api.get(`issues/${page.params['issueId']}/comments`, {
                         query: {
                             offset: pageParam,
                             size: commentQuery.size,
@@ -48,10 +48,10 @@
                 TE.match(
                     () => null,
                     (r) => {
-                        const url = new URL($page.url);
+                        const url = new URL(page.url);
                         const totalSize = pageParam + r.items.length;
                         url.searchParams.set('offset', pageParam + '');
-                        replaceState(url, $page.state);
+                        replaceState(url, page.state);
                         return {
                             ...r,
                             nextOffset: totalSize >= r.totalCount ? null : totalSize
@@ -95,7 +95,7 @@
         let subscription: Subscription | undefined = undefined;
         (async () => {
             const subscribeResult = await realtime.subscribe(
-                `issues.${$page.params['issueId']}.comments.created`
+                `issues.${page.params['issueId']}.comments.created`
             );
             if (!subscribeResult.isOk()) {
                 return;

@@ -3,11 +3,11 @@
     import { A, D, pipe } from '@mobily/ts-belt';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon, Select } from '~/lib/components';
+    import { addToast, Button, Icon, SelectBuilder } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import {
-        getPriorityLabel,
         getPriorityIcon,
+        getPriorityLabel,
         IssuePriorities,
         type IssuePriority
     } from '~/lib/models/issue';
@@ -65,7 +65,7 @@
     );
 </script>
 
-<Select
+<SelectBuilder
     options={{
         open,
         selected,
@@ -106,4 +106,4 @@
             </ol>
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

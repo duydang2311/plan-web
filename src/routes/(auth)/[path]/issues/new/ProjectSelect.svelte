@@ -1,8 +1,8 @@
 <script lang="ts">
     import { type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, Label, Select } from '~/lib/components';
-    import { createSelectProps } from '~/lib/components/Select.svelte';
+    import { Button, Icon, Label, SelectBuilder } from '~/lib/components';
+    import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import ProjectSelectMenu from './ProjectSelectMenu.svelte';
 
     const {
@@ -13,7 +13,7 @@
     const open = writable(false);
 </script>
 
-<Select
+<SelectBuilder
     options={createSelectProps<string, false>({
         open,
         selected,
@@ -37,7 +37,7 @@
                 </span>
             {:else}
                 <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
-                    Select a project
+                    SelectBuilder a project
                 </span>
             {/if}
             <Icon
@@ -49,4 +49,4 @@
             <ProjectSelectMenu {workspaceId} select={{ menu, option, helpers }} />
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

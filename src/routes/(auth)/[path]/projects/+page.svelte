@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { pipe } from '@baetheus/fun/fn';
     import { createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
@@ -70,7 +70,7 @@
         </div>
         <Button
             as="link"
-            href="/{$page.params['path']}/projects/new"
+            href="/{page.params['path']}/projects/new"
             variant="primary"
             filled={false}
             size="sm"
@@ -106,7 +106,7 @@
                         >
                         <td class="whitespace-nowrap overflow-hidden text-ellipsis">
                             <Link
-                                href="/{$page.params['path']}/projects/{identifier}/issues"
+                                href="/{page.params['path']}/projects/{identifier}/issues"
                                 title={name}
                             >
                                 {name}

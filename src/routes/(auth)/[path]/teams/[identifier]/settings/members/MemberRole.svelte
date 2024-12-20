@@ -1,15 +1,13 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { melt, type SelectOption } from '@melt-ui/svelte';
     import { createMutation, useQueryClient } from '@tanstack/svelte-query';
     import clsx from 'clsx';
     import { circInOut } from 'svelte/easing';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Spinner } from '~/lib/components';
-    import Button from '~/lib/components/Button.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
-    import Select, { createSelectProps } from '~/lib/components/Select.svelte';
+    import { Button, Icon, SelectBuilder, Spinner } from '~/lib/components';
+    import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { TeamMember } from '~/lib/models/team';
@@ -22,7 +20,7 @@
     let { data }: Props = $props();
     let status = $state<'pending-long' | null>(null);
     const { api } = useRuntime();
-    const queryKey = $derived(['team-members', { teamId: $page.data['team'].id }]);
+    const queryKey = $derived(['team-members', { teamId: page.data['team'].id }]);
     const queryClient = useQueryClient();
     const roles = ['Administrator', 'Manager', 'Member', 'Guest'].map((a) => ({
         label: a,
@@ -73,7 +71,7 @@
     });
 </script>
 
-<Select
+<SelectBuilder
     options={createSelectProps<string, false>({
         open,
         forceVisible: true,
@@ -140,4 +138,4 @@
             </ol>
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

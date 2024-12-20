@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import clsx from 'clsx';
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
@@ -47,7 +47,7 @@
     );
     const totalPages = $derived(Math.ceil(list.totalCount / query.size));
     const search = $derived.by(() => {
-        const searchParams = $page.url.searchParams;
+        const searchParams = page.url.searchParams;
         searchParams.delete('page');
         const search = searchParams.toString();
         if (search.length) {

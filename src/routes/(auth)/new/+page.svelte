@@ -6,7 +6,7 @@
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
     import type { ActionData } from './$types';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
     const errorMap = {
         root: {
@@ -84,7 +84,7 @@
                         class="absolute opacity-40 left-2 top-1/2 -translate-y-1/2"
                         bind:clientWidth={spanWidth}
                     >
-                        {$page.url.origin}/
+                        {page.url.origin}/
                     </span>
                 </div>
                 <Errors errors={errors?.['path']} errorMap={errorMap.path} />

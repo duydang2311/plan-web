@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import clsx from 'clsx';
     import type { HTMLOlAttributes } from 'svelte/elements';
     import { tsap } from '../utils/transition';
@@ -9,7 +9,7 @@
     type Props = HTMLOlAttributes;
 
     const { ...props }: Props = $props();
-    const routes = $derived($page.data.routes?.filter((a) => a.breadcrumb === true));
+    const routes = $derived(page.data.routes?.filter((a) => a.breadcrumb === true));
 </script>
 
 {#if routes}

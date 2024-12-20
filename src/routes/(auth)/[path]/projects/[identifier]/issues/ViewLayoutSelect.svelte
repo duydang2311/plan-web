@@ -1,9 +1,9 @@
 <script lang="ts">
     import { melt, type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, Select } from '~/lib/components';
+    import { Button, Icon, SelectBuilder } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
-    import { createSelectProps } from '~/lib/components/Select.svelte';
+    import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import { select, tsap } from '~/lib/utils/transition';
 
     const {
@@ -24,7 +24,7 @@
     );
 </script>
 
-<Select
+<SelectBuilder
     options={createSelectProps<string, false>({
         open,
         selected,
@@ -79,4 +79,4 @@
             </ol>
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

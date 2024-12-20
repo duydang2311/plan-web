@@ -1,11 +1,11 @@
 <script lang="ts">
     import { invalidate } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
-    import { derived as derivedStore, toStore } from 'svelte/store';
+    import { toStore } from 'svelte/store';
     import invariant from 'tiny-invariant';
     import { addToast } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -18,13 +18,13 @@
     import { validateDraggableIssueData } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const queryKey = $derived(createQueryKey($page.url, { layout: 'board' }));
+    const queryKey = $derived(createQueryKey(page.url, { layout: 'board' }));
     const query = createQuery(
-        derivedStore([page, toStore(() => data)], ([$page, $data]) => ({
-            queryKey: createQueryKey($page.url, { layout: 'board' }),
-            enabled: $data.tag === 'board',
+        toStore(() => ({
+            queryKey: createQueryKey(page.url, { layout: 'board' }),
+            enabled: page.data.tag === 'board',
             queryFn: async () => {
-                invariant($data.tag === 'board', "tag must be 'board'");
+                invariant(page.data.tag === 'board', "tag must be 'board'");
                 await invalidate('fetch:issues-board');
                 return (await data.page) as PageBoardData;
             }

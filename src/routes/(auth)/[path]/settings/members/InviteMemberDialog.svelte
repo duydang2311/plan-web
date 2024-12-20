@@ -11,7 +11,7 @@
         Avatar,
         Button,
         Combobox,
-        Dialog,
+        DialogBuilder,
         Errors,
         Field,
         Icon,
@@ -98,7 +98,7 @@
     });
 </script>
 
-<Dialog
+<DialogBuilder
     options={{
         open,
         forceVisible: true
@@ -254,4 +254,4 @@
             </form>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>

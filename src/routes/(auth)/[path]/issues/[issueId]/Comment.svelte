@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { type InfiniteData, useQueryClient } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
@@ -17,7 +17,7 @@
 
     let { comment, isAuthor, size }: { comment: IssueComment; isAuthor: boolean; size: number } =
         $props();
-    const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
+    const queryKey = ['comments', { issueId: page.params['issueId'], size }];
     const queryClient = useQueryClient();
     let editing = $state(false);
     let editor = $state.raw<Editor>();

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import clsx from 'clsx';
     import type { Snippet } from 'svelte';
     import type { IconName } from '~/lib/components/Icon.svelte';
@@ -23,7 +23,7 @@
 
     const { href, icon, activeIcon, label, children, childItems, ...props }: Props = $props();
     const open = writable(false);
-    const isActive = $derived($page.url.pathname === href);
+    const isActive = $derived(page.url.pathname === href);
 </script>
 
 {#if childItems && childItems.length}

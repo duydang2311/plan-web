@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { writable } from 'svelte/store';
     import { Button, Icon, Input } from '~/lib/components';
     import type { ActionData, PageData } from './$types';
@@ -10,7 +10,7 @@
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const showInviteMember = writable(false);
-    const view = $page.url.searchParams.get('view');
+    const view = page.url.searchParams.get('view');
     const viewOptions = [
         {
             label: 'Active members',

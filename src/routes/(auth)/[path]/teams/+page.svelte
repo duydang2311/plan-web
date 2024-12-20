@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { navigating, page } from '$app/stores';
+    import { navigating, page } from '$app/state';
     import { A, pipe } from '@mobily/ts-belt';
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
@@ -25,7 +25,7 @@
     let status = $state<'pending' | 'pending-long'>();
 
     const orders = $derived.by(() => {
-        const order = $navigating?.to?.url.searchParams.get('order');
+        const order = navigating?.to?.url.searchParams.get('order');
         if (!order) return null;
         return pipe(
             order.split(','),
@@ -123,7 +123,7 @@
                         {#each items as { createdTime, updatedTime, name, identifier }}
                             <Row>
                                 <td>
-                                    <Link href="/{$page.params['path']}/issues?team={identifier}">
+                                    <Link href="/{page.params['path']}/issues?team={identifier}">
                                         {name}
                                     </Link>
                                 </td>
@@ -142,7 +142,7 @@
                                     <div class="flex gap-2">
                                         <Button
                                             as="link"
-                                            href="/{$page.params[
+                                            href="/{page.params[
                                                 'path'
                                             ]}/teams/{identifier}/settings"
                                             variant="base"

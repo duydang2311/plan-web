@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
     import type { IconName } from '~/lib/components/Icon.svelte';
@@ -17,7 +17,7 @@
     }
 
     const { items }: Props = $props();
-    const pathname = $derived($page.url.pathname.split('/', 6).join('/'));
+    const pathname = $derived(page.url.pathname.split('/', 6).join('/'));
     let activeBar = $state<HTMLDivElement>();
 
     if (browser) {

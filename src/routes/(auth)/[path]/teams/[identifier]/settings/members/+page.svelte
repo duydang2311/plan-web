@@ -1,6 +1,6 @@
 <script lang="ts">
     import { replaceState } from '$app/navigation';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import clsx from 'clsx';
     import { Button, Icon } from '~/lib/components';
     import { none } from '~/lib/utils/transition';
@@ -11,14 +11,14 @@
     import PendingMembers from './PendingMembers.svelte';
 
     let { data, form }: { data: PageData; form: ActionData } = $props();
-    const params = $derived(queryParams($page.url, { show: '' }));
+    const params = $derived(queryParams(page.url, { show: '' }));
 
     function handleInvite() {
-        replaceState('', { ...$page.state, showInvitationDialog: true });
+        replaceState('', { ...page.state, showInvitationDialog: true });
     }
 </script>
 
-{#if $page.state.showInvitationDialog}
+{#if page.state.showInvitationDialog}
     <div out:none={{ duration: 200 }}>
         <InvitationDialog
             team={data.team}
@@ -27,7 +27,7 @@
                 defaultOpen: true,
                 onOpenChange: ({ next }) => {
                     if (next === false) {
-                        replaceState('', { ...$page.state, showInvitationDialog: false });
+                        replaceState('', { ...page.state, showInvitationDialog: false });
                     }
                     return next;
                 }
@@ -42,7 +42,7 @@
             <div class="flex gap-4">
                 <Button
                     as="link"
-                    href={fluentSearchParams($page.url).delete('show').toString()}
+                    href={fluentSearchParams(page.url).delete('show').toString()}
                     variant="base"
                     outline
                     size="sm"
@@ -55,7 +55,7 @@
                 </Button>
                 <Button
                     as="link"
-                    href={fluentSearchParams($page.url).set('show', 'pending').toString()}
+                    href={fluentSearchParams(page.url).set('show', 'pending').toString()}
                     variant="base"
                     outline
                     size="sm"

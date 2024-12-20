@@ -8,7 +8,7 @@
     import type { ValidationResult } from '~/lib/utils/validation';
     import { validate } from './utils';
     import type { ActionData, PageData } from './$types';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { D } from '@mobily/ts-belt';
 
     const errorMap = {
@@ -51,7 +51,7 @@
 
     <form
         method="post"
-        action="/{$page.params['path']}/teams/new"
+        action="/{page.params['path']}/teams/new"
         class="space-y-2"
         onchange={() => {
             validation = validate(fields);

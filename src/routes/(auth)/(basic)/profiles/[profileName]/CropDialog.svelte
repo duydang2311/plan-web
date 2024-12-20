@@ -2,7 +2,7 @@
     import { melt } from '@melt-ui/svelte';
     import Cropper from 'svelte-easy-crop';
     import { fade } from 'svelte/transition';
-    import { Button, Dialog, type DialogProps } from '~/lib/components';
+    import { Button, DialogBuilder, type DialogProps } from '~/lib/components';
     import { dialog, tsap } from '~/lib/utils/transition';
     import { getCroppedImage } from './utils.client';
 
@@ -22,7 +22,7 @@
     let cropArea = $state.raw<CropArea>();
 </script>
 
-<Dialog {...props}>
+<DialogBuilder {...props}>
     {#snippet children({ overlay, content, close })}
         <div
             transition:fade={{ duration: 150 }}
@@ -91,4 +91,4 @@
             </div>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>

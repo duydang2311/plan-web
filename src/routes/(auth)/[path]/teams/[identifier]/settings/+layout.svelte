@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import type { Snippet } from 'svelte';
     import Navigation from './Navigation.svelte';
 
@@ -9,7 +9,7 @@
 
     const { children }: Props = $props();
     const rootPath = $derived(
-        `/${$page.params['path']}/teams/${$page.params['identifier']}/settings`
+        `/${page.params['path']}/teams/${page.params['identifier']}/settings`
     );
 </script>
 

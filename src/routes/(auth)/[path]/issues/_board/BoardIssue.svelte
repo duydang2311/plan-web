@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import {
         attachClosestEdge,
         type Edge,
@@ -148,7 +148,7 @@
             <Icon name="draggable" class="ml-auto h-4" />
         </div>
         <p class="font-medium leading-none">
-            <Link href="/{$page.params['path']}/issues/{issue.orderNumber}">
+            <Link href="/{page.params['path']}/issues/{issue.orderNumber}">
                 {issue.title}
             </Link>
         </p>

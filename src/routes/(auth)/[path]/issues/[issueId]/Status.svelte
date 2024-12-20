@@ -3,9 +3,8 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon } from '~/lib/components';
+    import { addToast, Button, Icon, SelectBuilder } from '~/lib/components';
     import { isIconName } from '~/lib/components/Icon.svelte';
-    import Select from '~/lib/components/Select.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { WorkspaceStatus } from '~/lib/models/status';
@@ -93,7 +92,7 @@
     );
 </script>
 
-<Select
+<SelectBuilder
     options={{
         selected,
         open,
@@ -124,4 +123,4 @@
             <StatusOptions {selected} selectProps={{ menu, option, helpers }} {workspaceId} />
         {/if}
     {/snippet}
-</Select>
+</SelectBuilder>

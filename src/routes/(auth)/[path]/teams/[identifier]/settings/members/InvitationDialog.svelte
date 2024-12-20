@@ -10,7 +10,7 @@
     import {
         Button,
         Combobox,
-        Dialog,
+        DialogBuilder,
         Icon,
         Input,
         Label,
@@ -144,7 +144,7 @@
     });
 </script>
 
-<Dialog {...props}>
+<DialogBuilder {...props}>
     {#snippet children({ content, overlay, title, description, close })}
         <div
             use:melt={overlay}
@@ -308,4 +308,4 @@
             </div>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>

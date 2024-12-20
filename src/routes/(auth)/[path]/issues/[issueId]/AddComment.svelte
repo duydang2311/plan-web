@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { Editor } from '@tiptap/core';
     import { Button, Icon, Tiptap } from '~/lib/components';
     import type { ValidationResult } from '~/lib/utils/validation';
@@ -21,7 +21,7 @@
         function handle({ editor }: { editor: Editor }) {
             validation = clientValidate({
                 editor,
-                issueId: $page.params['issueId']
+                issueId: page.params['issueId']
             });
         }
 
@@ -45,7 +45,7 @@
             return;
         }
         const html = editor.getHTML();
-        const queryKey = ['comments', { issueId: $page.params['issueId'], size }];
+        const queryKey = ['comments', { issueId: page.params['issueId'], size }];
         const oldData =
             queryClient.getQueryData<InfiniteData<PaginatedList<IssueComment>, number>>(queryKey);
         queryClient.setQueryData<
@@ -107,7 +107,7 @@
         };
     }}
 >
-    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+    <input type="hidden" name="issueId" value={page.params['issueId']} />
     <div class="relative">
         <Tiptap
             bind:editor

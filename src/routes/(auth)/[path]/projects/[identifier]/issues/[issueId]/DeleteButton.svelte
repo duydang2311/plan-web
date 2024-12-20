@@ -1,12 +1,10 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { melt } from '@melt-ui/svelte';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Icon } from '~/lib/components';
-    import Button from '~/lib/components/Button.svelte';
-    import Dialog from '~/lib/components/Dialog.svelte';
+    import { Button, DialogBuilder, Icon } from '~/lib/components';
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { Issue } from '~/lib/models/issue';
     import { dialog, tsap } from '~/lib/utils/transition';
@@ -31,7 +29,7 @@
     Delete
 </Button>
 
-<Dialog
+<DialogBuilder
     options={{
         open
     }}
@@ -71,13 +69,13 @@
                         };
                     }}
                 >
-                    <input type="hidden" name="issueId" value={$page.params['issueId']} />
+                    <input type="hidden" name="issueId" value={page.params['issueId']} />
                     <Button variant="negative" outline class="w-fit">Delete</Button>
                 </form>
             </div>
         </div>
     {/snippet}
-</Dialog>
+</DialogBuilder>
 
 {#snippet description()}
     "<span class="font-medium">{issue.title}</span>" has been deleted.

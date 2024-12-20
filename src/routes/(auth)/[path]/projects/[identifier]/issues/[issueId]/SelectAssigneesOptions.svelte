@@ -4,8 +4,8 @@
     import { debounce } from '@mobily/ts-belt/Function';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Avatar, Icon, Input, Spinner } from '~/lib/components';
-    import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
+    import { Avatar, Icon, Input } from '~/lib/components';
+    import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';

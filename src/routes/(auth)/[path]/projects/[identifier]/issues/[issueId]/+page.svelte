@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { paginatedQuery, queryParams } from '~/lib/utils/url';
     import type { ActionData, PageData } from './$types';
     import AddComment from './AddComment.svelte';
@@ -13,7 +13,7 @@
     import SelectAssignees from './SelectAssignees.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
-    const commentQuery = paginatedQuery(queryParams($page.url, { offset: 0, size: 10 }));
+    const commentQuery = paginatedQuery(queryParams(page.url, { offset: 0, size: 10 }));
     let editing = $state.raw(false);
     let scrollRef = $state.raw<HTMLElement>();
 
@@ -21,7 +21,7 @@
     //     let subscription: Subscription | undefined = undefined;
     //     (async () => {
     //         const subscribeResult = await realtime.subscribe(
-    //             `issues.${$page.params['issueId']}.comments.created`
+    //             `issues.${page.params['issueId']}.comments.created`
     //         );
     //         if (!subscribeResult.isOk()) {
     //             return;

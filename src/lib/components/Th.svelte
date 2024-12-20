@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import clsx from 'clsx';
     import { sineInOut } from 'svelte/easing';
     import type { HTMLThAttributes } from 'svelte/elements';
@@ -11,7 +11,7 @@
     const { children, ...props }: Props = $props();
     const state: [boolean | null, URLSearchParams] | null = $derived.by(() => {
         if (!props.sortable) return null;
-        const cloned = new URLSearchParams($page.url.searchParams);
+        const cloned = new URLSearchParams(page.url.searchParams);
         const sort = cloned.get('order');
         if (!sort) {
             cloned.set('order', props.name);

@@ -3,7 +3,7 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
     import { toStore, writable } from 'svelte/store';
-    import { Avatar, Button, Icon, Select } from '~/lib/components';
+    import { Avatar, Button, Icon, SelectBuilder } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { User } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
@@ -139,7 +139,7 @@
             {/each}
         </ul>
     {/if}
-    <Select
+    <SelectBuilder
         options={{
             multiple: true,
             forceVisible: true,
@@ -199,5 +199,5 @@
                 />
             {/if}
         {/snippet}
-    </Select>
+    </SelectBuilder>
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { createQuery, keepPreviousData, useQueryClient } from '@tanstack/svelte-query';
     import { type State, TableHandler } from '@vincjo/datatables/server';
     import { toStore } from 'svelte/store';
@@ -75,5 +75,5 @@
     {table}
     {query}
     buildIssueHref={({ orderNumber }) =>
-        `/${$page.params.path}/projects/${$page.params.identifier}/issues/${orderNumber}`}
+        `/${page.params.path}/projects/${page.params.identifier}/issues/${orderNumber}`}
 />

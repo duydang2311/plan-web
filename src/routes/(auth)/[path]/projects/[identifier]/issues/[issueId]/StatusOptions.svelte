@@ -6,7 +6,7 @@
     import type { Writable } from 'svelte/store';
     import { Icon } from '~/lib/components';
     import { isIconName } from '~/lib/components/Icon.svelte';
-    import type { SelectChildrenProps } from '~/lib/components/Select.svelte';
+    import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';

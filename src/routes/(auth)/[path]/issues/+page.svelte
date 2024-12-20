@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import type { SelectOption } from '@melt-ui/svelte';
     import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
@@ -13,24 +13,24 @@
 
     const { data }: { data: PageData } = $props();
     const filterQueryParams = $derived({
-        team: $page.url.searchParams.get('team'),
-        project: $page.url.searchParams.get('project')
+        team: page.url.searchParams.get('team'),
+        project: page.url.searchParams.get('project')
     });
     const createIssueHref = $derived(
-        `/${$page.params['path']}/issues/new${stringifyQuery(filterQueryParams, { includeQuestionMark: true })}`
+        `/${page.params['path']}/issues/new${stringifyQuery(filterQueryParams, { includeQuestionMark: true })}`
     );
     const layouts = $derived([
         {
             label: 'Table',
             value: 'table',
             icon: 'rows' as const,
-            href: fluentSearchParams($page.url).delete('layout').toString()
+            href: fluentSearchParams(page.url).delete('layout').toString()
         },
         {
             label: 'Board',
             value: 'board',
             icon: 'columns' as const,
-            href: fluentSearchParams($page.url).set('layout', 'board').toString()
+            href: fluentSearchParams(page.url).set('layout', 'board').toString()
         }
     ]);
     const selectedLayout = writable<SelectOption<string>>(

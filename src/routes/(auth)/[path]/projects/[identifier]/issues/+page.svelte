@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import type { SelectOption } from '@melt-ui/svelte';
     import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
@@ -12,19 +12,19 @@
     import BoardLayout from './_board/BoardLayout.svelte';
 
     const { data }: { data: PageData } = $props();
-    const createIssueHref = $derived($page.url.pathname + '/new');
+    const createIssueHref = $derived(page.url.pathname + '/new');
     const layouts = $derived([
         {
             label: 'Table',
             value: 'table',
             icon: 'rows' as const,
-            href: $page.url.pathname + fluentSearchParams($page.url).delete('layout')
+            href: page.url.pathname + fluentSearchParams(page.url).delete('layout')
         },
         {
             label: 'Board',
             value: 'board',
             icon: 'columns' as const,
-            href: $page.url.pathname + fluentSearchParams($page.url).set('layout', 'board')
+            href: page.url.pathname + fluentSearchParams(page.url).set('layout', 'board')
         }
     ]);
     const selectedLayout = writable<SelectOption<string>>(
