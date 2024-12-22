@@ -12,8 +12,8 @@
     const routes = $derived(page.data.routes?.filter((a) => a.breadcrumb === true));
 </script>
 
-{#if routes}
-    <ol {...props} class={clsx('flex gap-2 text-sm', props.class)}>
+<ol {...props} class={clsx('flex gap-2 text-sm', props.class)}>
+    {#if routes}
         {#each routes as { meta: { title, href } }, i}
             {@const notFirst = i !== 0}
             {@const isLast = i === routes.length - 1}
@@ -43,5 +43,5 @@
                 {/if}
             </li>
         {/each}
-    </ol>
-{/if}
+    {/if}
+</ol>
