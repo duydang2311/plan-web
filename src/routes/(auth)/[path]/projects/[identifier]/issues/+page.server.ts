@@ -6,7 +6,6 @@ import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
-import { compareRank } from '~/lib/utils/ranking';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createQueryParams } from './utils';
 
@@ -23,8 +22,10 @@ export type LocalBoardIssue = Pick<
     'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'statusId' | 'statusRank'
 >;
 
+export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color'>;
+
 export interface PageBoardData {
-    statuses: WorkspaceStatus[];
+    statuses: PaginatedList<LocalWorkspaceStatus>;
     issueLists: Record<string, PaginatedList<LocalBoardIssue>>;
     project: { identifier: string };
 }
@@ -102,16 +103,19 @@ const loadBoardLayout = async ({
         return error(status, body);
     }
 
-    const exitPromise = Effect.gen(function* () {
-        const statuses = (yield* getWorkspaceStatuses(data.workspace.id)) ?? [];
-        const issueLists = yield* getIssuesForBoard(
+    const getStatusListExit = getWorkspaceStatusList(data.workspace.id).pipe(
+        runtime.runPromiseExit
+    );
+
+    const getIssueListsExit = Effect.gen(function* () {
+        const statusesExit = yield* Effect.promise(() => getStatusListExit);
+        if (Exit.isFailure(statusesExit)) {
+            return yield* Effect.failCause(statusesExit.cause);
+        }
+        return yield* getBoardIssueLists(
             query,
-            statuses.map((a) => a.id)
+            statusesExit.value.items.map((a) => a.id)
         );
-        return {
-            statuses,
-            issueLists
-        };
     }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
@@ -119,26 +123,21 @@ const loadBoardLayout = async ({
             page: {
                 tag: 'board' as const,
                 project: fetchProject.value,
-                streamed: exitPromise.then((a) =>
-                    Exit.isSuccess(a)
-                        ? a.value
-                        : {
-                              project: fetchProject.value,
-                              statuses: [],
-                              issueLists: {}
-                          }
-                )
+                statusList: getStatusListExit.then((a) =>
+                    Exit.isSuccess(a) ? a.value : paginatedList<LocalWorkspaceStatus>()
+                ),
+                issueLists: getIssueListsExit.then((a) => (Exit.isSuccess(a) ? a.value : {}))
             }
         };
     }
 
-    const exit = await exitPromise;
-    if (Exit.isFailure(exit)) {
-        const { status, ...body } = pipe(
-            exit.cause,
-            Cause.failureOption,
-            Option.getOrElse(() => Effect.runSync(LoadResponse.UnknownError()))
-        );
+    const [statusListExit, issueListExit] = await Promise.all([
+        getStatusListExit,
+        getIssueListsExit
+    ]);
+
+    if (Exit.isFailure(issueListExit)) {
+        const { status, ...body } = LoadResponse.Failure(issueListExit);
         return error(status, body);
     }
 
@@ -146,12 +145,15 @@ const loadBoardLayout = async ({
         page: {
             tag: 'board' as const,
             project: fetchProject.value,
-            streamed: exit.value
+            statusList: Exit.isSuccess(statusListExit)
+                ? statusListExit.value
+                : paginatedList<LocalWorkspaceStatus>(),
+            issueLists: Exit.isSuccess(issueListExit) ? issueListExit.value : {}
         }
     };
 };
 
-const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) =>
+const getBoardIssueLists = (query: Record<string, unknown>, statusIds: number[]) =>
     Effect.gen(function* () {
         const api = yield* ApiClient;
         const pairs = yield* Effect.all(
@@ -181,18 +183,7 @@ const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) 
             pairs.map(([id, response]) =>
                 pipe(
                     LoadResponse.JSON(() => response.json<PaginatedList<LocalBoardIssue>>()),
-                    Effect.map(
-                        (a) =>
-                            [
-                                id,
-                                paginatedList({
-                                    items: a.items.toSorted((a, b) =>
-                                        compareRank(a.statusRank, b.statusRank)
-                                    ),
-                                    totalCount: a.totalCount
-                                })
-                            ] as const
-                    )
+                    Effect.map((a) => [id, a] as const)
                 )
             ),
             {
@@ -201,16 +192,14 @@ const getIssuesForBoard = (query: Record<string, unknown>, statusIds: number[]) 
         ).pipe(Effect.map((a) => D.fromPairs(a)));
     });
 
-const getWorkspaceStatuses = (workspaceId: string) =>
+const getWorkspaceStatusList = (workspaceId: string) =>
     Effect.gen(function* () {
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
-            api.get(`workspaces/${workspaceId}`, {
-                query: { select: 'Statuses' }
+            api.get(`workspaces/${workspaceId}/statuses`, {
+                query: { select: 'Id,Value,Color' }
             })
         );
 
-        return yield* LoadResponse.JSON(() =>
-            response.json<{ statuses?: WorkspaceStatus[] }>().then((a) => a.statuses)
-        );
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>());
     });

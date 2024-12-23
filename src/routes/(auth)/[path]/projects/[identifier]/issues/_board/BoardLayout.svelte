@@ -1,37 +1,38 @@
 <script lang="ts">
-    import { invalidate } from '$app/navigation';
     import { page } from '$app/state';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-    import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
+    import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
+    import { createMutation, useQueryClient, type InfiniteData } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
-    import { derived as derivedStore, toStore } from 'svelte/store';
     import invariant from 'tiny-invariant';
-    import { addToast } from '~/lib/components';
+    import { addToast, Icon } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { paginatedList } from '~/lib/models/paginatedList';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { deeplyFind } from '~/lib/utils/array';
     import { compareRank, getRank } from '~/lib/utils/ranking';
     import type { PageData } from '../$types';
-    import type { PageBoardData } from '../+page.server';
-    import { createQueryKey } from '../utils';
+    import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
+    import { createBoardQueryParams } from '../utils';
     import Board from './Board.svelte';
-    import { validateDraggableIssueData } from './utils';
+    import {
+        createIssueListQueryKey,
+        createStatusListQuery,
+        createStatusListQueryKey,
+        validateDraggableIssueData
+    } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const queryKey = $derived(createQueryKey(page.url)({ layout: 'board' }));
-    const query = createQuery(
-        derivedStore([toStore(() => queryKey), toStore(() => data)], ([$queryKey, $data]) => ({
-            queryKey: $queryKey,
-            enabled: $data.page.tag === 'board',
-            queryFn: async () => {
-                invariant($data.page.tag === 'board', "tag must be 'board'");
-                await invalidate('fetch:issues-board');
-                return (await data.page.streamed) as PageBoardData;
-            }
-        }))
-    );
+    const statusListQuery = createStatusListQuery(() => ({ workspaceId: data.workspace.id }));
     const queryClient = useQueryClient();
     const { api } = useRuntime();
+    let preview = $state.raw<{
+        container: HTMLElement;
+        rect: DOMRect;
+        data: Record<string, unknown>;
+    } | null>(null);
+
     const mutation = createMutation({
         mutationFn: ({
             issueId,
@@ -48,77 +49,177 @@
                 body: { patch: { statusRank: target.statusRank, statusId: target.statusId } }
             }),
         onMutate: async ({ issueId, source, target }) => {
-            await queryClient.cancelQueries({ queryKey });
-            const old = queryClient.getQueryData<PageBoardData>(queryKey);
-            invariant(old, 'old must not be null');
+            await queryClient.cancelQueries({
+                predicate: ({ queryKey }) =>
+                    queryKey[0] === 'issues' &&
+                    queryKey[1] != null &&
+                    typeof queryKey[1] === 'object' &&
+                    'tag' in queryKey[1] &&
+                    queryKey[1].tag === 'issues-board' &&
+                    'statusId' in queryKey[1] &&
+                    (queryKey[1].statusId === source.statusId ||
+                        queryKey[1].statusId === target.statusId)
+            });
 
-            const sourceList = old.issueLists[source.statusId];
-            const targetList = old.issueLists[target.statusId];
-            const sourceIssue = sourceList.items.find((a) => a.id === issueId);
+            const sourceQK = createIssueListQueryKey(() => ({
+                params: createBoardQueryParams(page.url),
+                projectId: data.project.id,
+                statusId: source.statusId
+            }));
+            const targetQK = createIssueListQueryKey(() => ({
+                params: createBoardQueryParams(page.url),
+                projectId: data.project.id,
+                statusId: target.statusId
+            }));
+            const sourceList =
+                queryClient.getQueryData<InfiniteData<PaginatedList<LocalBoardIssue>, number>>(
+                    sourceQK
+                );
+            const targetList =
+                queryClient.getQueryData<InfiniteData<PaginatedList<LocalBoardIssue>, number>>(
+                    targetQK
+                );
+
             invariant(sourceList, 'source list must not be null');
             invariant(targetList, 'target list must not be null');
+
+            const sourceIssue = deeplyFind(
+                sourceList.pages,
+                (a) => a.items
+            )((a) => a.id === issueId);
             invariant(sourceIssue, 'source issue must not be null');
 
-            const data: PageBoardData =
-                source.statusId === target.statusId
-                    ? {
-                          ...old,
-                          issueLists: {
-                              ...old.issueLists,
-                              [source.statusId]: paginatedList({
-                                  items: sourceList.items
-                                      .map((a) =>
-                                          a.id === issueId
-                                              ? {
-                                                    ...a,
-                                                    statusRank: target.statusRank
-                                                }
-                                              : a
-                                      )
-                                      .toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
-                                  totalCount: sourceList.totalCount
-                              })
-                          }
-                      }
-                    : {
-                          ...old,
-                          issueLists: {
-                              ...old.issueLists,
-                              [source.statusId]: paginatedList({
-                                  items: sourceList.items.filter((a) => a.id !== issueId),
-                                  totalCount: sourceList.totalCount - 1
-                              }),
-                              [target.statusId]: paginatedList({
-                                  items: [
-                                      ...targetList.items,
-                                      {
-                                          ...sourceIssue,
-                                          statusRank: target.statusRank,
-                                          statusId: target.statusId
-                                      }
-                                  ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
-                                  totalCount: targetList.totalCount + 1
-                              })
-                          }
-                      };
+            if (source.statusId === target.statusId) {
+                const all = sourceList.pages.flatMap((a) => a.items);
+                const index = all.findIndex((a) => a.id === issueId);
+                if (index === -1) {
+                    return;
+                }
+                all[index] = { ...all[index], statusRank: target.statusRank };
+                all.sort((a, b) => compareRank(a.statusRank, b.statusRank));
+                const optimisticPages: PaginatedList<LocalBoardIssue>[] = [];
+                let start = 0;
+                for (const page of sourceList.pages) {
+                    const end = start + page.items.length;
+                    optimisticPages.push(
+                        paginatedList({
+                            items: all.slice(start, end),
+                            totalCount: page.totalCount
+                        })
+                    );
+                    start = end;
+                }
+                queryClient.setQueryData(sourceQK, {
+                    pages: optimisticPages,
+                    pageParams: sourceList.pageParams
+                });
+                return;
+            }
 
-            queryClient.setQueryData(queryKey, data);
-            return { old, sourceIssue, target };
+            const removeFromSource = () => {
+                const removed = sourceList.pages
+                    .flatMap((a) => a.items)
+                    .filter((a) => a.id !== issueId)
+                    .toSorted((a, b) => compareRank(a.statusRank, b.statusRank));
+                let start = 0;
+                const optimisticPages: PaginatedList<LocalBoardIssue>[] = [];
+                const optimisticPageParams: number[] = [];
+                let it = 0;
+                for (const page of sourceList.pages) {
+                    if (start >= removed.length) {
+                        break;
+                    }
+                    const end = start + page.items.length;
+                    optimisticPages.push(
+                        paginatedList({
+                            items: removed.slice(start, end),
+                            totalCount: page.totalCount - 1
+                        })
+                    );
+                    optimisticPageParams.push(sourceList.pageParams[it++]);
+                    start = end;
+                }
+                queryClient.setQueryData(sourceQK, {
+                    pages: optimisticPages,
+                    pageParams: optimisticPageParams
+                });
+            };
+
+            const addToTarget = () => {
+                const added = [
+                    ...targetList.pages.flatMap((a) => a.items),
+                    { ...sourceIssue, statusRank: target.statusRank, statusId: target.statusId }
+                ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank));
+                let start = 0;
+                const optimisticPages: PaginatedList<LocalBoardIssue>[] = [];
+                const optimisticPageParams: number[] = [];
+                let it = 0;
+                for (const page of sourceList.pages) {
+                    const end = start + page.items.length;
+                    optimisticPages.push(
+                        paginatedList({
+                            items: added.slice(start, end),
+                            totalCount: page.totalCount + 1
+                        })
+                    );
+                    optimisticPageParams.push(sourceList.pageParams[it++]);
+                    start = end;
+                }
+
+                const size = sourceQK[1].params.size as number;
+                const lastPage = optimisticPages.at(-1)!;
+                while (start < added.length) {
+                    const gaps = size - lastPage.items.length;
+                    if (gaps > 0) {
+                        lastPage.items.push(...added.slice(start, start + gaps));
+                        start += gaps;
+                    } else {
+                        optimisticPageParams.push(start);
+                        optimisticPages.push(
+                            paginatedList({
+                                items: added.slice(start, start + size),
+                                totalCount: lastPage.totalCount + 1
+                            })
+                        );
+                        start += size;
+                    }
+                }
+
+                queryClient.setQueryData(targetQK, {
+                    pages: optimisticPages,
+                    pageParams: optimisticPageParams
+                });
+            };
+
+            removeFromSource();
+            addToTarget();
+
+            return { sourceQK, sourceList, targetQK, targetList, sourceIssue, target };
         },
-        onSettled: async (response, error, { target }, context) => {
-            draggingIssueId = null;
+        onSettled: async (response, error, { source, target }, context) => {
             if ((error || !response?.ok) && context) {
-                const { old, sourceIssue } = context;
-                queryClient.setQueryData(queryKey, old);
+                const { sourceQK, sourceList, targetQK, targetList, sourceIssue } = context;
+                queryClient.setQueryData(sourceQK, sourceList);
+                queryClient.setQueryData(targetQK, targetList);
+
+                const statusList = queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(
+                    createStatusListQueryKey(() => ({
+                        workspaceId: data.workspace.id
+                    }))
+                );
+                if (!statusList) {
+                    return;
+                }
 
                 const sourceStatus =
                     sourceIssue.statusId == null
                         ? null
-                        : old.statuses.find((a) => a.id === sourceIssue.statusId!);
+                        : statusList.items.find((a) => a.id === sourceIssue.statusId!);
                 const targetStatus =
                     target.statusId === -1
                         ? null
-                        : old.statuses.find((a) => a.id === target.statusId!);
+                        : statusList.items.find((a) => a.id === target.statusId!);
+
                 addToast({
                     data: {
                         title: 'Could not move issue',
@@ -131,21 +232,43 @@
                     }
                 });
             }
-            await queryClient.invalidateQueries({ queryKey });
+            await queryClient.invalidateQueries({
+                predicate: ({ queryKey }) =>
+                    queryKey[0] === 'issues' &&
+                    queryKey[1] != null &&
+                    typeof queryKey[1] === 'object' &&
+                    'tag' in queryKey[1] &&
+                    queryKey[1].tag === 'issues-board' &&
+                    'projectId' in queryKey[1] &&
+                    queryKey[1].projectId === data.project.id &&
+                    'statusId' in queryKey[1] &&
+                    (queryKey[1].statusId === (source.statusId === -1 ? null : source.statusId) ||
+                        queryKey[1].statusId === (target.statusId === -1 ? null : target.statusId))
+            });
         }
     });
 
-    let draggingIssueId = $state.raw<string | null>(null);
     onMount(() => {
         return monitorForElements({
             canMonitor: ({ source }) => validateDraggableIssueData(source.data).ok,
-            onDragStart: ({ source }) => {
-                invariant(typeof source.data['id'] === 'string', 'source.data.id must be string');
-                draggingIssueId = source.data['id'];
+            onGenerateDragPreview: ({ location, source, nativeSetDragImage }) => {
+                const rect = source.element.getBoundingClientRect();
+                setCustomNativeDragPreview({
+                    nativeSetDragImage,
+                    getOffset: preserveOffsetOnSource({
+                        element: source.element,
+                        input: location.current.input
+                    }),
+                    render({ container }) {
+                        preview = { container, rect, data: source.data };
+                        return () => {
+                            preview = null;
+                        };
+                    }
+                });
             },
             onDrop: ({ source, location }) => {
-                if (!$query.data || location.current.dropTargets.length === 0) {
-                    draggingIssueId = null;
+                if (location.current.dropTargets.length === 0) {
                     return;
                 }
 
@@ -162,7 +285,16 @@
                     'target.data.statusId must be number'
                 );
 
-                const issueList = $query.data.issueLists[targetStatusId + ''];
+                const targetQK = createIssueListQueryKey(() => ({
+                    params: createBoardQueryParams(page.url),
+                    projectId: data.project.id,
+                    statusId: targetStatusId
+                }));
+                const targetList =
+                    queryClient.getQueryData<InfiniteData<PaginatedList<LocalBoardIssue>>>(
+                        targetQK
+                    );
+                invariant(targetList, 'target list must not be null');
                 const sourceData = { statusId: sourceStatusId, statusRank: sourceStatusRank };
                 if (target.data['type'] === 'board') {
                     $mutation.mutate({
@@ -170,7 +302,11 @@
                         source: sourceData,
                         target: {
                             statusId: targetStatusId,
-                            statusRank: getRank(null, issueList.items[0]?.statusRank || null)
+                            statusRank: getRank(
+                                null,
+                                targetList.pages.find(() => true)?.items.find(() => true)
+                                    ?.statusRank || null
+                            )
                         }
                     });
                     return;
@@ -185,8 +321,9 @@
                 );
 
                 const edge = extractClosestEdge(target.data);
+                const all = targetList.pages.flatMap((a) => a.items);
                 if (edge === 'top') {
-                    const previousIndex = issueList.items.findIndex((a) => a.id === targetId);
+                    const previousIndex = all.findIndex((a) => a.id === targetId);
                     $mutation.mutate({
                         issueId: source.data['id'],
                         source: sourceData,
@@ -195,13 +332,13 @@
                             statusRank: getRank(
                                 previousIndex === 0 || previousIndex === -1
                                     ? null
-                                    : issueList.items[previousIndex - 1].statusRank || null,
+                                    : all[previousIndex - 1].statusRank || null,
                                 targetStatusRank || null
                             )
                         }
                     });
                 } else {
-                    const nextIndex = issueList.items.findIndex((a) => a.id === targetId);
+                    const nextIndex = all.findIndex((a) => a.id === targetId);
                     $mutation.mutate({
                         issueId: source.data['id'],
                         source: sourceData,
@@ -209,9 +346,9 @@
                             statusId: targetStatusId,
                             statusRank: getRank(
                                 targetStatusRank || null,
-                                nextIndex === issueList.items.length - 1 || nextIndex === -1
+                                nextIndex === all.length - 1 || nextIndex === -1
                                     ? null
-                                    : issueList.items[nextIndex + 1].statusRank || null
+                                    : all[nextIndex + 1].statusRank || null
                             )
                         }
                     });
@@ -219,6 +356,19 @@
             }
         });
     });
+
+    function portal(node: HTMLElement, state: NonNullable<typeof preview>) {
+        function update() {
+            state.container.appendChild(node);
+            state.container.style.top = `${state.rect.top}px`;
+            state.container.style.left = `${state.rect.left}px`;
+        }
+
+        update();
+        return {
+            update
+        };
+    }
 </script>
 
 {#snippet errorDescription({ title, from, to }: { title: string; from: string; to: string })}
@@ -228,20 +378,39 @@
 {/snippet}
 
 {#if data.page.tag === 'board'}
-    <div class="flex flex-col grow justify-between overflow-hidden">
-        <div class="grow overflow-x-auto overflow-y-hidden w-full">
-            {#if $query.data}
-                <ol class="flex h-full w-fit gap-4 p-4">
-                    {#each [{ id: -1, value: 'No status', color: 'bg-base-3' }, ...$query.data.statuses] as status (status.id)}
-                        {@const list = $query.data.issueLists[status.id]}
+    <ol class="flex overflow-x-auto overflow-y-hidden w-full">
+        {#if $statusListQuery.data}
+            {#each $statusListQuery.data.items as status (status.id)}
+                <li>
+                    <ol class="flex h-full w-fit gap-4 p-4">
                         <Board
                             identifier={data.page.project.identifier}
-                            issues={list.items.filter((a) => a.id !== draggingIssueId)}
+                            projectId={data.project.id}
                             {status}
                         />
-                    {/each}
-                </ol>
-            {/if}
+                    </ol>
+                </li>
+            {/each}
+        {/if}
+    </ol>
+    {#if preview}
+        <div
+            use:portal={preview}
+            style="width: {preview.rect.width}px; height: calc({preview.rect
+                .height}px - 1rem);{navigator.userAgent.includes('Windows')
+                ? ' max-width: 280px; max-height: 280px;'
+                : ''}"
+            class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border-2"
+        >
+            <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
+                <p class="leading-none text-sm">
+                    <small>{data.page.project.identifier}-{preview.data.orderNumber}</small>
+                </p>
+                <Icon name="draggable" class="ml-auto h-4" />
+            </div>
+            <p class="font-medium leading-none">
+                {preview.data.title}
+            </p>
         </div>
-    </div>
+    {/if}
 {/if}

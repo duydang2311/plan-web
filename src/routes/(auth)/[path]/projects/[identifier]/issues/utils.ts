@@ -17,7 +17,7 @@ export const createBoardQueryParams = (url: URL) => {
     return {
         ...paginatedQuery(
             queryParams(url, {
-                page: 1,
+                offset: 0,
                 size: 20
             })
         ),
@@ -32,6 +32,7 @@ export const createQueryKey =
         return [
             'issues',
             {
+                tag: 'issues-board',
                 project: project ?? url.searchParams.get('project'),
                 layout: layout ?? (url.searchParams.get('layout') === 'board' ? 'board' : 'table'),
                 params: {
