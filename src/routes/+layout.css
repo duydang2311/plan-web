@@ -1,7 +1,7 @@
 @import '~/lib/stylesheets/themes/light.css';
 @import '~/lib/stylesheets/themes/dark.css';
 
-@import '~/lib/assets/fonts/SourceSans3/font-face.css';
+@import '~/lib/assets/fonts/Inter/font-face.css';
 @import '~/lib/stylesheets/preflight.css';
 @import 'sanitize.css/reduce-motion.css';
 @import 'sanitize.css/assets.css';
@@ -27,10 +27,10 @@
         --cubic-out: cubic-bezier(0.33, 1, 0.68, 1);
         --cubic-in: cubic-bezier(0.32, 0, 0.67, 0);
         --cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-        --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-            Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        --font-family-display: 'Source Sans 3', var(--font-family-base);
-        --font-family-body: 'Source Sans 3', var(--font-family-base);
+        --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+            'Helvetica Neue', sans-serif;
+        --font-family-display: InterVariable, var(--font-family-base);
+        --font-family-body: InterVariable, var(--font-family-base);
         --typo-scale: 1.15;
         --font-size-sm: 0.9028rem;
         --font-size-p: 1rem;
@@ -43,7 +43,7 @@
         --font-size-title: var(--font-size-h5);
 
         color-scheme: light dark;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 400;
         line-height: 1.5;
         font-synthesis: none;
@@ -52,9 +52,9 @@
         -moz-osx-font-smoothing: grayscale;
         -webkit-text-size-adjust: 100%;
         /* fix for Chrome */
-        /* font-feature-settings:
+        font-feature-settings:
             'liga' 1,
-            'calt' 1; */
+            'calt' 1;
 
         background-color: var(--theme-base-1);
         color: var(--theme-base-fg-2);
@@ -75,11 +75,11 @@
         --font-size-title: var(--font-size-h5);
     }
 
-    /* @supports (font-variation-settings: normal) {
+    @supports (font-variation-settings: normal) {
         :root {
             font-optical-sizing: auto;
         }
-    } */
+    }
 
     body {
         font-size: var(--font-size-p);
@@ -94,6 +94,15 @@
         color: theme('colors.base[fg-1]');
         font-family: var(--font-family-display);
         font-weight: 600;
+        --font-size-p: 0.8rem;
+        --font-size-sm: 0.5rem;
+        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
+        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
+        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
+        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
+        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
+        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+        --font-size-title: var(--font-size-h5);
     }
 
     h6 {
