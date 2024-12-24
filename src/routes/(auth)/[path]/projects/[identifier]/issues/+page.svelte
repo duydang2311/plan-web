@@ -39,7 +39,7 @@
                 <ViewLayoutSelect {layouts} selected={selectedLayout} />
             </div>
             <div class="grow">
-                <div class="relative">
+                <div class="relative h-full">
                     <Input
                         type="text"
                         placeholder="Type to search issue..."
