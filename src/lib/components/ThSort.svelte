@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { Field } from '@vincjo/datatables';
     import type { TableHandlerInterface } from '@vincjo/datatables/server';
-    import clsx from 'clsx';
     import type { Snippet } from 'svelte';
     import { sineInOut } from 'svelte/easing';
     import type { HTMLThAttributes } from 'svelte/elements';
@@ -20,7 +19,7 @@
     const sort = table.createSort(field);
 </script>
 
-<th {...restProps} class="c-table--th c-table--th-sort {cls}">
+<th {...restProps} class={['c-table--th c-table--th-sort', cls]}>
     <Button
         type="button"
         variant="base"
@@ -35,10 +34,10 @@
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
                     <Icon
                         name="arrow-up"
-                        class={clsx(
+                        class={[
                             'transition-transform duration-75 ease-out',
                             sort.direction === 'desc' && 'rotate-180'
-                        )}
+                        ]}
                     />
                 </div>
             {:else}

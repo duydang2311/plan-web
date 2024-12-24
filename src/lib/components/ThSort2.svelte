@@ -16,7 +16,7 @@
     const { class: cls, ...restProps } = $derived(html ?? {});
 </script>
 
-<th {...restProps} class="c-table--th c-table--th-sort {cls}">
+<th {...restProps} class={['c-table--th c-table--th-sort', cls]}>
     <Button
         type="button"
         variant="base"
