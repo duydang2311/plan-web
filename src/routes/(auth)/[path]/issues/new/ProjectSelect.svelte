@@ -37,7 +37,7 @@
                 </span>
             {:else}
                 <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
-                    SelectBuilder a project
+                    Select a project
                 </span>
             {/if}
             <Icon
