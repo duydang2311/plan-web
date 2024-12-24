@@ -43,7 +43,7 @@
                     <Input
                         type="text"
                         placeholder="Type to search issue..."
-                        class="pl-8 w-full h-full text-sm border-none rounded focus:shadow-none"
+                        class="pl-8 text-sm border-none rounded focus:shadow-none"
                     />
                     <Icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2" />
                 </div>
