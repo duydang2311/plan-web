@@ -1,15 +1,18 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
-import { CloudinaryLive } from './lib/elysia_api/contexts';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
+import { Cloudinary } from './lib/services/cloudinary.server';
+import { v2 } from 'cloudinary';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
 if (!env.API_VERSION) throw new ReferenceError('API_VERSION must be provided');
+
+export const CloudinaryLive = Layer.sync(Cloudinary, () => v2);
 
 export const handle: Handle = async ({
     event,
