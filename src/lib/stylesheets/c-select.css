@@ -7,7 +7,12 @@
     cursor: default;
     @apply shadow-sm;
 
-    &:not(:has(.c-select--option:hover)) .c-select--option[aria-selected='true'] {
+    &[data-melt-select-multiple] .c-select--option[aria-selected='true'] {
+        background-color: var(--theme-base-5);
+    }
+
+    &:not([data-melt-select-multiple]):not(:has(.c-select--option:hover))
+        .c-select--option[aria-selected='true'] {
         background-color: var(--theme-base-5);
     }
 }

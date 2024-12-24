@@ -85,11 +85,18 @@
         elements: { trigger, menu, option, group, groupLabel, label, arrow, hiddenInput },
         helpers: { isSelected, isHighlighted, closeMenu }
     } = createSelect<Value, Multiple, S>(options);
+    const extendedMenu = $derived(
+        options?.multiple
+            ? Object.assign($menu, {
+                  'data-melt-select-multiple': '' as const
+              })
+            : $menu
+    );
 </script>
 
 {@render children?.({
     trigger: $trigger,
-    menu: $menu,
+    menu: extendedMenu,
     option: $option,
     group: $group,
     groupLabel: $groupLabel,

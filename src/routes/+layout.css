@@ -94,15 +94,6 @@
         color: theme('colors.base[fg-1]');
         font-family: var(--font-family-display);
         font-weight: 600;
-        --font-size-p: 0.8rem;
-        --font-size-sm: 0.5rem;
-        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
-        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
-        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
-        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
-        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
-        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
-        --font-size-title: var(--font-size-h5);
     }
 
     h6 {
