@@ -64,10 +64,7 @@
                             data-sveltekit-replacestate
                         >
                             {#if selected}
-                                <Icon
-                                    name="check"
-                                    class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2 text-primary-1"
-                                />
+                                <Icon name="check" class="c-select--check" />
                             {/if}
                             <Icon name={layout.icon} />
                             {layout.label}

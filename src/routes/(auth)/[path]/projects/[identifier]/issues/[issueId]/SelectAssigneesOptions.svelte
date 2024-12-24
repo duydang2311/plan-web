@@ -122,7 +122,7 @@
                         <li use:melt={opt} class="c-select--option">
                             <Avatar seed={item.email} src={item.image ?? undefined} class="w-6" />
                             {#if selected}
-                                <Icon name="check" class="absolute left-2" />
+                                <Icon name="check" class="c-select--check" />
                             {/if}
                             {item.label}
                         </li>

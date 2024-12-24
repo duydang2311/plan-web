@@ -1,13 +1,30 @@
 .c-select--menu {
-    @apply p-1 bg-base-1 border border-base-border-1 rounded-md shadow-sm min-w-40 cursor-default;
+    padding: theme('padding[1]');
+    background-color: var(--theme-base-1);
+    border: 1px solid var(--theme-base-border-1);
+    border-radius: theme('borderRadius[md]');
+    min-width: theme('width[40]');
+    cursor: default;
+    @apply shadow-sm;
+
+    &:not(:has(.c-select--option:hover)) .c-select--option[aria-selected='true'] {
+        background-color: var(--theme-base-5);
+    }
 }
 
 .c-select--option {
-    color: var(--theme-base-fg-4);
-    @apply relative pl-10 pr-2 py-1 rounded w-full flex items-center gap-2 font-medium;
+    position: relative;
+    padding-inline: theme('padding[2]') theme('padding[10]');
+    padding-block: theme('padding[1]');
+    color: var(--theme-base-fg-3);
+    border-radius: theme('borderRadius[DEFAULT]');
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: theme('gap[2]');
     transition:
-        color 75ms var(--cubic-out),
-        background-color 75ms var(--cubic-out);
+        color 50ms var(--cubic-out),
+        background-color 50ms var(--cubic-out);
 
     &:where([data-melt-select-option]),
     &:where([data-melt-combobox-option]) {
@@ -19,8 +36,15 @@
 
         &[aria-selected='true'] {
             color: var(--theme-base-fg-1);
-            background-color: var(--theme-base-5);
             font-weight: 500;
         }
     }
+}
+
+.c-select--check {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    color: var(--text-base-fg-1);
 }

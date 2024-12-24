@@ -81,7 +81,7 @@
                 {@const selected = isSelected(item.value)}
                 <li use:melt={opt} class="c-select--option">
                     {#if selected}
-                        <Icon name="check" class="absolute left-2" />
+                        <Icon name="check" class="c-select--check" />
                     {/if}
                     {item.label}
                 </li>

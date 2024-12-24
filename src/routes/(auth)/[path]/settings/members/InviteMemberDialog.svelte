@@ -219,10 +219,7 @@
                                                     />
                                                 {/if}
                                                 {#if isSelected(item)}
-                                                    <Icon
-                                                        name="check"
-                                                        class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2"
-                                                    />
+                                                    <Icon name="check" class="c-select--check" />
                                                 {/if}
                                                 <span>
                                                     {#if item.profile}

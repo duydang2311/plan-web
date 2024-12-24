@@ -54,7 +54,12 @@
             />
         </Button>
         {#if $open}
-            <ol use:melt={menu} class="c-select--menu" in:tsap={select.in} out:tsap={select.out}>
+            <ol
+                use:melt={menu}
+                class="c-select--menu space-y-1"
+                in:tsap={select.in}
+                out:tsap={select.out}
+            >
                 {#each layouts as layout (layout.value)}
                     {@const opt = option(layout)}
                     {@const selected = isSelected(layout.value)}
@@ -66,10 +71,7 @@
                             data-sveltekit-replacestate
                         >
                             {#if selected}
-                                <Icon
-                                    name="check"
-                                    class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2 text-primary-1"
-                                />
+                                <Icon name="check" class="c-select--check" />
                             {/if}
                             <Icon name={layout.icon} />
                             {layout.label}
