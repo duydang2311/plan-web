@@ -13,6 +13,7 @@ export default withAnimations({
                 body: 'var(--font-family-body)'
             },
             fontSize: {
+                p: 'var(--font-size-p)',
                 h1: 'var(--font-size-h1)',
                 h2: 'var(--font-size-h2)',
                 h3: 'var(--font-size-h3)',

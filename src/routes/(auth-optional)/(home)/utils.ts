@@ -43,3 +43,9 @@ export function decodeDeclineTeamInvite(formData: FormData) {
         teamInvitationId: formData.get('teamInvitationId')
     };
 }
+
+export const createWorkspaceListParams = (userId: string) =>
+    ({
+        userId,
+        select: 'Name,Path'
+    }) as const;

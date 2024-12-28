@@ -4,6 +4,8 @@ import type { User } from './user';
 
 export interface Workspace {
     id: string;
+    name: string;
+    path: string;
     statuses?: WorkspaceStatus[];
 }
 
