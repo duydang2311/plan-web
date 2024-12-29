@@ -50,7 +50,7 @@
             <li>
                 <a
                     href="/{path}"
-                    class="block px-8 py-4 dark:bg-base-2 border border-base-border-3 rounded-md
+                    class="block px-12 py-4 dark:bg-base-2 border border-base-border-3 rounded-md
                     transition duration-75 ease-out hover:bg-base-3 hover:text-base-fg-1"
                 >
                     <p class="font-medium">{name}</p>
@@ -63,7 +63,7 @@
                 href="/new"
                 filled={false}
                 variant="base"
-                class="h-full flex items-center gap-2 px-8 py-4"
+                class="h-full flex items-center gap-2 px-12 py-4 text-base-fg-4"
             >
                 <Icon name="plus" />
                 Create workspace

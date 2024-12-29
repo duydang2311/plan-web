@@ -23,9 +23,9 @@
     <section>
         <div class="mb-4">
             <h2>Your workspaces</h2>
-            <p class="text-sm text-base-fg-5">
-                Workspace is a place to organize all your projects, teams, and issues. Start
-                selecting any workspace to navigate to the dashboard view.
+            <p class="c-label">
+                Workspace is where you organize projects, teams, and issues. Start by clicking on a
+                workspace to manage them or creating a new one.
             </p>
         </div>
         <WorkspaceList userId={data.user.id} />
