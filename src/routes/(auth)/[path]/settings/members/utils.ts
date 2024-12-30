@@ -23,7 +23,7 @@ export const workspaceMembersParams = ({ url, order }: { url: URL; order?: strin
             })
         ),
         order: order === undefined ? url.searchParams.get('order') : order,
-        select: 'CreatedTime,UpdatedTime,UserId,User.Email,Role.Name'
+        select: 'CreatedTime,UpdatedTime,Id,UserId,User.Email,Role.Name'
     }) as const;
 
 export const pendingMembersParams = ({
@@ -46,3 +46,11 @@ export const pendingMembersParams = ({
         order: order === undefined ? url.searchParams.get('order') : order,
         select: 'CreatedTime,Id,User.Id,User.Email,User.Profile.DisplayName,User.Profile.Image'
     }) as const;
+
+export const validateDeleteMemberActionFailure = validator(
+    Type.Object({
+        errors: Type.Object({
+            root: Type.Array(Type.String())
+        })
+    })
+);

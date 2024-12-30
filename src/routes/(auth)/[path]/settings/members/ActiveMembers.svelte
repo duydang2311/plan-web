@@ -4,13 +4,14 @@
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
     import { toStore } from 'svelte/store';
-    import { Icon, IconButton, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { Pagination, Row, Table, Th, THead } from '~/lib/components';
     import ThSort2 from '~/lib/components/ThSort2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { createSort, sortHelper } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
     import type { LocalWorkspaceMember } from './+page.server';
+    import DeleteMemberButton from './DeleteMemberButton.svelte';
     import { workspaceMembersParams } from './utils';
 
     const { data }: { data: PageData } = $props();
@@ -25,12 +26,13 @@
             order: sort.string
         })
     );
+    const queryKey = $derived([
+        'workspace-members',
+        { tag: 'active', workspaceId: data.workspace.id, params }
+    ]);
     const query = createQuery(
         toStore(() => ({
-            queryKey: [
-                'workspace-members',
-                { tag: 'active', workspaceId: data.workspace.id, params }
-            ],
+            queryKey,
             queryFn: async () => {
                 const response = await api.get(`workspaces/${data.workspace.id}/members`, {
                     query: params
@@ -59,7 +61,7 @@
                     <td class="col-span-full">No members yet.</td>
                 </Row>
             {:else}
-                {#each $query.data.items as { userId, user, role, createdTime, updatedTime } (userId)}
+                {#each $query.data.items as { id, user, role, createdTime, updatedTime } (id)}
                     <Row>
                         <td
                             class="whitespace-nowrap overflow-hidden text-ellipsis"
@@ -86,16 +88,7 @@
                             {DateTime.fromISO(updatedTime).toRelative()}
                         </td>
                         <td>
-                            <div class="flex flex-wrap gap-2">
-                                <IconButton
-                                    type="button"
-                                    variant="negative"
-                                    title="Remove member"
-                                    class="w-fit"
-                                >
-                                    <Icon name="trash" />
-                                </IconButton>
-                            </div>
+                            <DeleteMemberButton {id} {queryKey} />
                         </td>
                     </Row>
                 {/each}

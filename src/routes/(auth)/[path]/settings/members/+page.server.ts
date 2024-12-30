@@ -15,10 +15,7 @@ import {
     workspaceMembersParams
 } from './utils';
 
-export type LocalWorkspaceMember = Pick<
-    WorkspaceMember,
-    'createdTime' | 'updatedTime' | 'userId'
-> & {
+export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'updatedTime' | 'id'> & {
     user: Pick<User, 'email'>;
     role: Pick<Role, 'name'>;
 };
@@ -151,6 +148,17 @@ export const actions: Actions = {
             return null;
         }).pipe(
             Effect.catchAll((a) => Effect.succeed(fail(a.status, { inviteMember: a.data }))),
+            runtime.runPromise
+        );
+    },
+    'delete-member': ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`workspace-members/${formData.get('id')}`)
+            );
+        }).pipe(
+            Effect.catchAll((a) => Effect.succeed(fail(a.status, { deleteMember: a.data }))),
             runtime.runPromise
         );
     }
