@@ -56,7 +56,11 @@
                                 (r) => {
                                     const url = new URL(page.url);
                                     const totalSize = pageParam + r.items.length;
-                                    url.searchParams.set('offset', pageParam + '');
+                                    if (pageParam === 0) {
+                                        url.searchParams.delete('offset');
+                                    } else {
+                                        url.searchParams.set('offset', pageParam + '');
+                                    }
                                     replaceState(url, page.state);
                                     return {
                                         ...r,
