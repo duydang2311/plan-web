@@ -14,15 +14,15 @@
     let editor = $state.raw<Editor>();
     let validation = $state<ValidationResult>();
 
+    function handle({ editor }: { editor: Editor }) {
+        validation = clientValidate({
+            editor,
+            issueId
+        });
+    }
+
     $effect(() => {
         if (!editor) return;
-
-        function handle({ editor }: { editor: Editor }) {
-            validation = clientValidate({
-                editor,
-                issueId
-            });
-        }
 
         editor.on('create', handle);
         editor.on('update', handle);
@@ -105,7 +105,7 @@
         });
 
         e.formData.set('content', html);
-        editor.commands.clearContent();
+        editor.commands.clearContent(true);
         return async ({ result }) => {
             if (result.type !== 'success') {
                 editor?.commands.setContent(html);
