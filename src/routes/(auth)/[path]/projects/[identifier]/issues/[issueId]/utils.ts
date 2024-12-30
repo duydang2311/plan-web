@@ -1,4 +1,8 @@
+import { createQuery } from '@tanstack/svelte-query';
+import { toStore } from 'svelte/store';
+import { useRuntime } from '~/lib/contexts/runtime.client';
 import { validator } from '~/lib/utils/validation';
+import type { LocalIssue } from './+page.server';
 
 export const validate = validator<{ issueId: string; content: string }>((input, { error }) => {
     if (typeof input !== 'object' || !input) {
@@ -114,6 +118,24 @@ export function decodeDeleteComment(formData: FormData) {
 
 export const createFetchIssueQuery = () => {
     return {
-        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Status.Id,Status.Value,Status.Icon,Teams.Id,Teams.Name,Teams.Identifier,Assignees.Id,Assignees.Email,Assignees.Profile.DisplayName,Assignees.Profile.Image'
+        select: 'CreatedTime,UpdatedTime,Id,AuthorId,Title,Description,OrderNumber,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,Status.Id,Status.Value,Status.Icon,Teams.Id,Teams.Name,Teams.Identifier,Assignees.Id,Assignees.Email,Assignees.Profile.DisplayName,Assignees.Profile.Image'
     };
+};
+
+export const createIssueQuery = (depsFn: () => { issueId: string }) => {
+    const { api } = useRuntime();
+    return createQuery(
+        toStore(() => {
+            const { issueId } = depsFn();
+            return {
+                queryKey: ['issues', { issueId }],
+                queryFn: async () => {
+                    const response = await api.get(`issues/${issueId}`, {
+                        query: createFetchIssueQuery()
+                    });
+                    return await response.json<LocalIssue>();
+                }
+            };
+        })
+    );
 };

@@ -110,7 +110,7 @@
                     }}
                 >
                     {#snippet children(comment)}
-                        <div class="mt-4 pb-1 border-b border-b-base-border-3">
+                        <div class="mt-4">
                             <Comment
                                 {comment}
                                 {issueId}

@@ -11,40 +11,12 @@
     import Status from './Status.svelte';
     import SelectTeam from './SelectTeam.svelte';
     import SelectAssignees from './SelectAssignees.svelte';
+    import Author from './Author.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const commentQuery = paginatedQuery(queryParams(page.url, { offset: 0, size: 10 }));
     let editing = $state.raw(false);
     let scrollRef = $state.raw<HTMLElement>();
-
-    // onMount(() => {
-    //     let subscription: Subscription | undefined = undefined;
-    //     (async () => {
-    //         const subscribeResult = await realtime.subscribe(
-    //             `issues.${page.params['issueId']}.comments.created`
-    //         );
-    //         if (!subscribeResult.isOk()) {
-    //             return;
-    //         }
-    //         subscription = subscribeResult.value;
-    //         for await (const _ of subscription) {
-    //             if ($query.hasNextPage) {
-    //                 addToast({
-    //                     data: {
-    //                         title: '',
-    //                         description: 'A new comment has been added.'
-    //                     }
-    //                 });
-    //             } else {
-    //                 // TODO: use mutation
-    //                 await $query.refetch();
-    //             }
-    //         }
-    //     })();
-    //     return () => {
-    //         subscription?.unsubscribe();
-    //     };
-    // });
 </script>
 
 <main class="flex items-stretch h-full divide-x divide-base-border-2 overflow-hidden">
@@ -66,6 +38,7 @@
             <hr class="my-8 -mx-4" />
             <div class="max-w-paragraph-lg w-full mx-auto">
                 <h2 class="mb-4">Activity</h2>
+                <Author issueId={data.page.issue.id} />
                 <Comments
                     authorId={data.page.user.id}
                     issueId={data.page.issue.id}

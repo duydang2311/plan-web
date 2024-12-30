@@ -22,7 +22,7 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
-import type { User } from '~/lib/models/user';
+import type { User, UserProfile } from '~/lib/models/user';
 import type { WorkspaceStatus } from '~/lib/models/status';
 
 export type LocalIssue = Pick<
@@ -37,6 +37,7 @@ export type LocalIssue = Pick<
     | 'priority'
     | 'statusId'
 > & {
+    author: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
     teams: Pick<Team, 'id' | 'name' | 'identifier'>[];
     assignees: Pick<User, 'id' | 'email'> & {
         profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;

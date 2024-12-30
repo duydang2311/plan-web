@@ -31,24 +31,20 @@
     const open = writable(false);
 </script>
 
-<div class="rounded-md">
+<div class="rounded-lg border border-base-border-3 p-4 pb-2 shadow-sm dark:bg-base-3">
     <div class="flex items-center gap-2">
         <Avatar
             seed={comment.author.email}
             src={imageFromAsset(cloudinary)(comment.author.profile?.image)
-                ?.resize(Resize.fill(48, 48))
+                ?.resize(Resize.fill(32))
                 .toURL()}
-            class="size-12"
+            class="size-8"
         />
-        <div>
-            <p class="font-bold font-display text-base-fg-1">
+        <div class="text-sm text-base-fg-4">
+            <span class="font-bold font-display text-base-fg-2">
                 {comment.author.profile?.displayName ?? 'N/A'}
-            </p>
-            <p>
-                <small class="text-base-fg-5">
-                    {DateTime.fromISO(comment.createdTime).toRelative()}
-                </small>
-            </p>
+            </span>
+            added a comment · {DateTime.fromISO(comment.createdTime).toRelative()}
         </div>
     </div>
     <div class="mt-4">

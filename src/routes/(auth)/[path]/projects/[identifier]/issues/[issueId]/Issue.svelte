@@ -3,6 +3,7 @@
     import { createQuery } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
+    import { derived as derivedStore, toStore } from 'svelte/store';
     import { addToast, Icon } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
@@ -10,7 +11,6 @@
     import type { ActionData } from './$types';
     import type { LocalIssue } from './+page.server';
     import { createFetchIssueQuery } from './utils';
-    import { derived as derivedStore, toStore } from 'svelte/store';
 
     interface Props {
         form: ActionData;
@@ -37,16 +37,17 @@
             })
         )
     );
+    const issue = $derived($query.data);
     let editor = $state.raw<Editor>();
 </script>
 
-{#if $query.data}
+{#if issue}
     <div class="flex gap-4">
         <h1>
-            {$query.data.title}
+            {issue.title}
         </h1>
         <span class="text-base-fg-ghost font-light text-h1">
-            #{$query.data.orderNumber}
+            #{issue.orderNumber}
         </span>
     </div>
     <div class="max-w-full mt-6 transition-enforcement">
@@ -84,11 +85,11 @@
                         };
                     }}
                 >
-                    <input type="hidden" name="issueId" value={$query.data.id} />
+                    <input type="hidden" name="issueId" value={issue.id} />
                     <Tiptap
                         bind:editor
                         name="description"
-                        content={$query.data.description}
+                        content={issue.description}
                         editorProps={{ class: 'pb-8' }}
                     />
                     <div class="absolute right-2 bottom-2 flex gap-2">
@@ -116,9 +117,9 @@
             </div>
         {:else}
             <div class="prose max-w-paragraph-lg">
-                {#if $query.data.description && $query.data.description !== '<p></p>'}
+                {#if issue.description && issue.description !== '<p></p>'}
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                    {@html DOMPurify.sanitize($query.data.description, {
+                    {@html DOMPurify.sanitize(issue.description, {
                         USE_PROFILES: { html: true }
                     })}
                 {:else}
