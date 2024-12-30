@@ -1,18 +1,17 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { pipe } from '@baetheus/fun/fn';
     import { createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
-    import { Link, Pagination, Row, Table, Th, THead, Button, Input, Icon } from '~/lib/components';
+    import { Button, Icon, Input, Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-    import { TE } from '~/lib/utils/functional';
+    import { type PaginatedList } from '~/lib/models/paginatedList';
+    import { unwrapMaybePromise } from '~/lib/utils/promise';
+    import { QueryResponse } from '~/lib/utils/query';
+    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { paginatedQuery } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
-    import { paginatedQuery } from '~/lib/utils/url';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
-    import { createEffect } from '~/lib/utils/runes.svelte';
 
     const { data }: { data: PageData } = $props();
     const queryClient = useQueryClient();
@@ -20,27 +19,17 @@
     const queryKey = ['projects'];
     const query = createQuery({
         queryKey,
-        queryFn: () => {
-            return pipe(
-                TE.fromPromise(() =>
-                    api.get(`projects`, {
-                        query: {
-                            ...data.query,
-                            workspaceId: data.workspace.id,
-                            select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
-                        }
-                    })
-                )(),
-                TE.flatMap((a) =>
-                    a.ok
-                        ? TE.fromPromise(() => a.json<PaginatedList<LocalProject>>())()
-                        : TE.fail(a)
-                ),
-                TE.match(
-                    () => paginatedList<LocalProject>(),
-                    (r) => r
-                )
-            )();
+        queryFn: async () => {
+            const response = await QueryResponse.HTTP(() =>
+                api.get(`projects`, {
+                    query: {
+                        ...data.query,
+                        workspaceId: data.workspace.id,
+                        select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
+                    }
+                })
+            );
+            return await QueryResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
         }
     });
 

@@ -7,6 +7,7 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { LocalWorkspace } from './+page.server';
     import { Button, Icon } from '~/lib/components';
+    import { QueryResponse } from '~/lib/utils/query';
 
     interface Props {
         userId: string;
@@ -18,21 +19,14 @@
         toStore(() => ({
             queryKey: ['workspaces', { userId }],
             queryFn: async () => {
-                console.log(createWorkspaceListParams(userId));
-                const response = await api
-                    .get('workspaces', {
+                const response = await QueryResponse.HTTP(() =>
+                    api.get('workspaces', {
                         query: createWorkspaceListParams(userId)
                     })
-                    .catch((e) => {
-                        throw new Error(
-                            `There was an unknown error while fetching workspaces (code: fetch).\n${e}`,
-                            { cause: e }
-                        );
-                    });
-                if (!response.ok) {
-                    throw new Error(`${response.statusText} (code: ${response.status}).`);
-                }
-                return await response.json<PaginatedList<LocalWorkspace>>();
+                );
+                return await QueryResponse.JSON(() =>
+                    response.json<PaginatedList<LocalWorkspace>>()
+                );
             }
         }))
     );
