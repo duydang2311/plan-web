@@ -12,29 +12,40 @@
     const { userId, size, issueId }: { userId: string; issueId: string; size: number } = $props();
     const queryClient = useQueryClient();
     let editor = $state.raw<Editor>();
-    let validation = $state<ValidationResult>();
+    let validation = $state.raw<ValidationResult>();
+    let formRef = $state.raw<HTMLFormElement>();
 
-    function handle({ editor }: { editor: Editor }) {
+    const handle = ({ editor }: { editor: Editor }) => {
         validation = clientValidate({
             editor,
             issueId
         });
-    }
+    };
+
+    const submit = () => {
+        formRef?.requestSubmit();
+    };
 
     $effect(() => {
         if (!editor) return;
 
         editor.on('create', handle);
         editor.on('update', handle);
+        editor.on('submit', submit);
 
         return () => {
-            editor!.off('create', handle);
-            editor!.off('update', handle);
+            if (!editor) {
+                return;
+            }
+            editor.off('create', handle);
+            editor.off('update', handle);
+            editor.off('submit', submit);
         };
     });
 </script>
 
 <form
+    bind:this={formRef}
     method="post"
     action="?/comment"
     class="space-y-2"

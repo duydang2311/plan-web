@@ -17,7 +17,7 @@
 </script>
 
 {#if issue}
-    <div class="flex items-center gap-2 my-4 px-4">
+    <div class="flex items-center gap-2 mt-4 px-4">
         <Avatar
             seed={issue.author.profile?.name ?? issue.author.email}
             src={imageFromAsset(cloudinary)(issue.author.profile?.image)

@@ -45,7 +45,7 @@
                     size={commentQuery.size}
                     {scrollRef}
                 />
-                <div class="mt-4">
+                <div class="mt-8">
                     <AddComment
                         userId={data.page.user.id}
                         issueId={data.page.issue.id}
