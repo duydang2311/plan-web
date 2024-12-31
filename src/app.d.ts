@@ -50,3 +50,9 @@ declare global {
         type UseMutableArrays = 1;
     }
 }
+
+declare module '@tiptap/core' {
+    export interface EditorEvents {
+        submit: undefined;
+    }
+}

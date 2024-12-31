@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Editor } from '@tiptap/core';
+    import { Editor, Extension } from '@tiptap/core';
     import Link from '@tiptap/extension-link';
     import Placeholder from '@tiptap/extension-placeholder';
     import Underline from '@tiptap/extension-underline';
@@ -57,6 +57,21 @@
                         ),
                     HTMLAttributes: {
                         class: 'c-link'
+                    }
+                }),
+                Extension.create({
+                    addKeyboardShortcuts() {
+                        return {
+                            Enter: () => {
+                                this.editor.commands.setHardBreak();
+                                return true;
+                            },
+                            'Shift-Enter': () => true,
+                            'Mod-Enter': () => {
+                                this.editor.emit('submit');
+                                return true;
+                            }
+                        };
                     }
                 })
             ],
