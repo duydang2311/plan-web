@@ -1,16 +1,14 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { createQuery } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { derived as derivedStore, toStore } from 'svelte/store';
     import { addToast, Icon } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { ActionData } from './$types';
     import type { LocalIssue } from './+page.server';
-    import { createFetchIssueQuery } from './utils';
+    import { createIssueQuery } from './utils';
 
     interface Props {
         form: ActionData;
@@ -21,22 +19,9 @@
     }
 
     const { editing, issueId, onCancel, onSubmit }: Props = $props();
-    const { api, queryClient } = useRuntime();
+    const { queryClient } = useRuntime();
     const queryKey = $derived(['issues', { issueId }]);
-    const query = createQuery(
-        derivedStore(
-            toStore(() => queryKey),
-            ($queryKey) => ({
-                queryKey: $queryKey,
-                queryFn: async () => {
-                    const response = await api.get(`issues/${issueId}`, {
-                        query: createFetchIssueQuery()
-                    });
-                    return await response.json<LocalIssue>();
-                }
-            })
-        )
-    );
+    const query = createIssueQuery(() => ({ issueId }));
     const issue = $derived($query.data);
     let editor = $state.raw<Editor>();
 </script>
