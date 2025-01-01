@@ -54,6 +54,7 @@ export interface LocalComment {
         id: string;
         email: string;
         profile?: {
+            name: string;
             displayName: string;
             image?: Partial<Asset>;
         };
@@ -103,7 +104,7 @@ export const load: PageServerLoad = async ({
                     query: {
                         offset: 0,
                         size: commentQuery.offset + commentQuery.size,
-                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.DisplayName'
+                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.Name,Author.Profile.DisplayName'
                     }
                 });
                 if (!response.ok) {

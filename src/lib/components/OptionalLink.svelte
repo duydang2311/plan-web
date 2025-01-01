@@ -4,9 +4,13 @@
 
     type Props = HTMLAnchorAttributes;
 
-    const { children, ...props }: Props = $props();
+    const { children, href, ...props }: Props = $props();
 </script>
 
-<a {...props} class={clsx('c-link', props.class)}>
+{#if href}
+    <a {href} {...props} class={clsx('c-link', props.class)}>
+        {@render children?.()}
+    </a>
+{:else}
     {@render children?.()}
-</a>
+{/if}

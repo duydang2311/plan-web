@@ -41,7 +41,7 @@
                                     query: {
                                         offset: pageParam,
                                         size: $size,
-                                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.DisplayName'
+                                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.Name,Author.Profile.DisplayName'
                                     }
                                 })
                             )(),
