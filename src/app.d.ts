@@ -1,12 +1,12 @@
 // See https://kit.svelte.dev/docs/types#app
 
 import type { Layer } from 'effect/Layer';
-import type { ManagedRuntime } from 'effect/ManagedRuntime';
 import 'unplugin-icons/types/svelte';
 import type { Api } from './lib/api/server';
 import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
 import type { HttpClient } from './lib/services/http_client';
+import type { Effect, Exit } from 'effect';
 
 // for information about these interfaces
 declare global {
@@ -18,7 +18,16 @@ declare global {
         }
 
         interface Locals {
-            runtime: ManagedRuntime<HttpClient | ApiClient | Cloudinary, never>;
+            runtime: {
+                runPromise<A, E, R>(
+                    effect: Effect.Effect<A, E, R>,
+                    options?: { readonly signal?: AbortSignal } | undefined
+                ): Promise<A>;
+                runPromiseExit<A, E, R>(
+                    effect: Effect.Effect<A, E, R>,
+                    options?: { readonly signal?: AbortSignal } | undefined
+                ): Promise<Exit.Exit<A, E>>;
+            };
             appLive: Layer<HttpClient | ApiClient | Cloudinary>;
             user: {
                 id: string;

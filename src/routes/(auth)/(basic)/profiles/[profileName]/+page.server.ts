@@ -2,11 +2,11 @@ import { error } from '@sveltejs/kit';
 import { Effect, Exit } from 'effect';
 import type { User } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
+import type { Cloudinary } from '~/lib/services/cloudinary.server';
+import { urlFromAsset } from '~/lib/utils/cloudinary.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { decodeCreateProfile, validateCreateProfile } from './utils';
-import { urlFromAsset } from '~/lib/utils/cloudinary.server';
-import type { Cloudinary } from '~/lib/services/cloudinary.server';
 
 export type RemoteUser = Pick<User, 'id' | 'profile'>;
 export type LocalUser = Omit<RemoteUser, 'profile'> & {
@@ -18,12 +18,10 @@ export type LocalUser = Omit<RemoteUser, 'profile'> & {
 };
 
 export const load: PageServerLoad = async ({
-    depends,
     locals: { user, runtime },
     isDataRequest,
     params
 }) => {
-    depends('fetch:profiles');
     if (params.profileName === 'me') {
         const promise = Effect.gen(function* () {
             const response = yield* LoadResponse.HTTP(
@@ -36,7 +34,7 @@ export const load: PageServerLoad = async ({
             );
             return yield* dataFromRemoteUser({ id: user.id, profile });
         }).pipe(
-            Effect.catchAll(() => Effect.succeed(null)),
+            Effect.orElseSucceed(() => null),
             runtime.runPromise
         );
 

@@ -10,50 +10,53 @@
     import type { LocalUser, RemoteUser } from './+page.server';
     import CreateProfileView from './CreateProfileView.svelte';
     import ProfileView from './ProfileView.svelte';
+    import { toStore } from 'svelte/store';
 
     const { data }: { data: PageData } = $props();
-    const queryKey = ['profiles', { profileName: page.params['profileName'] }];
     const { api, cloudinary } = useRuntime();
-    const query = createQuery({
-        queryKey,
-        queryFn: async () => {
-            const user = await data.user;
-            if (!user) {
-                return null;
-            }
+    const queryKey = $derived(['profiles', { profileName: page.params['profileName'] }]);
+    const query = createQuery(
+        toStore(() => ({
+            queryKey,
+            queryFn: async () => {
+                const user = await data.user;
+                if (!user) {
+                    return null;
+                }
 
-            const a = await pipe(
-                TE.fromPromise(() =>
-                    api.get(`users/${user.id}`, {
-                        query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
-                    })
-                )(),
-                TE.flatMap((a) =>
-                    a.ok ? TE.fromPromise(() => a.json<RemoteUser>())() : TE.leftVoid
-                ),
-                TE.map(
-                    (a) =>
-                        pipe(
-                            a,
-                            D.update('profile', (a) =>
-                                a
-                                    ? pipe(
-                                          a,
-                                          D.deleteKey('image'),
-                                          D.set('imageUrl', urlFromAsset(cloudinary)(a.image))
-                                      )
-                                    : undefined
-                            )
-                        ) as LocalUser
-                ),
-                TE.match(
-                    () => null,
-                    (r) => r
-                )
-            )();
-            return a;
-        }
-    });
+                const a = await pipe(
+                    TE.fromPromise(() =>
+                        api.get(`users/${user.id}`, {
+                            query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
+                        })
+                    )(),
+                    TE.flatMap((a) =>
+                        a.ok ? TE.fromPromise(() => a.json<RemoteUser>())() : TE.leftVoid
+                    ),
+                    TE.map(
+                        (a) =>
+                            pipe(
+                                a,
+                                D.update('profile', (a) =>
+                                    a
+                                        ? pipe(
+                                              a,
+                                              D.deleteKey('image'),
+                                              D.set('imageUrl', urlFromAsset(cloudinary)(a.image))
+                                          )
+                                        : undefined
+                                )
+                            ) as LocalUser
+                    ),
+                    TE.match(
+                        () => null,
+                        (r) => r
+                    )
+                )();
+                return a;
+            }
+        }))
+    );
 </script>
 
 {#if $query.data == null}

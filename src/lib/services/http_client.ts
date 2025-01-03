@@ -1,4 +1,5 @@
-import { Context } from 'effect';
+import { Context, Layer } from 'effect';
+import { UniversalHttpClient } from './universal_http_client';
 
 type RequestRecord = Record<string, unknown>;
 type RequestArray = unknown[];
@@ -24,4 +25,14 @@ export class HttpClient extends Context.Tag('@plan/HttpClient')<
         delete(path: string, init?: HttpClientFetchRequestInit): Promise<Response>;
         put(path: string, init?: HttpClientFetchRequestInit): Promise<Response>;
     }
->() {}
+>() {
+    public static readonly Live = (fetch: typeof globalThis.fetch) =>
+        Layer.sync(
+            HttpClient,
+            () =>
+                new UniversalHttpClient({
+                    baseUrl: '/api',
+                    fetch
+                })
+        );
+}

@@ -1,18 +1,15 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
-import { Effect, Exit, Layer, ManagedRuntime } from 'effect';
+import { Effect, Exit, Layer } from 'effect';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
+import { Cloudinary } from './lib/services/cloudinary.server';
 import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
-import { Cloudinary } from './lib/services/cloudinary.server';
-import { v2 } from 'cloudinary';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
 if (!env.API_VERSION) throw new ReferenceError('API_VERSION must be provided');
-
-export const CloudinaryLive = Layer.sync(Cloudinary, () => v2);
 
 export const handle: Handle = async ({
     event,
@@ -58,14 +55,7 @@ export const handle: Handle = async ({
 
         locals.user = { id: exit.value.userId };
         locals.appLive = Layer.mergeAll(
-            Layer.sync(
-                HttpClient,
-                () =>
-                    new UniversalHttpClient({
-                        baseUrl: '/api',
-                        fetch
-                    })
-            ),
+            HttpClient.Live(fetch),
             Layer.sync(
                 ApiClient,
                 () =>
@@ -78,26 +68,21 @@ export const handle: Handle = async ({
                         cookies
                     })
             ),
-            CloudinaryLive
+            Cloudinary.Live
         );
-        locals.runtime = ManagedRuntime.make(locals.appLive);
+        locals.runtime = {
+            runPromise: makeRunPromise(locals.appLive),
+            runPromiseExit: makeRunPromiseExit(locals.appLive)
+        };
     }
 
     const response = await resolve(event);
-    await locals.runtime.dispose();
     return response;
 };
 
-function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
+const initLocals = (locals: App.Locals, fetch: typeof globalThis.fetch) => {
     locals.appLive = Layer.mergeAll(
-        Layer.sync(
-            HttpClient,
-            () =>
-                new UniversalHttpClient({
-                    baseUrl: '/api',
-                    fetch
-                })
-        ),
+        HttpClient.Live(fetch),
         Layer.sync(
             ApiClient,
             () =>
@@ -109,7 +94,30 @@ function initLocals(locals: App.Locals, fetch: typeof globalThis.fetch) {
                     })
                 })
         ),
-        CloudinaryLive
+        Cloudinary.Live
     );
-    locals.runtime = ManagedRuntime.make(locals.appLive);
-}
+    locals.runtime = {
+        runPromise: makeRunPromise(locals.appLive),
+        runPromiseExit: makeRunPromiseExit(locals.appLive)
+    };
+};
+
+const makeRunPromise =
+    <R>(appLive: Layer.Layer<R>) =>
+    <A, E, R>(
+        effect: Effect.Effect<A, E, R>,
+        options?: { readonly signal?: AbortSignal } | undefined
+    ): Promise<A> =>
+        effect.pipe(Effect.provide(appLive), (e) =>
+            Effect.runPromise(e as Effect.Effect<A, E, never>, options)
+        );
+
+const makeRunPromiseExit =
+    <R>(appLive: Layer.Layer<R>) =>
+    <A, E, R>(
+        effect: Effect.Effect<A, E, R>,
+        options?: { readonly signal?: AbortSignal } | undefined
+    ): Promise<Exit.Exit<A, E>> =>
+        effect.pipe(Effect.provide(appLive), (e) =>
+            Effect.runPromiseExit(e as Effect.Effect<A, E, never>, options)
+        );
