@@ -1,15 +1,18 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { Asset } from '~/lib/models/asset';
-import type { Issue } from '~/lib/models/issue';
+import type { Issue, IssueAudit } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import type { WorkspaceStatus } from '~/lib/models/status';
 import type { Team } from '~/lib/models/team';
+import type { User, UserProfile } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { Actions, PageServerLoad } from './$types';
 import {
+    createFetchIssueAuditListQuery,
     createFetchIssueQuery,
     decode,
     decodeDeleteComment,
@@ -22,8 +25,6 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
-import type { User, UserProfile } from '~/lib/models/user';
-import type { WorkspaceStatus } from '~/lib/models/status';
 
 export type LocalIssue = Pick<
     Issue,
@@ -60,6 +61,12 @@ export interface LocalComment {
         };
     };
 }
+
+export type LocalIssueAudit = Pick<IssueAudit, 'createdTime' | 'id' | 'action' | 'data'> & {
+    user: Pick<User, 'email'> & {
+        profile?: Pick<NonNullable<User['profile']>, 'name' | 'displayName' | 'image'>;
+    };
+};
 
 export const load: PageServerLoad = async ({
     parent,
@@ -121,6 +128,11 @@ export const load: PageServerLoad = async ({
         )
         .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<LocalComment>()));
 
+    const issueAuditList = fetchIssueAuditList(exit.value.id).pipe(
+        Effect.orElseSucceed(() => paginatedList<LocalIssueAudit>()),
+        runtime.runPromise
+    );
+
     return {
         page: {
             user,
@@ -130,6 +142,7 @@ export const load: PageServerLoad = async ({
                 query: commentQuery,
                 list: isDataRequest ? commentList : await commentList
             },
+            issueAuditList,
             isEditing: query['edit-desc']
         }
     };
@@ -377,3 +390,14 @@ export const actions: Actions = {
         return null;
     }
 };
+
+const fetchIssueAuditList = (issueId: string) =>
+    Effect.gen(function* () {
+        const response = yield* LoadResponse.HTTP(
+            (yield* ApiClient).get('issue-audits', {
+                query: createFetchIssueAuditListQuery(() => ({ issueId }))
+            })
+        );
+
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssueAudit>>());
+    });

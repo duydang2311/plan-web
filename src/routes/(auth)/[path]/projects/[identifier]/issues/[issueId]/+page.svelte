@@ -11,7 +11,7 @@
     import Status from './Status.svelte';
     import SelectTeam from './SelectTeam.svelte';
     import SelectAssignees from './SelectAssignees.svelte';
-    import Author from './Author.svelte';
+    import Audits from './Audits.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const commentQuery = paginatedQuery(queryParams(page.url, { offset: 0, size: 10 }));
@@ -37,14 +37,18 @@
             </div>
             <hr class="my-8 -mx-4" />
             <div class="max-w-paragraph-lg w-full mx-auto">
-                <h2 class="mb-4">Activity</h2>
-                <Author issueId={data.page.issue.id} />
-                <Comments
-                    authorId={data.page.user.id}
-                    issueId={data.page.issue.id}
-                    size={commentQuery.size}
-                    {scrollRef}
-                />
+                <h2>Activity</h2>
+                <div class="mt-4">
+                    <Audits issueId={data.page.issue.id} />
+                </div>
+                <div class="mt-2">
+                    <Comments
+                        authorId={data.page.user.id}
+                        issueId={data.page.issue.id}
+                        size={commentQuery.size}
+                        {scrollRef}
+                    />
+                </div>
                 <div class="mt-8">
                     <AddComment
                         userId={data.page.user.id}

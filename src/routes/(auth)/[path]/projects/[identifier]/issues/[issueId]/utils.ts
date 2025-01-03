@@ -139,3 +139,11 @@ export const createIssueQuery = (depsFn: () => { issueId: string }) => {
         })
     );
 };
+
+export const createFetchIssueAuditListQuery = (depsFn: () => { issueId: string }) => {
+    const { issueId } = depsFn();
+    return {
+        issueId,
+        select: 'Id,CreatedTime,Action,Data,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+    };
+};

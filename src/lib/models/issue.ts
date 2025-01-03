@@ -18,6 +18,24 @@ export interface Issue {
 
 export type IssuePriority = (typeof IssuePriorities)[keyof typeof IssuePriorities];
 
+export type IssueAuditAction = (typeof IssueAuditActions)[keyof typeof IssueAuditActions];
+
+export interface IssueAudit {
+    createdTime: string;
+    id: number;
+    issueId: string;
+    issue: Issue;
+    userId: string;
+    user: User;
+    action: IssueAuditAction;
+    data?: unknown;
+}
+
+export const IssueAuditActions = {
+    none: 0,
+    create: 1
+} as const;
+
 export const IssuePriorities = {
     none: 0,
     low: 1,

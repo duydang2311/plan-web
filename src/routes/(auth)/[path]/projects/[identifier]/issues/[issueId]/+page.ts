@@ -1,5 +1,6 @@
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { PageLoad } from './$types';
+import { createFetchIssueAuditListQuery } from './utils';
 
 export const load: PageLoad = async ({ parent, data, url, untrack }) => {
     const { queryClient } = await untrack(() => parent());
@@ -79,6 +80,16 @@ export const load: PageLoad = async ({ parent, data, url, untrack }) => {
         queryClient.prefetchQuery({
             queryKey: ['issues', { issueId: data.page.issue.id, tag: 'select-assignees' }],
             queryFn: () => data.page.issue.assignees
+        })
+    );
+
+    prefetchPromises.push(
+        queryClient.prefetchQuery({
+            queryKey: [
+                'issue-audits',
+                createFetchIssueAuditListQuery(() => ({ issueId: data.page.issue.id }))
+            ],
+            queryFn: () => data.page.issueAuditList
         })
     );
 
