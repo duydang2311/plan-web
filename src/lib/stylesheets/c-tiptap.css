@@ -1,7 +1,7 @@
 @layer base {
     .c-tiptap {
         --_border: var(--theme-base-border-2);
-        --_border-hover: color-mix(in srgb, var(--theme-base-border-1) 90%, var(--theme-base-fg-1));
+        --_border-hover: var(--theme-base-border-1);
         --_border-focus: var(--_border-hover);
     }
 
@@ -68,6 +68,7 @@
         padding: theme('padding[4]');
         border-bottom-left-radius: theme('borderRadius[md]');
         border-bottom-right-radius: theme('borderRadius[md]');
+        background-color: var(--theme-base-1);
         &:focus {
             outline: none;
         }
