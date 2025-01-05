@@ -34,12 +34,12 @@
         --typo-scale: 1.15;
         --font-size-sm: 0.9028rem;
         --font-size-p: 1rem;
-        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
-        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
-        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
-        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
-        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
-        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
+        --font-size-h6: 1.125rem;
+        --font-size-h5: 1.266rem;
+        --font-size-h4: 1.424rem;
+        --font-size-h3: 1.602rem;
+        --font-size-h2: 1.802rem;
+        --font-size-h1: 2.488rem;
         --font-size-title: var(--font-size-h5);
 
         color-scheme: light dark;

@@ -56,7 +56,8 @@
         'upload-outline': () => import('~icons/heroicons/cloud-arrow-up'),
         minus: () => import('~icons/heroicons/minus-16-solid'),
         edit: () => import('~icons/heroicons/pencil-16-solid'),
-        link: () => import('~icons/heroicons/link-16-solid')
+        link: () => import('~icons/heroicons/link-16-solid'),
+        'arrow-right': () => import('~icons/heroicons/arrow-right-16-solid')
     };
 
     export type IconName = keyof typeof imports;
