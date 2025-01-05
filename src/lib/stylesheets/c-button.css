@@ -11,7 +11,7 @@
     --_border-disabled: var(--theme-base-border-2);
 
     width: 100%;
-    text-align: left;
+    text-align: center;
     padding: theme('size[2]') theme('size[5]');
     font-weight: 600;
     color: var(--_fg);
@@ -24,6 +24,10 @@
 
     &:where(:not(.c-button--flat)) {
         border-radius: theme('borderRadius[md]');
+    }
+
+    &:where(.c-button--flat) {
+        text-align: left;
     }
 
     &:where(:not(:disabled)) {
