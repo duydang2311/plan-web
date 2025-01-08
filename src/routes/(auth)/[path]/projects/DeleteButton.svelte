@@ -13,6 +13,7 @@
     } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Project } from '~/lib/models/project';
+    import { validateActionFailureData } from './utils';
 
     const { queryKey, project }: { queryKey: unknown[]; project: Pick<Project, 'id' | 'name'> } =
         $props();
@@ -24,8 +25,17 @@
     Project <strong>{project.name}</strong> has been deleted from your workspace.
 {/snippet}
 
-{#snippet failure()}
-    An error has occured while deleting the project <strong>{project.name}</strong>.
+{#snippet genericFailure(code: string)}
+    <p>
+        An error has occured while deleting the project <strong>{project.name}</strong>.
+    </p>
+    <p class="text-base-fg-ghost text-sm">
+        Reason: {code}.
+    </p>
+{/snippet}
+
+{#snippet forbiddenFailure()}
+    You need sufficient privileges to perform this action.
 {/snippet}
 
 <PopoverBuilder
@@ -77,14 +87,40 @@
                                         description: success
                                     }
                                 });
-                            } else {
+                            } else if (result.type === 'failure') {
                                 queryClient.setQueryData(queryKey, old);
-                                addToast({
-                                    data: {
-                                        title: 'Project not deleted',
-                                        description: failure
-                                    }
-                                });
+
+                                const validation = validateActionFailureData(
+                                    result.data?.deleteProject
+                                );
+                                if (!validation.ok) {
+                                    addToast({
+                                        data: {
+                                            title: 'Unable to delete project',
+                                            description: genericFailure,
+                                            descriptionProps: 'unknown'
+                                        }
+                                    });
+                                    return;
+                                }
+
+                                if (validation.data.errors.root.includes('403')) {
+                                    addToast({
+                                        data: {
+                                            title: 'Unable to delete project',
+                                            description: forbiddenFailure
+                                        }
+                                    });
+                                } else {
+                                    addToast({
+                                        data: {
+                                            title: 'Unable to delete project',
+                                            description: genericFailure,
+                                            descriptionProps:
+                                                validation.data.errors.root[0] ?? 'unknown'
+                                        }
+                                    });
+                                }
                             }
                             await queryClient.invalidateQueries({ queryKey });
                         };
