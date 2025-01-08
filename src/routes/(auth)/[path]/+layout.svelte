@@ -37,7 +37,9 @@
 </svelte:head>
 
 <div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 dark:bg-base-1 lg:p-2 lg:pl-0">
-    <aside class="items-stretch px-4 py-2 space-y-4 w-60 overflow-auto lg:flex lg:flex-col hidden">
+    <aside
+        class="items-stretch px-4 py-2 space-y-4 min-w-60 max-w-60 overflow-auto lg:flex lg:flex-col hidden"
+    >
         <div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
             <Logo class="h-8 w-auto" />
             <p class="block">plan</p>

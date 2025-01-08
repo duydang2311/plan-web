@@ -1,0 +1,5 @@
+.c-main {
+    overflow: auto;
+    height: 100%;
+    padding: theme('padding[8]') theme('padding[4]');
+}
