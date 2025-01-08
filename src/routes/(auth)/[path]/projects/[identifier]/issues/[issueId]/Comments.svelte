@@ -76,6 +76,9 @@
                 })
             )
         );
+    const comments = $derived(
+        $query.data?.pages.filter((a) => a != null).flatMap((a) => a.items) ?? []
+    );
     let ref = $state<HTMLDivElement>();
     let fetching = false;
     const fetchNext = () => {
@@ -90,26 +93,42 @@
 
 <div bind:this={ref}>
     <div class="transition-enforcement">
-        {#if scrollRef && $query.data}
+        {#if $query.data}
             <div
-                transition:fade={{ duration: 200, easing: cubicInOut }}
                 class:animate-twPulse={$query.isFetching}
+                transition:fade={{ duration: 200, easing: cubicInOut }}
             >
-                <Virtualizer
-                    startMargin={ref?.offsetTop ?? 0}
-                    data={$query.data.pages.filter((a) => a != null).flatMap((a) => a.items) ?? []}
-                    getKey={(item) => item.id}
-                    {scrollRef}
-                    onscroll={(e) => {
-                        if (!ref || fetching || !$query.hasNextPage) {
-                            return;
-                        }
-                        if (e + scrollRef.offsetHeight + 500 > ref.offsetTop + ref.offsetHeight) {
-                            fetchNext();
-                        }
-                    }}
-                >
-                    {#snippet children(comment)}
+                {#if scrollRef}
+                    <Virtualizer
+                        startMargin={ref?.offsetTop ?? 0}
+                        data={comments}
+                        getKey={(item) => item.id}
+                        {scrollRef}
+                        onscroll={(e) => {
+                            if (!ref || fetching || !$query.hasNextPage) {
+                                return;
+                            }
+                            if (
+                                e + scrollRef.offsetHeight + 500 >
+                                ref.offsetTop + ref.offsetHeight
+                            ) {
+                                fetchNext();
+                            }
+                        }}
+                    >
+                        {#snippet children(comment)}
+                            <div class="mt-4">
+                                <Comment
+                                    {comment}
+                                    {issueId}
+                                    isAuthor={comment.author.id === authorId}
+                                    {size}
+                                />
+                            </div>
+                        {/snippet}
+                    </Virtualizer>
+                {:else}
+                    {#each comments as comment (comment.id)}
                         <div class="mt-4">
                             <Comment
                                 {comment}
@@ -118,8 +137,8 @@
                                 {size}
                             />
                         </div>
-                    {/snippet}
-                </Virtualizer>
+                    {/each}
+                {/if}
             </div>
         {:else}
             <div transition:fade={{ duration: 200, easing: cubicInOut }} class="mt-4 space-y-8">

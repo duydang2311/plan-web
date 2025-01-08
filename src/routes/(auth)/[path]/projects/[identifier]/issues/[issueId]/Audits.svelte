@@ -7,6 +7,7 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { LocalIssueAudit } from './+page.server';
     import { IssueAuditActions } from '~/lib/models/issue';
+    import AuditCreate from './AuditCreate.svelte';
 
     const { issueId }: { issueId: string } = $props();
     const { api } = useRuntime();
@@ -27,7 +28,7 @@
         })
     );
     const auditComponents = {
-        [IssueAuditActions.create]: () => import('./AuditCreate.svelte')
+        [IssueAuditActions.create]: AuditCreate
     } as const;
 </script>
 
@@ -37,11 +38,10 @@
     <ol class="space-y-4 px-4" class:animate-twPulse={$query.isFetching}>
         {#each $query.data.items as audit (audit.id)}
             {#if audit.action in auditComponents}
-                {#await auditComponents[audit.action as keyof typeof auditComponents]().then((a) => a.default) then Component}
-                    <li>
-                        <Component {audit} />
-                    </li>
-                {/await}
+                {@const Component = auditComponents[audit.action as keyof typeof auditComponents]}
+                <li>
+                    <Component {audit} />
+                </li>
             {:else}
                 Audit {audit.action}
             {/if}
