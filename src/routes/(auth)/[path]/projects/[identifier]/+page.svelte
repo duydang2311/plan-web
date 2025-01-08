@@ -1,9 +1,8 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { createQuery } from '@tanstack/svelte-query';
-    import { DateTime } from 'luxon';
     import { toStore } from 'svelte/store';
-    import { Main } from '~/lib/components';
+    import { Main, RelativeTime } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { QueryResponse } from '~/lib/utils/query';
     import type { PageData } from './$types';
@@ -46,9 +45,7 @@
                 {$query.data.name}
             </h1>
             <p class="c-label">
-                {page.params.identifier} · created {DateTime.fromISO(
-                    $query.data.createdTime
-                ).toRelative()}
+                {page.params.identifier} · created <RelativeTime time={$query.data.createdTime} />
             </p>
             {#if $query.data.description != null}
                 <p class="mt-8">

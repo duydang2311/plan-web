@@ -67,7 +67,8 @@ export const load: PageServerLoad = async ({ parent, locals: { runtime }, isData
     return {
         project: {
             ...data.project,
-            description: exit.value.description
+            description: exit.value.description,
+            createdTime: exit.value.createdTime
         },
         issueList,
         teamMetadata,
