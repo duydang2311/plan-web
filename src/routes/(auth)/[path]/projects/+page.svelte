@@ -94,10 +94,7 @@
                             title={identifier}>{identifier}</td
                         >
                         <td class="whitespace-nowrap overflow-hidden text-ellipsis">
-                            <Link
-                                href="/{page.params['path']}/projects/{identifier}/issues"
-                                title={name}
-                            >
+                            <Link href="/{page.params['path']}/projects/{identifier}" title={name}>
                                 {name}
                             </Link>
                         </td>

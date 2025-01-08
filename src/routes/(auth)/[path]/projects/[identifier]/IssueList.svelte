@@ -89,9 +89,13 @@
                         </li>
                     {/each}
                 </ol>
-                <span class="block text-sm font-medium text-base-fg-5 mt-2 text-right">
-                    Showing {$query.data?.items.length ?? 0} of {$query.data?.totalCount ?? 0} issues
-                </span>
+                {#if $query.data.items.length > 0 && $query.data.totalCount > 0}
+                    <span class="block text-sm font-medium text-base-fg-5 mt-2">
+                        Showing {$query.data.items.length} of {$query.data.totalCount} issues.
+                    </span>
+                {:else}
+                    <span class="text-base-fg-ghost text-sm font-medium">No issues available.</span>
+                {/if}
             </div>
         {/if}
     </div>
