@@ -106,7 +106,9 @@
                     aria-hidden={isActive}
                 />
             </div>
-            <span class="font-display">{label}</span>
+            <span class="font-display whitespace-nowrap">
+                {label}
+            </span>
         </a>
         {@render children?.()}
     </div>

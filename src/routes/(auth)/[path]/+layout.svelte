@@ -6,6 +6,7 @@
     import Logo from '~/lib/components/Logo.svelte';
     import type { LayoutData } from './$types';
     import Navigation from './Navigation.svelte';
+    import DynamicNavigation from './DynamicNavigation.svelte';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const route = $derived.by(() => {
@@ -36,13 +37,13 @@
 </svelte:head>
 
 <div class="flex w-full h-full min-w-screen min-h-screen bg-base-2 dark:bg-base-1 lg:p-2 lg:pl-0">
-    <aside class="items-stretch px-4 py-2 space-y-4 min-w-60 lg:flex lg:flex-col hidden">
+    <aside class="items-stretch px-4 py-2 space-y-4 w-60 overflow-auto lg:flex lg:flex-col hidden">
         <div class="select-none flex items-center gap-2 font-bold text-base-fg-1">
             <Logo class="h-8 w-auto" />
             <p class="block">plan</p>
         </div>
         <hr class="-mx-4 text-base-border-2" />
-        <div class="flex flex-col justify-between grow">
+        <div class="flex flex-col grow gap-4">
             <ul class="font-medium group text-sm">
                 <Navigation
                     items={[
@@ -67,7 +68,8 @@
                     ]}
                 />
             </ul>
-            <ul class="font-medium group text-sm">
+            <DynamicNavigation />
+            <ul class="mt-auto font-medium group text-sm">
                 <Navigation
                     items={[
                         {

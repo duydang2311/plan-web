@@ -7,10 +7,20 @@ import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
 import type { HttpClient } from './lib/services/http_client';
 import type { Effect, Exit } from 'effect';
+import type { IconName } from './lib/components/Icon.svelte';
 
 // for information about these interfaces
 declare global {
     type MaybePromise<T> = T | PromiseLike<T>;
+
+    interface RouteMeta {
+        title: string;
+        href: string;
+        navigation?: {
+            label: string;
+            entries: { label: string; href: string; icon: IconName; activeIcon: IconName }[];
+        };
+    }
 
     namespace App {
         interface Error {
@@ -37,7 +47,10 @@ declare global {
         interface PageData {
             routes?: (
                 | { breadcrumb?: never }
-                | { breadcrumb: true; meta: { title: string; href: string } }
+                | {
+                      breadcrumb: true;
+                      meta: RouteMeta;
+                  }
             )[];
         }
         interface PageState {
