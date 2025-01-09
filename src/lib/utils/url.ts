@@ -31,6 +31,36 @@ export function queryParams<T extends Record<string, unknown>>(
     return obj;
 }
 
+export function queryParamsStrict<T extends Record<string, unknown>>(
+    input: URL | URLSearchParams,
+    defaultValues: T
+): T {
+    if (input instanceof URL) {
+        input = input.searchParams;
+    }
+    const obj: T = { ...defaultValues };
+    for (const k in obj) {
+        let value: string | number | boolean | null = input.get(k);
+        if (typeof defaultValues[k] === 'boolean') {
+            if (value != null) {
+                obj[k] = (value === 'false' ? false : true) as T[Extract<keyof T, string>];
+            }
+            continue;
+        }
+
+        if (value) {
+            if (typeof defaultValues[k] === 'number') {
+                value = Number(value);
+                if (isNaN(value)) {
+                    value = defaultValues[k];
+                }
+            }
+            obj[k] = value as T[Extract<keyof T, string>];
+        }
+    }
+    return obj;
+}
+
 export function paginatedQuery<T extends { page?: number; offset?: number; size?: number }>(
     queryParams: T
 ) {

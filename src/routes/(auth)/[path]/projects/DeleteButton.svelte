@@ -15,8 +15,10 @@
     import { type Project } from '~/lib/models/project';
     import { validateActionFailureData } from './utils';
 
-    const { queryKey, project }: { queryKey: unknown[]; project: Pick<Project, 'id' | 'name'> } =
-        $props();
+    const {
+        queryKey,
+        project
+    }: { queryKey: readonly unknown[]; project: Pick<Project, 'id' | 'name'> } = $props();
     const queryClient = useQueryClient();
     const open = writable(false);
 </script>

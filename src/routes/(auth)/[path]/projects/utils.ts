@@ -1,5 +1,6 @@
-import { validator } from '~/lib/utils/validation';
 import { Type } from '~/lib/utils/typebox';
+import { paginatedQuery, queryParamsStrict } from '~/lib/utils/url';
+import { validator } from '~/lib/utils/validation';
 
 export const validateActionFailureData = validator(
     Type.Object({
@@ -8,3 +9,14 @@ export const validateActionFailureData = validator(
         })
     })
 );
+
+export const createProjectListQueryParams = (
+    deps: () => { url: URL; workspaceId: string } & Record<string, unknown>
+) => {
+    const { url, workspaceId, ...rest } = deps();
+    return {
+        ...paginatedQuery(queryParamsStrict(url, { page: 1, size: 20, order: null })),
+        workspaceId,
+        ...rest
+    };
+};

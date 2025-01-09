@@ -34,6 +34,7 @@ export { default as TextArea } from './TextArea.svelte';
 export { default as Th } from './Th.svelte';
 export { default as THead } from './THead.svelte';
 export { default as ThSort } from './ThSort.svelte';
+export { default as ThSort2 } from './ThSort2.svelte';
 export { default as Tiptap } from './Tiptap.svelte';
 export { default as TiptapButton } from './TiptapButton.svelte';
 export { addToast, default as Toaster } from './Toaster.svelte';

@@ -1,45 +1,58 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { page } from '$app/state';
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
-    import { Button, Icon, Input, Link, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { toStore } from 'svelte/store';
+    import {
+        Button,
+        Icon,
+        Input,
+        Link,
+        Pagination,
+        Row,
+        Table,
+        Th,
+        THead,
+        ThSort2
+    } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
     import { QueryResponse } from '~/lib/utils/query';
-    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { createSort, sortHelper } from '~/lib/utils/table.svelte';
     import { paginatedQuery } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
+    import { createProjectListQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const queryClient = useQueryClient();
     const { api } = useRuntime();
-    const queryKey = ['projects'];
-    const query = createQuery({
-        queryKey,
-        queryFn: async () => {
-            const response = await QueryResponse.HTTP(() =>
-                api.get(`projects`, {
-                    query: {
-                        ...data.query,
-                        workspaceId: data.workspace.id,
-                        select: 'Id,Name,Identifier,CreatedTime,UpdatedTime'
-                    }
-                })
-            );
-            return await QueryResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
-        }
+    const sort = createSort({
+        fields: page.url.searchParams.get('order') ?? undefined,
+        onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
     });
-
-    createEffect(
-        () => {
-            if (data.projects !== $query.data) {
-                unwrapMaybePromise(data.projects)((a) => queryClient.setQueryData(queryKey, a));
-            }
-        },
-        () => data.projects
+    const queryKey = $derived.by(() => {
+        const params = createProjectListQueryParams(() => ({
+            url: page.url,
+            workspaceId: data.workspace.id,
+            order: sort.string
+        }));
+        return ['projects', params] as const;
+    });
+    const query = createQuery(
+        toStore(() => ({
+            queryKey,
+            queryFn: async () => {
+                const response = await QueryResponse.HTTP(() =>
+                    api.get(`projects`, {
+                        query: queryKey[1]
+                    })
+                );
+                return await QueryResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
+            },
+            placeholderData: keepPreviousData
+        }))
     );
 </script>
 
@@ -72,10 +85,10 @@
     <Table style="grid-template-columns: auto 1fr auto auto max-content;">
         <THead>
             <Row class="py-2">
-                <Th name="identifier" sortable>Identifier</Th>
-                <Th name="name" sortable>Name</Th>
-                <Th name="createdTime" sortable>Created</Th>
-                <Th name="updatedTime" sortable>Updated</Th>
+                <ThSort2 field={sort.field('identifier')}>Identifier</ThSort2>
+                <ThSort2 field={sort.field('name')}>Name</ThSort2>
+                <ThSort2 field={sort.field('createdTime')}>Created</ThSort2>
+                <ThSort2 field={sort.field('updatedTime')}>Updated</ThSort2>
                 <Th></Th>
             </Row>
         </THead>
