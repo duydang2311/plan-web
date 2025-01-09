@@ -7,16 +7,16 @@
         type CreateInfiniteQueryResult,
         type InfiniteData
     } from '@tanstack/svelte-query';
+    import { cubicInOut } from 'svelte/easing';
     import { derived as derivedStore, toStore } from 'svelte/store';
+    import { fade } from 'svelte/transition';
     import { Virtualizer } from 'virtua/svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
     import type { LocalComment } from './+page.server';
     import Comment from './Comment.svelte';
-    import { fade } from 'svelte/transition';
     import SkeletonComment from './SkeletonComment.svelte';
-    import { cubicInOut } from 'svelte/easing';
 
     interface Props {
         authorId: string;
@@ -91,12 +91,20 @@
     };
 </script>
 
-<div bind:this={ref}>
-    <div class="transition-enforcement">
-        {#if $query.data}
+{#if $query.isLoading}
+    <div transition:fade={{ duration: 200, easing: cubicInOut }} class="mt-4 space-y-8">
+        <SkeletonComment />
+        <SkeletonComment />
+    </div>
+{:else if comments.length > 0}
+    <div bind:this={ref} class="mt-4">
+        <div class="transition-enforcement">
             <div
                 class:animate-twPulse={$query.isFetching}
                 transition:fade={{ duration: 200, easing: cubicInOut }}
+                class={scrollRef
+                    ? '[&>*>*>.comment-wrapper]:mt-4 [&>*>*:first-child>.comment-wrapper]:mt-0'
+                    : undefined}
             >
                 {#if scrollRef}
                     <Virtualizer
@@ -117,7 +125,7 @@
                         }}
                     >
                         {#snippet children(comment)}
-                            <div class="mt-4">
+                            <div class="comment-wrapper">
                                 <Comment
                                     {comment}
                                     {issueId}
@@ -128,8 +136,8 @@
                         {/snippet}
                     </Virtualizer>
                 {:else}
-                    {#each comments as comment (comment.id)}
-                        <div class="mt-4">
+                    {#each comments.slice(0, 10) as comment (comment.id)}
+                        <div class="mt-4 first:mt-0">
                             <Comment
                                 {comment}
                                 {issueId}
@@ -140,11 +148,6 @@
                     {/each}
                 {/if}
             </div>
-        {:else}
-            <div transition:fade={{ duration: 200, easing: cubicInOut }} class="mt-4 space-y-8">
-                <SkeletonComment />
-                <SkeletonComment />
-            </div>
-        {/if}
+        </div>
     </div>
-</div>
+{/if}

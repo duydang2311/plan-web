@@ -41,14 +41,12 @@
                 <div class="mt-4">
                     <Audits issueId={data.page.issue.id} />
                 </div>
-                <div class="mt-2">
-                    <Comments
-                        authorId={data.page.user.id}
-                        issueId={data.page.issue.id}
-                        size={commentQuery.size}
-                        {scrollRef}
-                    />
-                </div>
+                <Comments
+                    authorId={data.page.user.id}
+                    issueId={data.page.issue.id}
+                    size={commentQuery.size}
+                    {scrollRef}
+                />
                 <div class="mt-8">
                     <AddComment
                         userId={data.page.user.id}

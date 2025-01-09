@@ -59,7 +59,7 @@
             </div>
         {/if}
     </div>
-    <div class="mt-4">
+    <div class="mt-2">
         {#if editing}
             <form
                 method="post"

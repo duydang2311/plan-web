@@ -7,7 +7,7 @@ import type { WorkspaceStatus } from '~/lib/models/status';
 import type { Team } from '~/lib/models/team';
 import type { User, UserProfile } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { LoadResponse } from '~/lib/utils/kit';
+import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import type { Actions, PageServerLoad } from './$types';
@@ -308,44 +308,24 @@ export const actions: Actions = {
         return void 0 as void;
     },
     'delete-issue': async ({ request, params, locals: { runtime } }) => {
-        const exit = await runtime.runPromiseExit(
-            pipe(
-                Effect.gen(function* () {
-                    const formData = yield* Effect.tryPromise(() => request.formData());
-                    const validation = validateDeleteIssue(decodeDeleteIssue(formData));
-
-                    if (!validation.ok) {
-                        return yield* Effect.fail({ status: 400, errors: validation.errors });
-                    }
-
-                    const api = yield* ApiClient;
-                    const response = yield* api.delete(`issues/${validation.data.issueId}`);
-
-                    if (!response.ok) {
-                        return yield* Effect.fail({
-                            status: response.status,
-                            errors: { root: [response.status + ''] }
-                        });
-                    }
-
-                    return yield* Effect.succeed<void>(void 0);
-                }),
-                Effect.catchTags({
-                    ApiError: (e) => Effect.fail({ status: 500, errors: { root: [e.code] } }),
-                    UnknownException: () =>
-                        Effect.fail({ status: 500, errors: { root: ['unknown'] } })
-                })
-            )
-        );
+        const exit = await Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteIssue(decodeDeleteIssue(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`issues/${validation.data.issueId}`)
+            );
+        }).pipe(runtime.runPromiseExit);
 
         if (Exit.isFailure(exit)) {
-            const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
-            return fail(failure.status, {
-                editDescription: { errors: failure.errors as Record<string, string[]> }
-            });
+            return exit.cause.pipe(
+                Cause.failureOption,
+                Option.getOrElse(() => ActionResponse.UnknownError().pipe(Effect.runSync))
+            );
         }
 
-        return redirect(302, `/${params.path}`);
+        return redirect(302, `/${params.path}/projects/${params.identifier}`);
     },
     'delete-comment': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/state';
     import { melt } from '@melt-ui/svelte';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
@@ -10,7 +9,7 @@
     import { dialog, tsap } from '~/lib/utils/transition';
 
     interface Props {
-        issue: Pick<Issue, 'title' | 'description'>;
+        issue: Pick<Issue, 'id' | 'title' | 'description'>;
     }
 
     const { issue }: Props = $props();
@@ -69,7 +68,7 @@
                         };
                     }}
                 >
-                    <input type="hidden" name="issueId" value={page.params['issueId']} />
+                    <input type="hidden" name="issueId" value={issue.id} />
                     <Button variant="negative" outline class="w-fit">Delete</Button>
                 </form>
             </div>
