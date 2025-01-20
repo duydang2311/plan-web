@@ -1,4 +1,6 @@
+import type { Role } from './role';
 import type { Status } from './status';
+import type { User } from './user';
 import type { Workspace } from './workspace';
 
 export interface Project {
@@ -18,4 +20,13 @@ export interface ProjectStatus {
     project?: string;
     statusId: number;
     status?: Status;
+}
+
+export interface ProjectMember {
+    createdTime: string;
+    userRoleId: number;
+    roleId: number;
+    role: Role;
+    userId: string;
+    user: User;
 }

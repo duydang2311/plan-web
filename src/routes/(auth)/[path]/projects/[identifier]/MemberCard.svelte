@@ -17,7 +17,7 @@
         <h2 class="text-p text-base-fg-2">Members</h2>
         <IconButton
             as="link"
-            href="/{page.params.path}/projects/{page.params.identifier}/issues"
+            href="/{page.params.path}/projects/{page.params.identifier}/members"
             variant="base"
         >
             <Icon name="arrow-right" class="size-4" />
