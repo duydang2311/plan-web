@@ -9,6 +9,13 @@ interface CreateSortOptions {
     onDirectionChange?: (sort: Sort) => void;
 }
 
+interface CreatePaginationOptions {
+    page?: number;
+    rowsPerPage: number;
+    size?: number;
+    totalCount?: number;
+}
+
 export interface Sort {
     get string(): string | null;
 
@@ -23,6 +30,17 @@ export interface SortField<Field extends BaseField = BaseField> {
     get direction(): SortDirection;
     set direction(value);
     toggle(): void;
+}
+
+export interface PaginationHandler {
+    get page(): number;
+    set page(value: number);
+    get rowsPerPage(): number;
+    set rowsPerPage(value: number);
+    get size(): number;
+    set size(value: number);
+    get totalCount(): number;
+    set totalCount(value: number);
 }
 
 export const createSort = ({ fields, onDirectionChange }: CreateSortOptions = {}): Sort => {
@@ -86,6 +104,40 @@ export const createSort = ({ fields, onDirectionChange }: CreateSortOptions = {}
     return sort;
 };
 
+export const createPagination = (options?: CreatePaginationOptions): PaginationHandler => {
+    let page = $state.raw(options?.page ?? 1);
+    let rowsPerPage = $state.raw(options?.rowsPerPage ?? 20);
+    let size = $state.raw(options?.size ?? 0);
+    let totalCount = $state.raw(options?.totalCount ?? 0);
+
+    return {
+        get page() {
+            return page;
+        },
+        set page(value) {
+            page = value;
+        },
+        get rowsPerPage() {
+            return rowsPerPage;
+        },
+        set rowsPerPage(value) {
+            rowsPerPage = value;
+        },
+        get size() {
+            return size;
+        },
+        set size(value) {
+            size = value;
+        },
+        get totalCount() {
+            return totalCount;
+        },
+        set totalCount(value) {
+            totalCount = value;
+        }
+    };
+};
+
 const createSortField =
     ({ onDirectionChange }: { onDirectionChange: (sortField: SortField) => void }) =>
     <Field extends BaseField>(
@@ -121,5 +173,16 @@ export const sortHelper = {
             searchParams.set('order', sort.string);
         }
         replaceState(`${url.pathname}${searchParams.toString()}`, {});
+    }
+};
+
+export const paginationHelper = {
+    page: (url: URL) => {
+        const page = url.searchParams.get('page');
+        return !page || isNaN(Number(page)) ? 1 : Number(page);
+    },
+    rowsPerPage: (url: URL) => {
+        const rowsPerPage = url.searchParams.get('size');
+        return !rowsPerPage || isNaN(Number(rowsPerPage)) ? 20 : Number(rowsPerPage);
     }
 };
