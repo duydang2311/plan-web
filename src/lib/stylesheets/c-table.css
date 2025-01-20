@@ -46,6 +46,7 @@
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
+    align-items: center;
     padding: theme('padding[4]');
     transition: background-color 50ms ease-in-out;
     text-align: left;
