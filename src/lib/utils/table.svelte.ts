@@ -1,4 +1,5 @@
 import { replaceState } from '$app/navigation';
+import type { PaginatedList } from '../models/paginatedList';
 import { fluentSearchParams } from './url';
 
 export type BaseField = string;
@@ -41,6 +42,8 @@ export interface PaginationHandler {
     set size(value: number);
     get totalCount(): number;
     set totalCount(value: number);
+
+    sync(list: () => PaginatedList<unknown> | null | undefined): PaginationHandler;
 }
 
 export const createSort = ({ fields, onDirectionChange }: CreateSortOptions = {}): Sort => {
@@ -110,7 +113,7 @@ export const createPagination = (options?: CreatePaginationOptions): PaginationH
     let size = $state.raw(options?.size ?? 0);
     let totalCount = $state.raw(options?.totalCount ?? 0);
 
-    return {
+    const handler: PaginationHandler = {
         get page() {
             return page;
         },
@@ -134,8 +137,18 @@ export const createPagination = (options?: CreatePaginationOptions): PaginationH
         },
         set totalCount(value) {
             totalCount = value;
+        },
+        sync: (list) => {
+            $effect(() => {
+                const l = list();
+                size = l?.items.length ?? 0;
+                totalCount = l?.totalCount ?? 0;
+            });
+            return handler;
         }
     };
+
+    return handler;
 };
 
 const createSortField =
@@ -177,6 +190,14 @@ export const sortHelper = {
 };
 
 export const paginationHelper = {
+    createPagination: (url: URL, options?: { size?: number; totalCount?: number }) => {
+        return createPagination({
+            page: paginationHelper.page(url),
+            rowsPerPage: paginationHelper.rowsPerPage(url),
+            size: options?.size,
+            totalCount: options?.totalCount
+        });
+    },
     page: (url: URL) => {
         const page = url.searchParams.get('page');
         return !page || isNaN(Number(page)) ? 1 : Number(page);

@@ -11,13 +11,7 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { QueryResponse } from '~/lib/utils/query';
-    import { watch } from '~/lib/utils/runes.svelte';
-    import {
-        createPagination,
-        createSort,
-        paginationHelper,
-        sortHelper
-    } from '~/lib/utils/table.svelte';
+    import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
     import { createProjectMemberListQueryParams, type LocalProjectMember } from './utils';
 
     const { projectId }: { projectId: string } = $props();
@@ -45,17 +39,12 @@
         onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
     });
 
-    const pagination = createPagination({
-        page: paginationHelper.page(page.url),
-        rowsPerPage: paginationHelper.rowsPerPage(page.url),
-        size: $query.data?.items.length,
-        totalCount: $query.data?.totalCount
-    });
-
-    watch(() => $query.data)(() => {
-        pagination.size = $query.data?.items.length ?? 0;
-        pagination.totalCount = $query.data?.totalCount ?? 0;
-    });
+    const pagination = paginationHelper
+        .createPagination(page.url, {
+            size: $query.data?.items.length,
+            totalCount: $query.data?.totalCount
+        })
+        .sync(() => $query.data);
 </script>
 
 <div class="h-full grid grid-rows-[1fr_auto]">

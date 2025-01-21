@@ -44,3 +44,16 @@ export const createQueryKey =
             }
         ] as const;
     };
+
+export const createIssueListQueryParams = (
+    deps: () => { projectId: string; url?: URL } & Record<string, unknown>
+) => {
+    const { projectId, url, ...rest } = deps();
+    return {
+        projectId,
+        page: rest.page ?? url?.searchParams.get('page') ?? 0,
+        size: rest.size ?? url?.searchParams.get('size') ?? 20,
+        order: rest.order ?? url?.searchParams.get('order') ?? 'OrderNumber',
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+    };
+};

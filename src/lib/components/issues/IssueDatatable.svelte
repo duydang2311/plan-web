@@ -1,22 +1,13 @@
 <script lang="ts">
     import type { CreateQueryResult } from '@tanstack/svelte-query';
-    import { TableHandler } from '@vincjo/datatables/server';
     import { DateTime } from 'luxon';
-    import {
-        DatatablePagination,
-        Icon,
-        Link,
-        Row,
-        RowCount,
-        Table,
-        THead,
-        ThSort
-    } from '~/lib/components';
+    import { Icon, Link, Row, Table, THead, ThSort2 } from '~/lib/components';
     import type { Issue } from '~/lib/models/issue';
     import { getPriorityIcon, getPriorityLabel, IssuePriorities } from '~/lib/models/issue';
     import type { PaginatedList } from '~/lib/models/paginatedList';
+    import { type PaginationHandler, type Sort } from '~/lib/utils/table.svelte';
+    import Pagination2 from '../Pagination2.svelte';
 
-    type T = $$Generic<TableIssue>;
     type TableIssue = Pick<
         Issue,
         'createdTime' | 'updatedTime' | 'id' | 'title' | 'orderNumber' | 'priority'
@@ -29,24 +20,25 @@
 
     interface Props {
         query: CreateQueryResult<PaginatedList<TableIssue>>;
-        table: TableHandler<T>;
+        sort: Sort;
+        pagination: PaginationHandler;
         buildIssueHref: (row: TableIssue) => string;
     }
 
-    const { query, table, buildIssueHref }: Props = $props();
+    const { query, sort, pagination, buildIssueHref }: Props = $props();
 </script>
 
 <div class="grid grid-rows-[1fr_auto]">
     <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
         <THead>
             <Row class="py-1">
-                <ThSort {table} field="title" html={{ class: 'col-span-2' }}>Title</ThSort>
-                <ThSort {table} field="status">Status</ThSort>
-                <ThSort {table} field="priority">Priority</ThSort>
-                <ThSort {table} field="createdTime">Created</ThSort>
-                <ThSort {table} field="updatedTime" html={{ class: 'max-md:hidden' }}>
+                <ThSort2 field={sort.field('title')} html={{ class: 'col-span-2' }}>Title</ThSort2>
+                <ThSort2 field={sort.field('status')}>Status</ThSort2>
+                <ThSort2 field={sort.field('priority')}>Priority</ThSort2>
+                <ThSort2 field={sort.field('createdTime')}>Created</ThSort2>
+                <ThSort2 field={sort.field('updatedTime')} html={{ class: 'max-md:hidden' }}>
                     Updated
-                </ThSort>
+                </ThSort2>
             </Row>
         </THead>
         <tbody class:animate-twPulse={$query.isFetching}>
@@ -104,10 +96,5 @@
             {/if}
         </tbody>
     </Table>
-    <div
-        class="rounded-b-xl bg-base-1/20 border-t border-t-base-border-3 backdrop-blur sticky inset-x-0 -bottom-px flex justify-between items-center px-8 py-4"
-    >
-        <RowCount {table} />
-        <DatatablePagination {table} />
-    </div>
+    <Pagination2 {pagination} />
 </div>

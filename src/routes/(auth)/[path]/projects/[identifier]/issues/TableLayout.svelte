@@ -1,79 +1,61 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { page } from '$app/state';
-    import { createQuery, keepPreviousData, useQueryClient } from '@tanstack/svelte-query';
-    import { type State, TableHandler } from '@vincjo/datatables/server';
+    import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
     import IssueDatatable from '~/lib/components/issues/IssueDatatable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { unwrapMaybePromise } from '~/lib/utils/promise';
-    import { watch } from '~/lib/utils/runes.svelte';
+    import { QueryResponse } from '~/lib/utils/query';
+    import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
+    import { createIssueListQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
     const { api } = useRuntime();
-    const queryClient = useQueryClient();
-    const getParams = (state?: State<LocalIssue>) => {
-        let order = 'OrderNumber';
-        if (state?.sort) {
-            const field = state.sort.field === 'status' ? 'status.rank' : state.sort.field;
-            order = `${state.sort.direction === 'desc' ? '-' : ''}${field}`;
-        }
-        return {
-            projectId: data.project.id,
-            offset: state?.offset ?? 0,
-            size: state?.rowsPerPage ?? 20,
-            order
-        };
-    };
-    let tableState = $state<State<LocalIssue>>();
-    const queryKey = $derived([
-        'issues',
-        {
-            layout: 'table',
-            params: getParams(tableState)
-        }
-    ]);
+    const sort = createSort({
+        fields: page.url.searchParams.get('order') ?? undefined,
+        onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
+    });
+    const pagination = paginationHelper.createPagination(page.url).sync(() => $query.data);
     const query = createQuery(
-        toStore(() => ({
-            queryKey: queryKey,
-            queryFn: async () => {
-                const response = await api.get(`issues`, {
-                    query: {
-                        ...getParams(tableState),
-                        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+        toStore(() => {
+            const params = createIssueListQueryParams(() => ({
+                projectId: data.project.id,
+                url: page.url,
+                page: pagination.page,
+                size: pagination.rowsPerPage,
+                order: sort.string
+            }));
+            return {
+                queryKey: [
+                    'issues',
+                    {
+                        layout: 'table',
+                        params
                     }
-                });
-                return await response.json<PaginatedList<LocalIssue>>();
-            },
-            placeholderData: keepPreviousData
-        }))
+                ],
+                queryFn: async () => {
+                    const response = await QueryResponse.HTTP(() =>
+                        api.get(`issues`, {
+                            query: params
+                        })
+                    );
+                    return await QueryResponse.JSON(() =>
+                        response.json<PaginatedList<LocalIssue>>()
+                    );
+                },
+                placeholderData: keepPreviousData
+            };
+        })
     );
-    const table = new TableHandler<LocalIssue>($query.data?.items, {
-        rowsPerPage: 20,
-        totalRows: $query.data?.totalCount ?? 0
-    });
-    table.on('change', () => {
-        tableState = table.getState();
-    });
-
-    watch(() => $query.data)(() => {
-        table.totalRows = $query.data?.totalCount ?? 0;
-    });
-
-    watch(() => data.page)(() => {
-        if (data.page.tag === 'table' && data.page.streamed instanceof Promise) {
-            unwrapMaybePromise(data.page.streamed)((a) => {
-                queryClient.setQueryData(queryKey, a.issueList);
-            });
-        }
-    });
 </script>
 
 <IssueDatatable
-    {table}
     {query}
+    {sort}
+    {pagination}
     buildIssueHref={({ orderNumber }) =>
         `/${page.params.path}/projects/${page.params.identifier}/issues/${orderNumber}`}
 />

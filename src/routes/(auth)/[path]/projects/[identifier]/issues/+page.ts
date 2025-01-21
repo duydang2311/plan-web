@@ -3,7 +3,7 @@ import { mapMaybePromise } from '~/lib/utils/promise';
 import type { PageLoad } from './$types';
 import type { LocalBoardIssue, LocalIssue } from './+page.server';
 import { createIssueListQueryKey, createStatusListQueryKey } from './_board/utils';
-import { createBoardQueryParams } from './utils';
+import { createBoardQueryParams, createIssueListQueryParams } from './utils';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { workspace, project, queryClient } = await parent();
@@ -51,12 +51,10 @@ export const load: PageLoad = async ({ parent, url, data }) => {
                     'issues',
                     {
                         layout: 'table',
-                        params: {
+                        params: createIssueListQueryParams(() => ({
                             projectId: project.id,
-                            offset: 0,
-                            size: 20,
-                            order: 'OrderNumber'
-                        }
+                            url
+                        }))
                     }
                 ],
                 queryFn: () =>
