@@ -24,7 +24,7 @@ export interface ProjectStatus {
 
 export interface ProjectMember {
     createdTime: string;
-    userRoleId: number;
+    id: number;
     roleId: number;
     role: Role;
     userId: string;

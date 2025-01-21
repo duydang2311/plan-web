@@ -13,18 +13,22 @@
     import { QueryResponse } from '~/lib/utils/query';
     import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
     import { createProjectMemberListQueryParams, type LocalProjectMember } from './utils';
+    import DeleteAction from './DeleteAction.svelte';
 
     const { projectId }: { projectId: string } = $props();
     const { api, cloudinary } = useRuntime();
 
+    const queryParams = $derived(
+        createProjectMemberListQueryParams(() => ({ url: page.url, projectId }))
+    );
+    const queryKey = $derived(['project-members', queryParams]);
     const query = createQuery(
         toStore(() => {
-            const params = createProjectMemberListQueryParams(() => ({ url: page.url, projectId }));
             return {
-                queryKey: ['project-members', params],
+                queryKey,
                 queryFn: async () => {
                     const response = await QueryResponse.HTTP(() =>
-                        api.get('project-members', { query: params })
+                        api.get('project-members', { query: queryParams })
                     );
                     return await QueryResponse.JSON(() =>
                         response.json<PaginatedList<LocalProjectMember>>()
@@ -66,7 +70,7 @@
                     <td class="col-span-full">Nothing to show</td>
                 </Row>
             {:else}
-                {#each $query.data.items as item (item.userRoleId)}
+                {#each $query.data.items as item (item.id)}
                     {@const createdTime = DateTime.fromISO(item.createdTime)}
                     <Row>
                         <td>
@@ -100,7 +104,13 @@
                         <td>
                             {item.role.name}
                         </td>
-                        <td></td>
+                        <td>
+                            <DeleteAction
+                                {queryKey}
+                                id={item.id}
+                                name={item.user.profile?.displayName ?? item.user.email}
+                            />
+                        </td>
                     </Row>
                 {/each}
             {/if}
