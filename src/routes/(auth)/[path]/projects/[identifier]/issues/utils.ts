@@ -51,8 +51,8 @@ export const createIssueListQueryParams = (
     const { projectId, url, ...rest } = deps();
     return {
         projectId,
-        page: rest.page ?? url?.searchParams.get('page') ?? 0,
-        size: rest.size ?? url?.searchParams.get('size') ?? 20,
+        page: rest.page ?? Number(url?.searchParams.get('page') ?? '1'),
+        size: rest.size ?? Number(url?.searchParams.get('size') ?? '20'),
         order: rest.order ?? url?.searchParams.get('order') ?? 'OrderNumber',
         select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
     };
