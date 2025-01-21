@@ -48,7 +48,6 @@
                 size: pagination.rowsPerPage,
                 order: sort.string
             }));
-            console.log('toStore', params);
             return {
                 queryKey: [
                     'issues',
