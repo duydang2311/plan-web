@@ -42,6 +42,17 @@
         return [firstPage, ellipse, ...Array.from(Array(5)).map((_, i) => i + totalPages - 4)];
     });
 
+    const setPage = (value: number) => {
+        pagination.page = value;
+        const searchParams = fluentSearchParams(page.url);
+        if (value === 1) {
+            searchParams.delete('page');
+        } else {
+            searchParams.set('page', value + '');
+        }
+        replaceState(searchParams.toString(), page.state);
+    };
+
     if (browser) {
         gsap.registerPlugin(Flip);
     }
@@ -82,13 +93,7 @@
                 )}
                 disabled={pagination.page === value}
                 onclick={() => {
-                    pagination.page = value;
-                    replaceState(
-                        fluentSearchParams(page.url)
-                            .set('page', pagination.page + '')
-                            .toString(),
-                        page.state
-                    );
+                    setPage(value);
                 }}
             >
                 {value}
@@ -131,13 +136,7 @@
                 )}
                 disabled={pagination.page === 1}
                 onclick={() => {
-                    pagination.page -= 1;
-                    replaceState(
-                        fluentSearchParams(page.url)
-                            .set('page', pagination.page + '')
-                            .toString(),
-                        page.state
-                    );
+                    setPage(pagination.page - 1);
                 }}
             >
                 <Icon name="chevron-left" />
@@ -157,13 +156,7 @@
                 )}
                 disabled={pagination.page === totalPages}
                 onclick={() => {
-                    pagination.page += 1;
-                    replaceState(
-                        fluentSearchParams(page.url)
-                            .set('page', pagination.page + '')
-                            .toString(),
-                        page.state
-                    );
+                    setPage(pagination.page + 1);
                 }}
             >
                 <Icon name="chevron-right" />

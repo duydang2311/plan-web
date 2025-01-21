@@ -199,11 +199,11 @@ export const paginationHelper = {
         });
     },
     page: (url: URL) => {
-        const page = url.searchParams.get('page');
-        return !page || isNaN(Number(page)) ? 1 : Number(page);
+        const page = Number(url.searchParams.get('page') ?? '1');
+        return isNaN(page) ? 1 : page;
     },
     rowsPerPage: (url: URL) => {
-        const rowsPerPage = url.searchParams.get('size');
-        return !rowsPerPage || isNaN(Number(rowsPerPage)) ? 20 : Number(rowsPerPage);
+        const rowsPerPage = Number(url.searchParams.get('size') ?? '20');
+        return isNaN(rowsPerPage) ? 20 : rowsPerPage;
     }
 };
