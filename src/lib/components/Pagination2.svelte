@@ -100,7 +100,7 @@
 <div
     class="rounded-b-xl bg-base-1/20 border-t border-t-base-border-3 backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
 >
-    <span class="text-base-fg-3 text-sm font-bold">
+    <span class="text-base-fg-4 text-sm font-medium">
         {#if pagination.totalCount === 0}
             No entries found.
         {:else if label}
@@ -110,7 +110,12 @@
                 totalCount: pagination.totalCount
             })}
         {:else}
-            Showing {offset + 1} to {offset + pagination.size} of {pagination.totalCount}
+            Showing
+            <span class="font-bold text-base-fg-2">{offset + 1}</span>
+            to
+            <span class="font-bold text-base-fg-2">{offset + pagination.size}</span>
+            of
+            <span class="font-bold text-base-fg-2">{pagination.totalCount}</span>
             entries.
         {/if}
     </span>
