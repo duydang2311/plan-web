@@ -16,8 +16,8 @@
     class="lg:pr-2 outline-none"
     {...melt}
     use:meltAction
-    in:tsap|global={popover.in}
-    out:tsap|global={popover.out}
+    in:tsap={popover.in}
+    out:tsap={popover.out}
 >
     <div {...props} class={clsx('c-popover', props.class)}>
         {@render props.children?.()}
