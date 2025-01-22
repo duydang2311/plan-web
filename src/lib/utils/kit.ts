@@ -87,6 +87,11 @@ export const LoadResponse = {
 } as const;
 
 export const ActionResponse = {
+    Failure: <E>(cause: Cause.Cause<E>) =>
+        cause.pipe(
+            Cause.failureOption,
+            Option.getOrElse(() => fail(500, { errors: { root: ['unknown'] } }))
+        ),
     UnknownError: () => Effect.fail(fail(500, { errors: { root: ['unknown'] } })),
     ValidationError: (errors: Record<string, string[]>) => Effect.fail(fail(400, { errors })),
     Validation: <T>(
