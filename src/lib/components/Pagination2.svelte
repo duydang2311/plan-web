@@ -20,7 +20,7 @@
     const totalPages = $derived(Math.ceil(pagination.totalCount / pagination.rowsPerPage));
     const pages = $derived.by(() => {
         if (totalPages <= 7) {
-            return Array.from(Array(totalPages)).map((_, i) => i + 1);
+            return Array.from(Array(Math.max(totalPages, 1))).map((_, i) => i + 1);
         }
         const ellipse = null;
         const firstPage = 1;
