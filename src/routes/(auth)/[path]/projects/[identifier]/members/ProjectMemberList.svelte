@@ -12,8 +12,8 @@
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { QueryResponse } from '~/lib/utils/query';
     import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
-    import { createProjectMemberListQueryParams, type LocalProjectMember } from './utils';
     import DeleteAction from './DeleteAction.svelte';
+    import { createProjectMemberListQueryParams, type LocalProjectMember } from './utils';
 
     const { projectId }: { projectId: string } = $props();
     const { api, cloudinary } = useRuntime();
@@ -51,8 +51,25 @@
         .sync(() => $query.data);
 </script>
 
+{#snippet skeleton()}
+    <Row>
+        <td class="text-base-fg-ghost">
+            <div class="w-32 h-4 bg-base-3 animate-twPulse"></div>
+        </td>
+        <td class="text-base-fg-ghost">
+            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+        </td>
+        <td class="text-base-fg-ghost">
+            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+        </td>
+        <td class="text-base-fg-ghost">
+            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+        </td>
+    </Row>
+{/snippet}
+
 <div class="h-full grid grid-rows-[1fr_auto]">
-    <Table class="grid-cols-[1fr_auto_auto_auto]">
+    <Table class={['grid-cols-[1fr_auto_auto_auto]', $query.isFetching && 'animate-twPulse']}>
         <THead>
             <Row class="py-1">
                 <Th>User</Th>
@@ -61,13 +78,13 @@
             </Row>
         </THead>
         <tbody>
-            {#if $query.isLoading}
-                <Row>
-                    <td class="col-span-full">Loading</td>
-                </Row>
+            {#if $query.isPending}
+                {#each { length: 3 } as _}
+                    {@render skeleton()}
+                {/each}
             {:else if $query.data == null || $query.data.items.length === 0}
                 <Row>
-                    <td class="col-span-full">Nothing to show</td>
+                    <td class="col-span-full text-sm text-base-fg-ghost">No entries found.</td>
                 </Row>
             {:else}
                 {#each $query.data.items as item (item.id)}
@@ -78,6 +95,7 @@
                                 href={item.user.profile
                                     ? `/profiles/${item.user.profile.name}`
                                     : undefined}
+                                class="block w-fit"
                             >
                                 {#if item.user.profile == null}
                                     {item.user.email}
