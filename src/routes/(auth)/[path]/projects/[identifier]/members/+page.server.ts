@@ -2,9 +2,14 @@ import { Effect } from 'effect';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
-import type { Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { createProjectMemberListQueryParams, type LocalProjectMember } from './utils';
-import { decodeDeleteMember, validateDeleteMember } from './utils.server';
+import {
+    decodeDeleteMember,
+    decodeInviteMember,
+    validateDeleteMember,
+    validateInviteMember
+} from './utils.server';
 
 export const load: PageServerLoad = async ({ parent, url, locals: { runtime }, isDataRequest }) => {
     const data = await parent();
@@ -30,7 +35,7 @@ export const load: PageServerLoad = async ({ parent, url, locals: { runtime }, i
     };
 };
 
-export const actions: Actions = {
+export const actions = {
     'delete-member': async ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
@@ -39,6 +44,23 @@ export const actions: Actions = {
             );
             yield* ActionResponse.HTTP(
                 (yield* ApiClient).delete(`project-members/${validation.data.id}`)
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    'invite-member': async ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateInviteMember(decodeInviteMember(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).post(`project-member-invitations`, {
+                    body: {
+                        projectId: validation.data.projectId,
+                        userId: validation.data.userId,
+                        role: 2 // ProjectRole.Member
+                    }
+                })
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }

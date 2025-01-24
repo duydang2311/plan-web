@@ -13,3 +13,18 @@ export const validateDeleteMember = validator(
     }),
     { convert: true }
 );
+
+export const decodeInviteMember = (formData: FormData) => {
+    return {
+        projectId: formData.get('projectId'),
+        userId: formData.get('userId')
+    };
+};
+
+export const validateInviteMember = validator(
+    Type.Object({
+        projectId: Type.String(),
+        userId: Type.String()
+    }),
+    { stripLeadingSlash: true }
+);

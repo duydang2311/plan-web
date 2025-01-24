@@ -14,6 +14,7 @@ export { default as IconButton } from './IconButton.svelte';
 export { default as Input } from './Input.svelte';
 export { default as Label } from './Label.svelte';
 export { default as Link } from './Link.svelte';
+export { default as LoadingMonitor } from './LoadingMonitor.svelte';
 export { default as Logo } from './Logo.svelte';
 export { default as LogoType } from './LogoType.svelte';
 export { default as Main } from './Main.svelte';
