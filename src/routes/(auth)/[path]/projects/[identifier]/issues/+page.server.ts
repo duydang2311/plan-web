@@ -45,7 +45,6 @@ const loadTableLayout = async ({
         ...createQueryParams(url),
         projectId: data.project.id
     };
-
     const exitPromise = Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
         return {
@@ -88,7 +87,10 @@ const loadBoardLayout = async ({
     locals: { runtime }
 }: PageServerLoadEvent) => {
     const data = await parent();
-    const query: Record<string, unknown> = createBoardQueryParams(url);
+    const query: Record<string, unknown> = {
+        ...createBoardQueryParams(url),
+        projectId: data.project.id
+    };
 
     const fetchProject = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
