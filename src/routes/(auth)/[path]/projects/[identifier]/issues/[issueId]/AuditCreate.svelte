@@ -27,7 +27,7 @@
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
         >
-            <span class="font-bold font-display">
+            <span class="font-bold">
                 {audit.user.profile?.displayName ?? audit.user.email}
             </span>
         </OptionalLink>

@@ -44,7 +44,7 @@
             <OptionalLink
                 href={comment.author.profile ? `/users/${comment.author.profile.name}` : undefined}
             >
-                <span class="font-bold font-display">
+                <span class="font-bold">
                     {comment.author.profile?.displayName ?? comment.author.email}
                 </span>
             </OptionalLink>

@@ -12,6 +12,7 @@
 
     width: 100%;
     text-align: center;
+    font-family: var(--font-family-display);
     padding: theme('size[2]') theme('size[5]');
     font-weight: 600;
     color: var(--_fg);
