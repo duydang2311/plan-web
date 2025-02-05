@@ -1,4 +1,4 @@
-import { Cloudinary } from '@cloudinary/url-gen';
+import type { Cloudinary } from '@cloudinary/url-gen';
 import { type QueryClient } from '@tanstack/svelte-query';
 import defineLazyProperty from 'define-lazy-prop';
 import type { Context } from 'effect';

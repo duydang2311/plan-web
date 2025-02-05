@@ -1,6 +1,6 @@
 import {
     FormatRegistry,
-    JavaScriptTypeBuilder,
+    type JavaScriptTypeBuilder,
     Type,
     type StringOptions,
     type TString

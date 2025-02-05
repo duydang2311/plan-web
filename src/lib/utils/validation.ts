@@ -1,5 +1,5 @@
 import type { Static, TSchema } from '@sinclair/typebox';
-import { TypeCheck, TypeCompiler } from '@sinclair/typebox/compiler';
+import { type TypeCheck, TypeCompiler } from '@sinclair/typebox/compiler';
 import { Value, ValueErrorType } from '@sinclair/typebox/value';
 import { isEmptyObject } from './commons';
 
