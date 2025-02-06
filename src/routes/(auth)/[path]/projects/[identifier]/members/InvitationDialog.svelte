@@ -70,7 +70,7 @@
 
                         return async ({ result }) => {
                             loading.unset();
-                            if (Math.random() > 0.5 && result.type === 'failure') {
+                            if (result.type === 'failure') {
                                 const a = result.data as Exclude<
                                     Awaited<ReturnType<(typeof actions)['invite-member']>>,
                                     void
