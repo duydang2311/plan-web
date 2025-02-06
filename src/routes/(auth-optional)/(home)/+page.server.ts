@@ -1,21 +1,22 @@
 import { error, fail } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
-import type { Team, TeamInvitation } from '~/lib/models/team';
-import type { UserProfile } from '~/lib/models/user';
-import type { Workspace } from '~/lib/models/workspace';
+import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import type { TeamInvitation } from '~/lib/models/team';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
+    createTeamInvitationListQueryParams,
+    createUserQueryParams,
     createWorkspaceListParams,
     decodeAcceptTeamInvite,
     decodeDeclineTeamInvite,
     validateAcceptTeamInvite,
-    validateDeclineTeamInvite
+    validateDeclineTeamInvite,
+    type LocalTeamInvitation,
+    type LocalUser,
+    type LocalWorkspace
 } from './utils';
-
-export type LocalWorkspace = Pick<Workspace, 'name' | 'path'>;
 
 export const load: PageServerLoad = async ({ isDataRequest, locals: { runtime, user } }) => {
     if (!user) {
@@ -42,10 +43,7 @@ export const load: PageServerLoad = async ({ isDataRequest, locals: { runtime, u
     );
 
     return {
-        user: {
-            ...getUserExit.value,
-            id: user.id
-        },
+        user: getUserExit.value,
         teamInvitationList: isDataRequest ? teamInvitationList : await teamInvitationList,
         workspaceList: isDataRequest ? getWorkspaceListExit : await getWorkspaceListExit
     };
@@ -116,28 +114,22 @@ export const actions: Actions = {
 
 const getUserEffect = (userId: string) =>
     Effect.gen(function* () {
+        const params = createUserQueryParams();
         const response = yield* LoadResponse.HTTP(
             (yield* ApiClient).get(`users/${userId}`, {
-                query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
+                query: params
             })
         );
-        return yield* LoadResponse.JSON(() =>
-            response.json<{
-                profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'>;
-            }>()
-        );
+        return yield* LoadResponse.JSON(() => response.json<LocalUser>());
     });
 
 const getTeamInvitationListEffect = (userId: string) =>
     Effect.gen(function* () {
+        const params = createTeamInvitationListQueryParams();
         const response = yield* (yield* ApiClient).get(`users/${userId}/team-invitations`, {
-            query: { select: 'Id, Team.Id, Team.Name' }
+            query: params
         });
-        return yield* LoadResponse.JSON(() =>
-            response.json<
-                PaginatedList<Pick<TeamInvitation, 'id'> & { team: Pick<Team, 'id' | 'name'> }>
-            >()
-        );
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalTeamInvitation>>());
     });
 
 const getWorkspaceListEffect = (userId: string) =>

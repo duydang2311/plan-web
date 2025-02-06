@@ -1,25 +1,34 @@
 <script lang="ts">
     import { Link } from '~/lib/components';
-    import type { PageData } from './$types';
     import TeamInvitations from './TeamInvitations.svelte';
     import WorkspaceList from './WorkspaceList.svelte';
+    import { createUserQuery } from './utils';
 
-    const { data }: { data: Required<PageData> } = $props();
+    const { userId }: { userId: string } = $props();
+    const query = createUserQuery(() => ({ userId }));
 </script>
 
 <main class="space-y-8 p-4">
     <section>
-        {#if data.user.profile}
-            <h1 class="text-p text-base-fg-2">Welcome back, {data.user.profile.displayName}!</h1>
-        {:else}
+        {#if $query.isPending}
+            <p class="c-label">Loading...</p>
+        {:else if $query.error || $query.data.profile == null}
             <h1>Home</h1>
-            <p>
-                It seems like you don't have a profile yet! To personalize your experience, you can
-                start <Link href="/profiles/me">setting it up</Link>.
-            </p>
+            {#if $query.error}
+                <p class="c-label">
+                    An unknown error occurred while we were retrieving your information.
+                </p>
+            {:else}
+                <p>
+                    It seems like you don't have a profile yet! To personalize your experience, you
+                    can start <Link href="/profiles/me">setting it up</Link>.
+                </p>
+            {/if}
+        {:else}
+            <h1>Welcome back, {$query.data.profile.displayName}!</h1>
         {/if}
     </section>
-    <TeamInvitations {data} />
+    <TeamInvitations {userId} />
     <section>
         <div class="mb-4">
             <h2>Your workspaces</h2>
@@ -28,6 +37,6 @@
                 workspace to manage them or creating a new one.
             </p>
         </div>
-        <WorkspaceList userId={data.user.id} />
+        <WorkspaceList {userId} />
     </section>
 </main>

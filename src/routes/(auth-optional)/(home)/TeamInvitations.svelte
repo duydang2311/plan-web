@@ -1,21 +1,14 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { invalidate } from '$app/navigation';
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { useQueryClient } from '@tanstack/svelte-query';
     import { addToast, Button, Icon } from '~/lib/components';
-    import type { PageData } from './$types';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { TeamInvitation } from '~/lib/models/team';
+    import { createTeamInvitationListQuery } from './utils';
 
-    const { data }: { data: Required<PageData> } = $props();
+    const { userId }: { userId: string } = $props();
     const queryClient = useQueryClient();
-    const query = createQuery({
-        queryKey: ['team-invitations'],
-        queryFn: async () => {
-            await invalidate('fetch:home');
-            return data.teamInvitationList;
-        }
-    });
+    const query = createTeamInvitationListQuery(() => ({ userId }));
 </script>
 
 {#if $query.data && $query.data.items.length > 0}
