@@ -14,12 +14,12 @@ export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime
                     api.get(
                         `workspaces/${data.workspace.id}/projects/identifier/${params.identifier}`,
                         {
-                            query: { select: 'Id,Name' }
+                            query: { select: 'Id,Name,Identifier' }
                         }
                     )
                 );
                 return yield* LoadResponse.JSON(() =>
-                    response.json<{ id: string; name: string }>()
+                    response.json<{ id: string; name: string; identifier: string }>()
                 );
             })
         )

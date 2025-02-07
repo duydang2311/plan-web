@@ -12,7 +12,6 @@
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { deeplyFind } from '~/lib/utils/array';
     import { compareRank, getRank } from '~/lib/utils/ranking';
-    import type { PageData } from '../$types';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
     import { createBoardQueryParams } from '../utils';
     import Board from './Board.svelte';
@@ -23,8 +22,12 @@
         validateDraggableIssueData
     } from './utils';
 
-    const { data }: { data: PageData } = $props();
-    const statusListQuery = createStatusListQuery(() => ({ workspaceId: data.workspace.id }));
+    const {
+        workspaceId,
+        projectId,
+        projectIdentifier
+    }: { workspaceId: string; projectId: string; projectIdentifier: string } = $props();
+    const statusListQuery = createStatusListQuery(() => ({ workspaceId }));
     const queryClient = useQueryClient();
     const { api } = useRuntime();
     let preview = $state.raw<{
@@ -63,12 +66,12 @@
 
             const sourceQK = createIssueListQueryKey(() => ({
                 params: createBoardQueryParams(page.url),
-                projectId: data.project.id,
+                projectId,
                 statusId: source.statusId
             }));
             const targetQK = createIssueListQueryKey(() => ({
                 params: createBoardQueryParams(page.url),
-                projectId: data.project.id,
+                projectId,
                 statusId: target.statusId
             }));
             const sourceList =
@@ -204,7 +207,7 @@
 
                 const statusList = queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(
                     createStatusListQueryKey(() => ({
-                        workspaceId: data.workspace.id
+                        workspaceId
                     }))
                 );
                 if (!statusList) {
@@ -232,18 +235,30 @@
                     }
                 });
             }
+
             await queryClient.invalidateQueries({
-                predicate: ({ queryKey }) =>
-                    queryKey[0] === 'issues' &&
-                    queryKey[1] != null &&
-                    typeof queryKey[1] === 'object' &&
-                    'tag' in queryKey[1] &&
-                    queryKey[1].tag === 'issues-board' &&
-                    'projectId' in queryKey[1] &&
-                    queryKey[1].projectId === data.project.id &&
-                    'statusId' in queryKey[1] &&
-                    (queryKey[1].statusId === (source.statusId === -1 ? null : source.statusId) ||
-                        queryKey[1].statusId === (target.statusId === -1 ? null : target.statusId))
+                predicate: ({ queryKey }) => {
+                    if (queryKey[0] !== 'issues') {
+                        return false;
+                    }
+                    if (
+                        queryKey[1] != null &&
+                        typeof queryKey[1] === 'object' &&
+                        'tag' in queryKey[1] &&
+                        queryKey[1].tag === 'issues-board'
+                    ) {
+                        return (
+                            'projectId' in queryKey[1] &&
+                            queryKey[1].projectId === projectId &&
+                            'statusId' in queryKey[1] &&
+                            (queryKey[1].statusId ===
+                                (source.statusId === -1 ? null : source.statusId) ||
+                                queryKey[1].statusId ===
+                                    (target.statusId === -1 ? null : target.statusId))
+                        );
+                    }
+                    return true;
+                }
             });
         }
     });
@@ -287,7 +302,7 @@
 
                 const targetQK = createIssueListQueryKey(() => ({
                     params: createBoardQueryParams(page.url),
-                    projectId: data.project.id,
+                    projectId,
                     statusId: targetStatusId
                 }));
                 const targetList =
@@ -377,40 +392,34 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-{#if data.page.tag === 'board'}
-    <ol class="flex overflow-x-auto overflow-y-hidden w-full">
-        {#if $statusListQuery.data}
-            {#each $statusListQuery.data.items as status (status.id)}
-                <li>
-                    <ol class="flex h-full w-fit gap-4 p-4">
-                        <Board
-                            identifier={data.page.project.identifier}
-                            projectId={data.project.id}
-                            {status}
-                        />
-                    </ol>
-                </li>
-            {/each}
-        {/if}
-    </ol>
-    {#if preview}
-        <div
-            use:portal={preview}
-            style="width: {preview.rect.width}px; height: calc({preview.rect
-                .height}px - 1rem);{navigator.userAgent.includes('Windows')
-                ? ' max-width: 280px; max-height: 280px;'
-                : ''}"
-            class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border-2"
-        >
-            <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
-                <p class="leading-none text-sm">
-                    <small>{data.page.project.identifier}-{preview.data.orderNumber}</small>
-                </p>
-                <Icon name="draggable" class="ml-auto h-4" />
-            </div>
-            <p class="font-medium leading-none">
-                {preview.data.title}
-            </p>
-        </div>
+<ol class="flex overflow-x-auto overflow-y-hidden w-full">
+    {#if $statusListQuery.data}
+        {#each $statusListQuery.data.items as status (status.id)}
+            <li>
+                <ol class="flex h-full w-fit gap-4 p-4">
+                    <Board identifier={projectIdentifier} {projectId} {status} />
+                </ol>
+            </li>
+        {/each}
     {/if}
+</ol>
+{#if preview}
+    <div
+        use:portal={preview}
+        style="width: {preview.rect.width}px; height: calc({preview.rect
+            .height}px - 1rem);{navigator.userAgent.includes('Windows')
+            ? ' max-width: 280px; max-height: 280px;'
+            : ''}"
+        class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border-2"
+    >
+        <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
+            <p class="leading-none text-sm">
+                <small>{projectIdentifier}-{preview.data.orderNumber}</small>
+            </p>
+            <Icon name="draggable" class="ml-auto h-4" />
+        </div>
+        <p class="font-medium leading-none">
+            {preview.data.title}
+        </p>
+    </div>
 {/if}

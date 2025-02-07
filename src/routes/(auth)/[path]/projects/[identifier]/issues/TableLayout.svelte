@@ -8,11 +8,10 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { QueryResponse } from '~/lib/utils/query';
     import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
-    import type { PageData } from './$types';
     import type { LocalIssue } from './+page.server';
     import { createIssueListQueryParams } from './utils';
 
-    const { data }: { data: PageData } = $props();
+    const { projectId }: { projectId: string } = $props();
     const { api } = useRuntime();
     const sort = createSort({
         fields: page.url.searchParams.get('order') ?? undefined,
@@ -22,7 +21,7 @@
     const query = createQuery(
         toStore(() => {
             const params = createIssueListQueryParams(() => ({
-                projectId: data.project.id,
+                projectId,
                 url: page.url,
                 page: pagination.page,
                 size: pagination.rowsPerPage,

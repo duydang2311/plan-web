@@ -3,7 +3,7 @@
         --_bg: var(--theme-base-1);
         --_bg-2: var(--theme-base-1);
         --_hover: var(--theme-base-2);
-        --_border: var(--theme-base-border-3);
+        --_border: var(--theme-base-border-2);
     }
 
     :root[data-theme='dark'] .c-table {
@@ -40,6 +40,7 @@
     top: 0;
     background-color: var(--_bg);
     border-bottom: 1px solid var(--_border);
+    border-style: dashed;
     font-family: var(--font-family-display);
 }
 

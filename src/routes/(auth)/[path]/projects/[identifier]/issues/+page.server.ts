@@ -92,19 +92,6 @@ const loadBoardLayout = async ({
         projectId: data.project.id
     };
 
-    const fetchProject = await Effect.gen(function* () {
-        const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(`projects/${data.project.id}`, {
-                query: { select: 'Identifier' }
-            })
-        );
-        return yield* LoadResponse.JSON(() => response.json<{ identifier: string }>());
-    }).pipe(runtime.runPromiseExit);
-    if (Exit.isFailure(fetchProject)) {
-        const { status, ...body } = LoadResponse.Failure(fetchProject);
-        return error(status, body);
-    }
-
     const getStatusListExit = getWorkspaceStatusList(data.workspace.id).pipe(
         runtime.runPromiseExit
     );
@@ -124,7 +111,6 @@ const loadBoardLayout = async ({
         return {
             page: {
                 tag: 'board' as const,
-                project: fetchProject.value,
                 statusList: getStatusListExit.then((a) =>
                     Exit.isSuccess(a) ? a.value : paginatedList<LocalWorkspaceStatus>()
                 ),
@@ -146,7 +132,6 @@ const loadBoardLayout = async ({
     return {
         page: {
             tag: 'board' as const,
-            project: fetchProject.value,
             statusList: Exit.isSuccess(statusListExit)
                 ? statusListExit.value
                 : paginatedList<LocalWorkspaceStatus>(),

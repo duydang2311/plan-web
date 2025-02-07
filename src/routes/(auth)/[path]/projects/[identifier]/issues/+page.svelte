@@ -65,8 +65,12 @@
         </div>
     </div>
     {#if $selectedLayout.value === 'table'}
-        <TableLayout {data} />
+        <TableLayout projectId={data.project.id} />
     {:else if $selectedLayout.value === 'board'}
-        <BoardLayout {data} />
+        <BoardLayout
+            projectId={data.project.id}
+            workspaceId={data.workspace.id}
+            projectIdentifier={data.project.identifier}
+        />
     {/if}
 </main>

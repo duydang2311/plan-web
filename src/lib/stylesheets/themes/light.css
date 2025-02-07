@@ -10,13 +10,13 @@
 }
 
 :root {
-    --theme-base-1: oklch(98% 0.0027 295.22);
-    --theme-base-2: oklch(96.5% 0.0027 295.22);
-    --theme-base-3: oklch(96% 0.0027 295.22);
-    --theme-base-4: oklch(95% 0.0027 295.22);
-    --theme-base-5: oklch(94% 0.0027 295.22);
-    --theme-base-hover: oklch(92% 0.0027 295.22);
-    --theme-base-active: oklch(91% 0.0027 295.22);
+    --theme-base-1: oklch(100% 0.0027 295.22);
+    --theme-base-2: oklch(98.5% 0.0027 295.22);
+    --theme-base-3: oklch(97% 0.0027 295.22);
+    --theme-base-4: oklch(96% 0.0027 295.22);
+    --theme-base-5: oklch(95% 0.0027 295.22);
+    --theme-base-hover: oklch(93% 0.0027 295.22);
+    --theme-base-active: oklch(92% 0.0027 295.22);
     --theme-base-disabled: oklch(90% 0.0027 295.22);
     --theme-base-fg-1: oklch(16% 0.0027 295.22);
     --theme-base-fg-2: oklch(35% 0.0027 295.22);

@@ -19,7 +19,7 @@
     let scrollRef = $state.raw<HTMLElement>();
 </script>
 
-<main class="flex items-stretch h-full divide-x divide-base-border-2 overflow-hidden">
+<main class="flex items-stretch h-full divide-x divide-base-border-2 divide-dashed overflow-hidden">
     <div class="grow relative h-full overflow-auto" bind:this={scrollRef} style="contain: strict;">
         <div class="flex flex-col min-h-full relative p-4">
             <div class="max-w-paragraph-lg w-full mx-auto">
@@ -35,7 +35,7 @@
                     }}
                 />
             </div>
-            <hr class="my-8 -mx-4" />
+            <hr class="my-8 -mx-4 border-dashed border-base-border-2" />
             <div class="max-w-paragraph-lg w-full mx-auto">
                 <h2>Activity</h2>
                 <div class="mt-4">

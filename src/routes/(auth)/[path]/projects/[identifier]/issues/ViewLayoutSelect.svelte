@@ -1,21 +1,21 @@
 <script lang="ts">
+    import { replaceState } from '$app/navigation';
+    import { page } from '$app/state';
     import { melt, type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
     import { Button, Icon, SelectBuilder } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
-    import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import { select, tsap } from '~/lib/utils/transition';
+    import { fluentSearchParams } from '~/lib/utils/url';
 
     const {
         layouts,
         selected
     }: {
-        layouts: {
-            label: string;
-            value: string;
+        layouts: (SelectOption<string> & {
             icon: IconName;
             href: string;
-        }[];
+        })[];
         selected: Writable<SelectOption<string>>;
     } = $props();
     const open = writable(false);
@@ -25,7 +25,7 @@
 </script>
 
 <SelectBuilder
-    options={createSelectProps<string, false>({
+    options={{
         open,
         selected,
         positioning: {
@@ -33,8 +33,16 @@
             sameWidth: false,
             placement: 'bottom-start'
         },
-        forceVisible: true
-    })}
+        forceVisible: true,
+        onSelectedChange: ({ next }) => {
+            replaceState(
+                layouts.find((a) => a.value === next?.value)?.href ??
+                    `${page.url.pathname}${fluentSearchParams(page.url).delete('layout').toString()}`,
+                page.state
+            );
+            return next;
+        }
+    }}
 >
     {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
         <Button
@@ -63,19 +71,12 @@
                 {#each layouts as layout (layout.value)}
                     {@const opt = option(layout)}
                     {@const selected = isSelected(layout.value)}
-                    <li>
-                        <a
-                            use:melt={opt}
-                            href={layout.href}
-                            class="c-select--option"
-                            data-sveltekit-replacestate
-                        >
-                            {#if selected}
-                                <Icon name="check" class="c-select--check" />
-                            {/if}
-                            <Icon name={layout.icon} />
-                            {layout.label}
-                        </a>
+                    <li use:melt={opt} class="c-select--option">
+                        {#if selected}
+                            <Icon name="check" class="c-select--check" />
+                        {/if}
+                        <Icon name={layout.icon} />
+                        {layout.label}
                     </li>
                 {/each}
             </ol>

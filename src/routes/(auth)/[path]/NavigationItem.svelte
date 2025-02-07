@@ -82,8 +82,8 @@
 {:else}
     <div
         class={clsx(
-            'relative flex gap-2 rounded-md transition-[color_background-color_font-weight] ease-in-out duration-75 hover:bg-primary-1/5',
-            isActive && 'font-bold group-[:not(:hover)]:bg-primary-1/5 text-primary-1',
+            'relative flex gap-2 rounded-md transition-[color_background-color_font-weight] ease-in-out duration-75 hover:bg-base-fg-1/5',
+            isActive && 'font-bold group-[:not(:hover)]:bg-base-fg-1/5 text-base-fg-1',
             props.class
         )}
     >

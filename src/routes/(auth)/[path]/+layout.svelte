@@ -44,7 +44,7 @@
             <Logo class="h-8 w-auto" />
             <p class="block">plan</p>
         </div>
-        <hr class="-mx-4 text-base-border-2" />
+        <hr class="mx-2 border-base-border-2 border-dashed" />
         <div class="flex flex-col grow gap-4">
             <ul class="font-medium group text-sm">
                 <Navigation
@@ -72,6 +72,7 @@
             </ul>
             <DynamicNavigation />
             <ul class="mt-auto font-medium group text-sm">
+                <hr class="border-dashed border-base-border-2 mb-4 mx-2" />
                 <Navigation
                     items={[
                         {
