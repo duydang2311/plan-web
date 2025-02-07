@@ -53,6 +53,7 @@
                             if (result.type === 'failure') {
                                 queryClient.setQueryData(queryKey, previous);
                             }
+                            await queryClient.invalidateQueries({ queryKey: ['project-members'] });
                         };
                     }}
                 >

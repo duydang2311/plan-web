@@ -103,6 +103,9 @@
                                     }
                                 });
                             }
+                            await queryClient.invalidateQueries({
+                                queryKey: ['project-member-invitations']
+                            });
                         };
                     }}
                 >

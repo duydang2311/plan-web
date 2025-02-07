@@ -10,6 +10,7 @@
     import { createLoading, createUiStatus, watch } from '~/lib/utils/runes.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
     import { type actions } from './+page.server';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
 
     const errorMap = {
         String: 'Find and select a user to invite.',
@@ -23,6 +24,7 @@
     const selected = writable<ComboboxOption<SearchUser>>() as
         | Writable<ComboboxOption<SearchUser>>
         | undefined;
+    const { queryClient } = useRuntime();
     let status = createUiStatus();
     const loading = createLoading();
 
@@ -93,6 +95,9 @@
                                     }
                                 });
                             }
+                            await queryClient.invalidateQueries({
+                                queryKey: ['project-member-invitations']
+                            });
                         };
                     }}
                 >
