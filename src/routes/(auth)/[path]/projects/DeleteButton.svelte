@@ -13,7 +13,7 @@
     } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Project } from '~/lib/models/project';
-    import { validateActionFailureData } from './utils';
+    import { validateActionFailureData } from '~/lib/utils/kit.client';
 
     const {
         queryKey,

@@ -30,3 +30,14 @@ export interface ProjectMember {
     userId: string;
     user: User;
 }
+
+export interface ProjectMemberInvitation {
+    createdTime: string;
+    id: number;
+    userId: string;
+    user: User;
+    projectId: string;
+    project: Project;
+    roleId: number;
+    role: Role;
+}

@@ -61,6 +61,7 @@ export function queryParamsStrict<T extends Record<string, unknown>>(
     return obj;
 }
 
+// TODO: i might rename this to withOffset
 export function paginatedQuery<T extends { page?: number; offset?: number; size?: number }>(
     queryParams: T
 ) {

@@ -1,19 +1,33 @@
 import type { PageLoad } from './$types';
-import { createProjectMemberListQueryParams } from './utils';
+import { InvitationListQuery, MemberListQuery } from './utils';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { queryClient, project } = await parent();
 
-    await queryClient.prefetchQuery({
-        queryKey: [
-            'project-members',
-            createProjectMemberListQueryParams(() => ({
-                projectId: project.id,
-                url
-            }))
-        ],
-        queryFn: () => data.memberList
-    });
+    switch (data.view) {
+        case 'pending':
+            await queryClient.prefetchQuery({
+                queryKey: InvitationListQuery.key({
+                    params: InvitationListQuery.params({
+                        projectId: project.id,
+                        url
+                    })
+                }),
+                queryFn: () => data.memberInvitationList
+            });
+            break;
+        default:
+            await queryClient.prefetchQuery({
+                queryKey: MemberListQuery.key({
+                    params: MemberListQuery.params({
+                        projectId: project.id,
+                        url
+                    })
+                }),
+                queryFn: () => data.memberList
+            });
+            break;
+    }
 
     return data;
 };

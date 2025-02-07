@@ -28,3 +28,16 @@ export const validateInviteMember = validator(
     }),
     { stripLeadingSlash: true }
 );
+
+export const decodeDeleteInvitation = (formData: FormData) => {
+    return {
+        id: formData.get('id')
+    };
+};
+
+export const validateDeleteInvitation = validator(
+    Type.Object({
+        id: Type.Number()
+    }),
+    { stripLeadingSlash: true, convert: true }
+);

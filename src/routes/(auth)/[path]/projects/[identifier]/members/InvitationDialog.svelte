@@ -15,7 +15,8 @@
         String: 'Find and select a user to invite.',
         403: 'You are not authorized for this action.',
         invalid_reference: 'User not found.',
-        409: 'The user is already in this project.'
+        invitation_conflict: 'The invitation has already been sent.',
+        member_already: 'The user has already been a member in the project.'
     };
 
     const { projectId, open }: { projectId: string; open: Writable<boolean> } = $props();

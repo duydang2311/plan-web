@@ -1,22 +1,22 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
-    import { page } from '$app/state';
-    import { Resize } from '@cloudinary/url-gen/actions';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
-    import { DateTime } from 'luxon';
     import { toStore } from 'svelte/store';
-    import { Avatar, OptionalLink, Row, Table, Th, THead, ThSort2 } from '~/lib/components';
-    import Pagination2 from '~/lib/components/Pagination2.svelte';
+    import { InvitationListQuery, type LocalProjectMemberInvitation } from './utils';
+    import { page } from '$app/state';
+    import { QueryResponse } from '~/lib/utils/query';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { QueryResponse } from '~/lib/utils/query';
+    import { Avatar, OptionalLink, Row, Table, Th, THead, ThSort2 } from '~/lib/components';
     import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
-    import DeleteAction from './DeleteAction.svelte';
-    import { MemberListQuery, type LocalProjectMember } from './utils';
+    import { browser } from '$app/environment';
+    import { DateTime } from 'luxon';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import Pagination2 from '~/lib/components/Pagination2.svelte';
+    import { Resize } from '@cloudinary/url-gen/actions';
+    import DeleteInvitationAction from './DeleteInvitationAction.svelte';
 
     const { projectId }: { projectId: string } = $props();
-    const { api, cloudinary } = useRuntime();
+    const { cloudinary, api } = useRuntime();
 
     const sort = createSort({
         fields: page.url.searchParams.get('order') ?? undefined,
@@ -24,7 +24,7 @@
     });
     const pagination = paginationHelper.createPagination(page.url);
     const queryParams = $derived(
-        MemberListQuery.params({
+        InvitationListQuery.params({
             url: page.url,
             projectId,
             order: sort.string,
@@ -32,17 +32,17 @@
             size: pagination.rowsPerPage
         })
     );
-    const queryKey = $derived(MemberListQuery.key({ params: queryParams }));
+    const queryKey = $derived(InvitationListQuery.key({ params: queryParams }));
     const query = createQuery(
         toStore(() => {
             return {
                 queryKey,
                 queryFn: async () => {
                     const response = await QueryResponse.HTTP(() =>
-                        api.get('project-members', { query: queryParams })
+                        api.get('project-member-invitations', { query: queryParams })
                     );
-                    return await QueryResponse.JSON(() =>
-                        response.json<PaginatedList<LocalProjectMember>>()
+                    return QueryResponse.JSON(() =>
+                        response.json<PaginatedList<LocalProjectMemberInvitation>>()
                     );
                 },
                 placeholderData: keepPreviousData
@@ -74,7 +74,7 @@
         <THead>
             <Row class="py-1">
                 <Th>User</Th>
-                <ThSort2 field={sort.field('createdTime')}>Joined</ThSort2>
+                <ThSort2 field={sort.field('createdTime')}>Invited</ThSort2>
                 <Th class="col-span-2">Role</Th>
             </Row>
         </THead>
@@ -124,7 +124,7 @@
                             {item.role.name}
                         </td>
                         <td>
-                            <DeleteAction
+                            <DeleteInvitationAction
                                 {queryKey}
                                 id={item.id}
                                 name={item.user.profile?.displayName ?? item.user.email}

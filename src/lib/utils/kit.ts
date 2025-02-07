@@ -103,17 +103,30 @@ export const ActionResponse = {
     FetchError: (error: ApiError) => Effect.fail(fail(500, { errors: { root: [error.code] } })),
     HTTPError: (response: Response) =>
         Effect.gen(function* () {
-            if (response.status === 400) {
-                const json = yield* ActionResponse.JSON(() => response.json());
-                const problem = yield* validateProblemDetailsEffect(json).pipe(
-                    Effect.mapError((e) => fail(500, { errors: { root: [e.code] } }))
-                );
-                return yield* Effect.fail(fail(400, { errors: flattenProblemDetails(problem) }));
-            }
-            return yield* Effect.fail(
-                fail(response.status, { errors: { root: [response.status + ''] } })
+            const json = yield* Effect.tryPromise({
+                try: () => response.json(),
+                catch: () => ({ _tag: 'json' as const })
+            });
+            const problem = yield* validateProblemDetailsEffect(json).pipe(
+                Effect.mapError((a) => ({ _tag: 'problem' as const, error: a }))
             );
-        }),
+            return yield* Effect.fail(
+                fail(response.status, { errors: flattenProblemDetails(problem) })
+            );
+        }).pipe(
+            Effect.catchTags({
+                json: () =>
+                    Effect.fail(
+                        fail(response.status, { errors: { root: [response.status + ''] } })
+                    ),
+                problem: (e) =>
+                    response.status === 400
+                        ? Effect.fail(fail(500, { errors: { root: [e.error.code] } }))
+                        : Effect.fail(
+                              fail(response.status, { errors: { root: [response.status + ''] } })
+                          )
+            })
+        ),
     HTTP: (effect: Effect.Effect<Response, ApiError>) =>
         Effect.gen(function* () {
             const response = yield* pipe(

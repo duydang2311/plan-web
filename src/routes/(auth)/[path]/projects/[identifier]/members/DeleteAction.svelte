@@ -7,7 +7,8 @@
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { LocalProjectMember } from './utils';
 
-    const { queryKey, id, name }: { queryKey: unknown[]; id: number; name: string } = $props();
+    const { queryKey, id, name }: { queryKey: readonly unknown[]; id: number; name: string } =
+        $props();
     const { queryClient } = useRuntime();
     const open = writable(false);
 </script>
