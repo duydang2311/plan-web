@@ -2,7 +2,6 @@
     import { browser } from '$app/environment';
     import { page } from '$app/state';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
-    import { Option } from 'effect';
     import { toStore } from 'svelte/store';
     import IssueDatatable from '~/lib/components/issues/IssueDatatable.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -14,31 +13,12 @@
     import { createIssueListQueryParams } from './utils';
 
     const { data }: { data: PageData } = $props();
-    const { api, queryClient } = useRuntime();
+    const { api } = useRuntime();
     const sort = createSort({
         fields: page.url.searchParams.get('order') ?? undefined,
         onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
     });
-    const pagination = paginationHelper
-        .createPagination(
-            page.url,
-            Option.fromNullable(
-                queryClient.getQueryData<PaginatedList<LocalIssue>>([
-                    'issues',
-                    {
-                        layout: 'table',
-                        params: createIssueListQueryParams(() => ({
-                            projectId: data.project.id,
-                            url: page.url
-                        }))
-                    }
-                ])
-            ).pipe(
-                Option.map((a) => ({ size: a.items.length, totalCount: a.totalCount })),
-                Option.getOrUndefined
-            )
-        )
-        .sync(() => $query.data);
+    const pagination = paginationHelper.createPagination(page.url);
     const query = createQuery(
         toStore(() => {
             const params = createIssueListQueryParams(() => ({
@@ -70,6 +50,7 @@
             };
         })
     );
+    pagination.sync(() => $query.data);
 </script>
 
 <IssueDatatable
