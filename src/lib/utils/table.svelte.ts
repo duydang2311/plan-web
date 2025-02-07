@@ -139,6 +139,9 @@ export const createPagination = (options?: CreatePaginationOptions): PaginationH
             totalCount = value;
         },
         sync: (list) => {
+            const l = list();
+            size = l?.items.length ?? 0;
+            totalCount = l?.totalCount ?? 0;
             $effect(() => {
                 const l = list();
                 size = l?.items.length ?? 0;
