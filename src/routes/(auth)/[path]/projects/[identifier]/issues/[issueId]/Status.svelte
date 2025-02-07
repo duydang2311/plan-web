@@ -79,7 +79,13 @@
                     }
                 });
             }
-            await queryClient.invalidateQueries({ queryKey });
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey }),
+                queryClient.invalidateQueries({
+                    predicate: ({ queryKey, queryHash }) =>
+                        queryKey[0] === 'issues' && queryHash.includes('Status')
+                })
+            ]);
         }
     });
     const selected = writable<SelectOption<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>>>(

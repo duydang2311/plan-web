@@ -56,7 +56,14 @@
                     }
                 });
             }
-            await queryClient.invalidateQueries({ queryKey });
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey }),
+                queryClient.invalidateQueries({
+                    queryKey,
+                    predicate: ({ queryKey, queryHash }) =>
+                        queryKey[0] === 'issues' && queryHash.includes('Priority')
+                })
+            ]);
         }
     });
     const priority = $derived($query.data ?? 0);
