@@ -30,7 +30,7 @@
 <div class="rounded-lg border border-base-border-3 p-4 shadow-sm dark:bg-base-3">
     <div class="flex items-center gap-2">
         <OptionalLink
-            href={comment.author.profile ? `/users/${comment.author.profile.name}` : undefined}
+            href={comment.author.profile ? `/profiles/${comment.author.profile.name}` : undefined}
         >
             <Avatar
                 seed={comment.author.email}
@@ -42,7 +42,9 @@
         </OptionalLink>
         <div class="text-sm">
             <OptionalLink
-                href={comment.author.profile ? `/users/${comment.author.profile.name}` : undefined}
+                href={comment.author.profile
+                    ? `/profiles/${comment.author.profile.name}`
+                    : undefined}
             >
                 <span class="font-bold">
                     {comment.author.profile?.displayName ?? comment.author.email}
