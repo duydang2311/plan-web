@@ -1,9 +1,9 @@
-import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
-import { mapMaybePromise } from '~/lib/utils/promise';
+import { paginatedList } from '~/lib/models/paginatedList';
+import { mapMaybePromise, unwrapMaybePromise } from '~/lib/utils/promise';
 import type { PageLoad } from './$types';
-import type { LocalBoardIssue, LocalIssue } from './+page.server';
 import { createIssueListQueryKey, createStatusListQueryKey } from './_board/utils';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
+import { prefetchQuery } from '~/lib/utils/query';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { workspace, project, queryClient } = await parent();
@@ -16,38 +16,34 @@ export const load: PageLoad = async ({ parent, url, data }) => {
                 totalCount: statusList.totalCount + 1
             });
             const page = data.page;
-            await Promise.all([
-                queryClient.prefetchQuery({
-                    queryKey: createStatusListQueryKey(() => ({
-                        workspaceId: workspace.id
-                    })),
-                    queryFn: () => list
-                })
-            ]);
+            prefetchQuery(queryClient)(
+                createStatusListQueryKey(() => ({
+                    workspaceId: workspace.id
+                })),
+                () => list
+            );
 
-            await Promise.all(
-                list.items.map((a) => {
-                    return queryClient.prefetchInfiniteQuery<
-                        PaginatedList<LocalBoardIssue> & { nextOffset?: number }
-                    >({
-                        queryKey: createIssueListQueryKey(() => ({
+            unwrapMaybePromise(page.issueLists)((a) => {
+                for (const b of list.items) {
+                    prefetchQuery(queryClient)(
+                        createIssueListQueryKey(() => ({
                             projectId: project.id,
                             params: createBoardQueryParams(url),
-                            statusId: a.id
+                            statusId: b.id
                         })),
-                        queryFn: () => mapMaybePromise(page.issueLists, (b) => b[a.id]),
-                        initialPageParam: 0,
-                        getNextPageParam: (
-                            lastPage: PaginatedList<LocalBoardIssue> & { nextOffset?: number }
-                        ) => lastPage?.nextOffset
-                    });
-                })
-            );
+                        () => ({
+                            pageParams: [0],
+                            pages: [a[b.id]]
+                        })
+                    );
+                }
+            });
             break;
         }
-        default:
-            await queryClient.prefetchQuery({
-                queryKey: [
+        default: {
+            const streamed = data.page.streamed;
+            prefetchQuery(queryClient)(
+                [
                     'issues',
                     {
                         layout: 'table',
@@ -57,11 +53,10 @@ export const load: PageLoad = async ({ parent, url, data }) => {
                         }))
                     }
                 ],
-                queryFn: () =>
-                    data.page.tag === 'table'
-                        ? mapMaybePromise(data.page.streamed, (a) => a.issueList)
-                        : paginatedList<LocalIssue>()
-            });
+                () => mapMaybePromise(streamed)((a) => a.issueList)
+            );
+            break;
+        }
     }
 
     return data;

@@ -1,3 +1,14 @@
+import type { QueryClient } from '@tanstack/svelte-query';
+import { unwrapMaybePromise } from './promise';
+
+export const prefetchQuery =
+    (queryClient: QueryClient) =>
+    (queryKey: readonly unknown[], queryFn: () => MaybePromise<unknown>) => {
+        unwrapMaybePromise(queryFn())((a) => {
+            queryClient.setQueryData(queryKey, a);
+        });
+    };
+
 export const QueryResponse = {
     Fetch: async (f: () => Promise<Response>) => {
         try {

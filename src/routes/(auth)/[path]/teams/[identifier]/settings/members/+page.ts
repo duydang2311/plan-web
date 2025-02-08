@@ -1,3 +1,4 @@
+import { prefetchQuery } from '~/lib/utils/query';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
@@ -5,16 +6,16 @@ export const load: PageLoad = async ({ parent, url, data }) => {
     if (!queryClient.isFetching()) {
         switch (url.searchParams.get('show')) {
             case 'pending':
-                await queryClient.prefetchQuery({
-                    queryKey: ['team-invitations', { teamId: data.team.id }],
-                    queryFn: () => data.teamInvitationList!
-                });
+                prefetchQuery(queryClient)(
+                    ['team-invitations', { teamId: data.team.id }],
+                    () => data.teamInvitationList!
+                );
                 break;
             default:
-                await queryClient.prefetchQuery({
-                    queryKey: ['team-members', { teamId: data.team.id }],
-                    queryFn: () => data.teamMemberList!
-                });
+                prefetchQuery(queryClient)(
+                    ['team-members', { teamId: data.team.id }],
+                    () => data.teamMemberList!
+                );
                 break;
         }
     }

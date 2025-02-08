@@ -1,3 +1,4 @@
+import { prefetchQuery } from '~/lib/utils/query';
 import type { PageLoad } from './$types';
 import { InvitationListQuery, MemberListQuery } from './utils';
 
@@ -6,26 +7,26 @@ export const load: PageLoad = async ({ parent, url, data }) => {
 
     switch (data.view) {
         case 'pending':
-            await queryClient.prefetchQuery({
-                queryKey: InvitationListQuery.key({
+            prefetchQuery(queryClient)(
+                InvitationListQuery.key({
                     params: InvitationListQuery.params({
                         projectId: project.id,
                         url
                     })
                 }),
-                queryFn: () => data.memberInvitationList
-            });
+                () => data.memberInvitationList
+            );
             break;
         default:
-            await queryClient.prefetchQuery({
-                queryKey: MemberListQuery.key({
+            prefetchQuery(queryClient)(
+                MemberListQuery.key({
                     params: MemberListQuery.params({
                         projectId: project.id,
                         url
                     })
                 }),
-                queryFn: () => data.memberList
-            });
+                () => data.memberList
+            );
             break;
     }
 

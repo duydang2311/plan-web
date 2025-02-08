@@ -45,7 +45,7 @@
 
     const sorted = $derived.by(() => {
         if (!orders) return teamList;
-        return mapMaybePromise(teamList, (list) =>
+        return mapMaybePromise(teamList)((list) =>
             paginatedList({
                 items: orderBy(
                     list.items,

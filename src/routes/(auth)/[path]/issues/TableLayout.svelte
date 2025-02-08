@@ -28,7 +28,7 @@
             enabled: queryInfo.tag === 'table',
             queryFn: async () => {
                 invariant(data.tag === 'table', "tag must be 'table'");
-                const query = await mapMaybePromise(data.page, (a) => {
+                const query = await mapMaybePromise(data.page)((a) => {
                     return {
                         ...queryInfo.params,
                         projectId: a.projectId,
