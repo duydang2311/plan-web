@@ -3,9 +3,12 @@ import type { WorkspaceStatus } from './status';
 import type { User } from './user';
 
 export interface Workspace {
+    createdTime: string;
     id: string;
     name: string;
     path: string;
+    totalProjects: number;
+    totalUsers: number;
     statuses?: WorkspaceStatus[];
 }
 

@@ -11,7 +11,10 @@ import { validator } from '~/lib/utils/validation';
 export type LocalUser = Pick<User, 'id'> & {
     profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'>;
 };
-export type LocalWorkspace = Pick<Workspace, 'name' | 'path'>;
+export type LocalWorkspace = Pick<
+    Workspace,
+    'createdTime' | 'name' | 'path' | 'totalProjects' | 'totalUsers'
+>;
 export type LocalTeamInvitation = Pick<TeamInvitation, 'id'> & { team: Pick<Team, 'id' | 'name'> };
 
 export const validateAcceptTeamInvite = validator<{ teamInvitationId: string }>(
@@ -61,7 +64,7 @@ export function decodeDeclineTeamInvite(formData: FormData) {
 export const createWorkspaceListParams = (userId: string) =>
     ({
         userId,
-        select: 'Name,Path'
+        select: 'CreatedTime,Name,Path,TotalProjects,TotalUsers'
     }) as const;
 
 export const createUserQueryParams = () => {
