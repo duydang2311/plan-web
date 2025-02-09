@@ -1,11 +1,12 @@
 import type { QueryClient } from '@tanstack/svelte-query';
-import { unwrapMaybePromise } from './promise';
 
 export const prefetchQuery =
     (queryClient: QueryClient) =>
     (queryKey: readonly unknown[], queryFn: () => MaybePromise<unknown>) => {
-        unwrapMaybePromise(queryFn())((a) => {
-            queryClient.setQueryData(queryKey, a);
+        queryClient.prefetchQuery({
+            queryKey,
+            queryFn,
+            staleTime: 0
         });
     };
 
