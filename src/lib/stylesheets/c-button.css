@@ -32,7 +32,7 @@
     }
 
     &:where(:not(:disabled)) {
-        &.c-button--outline {
+        &:where(.c-button--outline) {
             border: 1px solid var(--_border);
         }
         &:hover {
