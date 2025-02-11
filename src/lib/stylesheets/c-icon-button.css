@@ -1,6 +1,6 @@
 .c-icon-button {
-    border-radius: theme('borderRadius[DEFAULT]');
-    padding: theme('padding[0.5]');
+    border-radius: var(--radius-sm);
+    padding: --spacing(0.5);
     transition:
         transform 120ms ease-in-out,
         color 75ms ease-in-out,
@@ -24,16 +24,16 @@
 }
 
 .c-icon-button--base {
-    color: var(--theme-base-fg-2);
+    color: var(--color-base-fg-2);
     @apply ring-base-fg-2/20;
 
     &:hover {
-        color: var(--theme-base-fg-1);
+        color: var(--color-base-fg-1);
         @apply bg-base-fg-2/20;
     }
 
     &:active {
-        color: var(--theme-base-fg-3);
+        color: var(--color-base-fg-3);
     }
 
     &:focus-visible {
@@ -42,18 +42,18 @@
 }
 
 .c-icon-button--negative {
-    color: var(--theme-negative-1);
-    border-radius: theme('borderRadius[md]');
-    padding: theme('padding[0.5]');
+    color: var(--color-negative-1);
+    border-radius: var(--radius-md);
+    padding: --spacing(0.5);
     @apply ring-negative-1/20;
 
     &:hover {
-        color: var(--theme-negative-2);
+        color: var(--color-negative-2);
         @apply bg-negative-1/20;
     }
 
     &:active {
-        color: var(--theme-negative-3);
+        color: var(--color-negative-3);
     }
 
     &:focus-visible {

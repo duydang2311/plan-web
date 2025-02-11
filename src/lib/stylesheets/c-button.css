@@ -3,17 +3,17 @@
     --_bg-hover: color-mix(in srgb, var(--_fg) 5%, transparent);
     --_bg-active: color-mix(in srgb, var(--_fg) 10%, transparent);
     --_bg-disabled: transparent;
-    --_fg: var(--theme-base-fg-2);
-    --_fg-hover: var(--theme-base-fg-1);
-    --_fg-disabled: var(--theme-base-fg-disabled);
+    --_fg: var(--color-base-fg-2);
+    --_fg-hover: var(--color-base-fg-1);
+    --_fg-disabled: var(--color-base-fg-disabled);
     --_shadow: none;
-    --_border: var(--theme-base-border-2);
-    --_border-disabled: var(--theme-base-border-2);
+    --_border: var(--color-base-border-2);
+    --_border-disabled: var(--color-base-border-2);
 
     width: 100%;
     text-align: center;
-    font-family: var(--font-family-display);
-    padding: theme('size[2]') theme('size[5]');
+    font-family: var(--font-display);
+    padding: --spacing(2) --spacing(5);
     font-weight: 600;
     color: var(--_fg);
     box-shadow: var(--_shadow);
@@ -24,7 +24,7 @@
         box-shadow 75ms ease-out;
 
     &:where(:not(.c-button--flat)) {
-        border-radius: theme('borderRadius[md]');
+        border-radius: var(--radius-md);
     }
 
     &:where(.c-button--flat) {
@@ -58,17 +58,17 @@
     }
 
     &:where(.c-button--filled) {
-        --_bg: var(--theme-base-2);
-        --_bg-hover: var(--theme-base-4);
-        --_bg-active: var(--theme-base-active);
-        --_bg-disabled: var(--theme-base-2);
+        --_bg: var(--color-base-2);
+        --_bg-hover: var(--color-base-4);
+        --_bg-active: var(--color-base-active);
+        --_bg-disabled: var(--color-base-2);
     }
 
     &:where(:root[data-theme='dark'] &) {
         &.c-button--filled {
-            --_bg: var(--theme-base-3);
-            --_bg-hover: var(--theme-base-4);
-            --_bg-active: var(--theme-base-active);
+            --_bg: var(--color-base-3);
+            --_bg-hover: var(--color-base-4);
+            --_bg-active: var(--color-base-active);
         }
     }
 
@@ -79,51 +79,51 @@
 }
 
 .c-button--primary {
-    --_fg: var(--theme-primary-2);
-    --_fg-hover: var(--theme-primary-1);
-    --_border: var(--theme-primary-border);
+    --_fg: var(--color-primary-2);
+    --_fg-hover: var(--color-primary-1);
+    --_border: var(--color-primary-border);
 
     &.c-button--filled {
-        --_bg: var(--theme-primary-1);
-        --_fg: var(--theme-primary-fg-2);
-        --_fg-hover: var(--theme-primary-fg-1);
-        --_bg-hover: var(--theme-primary-hover);
-        --_bg-active: var(--theme-primary-active);
+        --_bg: var(--color-primary-1);
+        --_fg: var(--color-primary-fg-2);
+        --_fg-hover: var(--color-primary-fg-1);
+        --_bg-hover: var(--color-primary-hover);
+        --_bg-active: var(--color-primary-active);
     }
 }
 
 .c-button--negative {
-    --_fg: var(--theme-negative-2);
-    --_fg-hover: var(--theme-negative-1);
-    --_border: var(--theme-negative-border);
+    --_fg: var(--color-negative-2);
+    --_fg-hover: var(--color-negative-1);
+    --_border: var(--color-negative-border);
 
     &.c-button--filled {
-        --_bg: var(--theme-negative-1);
-        --_fg: var(--theme-negative-fg-2);
-        --_fg-hover: var(--theme-negative-fg-1);
-        --_bg-hover: var(--theme-negative-hover);
-        --_bg-active: var(--theme-negative-active);
+        --_bg: var(--color-negative-1);
+        --_fg: var(--color-negative-fg-2);
+        --_fg-hover: var(--color-negative-fg-1);
+        --_bg-hover: var(--color-negative-hover);
+        --_bg-active: var(--color-negative-active);
     }
 }
 
 .c-button--positive {
-    --_fg: var(--theme-positive-2);
-    --_fg-hover: var(--theme-positive-1);
-    --_border: var(--theme-positive-border);
+    --_fg: var(--color-positive-2);
+    --_fg-hover: var(--color-positive-1);
+    --_border: var(--color-positive-border);
 
     &.c-button--filled {
-        --_bg: var(--theme-positive-1);
-        --_fg: var(--theme-positive-fg-2);
-        --_fg-hover: var(--theme-positive-fg-1);
-        --_bg-hover: var(--theme-positive-hover);
-        --_bg-active: var(--theme-positive-active);
+        --_bg: var(--color-positive-1);
+        --_fg: var(--color-positive-fg-2);
+        --_fg-hover: var(--color-positive-fg-1);
+        --_bg-hover: var(--color-positive-hover);
+        --_bg-active: var(--color-positive-active);
     }
 }
 
 .c-button--sm {
     font-size: theme('fontSize[sm]');
     &:where(:not(.c-button--flat)) {
-        padding: theme('padding[1]') theme('padding[3]');
-        border-radius: theme('borderRadius[DEFAULT]');
+        padding: --spacing(1) --spacing(3);
+        border-radius: var(--radius-sm);
     }
 }

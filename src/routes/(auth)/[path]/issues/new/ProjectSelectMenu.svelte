@@ -40,7 +40,7 @@
 <ol use:melt={menu} class="c-select--menu" in:tsap={select.in} out:tsap={select.out}>
     {#if $query.isFetching}
         {#each { length: 4 } as _}
-            <li class="animate-twPulse rounded h-8 w-full bg-base-3"></li>
+            <li class="animate-pulse rounded h-8 w-full bg-base-3"></li>
         {/each}
     {:else if teams != null}
         {#each teams as team (team.value)}

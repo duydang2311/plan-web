@@ -152,18 +152,18 @@
 
 <style>
     .c-table--pagination--button {
-        color: var(--theme-base-fg-5);
+        color: var(--color-base-fg-5);
         &:not(:disabled) {
             &:hover {
-                color: var(--theme-base-fg-2);
-                background-color: var(--theme-base-4);
+                color: var(--color-base-fg-2);
+                background-color: var(--color-base-4);
             }
             &:active {
-                background-color: var(--theme-base-active);
+                background-color: var(--color-base-active);
             }
         }
         &:disabled {
-            color: var(--theme-base-fg-ghost);
+            color: var(--color-base-fg-ghost);
         }
     }
 </style>

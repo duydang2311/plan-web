@@ -1,4 +1,4 @@
-<div class="animate-twPulse">
+<div class="animate-pulse">
     <div class="flex items-center gap-2">
         <div class="size-12 bg-base-5 rounded-full"></div>
         <div>

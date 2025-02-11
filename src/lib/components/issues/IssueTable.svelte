@@ -39,7 +39,7 @@
             <Th sortable name="updatedTime" class="max-md:hidden">Updated</Th>
         </Row>
     </THead>
-    <tbody class={clsx(status === 'loading' && 'animate-twPulse')}>
+    <tbody class={clsx(status === 'loading' && 'animate-pulse')}>
         {#if issues == null || issues.items.length === 0}
             <Row>
                 <td class="col-span-full text-base-fg-ghost">No issues yet.</td>

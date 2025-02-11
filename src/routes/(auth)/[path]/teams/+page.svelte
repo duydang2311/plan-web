@@ -110,9 +110,7 @@
                 </Row>
             </THead>
             <tbody
-                class={clsx(
-                    (status === 'pending' || status === 'pending-long') && 'animate-twPulse'
-                )}
+                class={clsx((status === 'pending' || status === 'pending-long') && 'animate-pulse')}
             >
                 {#await sorted}
                     <Row>

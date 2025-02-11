@@ -1,51 +1,50 @@
-@import '~/lib/stylesheets/themes/light.css';
-@import '~/lib/stylesheets/themes/dark.css';
+@import 'tailwindcss' source('../');
 
-@import '~/lib/assets/fonts/Inter/font-face.css';
-@import '~/lib/assets/fonts/RedditSans/font-face.css';
-@import '~/lib/stylesheets/preflight.css';
-@import 'sanitize.css/reduce-motion.css';
-@import 'sanitize.css/assets.css';
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-@import '~/lib/stylesheets/tw-base.css';
+@import '~/lib/stylesheets/themes/light.css' layer(theme);
+@import '~/lib/stylesheets/themes/dark.css' layer(base);
 
-@import '~/lib/stylesheets/c-input.css';
-@import '~/lib/stylesheets/c-button.css';
-@import '~/lib/stylesheets/c-link.css';
-@import '~/lib/stylesheets/c-label.css';
-@import '~/lib/stylesheets/c-table.css';
-@import '~/lib/stylesheets/c-tiptap.css';
-@import '~/lib/stylesheets/c-popover.css';
-@import '~/lib/stylesheets/c-badge.css';
-@import '~/lib/stylesheets/c-icon-button.css';
-@import '~/lib/stylesheets/c-select.css';
-@import '~/lib/stylesheets/c-main.css';
+@import '~/lib/assets/fonts/Inter/font-face.css' layer(theme);
+@import '~/lib/assets/fonts/RedditSans/font-face.css' layer(theme);
 
-@import '~/lib/stylesheets/tw-components.css';
-@import '~/lib/stylesheets/tw-utilities.css';
+@import '~/lib/stylesheets/c-input.css' layer(components);
+@import '~/lib/stylesheets/c-button.css' layer(components);
+@import '~/lib/stylesheets/c-link.css' layer(components);
+@import '~/lib/stylesheets/c-label.css' layer(components);
+@import '~/lib/stylesheets/c-table.css' layer(components);
+@import '~/lib/stylesheets/c-tiptap.css' layer(components);
+@import '~/lib/stylesheets/c-popover.css' layer(components);
+@import '~/lib/stylesheets/c-badge.css' layer(components);
+@import '~/lib/stylesheets/c-icon-button.css' layer(components);
+@import '~/lib/stylesheets/c-select.css' layer(components);
+@import '~/lib/stylesheets/c-main.css' layer(components);
+
+@theme {
+    --font-display: InterVariable, var(--font-sans);
+    --font-body: 'Reddit Sans', InterVariable, var(--font-sans);
+    --text-sm: 0.9028rem;
+    --text-p: 1rem;
+    --text-h6: 1.125rem;
+    --text-h5: 1.266rem;
+    --text-h4: 1.424rem;
+    --text-h3: 1.602rem;
+    --text-h2: 1.802rem;
+    --text-h1: 2.488rem;
+    --text-title: var(--text-h5);
+    --container-paragraph-sm: var(--container-sm);
+    --container-paragraph-lg: var(--container-2xl);
+    --radius-full: calc(infinity * 1px);
+
+    --cubic-out: cubic-bezier(0.33, 1, 0.68, 1);
+    --cubic-in: cubic-bezier(0.32, 0, 0.67, 0);
+    --cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
 
 @layer base {
     :root {
-        --cubic-out: cubic-bezier(0.33, 1, 0.68, 1);
-        --cubic-in: cubic-bezier(0.32, 0, 0.67, 0);
-        --cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-        --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-            'Helvetica Neue', sans-serif;
-        --font-family-display: InterVariable, var(--font-family-base);
-        --font-family-body: 'Reddit Sans', InterVariable, var(--font-family-base);
-        --typo-scale: 1.15;
-        --font-size-sm: 0.9028rem;
-        --font-size-p: 1rem;
-        --font-size-h6: 1.125rem;
-        --font-size-h5: 1.266rem;
-        --font-size-h4: 1.424rem;
-        --font-size-h3: 1.602rem;
-        --font-size-h2: 1.802rem;
-        --font-size-h1: 2.488rem;
-        --font-size-title: var(--font-size-h5);
-
         color-scheme: light dark;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 400;
         line-height: 1.5;
         font-synthesis: none;
@@ -58,9 +57,9 @@
             'liga' 1,
             'calt' 1;
 
-        background-color: var(--theme-base-1);
-        color: var(--theme-base-fg-2);
-        font-family: var(--font-family-body);
+        background-color: var(--color-base-1);
+        color: var(--color-base-fg-2);
+        font-family: var(--font-body);
         transition:
             color 100ms ease-in-out,
             background-color 100ms ease-in-out;
@@ -68,13 +67,13 @@
 
     .prose {
         --typo-scale: 1.0625;
-        --font-size-h6: calc(var(--font-size-p) * var(--typo-scale));
-        --font-size-h5: calc(var(--font-size-h6) * var(--typo-scale));
-        --font-size-h4: calc(var(--font-size-h5) * var(--typo-scale));
-        --font-size-h3: calc(var(--font-size-h4) * var(--typo-scale));
-        --font-size-h2: calc(var(--font-size-h3) * var(--typo-scale));
-        --font-size-h1: calc(var(--font-size-h2) * var(--typo-scale));
-        --font-size-title: var(--font-size-h5);
+        --font-size-h6: calc(var(--text-p) * var(--typo-scale));
+        --font-size-h5: calc(var(--text-h6) * var(--typo-scale));
+        --font-size-h4: calc(var(--text-h5) * var(--typo-scale));
+        --font-size-h3: calc(var(--text-h4) * var(--typo-scale));
+        --font-size-h2: calc(var(--text-h3) * var(--typo-scale));
+        --font-size-h1: calc(var(--text-h2) * var(--typo-scale));
+        --font-size-title: var(--text-h5);
     }
 
     @supports (font-variation-settings: normal) {
@@ -84,7 +83,7 @@
     }
 
     body {
-        font-size: var(--font-size-p);
+        font-size: var(--text-p);
     }
 
     h1,
@@ -93,37 +92,37 @@
     h4,
     h5,
     h6 {
-        color: theme('colors.base[fg-1]');
-        font-family: var(--font-family-display);
+        color: var(--color-base-fg-1);
+        font-family: var(--font-display);
         font-weight: 600;
     }
 
     h6 {
-        font-size: var(--font-size-h6);
+        font-size: var(--text-h6);
     }
 
     h5 {
-        font-size: var(--font-size-h5);
+        font-size: var(--text-h5);
     }
 
     h4 {
-        font-size: var(--font-size-h4);
+        font-size: var(--text-h4);
     }
 
     h3 {
-        font-size: var(--font-size-h3);
+        font-size: var(--text-h3);
     }
 
     h2 {
-        font-size: var(--font-size-h2);
+        font-size: var(--text-h2);
     }
 
     h1 {
-        font-size: var(--font-size-h1);
+        font-size: var(--text-h1);
     }
 
     small {
-        font-size: var(--font-size-sm);
+        font-size: var(--text-sm);
     }
 
     .transition-enforcement {
@@ -136,23 +135,23 @@
     }
 
     hr {
-        border-color: var(--theme-base-border-3);
+        border-color: var(--color-base-border-3);
     }
 
     .scrollbar-3 {
         &::-webkit-scrollbar-thumb {
-            border: theme('width[0.5]') solid var(--theme-base-3);
+            border: --spacing(0.5) solid var(--color-base-3);
         }
     }
 
     ::-webkit-scrollbar {
-        width: theme('width[2]');
-        height: theme('width[2]');
+        width: --spacing(2);
+        height: --spacing(2);
     }
 
     ::-webkit-scrollbar-thumb {
-        border: theme('width[0.5]') solid var(--theme-base-1);
-        border-radius: theme('borderRadius[full]');
-        background: color-mix(in oklch, var(--theme-base-fg-2) 30%, var(--theme-base-1));
+        border: --spacing(0.5) solid var(--color-base-1);
+        border-radius: var(--radius-full);
+        background: color-mix(in oklch, var(--color-base-fg-2) 30%, var(--color-base-1));
     }
 }

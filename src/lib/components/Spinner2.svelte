@@ -14,7 +14,7 @@
         height="100%"
         stroke="currentColor"
         xmlns="http://www.w3.org/2000/svg"
-        class="animate-twSpin animate-infinite"
+        class="animate-spin animate-infinite"
         ><g clip-path="url(#clip0_2393_1490)">
             <path d="M8 0V4" stroke="currentColor" stroke-width="1.5"></path>
             <path opacity="0.5" d="M8 16V12" stroke="currentColor" stroke-width="1.5"></path>

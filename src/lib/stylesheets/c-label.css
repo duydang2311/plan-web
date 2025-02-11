@@ -1,7 +1,7 @@
 .c-label {
     display: block;
-    color: var(--theme-base-fg-4);
+    color: var(--color-base-fg-4);
     font-weight: 500;
-    font-size: var(--font-size-sm);
+    font-size: var(--text-sm);
     max-width: max-content;
 }

@@ -89,7 +89,7 @@
         {/if}
     {:else}
         {#each { length: 3 } as _}
-            <li class="c-select--option bg-base-4 animate-twPulse h-7 w-full"></li>
+            <li class="c-select--option bg-base-4 animate-pulse h-7 w-full"></li>
         {/each}
     {/if}
 </ol>

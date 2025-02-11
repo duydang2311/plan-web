@@ -31,7 +31,7 @@
                 <ThSort3 name="updatedTime" class="max-md:hidden">Updated</ThSort3>
             </Row>
         </THead>
-        <tbody class:animate-twPulse={loading.short}>
+        <tbody class:animate-pulse={loading.short}>
             {#if issueList == null || issueList.items.length === 0}
                 <Row>
                     <td class="col-span-full text-base-fg-ghost">No issues yet.</td>

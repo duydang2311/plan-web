@@ -41,7 +41,7 @@
                 </ThSort2>
             </Row>
         </THead>
-        <tbody class:animate-twPulse={$query.isFetching}>
+        <tbody class:animate-pulse={$query.isFetching}>
             {#if $query.data == null || $query.data.items.length === 0}
                 <Row>
                     <td class="col-span-full text-base-fg-ghost">No issues yet.</td>

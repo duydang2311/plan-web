@@ -1,16 +1,14 @@
-@layer base {
-    .c-table {
-        --_bg: var(--theme-base-1);
-        --_bg-2: var(--theme-base-1);
-        --_hover: var(--theme-base-2);
-        --_border: var(--theme-base-border-2);
-    }
+.c-table {
+    --_bg: var(--color-base-1);
+    --_bg-2: var(--color-base-1);
+    --_hover: var(--color-base-2);
+    --_border: var(--color-base-border-2);
+}
 
-    :root[data-theme='dark'] .c-table {
-        --_bg: var(--theme-base-2);
-        --_bg-2: var(--theme-base-1);
-        --_hover: var(--theme-base-3);
-    }
+:root[data-theme='dark'] .c-table {
+    --_bg: var(--color-base-2);
+    --_bg-2: var(--color-base-1);
+    --_hover: var(--color-base-3);
 }
 
 .c-table {
@@ -41,7 +39,7 @@
     background-color: var(--_bg);
     border-bottom: 1px solid var(--_border);
     border-style: dashed;
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
 }
 
 .c-table--row {
@@ -49,17 +47,17 @@
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
     align-items: center;
-    padding: theme('padding[4]');
+    padding: --spacing(4);
     transition: background-color 50ms ease-in-out;
     text-align: left;
 
     :where(& > *) {
-        padding-inline: theme('padding[4]');
+        padding-inline: --spacing(4);
     }
 
     :where(& > .c-table--th) {
         font-weight: 500;
-        font-size: var(--font-size-sm);
+        font-size: var(--text-sm);
     }
 }
 

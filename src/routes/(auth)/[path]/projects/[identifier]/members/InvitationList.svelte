@@ -55,22 +55,22 @@
 {#snippet skeleton()}
     <Row>
         <td class="text-base-fg-ghost">
-            <div class="w-32 h-4 bg-base-3 animate-twPulse"></div>
+            <div class="w-32 h-4 bg-base-3 animate-pulse"></div>
         </td>
         <td class="text-base-fg-ghost">
-            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+            <div class="w-20 h-4 bg-base-3 animate-pulse"></div>
         </td>
         <td class="text-base-fg-ghost">
-            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+            <div class="w-20 h-4 bg-base-3 animate-pulse"></div>
         </td>
         <td class="text-base-fg-ghost">
-            <div class="w-20 h-4 bg-base-3 animate-twPulse"></div>
+            <div class="w-20 h-4 bg-base-3 animate-pulse"></div>
         </td>
     </Row>
 {/snippet}
 
 <div class="h-full grid grid-rows-[1fr_auto]">
-    <Table class={['grid-cols-[1fr_auto_auto_auto]', $query.isFetching && 'animate-twPulse']}>
+    <Table class={['grid-cols-[1fr_auto_auto_auto]', $query.isFetching && 'animate-pulse']}>
         <THead>
             <Row class="py-1">
                 <Th>User</Th>

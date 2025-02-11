@@ -1,32 +1,32 @@
 .c-select--menu {
-    padding: theme('padding[1]');
-    background-color: var(--theme-base-1);
-    border: 1px solid var(--theme-base-border-1);
-    border-radius: theme('borderRadius[md]');
-    min-width: theme('width[40]');
+    padding: --spacing(1);
+    background-color: var(--color-base-1);
+    border: 1px solid var(--color-base-border-1);
+    border-radius: var(--radius-md);
+    min-width: --spacing(40);
     cursor: default;
     @apply shadow-sm;
 
     &[data-melt-select-multiple] .c-select--option[aria-selected='true'] {
-        background-color: var(--theme-base-5);
+        background-color: var(--color-base-5);
     }
 
     &:not([data-melt-select-multiple]):not(:has(.c-select--option:hover))
         .c-select--option[aria-selected='true'] {
-        background-color: var(--theme-base-5);
+        background-color: var(--color-base-5);
     }
 }
 
 .c-select--option {
     position: relative;
-    padding-inline: theme('padding[2]') theme('padding[10]');
-    padding-block: theme('padding[1]');
-    color: var(--theme-base-fg-3);
-    border-radius: theme('borderRadius[DEFAULT]');
+    padding-inline: --spacing(2) --spacing(10);
+    padding-block: --spacing(1);
+    color: var(--color-base-fg-3);
+    border-radius: var(--radius-sm);
     width: 100%;
     display: flex;
     align-items: center;
-    gap: theme('gap[2]');
+    gap: --spacing(2);
     transition:
         color 50ms var(--cubic-out),
         background-color 50ms var(--cubic-out);
@@ -35,12 +35,12 @@
     &:where([data-melt-combobox-option]) {
         &[data-highlighted],
         &:hover {
-            color: var(--theme-base-fg-1);
-            background-color: var(--theme-base-4);
+            color: var(--color-base-fg-1);
+            background-color: var(--color-base-4);
         }
 
         &[aria-selected='true'] {
-            color: var(--theme-base-fg-1);
+            color: var(--color-base-fg-1);
             font-weight: 500;
         }
     }

@@ -60,7 +60,7 @@
             <Th></Th>
         </Row>
     </THead>
-    <tbody bind:this={tbody} class="animate-tbody">
+    <tbody bind:this={tbody}>
         {#if $query.data}
             {#each $query.data.items as item (item.member.id)}
                 <PendingMemberRow data={item} />

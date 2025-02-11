@@ -1,7 +1,7 @@
 .c-link {
-    --_fg: var(--theme-base-fg-2);
-    --_fg-hover: var(--theme-base-fg-1);
-    --_fg-active: var(--theme-base-fg-3);
+    --_fg: var(--color-base-fg-2);
+    --_fg-hover: var(--color-base-fg-1);
+    --_fg-active: var(--color-base-fg-3);
 
     color: var(--_fg);
     text-decoration: none;
@@ -24,8 +24,8 @@
     }
 
     &:where(.prose &) {
-        --_fg: var(--theme-info-1);
-        --_fg-hover: var(--theme-info-hover);
-        --_fg-active: var(--theme-info-active);
+        --_fg: var(--color-info-1);
+        --_fg-hover: var(--color-info-hover);
+        --_fg-active: var(--color-info-active);
     }
 }

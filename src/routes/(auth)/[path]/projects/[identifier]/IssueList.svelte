@@ -12,7 +12,7 @@
 
 {#snippet skeleton()}
     <li
-        class="group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 p-2 animate-twPulse *:h-6 *:rounded"
+        class="group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 p-2 animate-pulse *:h-6 *:rounded"
     >
         <div class="bg-base-3 w-16"></div>
         <div class="bg-base-3 w-full"></div>
@@ -50,7 +50,7 @@
             <div>
                 <ol
                     class="mt-2"
-                    class:animate-twPulse={$query.isFetching}
+                    class:animate-pulse={$query.isFetching}
                     in:tsap={(node, gsap) =>
                         gsap.from(node, { opacity: 0, duration: 0.15, ease: 'power1.out' })}
                 >

@@ -1,30 +1,28 @@
-@layer base {
-    .c-popover {
-        --_border: var(--theme-base-border-1);
-        --_bg: var(--theme-base-1);
-    }
+.c-popover {
+    --_border: var(--color-base-border-1);
+    --_bg: var(--color-base-1);
+}
 
-    :root[data-theme='dark'] .c-popover {
-        --_bg: var(--theme-base-2);
-    }
+:root[data-theme='dark'] .c-popover {
+    --_bg: var(--color-base-2);
+}
 
-    .c-popover {
-        background-color: var(--_bg);
-        padding: theme('padding[4]');
-        border: 1px solid var(--_border);
-        border-radius: theme('borderRadius[lg]');
-        max-width: 100%;
-        @apply shadow;
+.c-popover {
+    background-color: var(--_bg);
+    padding: --spacing(4);
+    border: 1px solid var(--_border);
+    border-radius: var(--radius-lg);
+    max-width: 100%;
+    @apply shadow;
 
-        & h2 {
-            --font-size-h2: var(--font-size-h4);
-            font-weight: 600;
-        }
+    & h2 {
+        --font-size-h2: var(--text-h4);
+        font-weight: 600;
     }
+}
 
-    .c-popover--arrow {
-        --arrow-size: 0.7rem;
-        border-top: 1px solid var(--_border);
-        border-left: 1px solid var(--_border);
-    }
+.c-popover--arrow {
+    --arrow-size: 0.7rem;
+    border-top: 1px solid var(--_border);
+    border-left: 1px solid var(--_border);
 }

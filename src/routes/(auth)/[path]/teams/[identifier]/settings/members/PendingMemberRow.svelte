@@ -56,7 +56,7 @@
     };
 </script>
 
-<Row class={clsx(status === 'submitting' && 'animate-twPulse')}>
+<Row class={clsx(status === 'submitting' && 'animate-pulse')}>
     <td>
         {data.member.email}
     </td>

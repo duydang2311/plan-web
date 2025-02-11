@@ -104,7 +104,7 @@
     </div>
     <div
         class="relative p-1 border-t border-t-base-border-3"
-        class:animate-twPulse={$query.isFetching}
+        class:animate-pulse={$query.isFetching}
     >
         {#if status === 'pending'}
             <Spinner2 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-8" />
@@ -132,7 +132,7 @@
         {:else}
             <ul class="space-y-1">
                 {#each { length: 3 } as _}
-                    <li class="c-select--option bg-base-4 animate-twPulse h-7 w-full"></li>
+                    <li class="c-select--option bg-base-4 animate-pulse h-7 w-full"></li>
                 {/each}
             </ul>
         {/if}

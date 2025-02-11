@@ -35,7 +35,7 @@
 {#if $query.isPending}
     Loading issue activities...
 {:else if $query.data}
-    <ol class="space-y-4 px-4" class:animate-twPulse={$query.isFetching}>
+    <ol class="space-y-4 px-4" class:animate-pulse={$query.isFetching}>
         {#each $query.data.items as audit (audit.id)}
             {#if audit.action in auditComponents}
                 {@const Component = auditComponents[audit.action as keyof typeof auditComponents]}

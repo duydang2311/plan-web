@@ -23,10 +23,7 @@
             <Icon name="arrow-right" class="size-4" />
         </IconButton>
     </div>
-    <div
-        class:animate-twPulse={$query.isFetching}
-        class="relative text-base-fg-1 text-h2 font-bold"
-    >
+    <div class:animate-pulse={$query.isFetching} class="relative text-base-fg-1 text-h2 font-bold">
         {#if $query.isLoading}
             <Spinner2 class="absolute size-5 left-0 top-1/2 translate-x-1/2 -translate-y-1/2" />
         {/if}

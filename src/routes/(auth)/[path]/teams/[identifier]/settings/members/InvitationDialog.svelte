@@ -235,7 +235,7 @@
                                         <ol
                                             class={clsx(
                                                 'space-y-1',
-                                                $query.isFetching && 'animate-twPulse'
+                                                $query.isFetching && 'animate-pulse'
                                             )}
                                         >
                                             {#if !$query.data.items.length}

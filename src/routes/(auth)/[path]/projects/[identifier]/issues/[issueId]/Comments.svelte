@@ -100,7 +100,7 @@
     <div bind:this={ref} class="mt-4">
         <div class="transition-enforcement">
             <div
-                class:animate-twPulse={$query.isFetching}
+                class:animate-pulse={$query.isFetching}
                 transition:fade={{ duration: 200, easing: cubicInOut }}
                 class={scrollRef
                     ? '[&>*>*>.comment-wrapper]:mt-4 [&>*>*:first-child>.comment-wrapper]:mt-0'
