@@ -43,13 +43,12 @@
     });
 </script>
 
-<th {...props} class={clsx('c-table--th', props.class)}>
+<th {...props} class={clsx('c-table--th', props.sortable && 'c-table--th-sort', props.class)}>
     {#if props.sortable === true && state}
         <a
             href="?{state[1].toString()}"
             class="group flex items-center gap-2"
-            data-sveltekit-preload-data="tap"
-            data-sveltekit-noscroll
+            data-sveltekit-replacestate
         >
             {@render children?.()}
             <div class="transition-enforcement">

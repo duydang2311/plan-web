@@ -3,13 +3,15 @@
     import type { SelectOption } from '@melt-ui/svelte';
     import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
-    import { Button, Icon } from '~/lib/components';
+    import { Await, Button, Icon } from '~/lib/components';
     import Input from '~/lib/components/Input.svelte';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import TableLayout from './TableLayout.svelte';
     import ViewLayoutSelect from './ViewLayoutSelect.svelte';
     import BoardLayout from './_board/BoardLayout.svelte';
+    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { paginatedList } from '~/lib/models/paginatedList';
 
     const { data }: { data: PageData } = $props();
     const createIssueHref = $derived(page.url.pathname + '/new');
@@ -64,9 +66,13 @@
             </Button>
         </div>
     </div>
-    {#if $selectedLayout.value === 'table'}
-        <TableLayout projectId={data.project.id} />
-    {:else if $selectedLayout.value === 'board'}
+    {#if $selectedLayout.value === 'table' && data.page.tag === 'table'}
+        <Await resolve={data.page.streamed}>
+            {#snippet children({ value, loading })}
+                <TableLayout issueList={value?.issueList} {loading} />
+            {/snippet}
+        </Await>
+    {:else if $selectedLayout.value === 'board' && data.page.tag === 'board'}
         <BoardLayout
             projectId={data.project.id}
             workspaceId={data.workspace.id}

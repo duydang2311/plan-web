@@ -1,5 +1,6 @@
 export { default as Accordion } from './Accordion.svelte';
 export { default as Avatar } from './Avatar.svelte';
+export { default as Await } from './Await.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';
 export { default as Button } from './Button.svelte';

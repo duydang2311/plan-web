@@ -325,7 +325,7 @@ export const actions: Actions = {
             );
         }
 
-        return redirect(302, `/${params.path}/projects/${params.identifier}`);
+        return redirect(302, `/${params.path}/projects/${params.identifier}/issues`);
     },
     'delete-comment': async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(

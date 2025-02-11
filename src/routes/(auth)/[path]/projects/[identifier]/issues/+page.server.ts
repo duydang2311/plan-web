@@ -7,7 +7,7 @@ import type { WorkspaceStatus } from '~/lib/models/status';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
-import { createBoardQueryParams, createQueryParams } from './utils';
+import { createBoardQueryParams, createIssueListQueryParams } from './utils';
 
 export type LocalIssue = Pick<
     Issue,
@@ -41,10 +41,10 @@ const loadTableLayout = async ({
     locals: { runtime }
 }: PageServerLoadEvent) => {
     const data = await parent();
-    const query: Record<string, unknown> = {
-        ...createQueryParams(url),
-        projectId: data.project.id
-    };
+    const query: Record<string, unknown> = createIssueListQueryParams({
+        projectId: data.project.id,
+        url
+    });
     const exitPromise = Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
         return {

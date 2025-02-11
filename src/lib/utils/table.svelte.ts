@@ -1,4 +1,4 @@
-import { replaceState } from '$app/navigation';
+import { goto, replaceState } from '$app/navigation';
 import type { PaginatedList } from '../models/paginatedList';
 import { fluentSearchParams } from './url';
 
@@ -12,9 +12,11 @@ interface CreateSortOptions {
 
 interface CreatePaginationOptions {
     page?: number;
-    rowsPerPage: number;
+    rowsPerPage?: number;
     size?: number;
     totalCount?: number;
+    syncUrl?: () => URL;
+    syncList?: () => PaginatedList<unknown>;
 }
 
 export interface Sort {
@@ -108,10 +110,38 @@ export const createSort = ({ fields, onDirectionChange }: CreateSortOptions = {}
 };
 
 export const createPagination = (options?: CreatePaginationOptions): PaginationHandler => {
-    let page = $state.raw(options?.page ?? 1);
-    let rowsPerPage = $state.raw(options?.rowsPerPage ?? 20);
-    let size = $state.raw(options?.size ?? 0);
-    let totalCount = $state.raw(options?.totalCount ?? 0);
+    let initialPage = options?.page ?? 1;
+    let initialRowsPerPage = options?.rowsPerPage ?? 20;
+    let initialSize = 0;
+    let initialTotalCount = 0;
+
+    if (options?.syncUrl) {
+        const url = options.syncUrl();
+        initialPage = paginationHelper.page(url);
+        initialRowsPerPage = paginationHelper.rowsPerPage(url);
+        $effect(() => {
+            const url = options.syncUrl!();
+            page = paginationHelper.page(url);
+            rowsPerPage = paginationHelper.rowsPerPage(url);
+        });
+    }
+
+    if (options?.syncList) {
+        const list = options.syncList();
+        initialSize = list.items.length;
+        initialTotalCount = list.totalCount;
+
+        $effect(() => {
+            const list = options.syncList!();
+            size = list.items.length;
+            totalCount = list.totalCount;
+        });
+    }
+
+    let page = $state.raw(initialPage);
+    let rowsPerPage = $state.raw(initialRowsPerPage);
+    let size = $state.raw(initialSize);
+    let totalCount = $state.raw(initialTotalCount);
 
     const handler: PaginationHandler = {
         get page() {
@@ -180,7 +210,13 @@ const createSortField =
         return sortField;
     };
 
-export const sortHelper = {
+export const sortHelper: {
+    replaceState: (url: URL) => (sort: Sort) => void;
+    goto: (
+        url: URL,
+        opts: Parameters<(typeof import('$app/navigation'))['goto']>[1]
+    ) => (sort: Sort) => void;
+} = {
     replaceState: (url: URL) => (sort: Sort) => {
         const searchParams = fluentSearchParams(url);
         if (sort.string == null) {
@@ -189,6 +225,15 @@ export const sortHelper = {
             searchParams.set('order', sort.string);
         }
         replaceState(`${url.pathname}${searchParams.toString()}`, {});
+    },
+    goto: (url, opts) => (sort: Sort) => {
+        const searchParams = fluentSearchParams(url);
+        if (sort.string == null) {
+            searchParams.delete('order');
+        } else {
+            searchParams.set('order', sort.string);
+        }
+        goto(`${url.pathname}${searchParams.toString()}`, opts);
     }
 };
 

@@ -45,10 +45,11 @@ export const createQueryKey =
         ] as const;
     };
 
-export const createIssueListQueryParams = (
-    deps: () => { projectId: string; url?: URL } & Record<string, unknown>
-) => {
-    const { projectId, url, ...rest } = deps();
+export const createIssueListQueryParams = ({
+    projectId,
+    url,
+    ...rest
+}: { projectId: string; url?: URL } & Record<string, unknown>) => {
     return {
         projectId,
         page: rest.page ?? Number(url?.searchParams.get('page') ?? '1'),

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import clsx from 'clsx';
     import gsap from 'gsap';
@@ -23,37 +22,26 @@
             return Array.from(Array(Math.max(totalPages, 1))).map((_, i) => i + 1);
         }
         const ellipse = null;
-        const firstPage = 1;
-        const lastPage = totalPages - 1;
         if (pagination.page < 4) {
-            return [1, 2, 3, 4, 5, ellipse, lastPage];
+            return [1, 2, 3, 4, 5, ellipse, totalPages];
         }
 
         if (pagination.page < totalPages - 3) {
             return [
-                firstPage,
+                1,
                 ellipse,
                 ...Array.from(Array(3)).map((_, i) => i + pagination.page - 1),
                 ellipse,
-                lastPage
+                totalPages
             ];
         }
 
-        return [firstPage, ellipse, ...Array.from(Array(5)).map((_, i) => i + totalPages - 4)];
+        return [1, ellipse, ...Array.from(Array(5)).map((_, i) => i + totalPages - 4)];
     });
 
-    const setPage = (value: number) => {
-        pagination.page = value;
-        const searchParams = fluentSearchParams(page.url);
-        if (value === 1) {
-            searchParams.delete('page');
-        } else {
-            searchParams.set('page', value + '');
-        }
-        goto(`${page.url.pathname}${searchParams.toString()}`, {
-            replaceState: true,
-            state: page.state
-        });
+    const getSearchParams = (pageNumber: number) => {
+        const params = fluentSearchParams(page.url);
+        return pageNumber === 1 ? params.delete('page') : params.set('page', pageNumber + '');
     };
 
     if (browser) {
@@ -61,6 +49,7 @@
     }
 
     let active = $state<HTMLDivElement>();
+
     $effect.pre(() => {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         pagination.page;
@@ -88,19 +77,18 @@
                     class="absolute inset-0 bg-base-active rounded-full"
                 ></div>
             {/if}
-            <button
-                type="button"
+            <a
+                href="{page.url.pathname}{getSearchParams(value).toString()}"
                 class={clsx(
-                    'relative w-full h-full content-center rounded-full py-1 transition ease-in-out',
-                    pagination.page === value ? 'text-base-fg-2' : 'hover:bg-base-hover'
+                    'block text-center relative w-full h-full content-center rounded-full py-1 transition ease-in-out',
+                    pagination.page === value
+                        ? 'text-base-fg-2 pointer-events-none'
+                        : 'hover:bg-base-hover'
                 )}
-                disabled={pagination.page === value}
-                onclick={() => {
-                    setPage(value);
-                }}
+                data-sveltekit-replacestate
             >
                 {value}
-            </button>
+            </a>
         {/if}
     </li>
 {/snippet}
@@ -129,41 +117,35 @@
     </span>
     <ol class="flex items-stretch text-sm font-bold text-base-fg-4">
         <li>
-            <button
-                type="button"
+            <a
+                href="{page.url.pathname}{getSearchParams(pagination.page - 1).toString()}"
                 class={clsx(
                     'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
                     pagination.page === 1
                         ? 'pointer-events-none text-base-fg-3/40'
                         : 'hover:bg-base-hover'
                 )}
-                disabled={pagination.page === 1}
-                onclick={() => {
-                    setPage(pagination.page - 1);
-                }}
+                data-sveltekit-replacestate
             >
                 <Icon name="chevron-left" />
-            </button>
+            </a>
         </li>
         {#each pages as page}
             {@render item(page)}
         {/each}
         <li>
-            <button
-                type="button"
+            <a
+                href="{page.url.pathname}{getSearchParams(pagination.page + 1).toString()}"
                 class={clsx(
                     'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
                     pagination.page === totalPages
                         ? 'pointer-events-none text-base-fg-3/40'
                         : 'hover:bg-base-hover'
                 )}
-                disabled={pagination.page === totalPages}
-                onclick={() => {
-                    setPage(pagination.page + 1);
-                }}
+                data-sveltekit-replacestate
             >
                 <Icon name="chevron-right" />
-            </button>
+            </a>
         </li>
     </ol>
 </div>

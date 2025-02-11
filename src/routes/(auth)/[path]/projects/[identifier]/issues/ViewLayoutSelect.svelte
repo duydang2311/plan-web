@@ -1,12 +1,9 @@
 <script lang="ts">
-    import { replaceState } from '$app/navigation';
-    import { page } from '$app/state';
     import { melt, type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
     import { Button, Icon, SelectBuilder } from '~/lib/components';
     import type { IconName } from '~/lib/components/Icon.svelte';
     import { select, tsap } from '~/lib/utils/transition';
-    import { fluentSearchParams } from '~/lib/utils/url';
 
     const {
         layouts,
@@ -33,15 +30,7 @@
             sameWidth: false,
             placement: 'bottom-start'
         },
-        forceVisible: true,
-        onSelectedChange: ({ next }) => {
-            replaceState(
-                layouts.find((a) => a.value === next?.value)?.href ??
-                    `${page.url.pathname}${fluentSearchParams(page.url).delete('layout').toString()}`,
-                page.state
-            );
-            return next;
-        }
+        forceVisible: true
     }}
 >
     {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
@@ -71,12 +60,19 @@
                 {#each layouts as layout (layout.value)}
                     {@const opt = option(layout)}
                     {@const selected = isSelected(layout.value)}
-                    <li use:melt={opt} class="c-select--option">
-                        {#if selected}
-                            <Icon name="check" class="c-select--check" />
-                        {/if}
-                        <Icon name={layout.icon} />
-                        {layout.label}
+                    <li>
+                        <a
+                            href={layout.href}
+                            use:melt={opt}
+                            class="c-select--option"
+                            data-sveltekit-replacestate
+                        >
+                            {#if selected}
+                                <Icon name="check" class="c-select--check" />
+                            {/if}
+                            <Icon name={layout.icon} />
+                            {layout.label}
+                        </a>
                     </li>
                 {/each}
             </ol>

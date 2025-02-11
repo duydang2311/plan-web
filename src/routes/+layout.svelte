@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
+    import { page } from '$app/state';
     import { env } from '$env/dynamic/public';
     import { Cloudinary } from '@cloudinary/url-gen/index';
     import { QueryClientProvider } from '@tanstack/svelte-query';
@@ -9,7 +11,6 @@
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
     import type { LayoutData } from './$types';
     import './+layout.css';
-    import { page } from '$app/state';
 
     const { data, children }: { data: LayoutData; children: Snippet } = $props();
     const runtime = setRuntime({
@@ -54,6 +55,15 @@
         }
         return async () => {
             runtime.realtime.dispose();
+        };
+    });
+
+    onMount(() => {
+        const interval = setInterval(() => {
+            invalidateAll();
+        }, 60 * 1000);
+        return () => {
+            clearInterval(interval);
         };
     });
 </script>

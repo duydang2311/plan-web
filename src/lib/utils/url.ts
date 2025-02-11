@@ -96,7 +96,7 @@ export const stringifyQuery = (
         .join('&')}`;
 };
 
-class FluentSearchParams {
+export class FluentSearchParams {
     private _searchParams: URLSearchParams;
 
     public constructor(searchParams: URLSearchParams) {

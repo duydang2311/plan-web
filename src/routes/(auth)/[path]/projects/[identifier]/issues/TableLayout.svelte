@@ -1,61 +1,92 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import { page } from '$app/state';
-    import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
-    import { toStore } from 'svelte/store';
-    import IssueDatatable from '~/lib/components/issues/IssueDatatable.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { QueryResponse } from '~/lib/utils/query';
-    import { createSort, paginationHelper, sortHelper } from '~/lib/utils/table.svelte';
+    import { DateTime } from 'luxon';
+    import { Icon, Link, RelativeTime, Row, Table, Th, THead } from '~/lib/components';
+    import Pagination3 from '~/lib/components/Pagination3.svelte';
+    import ThSort3 from '~/lib/components/ThSort3.svelte';
+    import { getPriorityIcon, getPriorityLabel, IssuePriorities } from '~/lib/models/issue';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { type Loading } from '~/lib/utils/runes.svelte';
+    import { createPagination } from '~/lib/utils/table.svelte';
     import type { LocalIssue } from './+page.server';
-    import { createIssueListQueryParams } from './utils';
 
-    const { projectId }: { projectId: string } = $props();
-    const { api } = useRuntime();
-    const sort = createSort({
-        fields: page.url.searchParams.get('order') ?? undefined,
-        onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
+    const {
+        issueList,
+        loading
+    }: { issueList: PaginatedList<LocalIssue> | undefined; loading: Loading } = $props();
+    const pagination = createPagination({
+        syncUrl: () => page.url,
+        syncList: () => issueList ?? paginatedList()
     });
-    const pagination = paginationHelper.createPagination(page.url);
-    const query = createQuery(
-        toStore(() => {
-            const params = createIssueListQueryParams(() => ({
-                projectId,
-                url: page.url,
-                page: pagination.page,
-                size: pagination.rowsPerPage,
-                order: sort.string
-            }));
-            return {
-                queryKey: [
-                    'issues',
-                    {
-                        layout: 'table',
-                        params
-                    }
-                ],
-                queryFn: async () => {
-                    const response = await QueryResponse.HTTP(() =>
-                        api.get(`issues`, {
-                            query: params
-                        })
-                    );
-                    return await QueryResponse.JSON(() =>
-                        response.json<PaginatedList<LocalIssue>>()
-                    );
-                },
-                placeholderData: keepPreviousData
-            };
-        })
-    );
-    pagination.sync(() => $query.data);
 </script>
 
-<IssueDatatable
-    {query}
-    {sort}
-    {pagination}
-    buildIssueHref={({ orderNumber }) =>
-        `/${page.params.path}/projects/${page.params.identifier}/issues/${orderNumber}`}
-/>
+<div class="grid grid-rows-[1fr_auto]">
+    <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
+        <THead>
+            <Row class="py-2">
+                <ThSort3 name="title" class="col-span-2">Title</ThSort3>
+                <Th>Status</Th>
+                <ThSort3 name="priority">Priority</ThSort3>
+                <ThSort3 name="createdTime">Created</ThSort3>
+                <ThSort3 name="updatedTime" class="max-md:hidden">Updated</ThSort3>
+            </Row>
+        </THead>
+        <tbody class:animate-twPulse={loading.short}>
+            {#if issueList == null || issueList.items.length === 0}
+                <Row>
+                    <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
+                </Row>
+            {:else}
+                {#each issueList.items as row}
+                    <Row>
+                        <td>
+                            <div
+                                class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
+                            >
+                                {row.project.identifier}-{row.orderNumber}
+                            </div>
+                        </td>
+                        <td>
+                            <Link
+                                href={`/${page.params.path}/projects/${page.params.identifier}/issues/${row.orderNumber}`}
+                            >
+                                {row.title}
+                            </Link>
+                        </td>
+                        <td>
+                            {#if row.status?.value}
+                                {row.status.value}
+                            {:else}
+                                <span class="text-base-fg-ghost">N/A</span>
+                            {/if}
+                        </td>
+                        <td title={getPriorityLabel(row.priority)}>
+                            <Icon
+                                name={getPriorityIcon(row.priority)}
+                                class={row.priority == IssuePriorities.none
+                                    ? 'text-base-fg-ghost'
+                                    : undefined}
+                            />
+                        </td>
+                        <td
+                            title={DateTime.fromISO(row.createdTime).toLocaleString(
+                                DateTime.DATETIME_SHORT
+                            )}
+                        >
+                            <RelativeTime time={row.createdTime} />
+                        </td>
+                        <td
+                            class="max-md:hidden"
+                            title={DateTime.fromISO(row.updatedTime).toLocaleString(
+                                DateTime.DATETIME_SHORT
+                            )}
+                        >
+                            <RelativeTime time={row.updatedTime} />
+                        </td>
+                    </Row>
+                {/each}
+            {/if}
+        </tbody>
+    </Table>
+    <Pagination3 {pagination} />
+</div>

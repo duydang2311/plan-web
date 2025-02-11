@@ -1,9 +1,9 @@
 import { paginatedList } from '~/lib/models/paginatedList';
-import { mapMaybePromise, unwrapMaybePromise } from '~/lib/utils/promise';
+import { unwrapMaybePromise } from '~/lib/utils/promise';
+import { prefetchQuery } from '~/lib/utils/query';
 import type { PageLoad } from './$types';
 import { createIssueListQueryKey, createStatusListQueryKey } from './_board/utils';
-import { createBoardQueryParams, createIssueListQueryParams } from './utils';
-import { prefetchQuery } from '~/lib/utils/query';
+import { createBoardQueryParams } from './utils';
 
 export const load: PageLoad = async ({ parent, url, data }) => {
     const { workspace, project, queryClient } = await parent();
@@ -38,23 +38,6 @@ export const load: PageLoad = async ({ parent, url, data }) => {
                     );
                 }
             });
-            break;
-        }
-        default: {
-            const streamed = data.page.streamed;
-            prefetchQuery(queryClient)(
-                [
-                    'issues',
-                    {
-                        layout: 'table',
-                        params: createIssueListQueryParams(() => ({
-                            projectId: project.id,
-                            url
-                        }))
-                    }
-                ],
-                () => mapMaybePromise(streamed)((a) => a.issueList)
-            );
             break;
         }
     }
