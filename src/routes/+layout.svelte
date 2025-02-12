@@ -5,7 +5,7 @@
     import { Cloudinary } from '@cloudinary/url-gen/index';
     import { QueryClientProvider } from '@tanstack/svelte-query';
     import { onMount, type Snippet } from 'svelte';
-    import Toaster from '~/lib/components/Toaster.svelte';
+    import { Sonner, Toaster } from '~/lib/components';
     import { setRuntime } from '~/lib/contexts/runtime.client';
     import { NATSRealtime } from '~/lib/services/realtime.client';
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
@@ -69,6 +69,7 @@
 </script>
 
 <Toaster />
+<Sonner />
 <QueryClientProvider client={data.queryClient}>
     {@render children()}
 </QueryClientProvider>
