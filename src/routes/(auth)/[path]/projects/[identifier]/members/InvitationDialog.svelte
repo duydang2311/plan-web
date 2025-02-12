@@ -3,7 +3,7 @@
     import { type ComboboxOption, melt } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { addToast, Button, DialogBuilder, Icon, LoadingMonitor, toast } from '~/lib/components';
+    import { Button, DialogBuilder, Icon, LoadingMonitor, toast } from '~/lib/components';
     import SearchUserCombobox, {
         type SearchUser
     } from '~/lib/components/SearchUserCombobox.svelte';
@@ -33,8 +33,8 @@
     });
 </script>
 
-{#snippet successDescription(name: string)}
-    Invitation to the project has been sent to <span class="font-bold">{name}</span> successfully.
+{#snippet success(name: string)}
+    Invitation successfully sent to <span class="font-bold">{name}</span>.
 {/snippet}
 
 <DialogBuilder options={{ open, forceVisible: true }}>
@@ -88,9 +88,9 @@
                             } else {
                                 status.succeed();
                                 toast({
-                                    title: 'Invitation sent',
-                                    description: successDescription,
-                                    descriptionProps: name
+                                    type: 'positive',
+                                    body: success,
+                                    bodyProps: name
                                 });
                             }
                             await queryClient.invalidateQueries({
