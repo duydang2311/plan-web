@@ -13,8 +13,14 @@
     let value = $state.raw(isPromiseLike(resolve) ? undefined : resolve);
     const loading = createLoading();
 
-    watch(() => resolve)(() => {
+    if (isPromiseLike(resolve)) {
         loading.set();
+    }
+
+    watch(() => resolve)(() => {
+        if (isPromiseLike(resolve)) {
+            loading.set();
+        }
         unwrapMaybePromise(resolve)((a) => {
             value = a;
             loading.unset();

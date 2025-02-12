@@ -1,11 +1,12 @@
 import { D } from '@mobily/ts-belt';
 import { error } from '@sveltejs/kit';
-import { Cause, Effect, Exit, Option, pipe } from 'effect';
+import { Effect, Exit, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
+import { mapMaybePromise, maybeStream } from '~/lib/utils/promise';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
 
@@ -45,37 +46,19 @@ const loadTableLayout = async ({
         projectId: data.project.id,
         url
     });
-    const exitPromise = Effect.gen(function* () {
+    const getIssueList = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
-        return {
-            issueList: yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>())
-        };
-    }).pipe(runtime.runPromiseExit);
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>());
+    }).pipe(
+        Effect.orElseSucceed(() => paginatedList<LocalIssue>()),
+        runtime.runPromise,
+        (a) => maybeStream(a)(isDataRequest)
+    );
 
-    if (isDataRequest) {
-        return {
-            page: {
-                tag: 'table' as const,
-                streamed: exitPromise.then((a) =>
-                    Exit.isSuccess(a) ? a.value : { issueList: paginatedList<LocalIssue>() }
-                )
-            }
-        };
-    }
-
-    const exit = await exitPromise;
-    if (Exit.isFailure(exit)) {
-        const { status, ...body } = pipe(
-            exit.cause,
-            Cause.failureOption,
-            Option.getOrElse(() => Effect.runSync(LoadResponse.UnknownError()))
-        );
-        return error(status, body);
-    }
     return {
         page: {
             tag: 'table' as const,
-            streamed: exit.value
+            issueList: getIssueList()
         }
     };
 };

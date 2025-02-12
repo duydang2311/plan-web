@@ -10,8 +10,6 @@
     import TableLayout from './TableLayout.svelte';
     import ViewLayoutSelect from './ViewLayoutSelect.svelte';
     import BoardLayout from './_board/BoardLayout.svelte';
-    import { mapMaybePromise } from '~/lib/utils/promise';
-    import { paginatedList } from '~/lib/models/paginatedList';
 
     const { data }: { data: PageData } = $props();
     const createIssueHref = $derived(page.url.pathname + '/new');
@@ -67,9 +65,9 @@
         </div>
     </div>
     {#if $selectedLayout.value === 'table' && data.page.tag === 'table'}
-        <Await resolve={data.page.streamed}>
+        <Await resolve={data.page.issueList}>
             {#snippet children({ value, loading })}
-                <TableLayout issueList={value?.issueList} {loading} />
+                <TableLayout issueList={value} {loading} />
             {/snippet}
         </Await>
     {:else if $selectedLayout.value === 'board' && data.page.tag === 'board'}

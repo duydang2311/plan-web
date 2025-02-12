@@ -28,3 +28,18 @@ export function unwrapMaybePromise<TIn>(
         }
     };
 }
+
+const delayed = Symbol('delayed');
+export function maybeStream<T>(promise: Promise<T>, options = { waitMs: 200 }) {
+    return async (stream: boolean): Promise<() => MaybePromise<T>> => {
+        if (stream) {
+            return () => promise;
+        }
+
+        const resolved = await Promise.race([
+            promise,
+            new Promise<typeof delayed>((resolve) => setTimeout(resolve, options.waitMs, delayed))
+        ]);
+        return resolved === delayed ? () => promise : () => resolved;
+    };
+}

@@ -31,8 +31,31 @@
                 <ThSort3 name="updatedTime" class="max-md:hidden">Updated</ThSort3>
             </Row>
         </THead>
-        <tbody class:animate-pulse={loading.short}>
-            {#if issueList == null || issueList.items.length === 0}
+        <tbody class:animate-pulse={loading.immediate}>
+            {#if issueList == null && loading.immediate}
+                {#each { length: 3 } as _}
+                    <Row>
+                        <td>
+                            <div class="w-16 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                        <td>
+                            <div class="w-64 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                        <td>
+                            <div class="w-24 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                        <td>
+                            <div class="w-24 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                        <td>
+                            <div class="w-32 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                        <td>
+                            <div class="w-32 h-5 bg-base-3 animate-pulse"></div>
+                        </td>
+                    </Row>
+                {/each}
+            {:else if issueList == null || issueList.items.length === 0}
                 <Row>
                     <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
                 </Row>
@@ -76,7 +99,6 @@
                             <RelativeTime time={row.createdTime} />
                         </td>
                         <td
-                            class="max-md:hidden"
                             title={DateTime.fromISO(row.updatedTime).toLocaleString(
                                 DateTime.DATETIME_SHORT
                             )}
