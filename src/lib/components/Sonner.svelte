@@ -3,35 +3,23 @@
     import SonnerToast from './SonnerToast.svelte';
     import type { Snippet } from 'svelte';
 
-    export type ToastProps<TTitle, TDescription> = (
+    export type ToastProps<TBody> = (
+        | { body: string; bodyProps?: never }
         | {
-              title?: string;
-              titleProps?: never;
+              body: Snippet<[TBody]>;
+              bodyProps?: TBody;
           }
-        | {
-              title: Snippet<[TTitle]>;
-              titleProps?: TTitle;
-          }
-    ) &
-        (
-            | {
-                  description?: string;
-                  descriptionProps?: never;
-              }
-            | {
-                  description: Snippet<[TDescription]>;
-                  descriptionProps?: TDescription;
-              }
-        ) & {
-            durationMs?: number;
-            onDismiss?: () => void;
-        };
+    ) & {
+        type?: 'positive' | 'negative';
+        durationMs?: number;
+        onDismiss?: () => void;
+    };
 
-    export const toast = <TTitle, TDescription>({
+    export const toast = <TBody,>({
         durationMs = 5000,
         onDismiss,
         ...props
-    }: ToastProps<TTitle, TDescription>) => {
+    }: ToastProps<TBody>) => {
         const id = __toast(SonnerToast as unknown as Parameters<typeof __toast>[0], {
             componentProps: {
                 ...props,

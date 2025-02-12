@@ -57,7 +57,9 @@
         minus: () => import('~icons/heroicons/minus-16-solid'),
         edit: () => import('~icons/heroicons/pencil-16-solid'),
         link: () => import('~icons/heroicons/link-16-solid'),
-        'arrow-right': () => import('~icons/heroicons/arrow-right-16-solid')
+        'arrow-right': () => import('~icons/heroicons/arrow-right-16-solid'),
+        success: () => import('~icons/heroicons/check-circle-16-solid'),
+        failure: () => import('~icons/heroicons/exclamation-circle-16-solid')
     };
 
     export type IconName = keyof typeof imports;
