@@ -12,7 +12,11 @@ export const createProjectQueryParams = () => {
 
 export const createIssueListQueryParams = (deps: () => { projectId: string }) => {
     const { projectId } = deps();
-    return { projectId, select: 'CreatedTime,UpdatedTime,Id,Title,Description,OrderNumber' };
+    return {
+        projectId,
+        select: 'CreatedTime,UpdatedTime,Id,Title,Description,OrderNumber',
+        size: 5
+    };
 };
 
 export const createIssueListQuery = (deps: () => { projectId: string }) => {
