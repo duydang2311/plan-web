@@ -68,19 +68,19 @@
 {#snippet item(value: number | null)}
     <li class="relative w-12">
         {#if value == null}
-            <div class="w-full h-full text-center items-center text-base-fg-ghost">...</div>
+            <div class="text-base-fg-ghost h-full w-full items-center text-center">...</div>
         {:else}
             {#if pagination.page === value}
                 <div
                     bind:this={active}
                     data-flip-id="pagination"
-                    class="absolute inset-0 bg-base-active rounded-full"
+                    class="bg-base-active absolute inset-0 rounded-full"
                 ></div>
             {/if}
             <a
                 href="{page.url.pathname}{getSearchParams(value).toString()}"
                 class={clsx(
-                    'block text-center relative w-full h-full content-center rounded-full py-1 transition ease-in-out',
+                    'relative block h-full w-full content-center rounded-full py-1 text-center transition',
                     pagination.page === value
                         ? 'text-base-fg-2 pointer-events-none'
                         : 'hover:bg-base-hover'
@@ -94,7 +94,7 @@
 {/snippet}
 
 <div
-    class="rounded-b-xl bg-base-1/20 border-t border-t-base-border-3 backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+    class="bg-base-1/20 border-t-base-border-3 sticky inset-x-0 bottom-0 flex items-center justify-between rounded-b-xl border-t px-8 py-4 backdrop-blur"
 >
     <span class="text-base-fg-4 text-sm font-medium">
         {#if pagination.totalCount === 0}
@@ -107,22 +107,22 @@
             })}
         {:else}
             Showing
-            <span class="font-bold text-base-fg-2">{offset + 1}</span>
+            <span class="text-base-fg-2 font-bold">{offset + 1}</span>
             to
-            <span class="font-bold text-base-fg-2">{offset + pagination.size}</span>
+            <span class="text-base-fg-2 font-bold">{offset + pagination.size}</span>
             of
-            <span class="font-bold text-base-fg-2">{pagination.totalCount}</span>
+            <span class="text-base-fg-2 font-bold">{pagination.totalCount}</span>
             entries.
         {/if}
     </span>
-    <ol class="flex items-stretch text-sm font-bold text-base-fg-4">
+    <ol class="text-base-fg-4 flex items-stretch text-sm font-bold">
         <li>
             <a
                 href="{page.url.pathname}{getSearchParams(pagination.page - 1).toString()}"
                 class={clsx(
-                    'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                    'block h-full content-center rounded-full px-4 transition duration-100',
                     pagination.page === 1
-                        ? 'pointer-events-none text-base-fg-3/40'
+                        ? 'text-base-fg-3/40 pointer-events-none'
                         : 'hover:bg-base-hover'
                 )}
                 data-sveltekit-replacestate
@@ -137,9 +137,9 @@
             <a
                 href="{page.url.pathname}{getSearchParams(pagination.page + 1).toString()}"
                 class={clsx(
-                    'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                    'block h-full content-center rounded-full px-4 transition duration-100',
                     pagination.page === totalPages
-                        ? 'pointer-events-none text-base-fg-3/40'
+                        ? 'text-base-fg-3/40 pointer-events-none'
                         : 'hover:bg-base-hover'
                 )}
                 data-sveltekit-replacestate

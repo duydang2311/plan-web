@@ -57,17 +57,14 @@
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
                     <Icon
                         name="arrow-up"
-                        class={clsx(
-                            'transition-transform ease-in-out',
-                            state[0] === 'desc' && 'rotate-180'
-                        )}
+                        class={clsx('transition-transform', state[0] === 'desc' && 'rotate-180')}
                     />
                 </div>
             {:else}
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
                     <Icon
                         name="arrows-up-down"
-                        class="transition ease-in-out text-base-fg-ghost group-hover:text-current"
+                        class="text-base-fg-ghost transition group-hover:text-current"
                     />
                 </div>
             {/if}

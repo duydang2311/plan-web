@@ -21,7 +21,7 @@
         }
         .spinner_V8m1 circle {
             stroke-linecap: round;
-            animation: spinner_YpZS 1.5s ease-in-out infinite;
+            animation: spinner_YpZS 1.5s infinite;
         }
         @keyframes spinner_zKoa {
             100% {

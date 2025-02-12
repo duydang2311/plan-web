@@ -127,14 +127,14 @@
             <div
                 bind:this={active}
                 data-flip-id="pagination"
-                class="absolute inset-0 bg-base-active rounded-full"
+                class="bg-base-active absolute inset-0 rounded-full"
             ></div>
         {/if}
         <a
             data-sveltekit-noscroll
             href="{search}page={page}"
             class={clsx(
-                'relative block h-full content-center rounded-full py-1 transition ease-in-out',
+                'relative block h-full content-center rounded-full py-1 transition',
                 query.page === page ? 'text-base-fg-2' : 'hover:bg-base-hover'
             )}
         >
@@ -144,7 +144,7 @@
 {/snippet}
 
 <div
-    class="rounded-b-xl bg-base-1/20 border-t border-t-base-border-3 backdrop-blur sticky inset-x-0 bottom-0 flex justify-between items-center px-8 py-4"
+    class="bg-base-1/20 border-t-base-border-3 sticky inset-x-0 bottom-0 flex items-center justify-between rounded-b-xl border-t px-8 py-4 backdrop-blur"
 >
     <span class="text-base-fg-3 text-sm font-bold">
         {#if list.length === 0}
@@ -159,7 +159,7 @@
             Displaying {query.offset + 1} - {query.offset + list.length} out of {list.totalCount} items.
         {/if}
     </span>
-    <ol class="flex items-stretch text-sm font-bold text-base-fg-5">
+    <ol class="text-base-fg-5 flex items-stretch text-sm font-bold">
         {#if totalPages <= 1}
             {@render item(1)}
         {:else}
@@ -168,9 +168,9 @@
                     data-sveltekit-noscroll
                     href="{search}page={query.page - 1}"
                     class={clsx(
-                        'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                        'block h-full content-center rounded-full px-4 transition duration-100',
                         query.page === 1
-                            ? 'pointer-events-none text-base-fg-3/40'
+                            ? 'text-base-fg-3/40 pointer-events-none'
                             : 'hover:bg-base-hover'
                     )}
                 >
@@ -187,9 +187,9 @@
                     data-sveltekit-noscroll
                     href="{search}page={query.page + 1}"
                     class={clsx(
-                        'block px-4 h-full content-center rounded-full transition duration-100 ease-in-out',
+                        'block h-full content-center rounded-full px-4 transition duration-100',
                         query.page === totalPages
-                            ? 'pointer-events-none text-base-fg-3/40'
+                            ? 'text-base-fg-3/40 pointer-events-none'
                             : 'hover:bg-base-hover'
                     )}
                 >

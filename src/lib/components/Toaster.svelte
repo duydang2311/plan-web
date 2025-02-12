@@ -51,7 +51,7 @@
 </script>
 
 <div
-    class="fixed bottom-4 z-50 flex flex-col items-end ease-in-out gap-2 max-md:inset-x-4 md:right-4 md:w-full md:max-w-paragraph-sm"
+    class="md:max-w-paragraph-sm fixed bottom-4 z-50 flex flex-col items-end gap-2 max-md:inset-x-4 md:right-4 md:w-full"
     use:portal
 >
     {#each $toasts as toast (toast.id)}

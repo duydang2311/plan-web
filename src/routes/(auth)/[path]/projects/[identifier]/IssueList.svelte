@@ -12,7 +12,7 @@
 
 {#snippet skeleton()}
     <li
-        class="group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 p-2 animate-pulse *:h-6 *:rounded"
+        class="group relative grid animate-pulse grid-cols-[auto_1fr_auto] items-center gap-4 p-2 *:h-6 *:rounded"
     >
         <div class="bg-base-3 w-16"></div>
         <div class="bg-base-3 w-full"></div>
@@ -29,7 +29,7 @@
             variant="base"
             filled={false}
             size="sm"
-            class="flex items-center gap-2 w-fit"
+            class="flex w-fit items-center gap-2"
         >
             <Icon name="arrow-right" />
             See more
@@ -61,26 +61,26 @@
                                 href="/{page.params.path}/projects/{page.params
                                     .identifier}/issues/{item.orderNumber}"
                                 class={[
-                                    'group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 p-2 rounded transition-[color_background-color_padding] ease-in-out',
-                                    'hover:pl-8 hover:bg-base-3 hover:text-base-fg-1'
+                                    'group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded p-2 transition-[color_background-color_padding]',
+                                    'hover:bg-base-3 hover:text-base-fg-1 hover:pl-8'
                                 ]}
                             >
                                 <Icon
                                     name="chevron-right"
-                                    class="absolute left-0 translate-x-0 opacity-0 top-1/2 -translate-y-1/2 transition-[opacity_transform] transform ease-in-out group-hover:translate-x-1/2 group-hover:opacity-100"
+                                    class="absolute left-0 top-1/2 -translate-y-1/2 translate-x-0 transform opacity-0 transition-[opacity_transform] group-hover:translate-x-1/2 group-hover:opacity-100"
                                 />
                                 <div
-                                    class="text-base-fg-5 text-sm whitespace-nowrap overflow-hidden font-medium tracking-tight"
+                                    class="text-base-fg-5 overflow-hidden whitespace-nowrap text-sm font-medium tracking-tight"
                                 >
                                     {page.params.identifier}-{item.orderNumber}
                                 </div>
                                 <div
-                                    class="text-ellipsis whitespace-nowrap overflow-hidden font-medium"
+                                    class="overflow-hidden text-ellipsis whitespace-nowrap font-medium"
                                 >
                                     {item.title}
                                 </div>
                                 <div
-                                    class="text-base-fg-5 text-ellipsis whitespace-nowrap overflow-hidden text-sm"
+                                    class="text-base-fg-5 overflow-hidden text-ellipsis whitespace-nowrap text-sm"
                                     title={created.toLocaleString(DateTime.DATETIME_MED)}
                                 >
                                     created {created.toRelative()}

@@ -89,13 +89,13 @@
 
 <li
     class={clsx(
-        'min-w-96 flex flex-col py-4 rounded-lg transition ease-in-out duration-75',
+        'flex min-w-96 flex-col rounded-lg py-4 transition duration-75',
         dragStatus != null && dragStatusClasses[dragStatus]
     )}
     use:atlas={{ id: status.id }}
 >
     <h2 class="text-h5 px-4">{status.value}</h2>
-    <div class="scrollbar-3 grow overflow-x-hidden overflow-y-auto pt-2">
+    <div class="scrollbar-3 grow overflow-y-auto overflow-x-hidden pt-2">
         <ol class="h-full px-4">
             {#each issues as issue (issue.id)}
                 <li

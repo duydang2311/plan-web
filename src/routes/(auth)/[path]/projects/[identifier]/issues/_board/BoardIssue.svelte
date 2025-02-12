@@ -101,15 +101,15 @@
 <div class="py-1" use:atlas={issue}>
     <div
         class={clsx(
-            'relative w-full p-4 rounded-md border cursor-grab transition ease-in-out duration-75',
+            'relative w-full cursor-grab rounded-md border p-4 transition duration-75',
             dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={8} radius={8} stroke={2} />
         {/if}
-        <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
-            <p class="leading-none text-sm">
+        <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
+            <p class="text-sm leading-none">
                 <small>{identifier}-{issue.orderNumber}</small>
             </p>
             <Icon name="draggable" class="ml-auto h-4" />

@@ -63,8 +63,8 @@
         color: var(--color-base-fg-2);
         font-family: var(--font-body);
         transition:
-            color 100ms ease-in-out,
-            background-color 100ms ease-in-out;
+            color 100ms var(--cubic-out),
+            background-color 100ms var(--cubic-out);
     }
 
     .prose {

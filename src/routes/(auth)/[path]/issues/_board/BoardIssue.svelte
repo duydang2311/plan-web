@@ -134,15 +134,15 @@
 <div class="py-1" use:atlas={issue}>
     <div
         class={clsx(
-            'relative w-full p-4 rounded-md border cursor-grab transition ease-in-out duration-75',
+            'relative w-full cursor-grab rounded-md border p-4 transition duration-75',
             dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={8} radius={8} stroke={2} />
         {/if}
-        <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
-            <p class="leading-none text-sm">
+        <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
+            <p class="text-sm leading-none">
                 <small>{identifier}-{issue.orderNumber}</small>
             </p>
             <Icon name="draggable" class="ml-auto h-4" />
@@ -162,10 +162,10 @@
             .height}px - 1rem);{navigator.userAgent.includes('Windows')
             ? ' max-width: 280px; max-height: 280px;'
             : ''}"
-        class="bg-base-1 z-10 rounded-md text-base-fg-1 px-4 content-center opacity-100 border border-base-border-2"
+        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border px-4 opacity-100"
     >
-        <div class="flex gap-1 justify-between items-center text-base-fg-ghost mb-2">
-            <p class="leading-none text-sm">
+        <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
+            <p class="text-sm leading-none">
                 <small>{identifier}-{issue.orderNumber}</small>
             </p>
             <Icon name="draggable" class="ml-auto h-4" />

@@ -42,10 +42,7 @@
                     >
                         <Icon
                             name="chevron-right"
-                            class={clsx(
-                                'transition ease-in-out',
-                                $open && 'rotate-90 text-base-fg-1'
-                            )}
+                            class={clsx('transition', $open && 'text-base-fg-1 rotate-90')}
                         />
                     </IconButton>
                 </Self>
@@ -82,27 +79,21 @@
 {:else}
     <div
         class={clsx(
-            'relative flex gap-2 rounded-md transition-[color_background-color_font-weight] ease-in-out duration-75 hover:bg-base-fg-1/5',
-            isActive && 'font-bold group-[:not(:hover)]:bg-base-fg-1/5 text-base-fg-1',
+            'hover:bg-base-fg-1/5 relative flex gap-2 rounded-md transition-[color_background-color_font-weight] duration-75',
+            isActive && 'group-[:not(:hover)]:bg-base-fg-1/5 text-base-fg-1 font-bold',
             props.class
         )}
     >
-        <a {href} class="grow flex p-2 items-center gap-2 font-display">
+        <a {href} class="font-display flex grow items-center gap-2 p-2">
             <div class="transition-enforcement">
                 <Icon
                     name={activeIcon}
-                    class={clsx(
-                        'transition-opacity ease-in-out duration-200',
-                        !isActive && 'opacity-0'
-                    )}
+                    class={clsx('transition-opacity duration-200', !isActive && 'opacity-0')}
                     aria-hidden={!isActive}
                 />
                 <Icon
                     name={icon}
-                    class={clsx(
-                        'transition-opacity ease-in-out duration-200',
-                        isActive && 'opacity-0'
-                    )}
+                    class={clsx('transition-opacity duration-200', isActive && 'opacity-0')}
                     aria-hidden={isActive}
                 />
             </div>

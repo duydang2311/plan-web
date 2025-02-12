@@ -117,17 +117,17 @@
     );
 </script>
 
-<Row bind:ref class="relative transition ease-in-out">
-    <td class="content-center pr-0 text-base-fg-ghost cursor-grab">
+<Row bind:ref class="relative transition">
+    <td class="text-base-fg-ghost cursor-grab content-center pr-0">
         <Icon name="draggable" />
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={0} />
         {/if}
     </td>
-    <td class="whitespace-nowrap overflow-hidden text-ellipsis" title={status.value}>
+    <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={status.value}>
         {status.value}
     </td>
-    <td class="whitespace-nowrap overflow-hidden text-ellipsis" title={status.description}>
+    <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={status.description}>
         {#if status.description}
             {status.description}
         {/if}
@@ -143,7 +143,7 @@
         style={navigator.userAgent.includes('Windows')
             ? 'max-width: 280px; max-height: 280px;'
             : undefined}
-        class="bg-base-1 rounded px-3 py-1 border border-base-border-2 font-medium"
+        class="bg-base-1 border-base-border-2 rounded border px-3 py-1 font-medium"
     >
         {status.value}
     </div>
