@@ -3,7 +3,7 @@
     import { type ComboboxOption, melt } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { addToast, Button, DialogBuilder, Icon, LoadingMonitor } from '~/lib/components';
+    import { addToast, Button, DialogBuilder, Icon, LoadingMonitor, toast } from '~/lib/components';
     import SearchUserCombobox, {
         type SearchUser
     } from '~/lib/components/SearchUserCombobox.svelte';
@@ -48,11 +48,11 @@
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-8 w-full max-w-paragraph-lg"
+            class="max-w-paragraph-lg fixed top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 p-8"
         >
-            <div class="bg-base-1 p-8 rounded-md space-y-4 border border-base-border-2">
+            <div class="bg-base-1 border-base-border-2 space-y-4 rounded-md border p-8">
                 <div class="text-center">
-                    <Icon name="user-plus" class="size-16 mx-auto" />
+                    <Icon name="user-plus" class="mx-auto size-16" />
                     <h2 use:melt={title}>Invite member</h2>
                     <p class="c-label mx-auto text-pretty" use:melt={description}>
                         Find and invite people to your project by their username or email address.
@@ -87,12 +87,10 @@
                                 );
                             } else {
                                 status.succeed();
-                                addToast({
-                                    data: {
-                                        title: `Invitation sent`,
-                                        description: successDescription,
-                                        descriptionProps: name
-                                    }
+                                toast({
+                                    title: 'Invitation sent',
+                                    description: successDescription,
+                                    descriptionProps: name
                                 });
                             }
                             await queryClient.invalidateQueries({
@@ -105,11 +103,11 @@
                     {#if $selected}
                         <input type="hidden" name="userId" value={$selected.value.id} />
                     {/if}
-                    <div class="flex gap-4 items-center justify-between flex-wrap">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
                         {#if status.isSuccess}
                             <p class="text-positive-1 c-label">Invitation sent successfully.</p>
                         {/if}
-                        <div class="grow flex items-center gap-2 justify-end">
+                        <div class="flex grow items-center justify-end gap-2">
                             <Button type="button" variant="base" outline melt={close} class="w-fit">
                                 Cancel
                             </Button>
@@ -117,7 +115,7 @@
                                 type="submit"
                                 variant="primary"
                                 outline
-                                class="w-fit flex gap-2 items-center"
+                                class="flex w-fit items-center gap-2"
                                 disabled={loading.immediate}
                             >
                                 <LoadingMonitor {loading} class="size-5">
