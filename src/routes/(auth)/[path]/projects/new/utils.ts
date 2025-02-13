@@ -5,7 +5,8 @@ export const validate = validator(
     Type.Object({
         workspaceId: Type.String(),
         name: Type.String(),
-        identifier: Type.String({ maxLength: 5 })
+        identifier: Type.String({ maxLength: 5 }),
+        description: Type.Optional(Type.String())
     }),
     { stripLeadingSlash: true }
 );
@@ -16,6 +17,7 @@ export function decode(formData: FormData) {
     return {
         workspaceId: formData.get('workspaceId'),
         name: formData.get('name'),
-        identifier: formData.get('identifier')
+        identifier: formData.get('identifier'),
+        description: formData.get('description')
     };
 }
