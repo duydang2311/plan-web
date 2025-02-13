@@ -13,14 +13,14 @@
 
 <Main>
     <div class="max-w-paragraph-lg mx-auto">
-        <h1 class="text-h1">
+        <h1 class="text-h1 tracking-none">
             {data.project.name}
         </h1>
         <p class="c-label">
             {page.params.identifier} · created <RelativeTime time={data.project.createdTime} />
         </p>
         {#if data.project.description != null}
-            <p class="mt-8">
+            <p class="c-label mt-2">
                 {data.project.description ?? 'Description not available.'}
             </p>
         {/if}
