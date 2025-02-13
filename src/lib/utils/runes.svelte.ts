@@ -10,6 +10,11 @@ export interface Loading {
     get long(): boolean;
 }
 
+export interface Ref<T> {
+    get value(): T;
+    set value(value: T);
+}
+
 export const createEffect: ((fn: () => void | (() => void), depsFn?: () => unknown) => void) & {
     pre: (fn: () => void | (() => void), depsFn?: () => unknown) => void;
 } = Object.assign(
@@ -167,4 +172,22 @@ export const createUiStatus = () => {
     };
 
     return uiStatus;
+};
+
+export const createRef = <T>(f: () => T): Ref<T> => {
+    let value = $state.raw(f());
+    $effect(() => {
+        const v = f();
+        untrack(() => {
+            value = v;
+        });
+    });
+    return {
+        get value() {
+            return value;
+        },
+        set value(v) {
+            value = v;
+        }
+    };
 };
