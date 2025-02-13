@@ -1,25 +1,29 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { useQueryClient } from '@tanstack/svelte-query';
+    import { invalidate } from '$app/navigation';
     import { writable } from 'svelte/store';
     import {
-        addToast,
         Button,
         Icon,
         IconButton,
         Popover,
         PopoverArrow,
-        PopoverBuilder
+        PopoverBuilder,
+        toast
     } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Project } from '~/lib/models/project';
     import { validateActionFailureData } from '~/lib/utils/kit.client';
+    import type { Ref } from '~/lib/utils/runes.svelte';
+    import type { LocalProject } from './+page.server';
 
     const {
-        queryKey,
+        ref,
         project
-    }: { queryKey: readonly unknown[]; project: Pick<Project, 'id' | 'name'> } = $props();
-    const queryClient = useQueryClient();
+    }: {
+        ref: Ref<PaginatedList<LocalProject> | undefined>;
+        project: Pick<Project, 'id' | 'name'>;
+    } = $props();
     const open = writable(false);
 </script>
 
@@ -61,70 +65,56 @@
             <Icon name="trash" />
         </IconButton>
         {#if $open}
-            <Popover melt={content} class="text-pretty w-96">
+            <Popover melt={content} class="w-96 text-pretty">
                 <PopoverArrow melt={arrow} />
                 <h2 class="mb-2">Delete project?</h2>
                 <p>Would you like to delete the project? This action cannot be undone.</p>
                 <form
                     method="post"
-                    action="?/delete-project"
-                    class="flex gap-2 flex-wrap mt-4 justify-end"
+                    action="?/delete_project"
+                    class="mt-4 flex flex-wrap justify-end gap-2"
                     use:enhance={async () => {
-                        await queryClient.cancelQueries({ queryKey });
-                        const old = queryClient.getQueryData<PaginatedList<Project>>(queryKey);
+                        const old = ref.value;
                         if (old) {
-                            queryClient.setQueryData(
-                                queryKey,
-                                paginatedList({
-                                    items: old.items.filter((a) => a.id !== project.id),
-                                    totalCount: old.totalCount - 1
-                                })
-                            );
+                            ref.value = paginatedList({
+                                items: old.items.filter((a) => a.id !== project.id),
+                                totalCount: old.totalCount - 1
+                            });
                         }
                         return async ({ result }) => {
                             if (result.type === 'success') {
-                                addToast({
-                                    data: {
-                                        title: 'Project deleted',
-                                        description: success
-                                    }
+                                toast({
+                                    type: 'positive',
+                                    body: success
                                 });
                             } else if (result.type === 'failure') {
-                                queryClient.setQueryData(queryKey, old);
-
                                 const validation = validateActionFailureData(
                                     result.data?.deleteProject
                                 );
                                 if (!validation.ok) {
-                                    addToast({
-                                        data: {
-                                            title: 'Unable to delete project',
-                                            description: genericFailure,
-                                            descriptionProps: 'unknown'
-                                        }
+                                    toast({
+                                        type: 'negative',
+                                        body: genericFailure,
+                                        bodyProps: 'unknown'
                                     });
                                     return;
                                 }
 
                                 if (validation.data.errors.root.includes('403')) {
-                                    addToast({
-                                        data: {
-                                            title: 'Unable to delete project',
-                                            description: forbiddenFailure
-                                        }
+                                    toast({
+                                        type: 'negative',
+                                        body: forbiddenFailure
                                     });
                                 } else {
-                                    addToast({
-                                        data: {
-                                            title: 'Unable to delete project',
-                                            description: genericFailure,
-                                            descriptionProps:
-                                                validation.data.errors.root[0] ?? 'unknown'
-                                        }
+                                    toast({
+                                        type: 'negative',
+                                        body: genericFailure,
+                                        bodyProps: validation.data.errors.root[0] ?? 'unknown'
                                     });
                                 }
+                                ref.value = old;
                             }
-                            await queryClient.invalidateQueries({ queryKey });
+                            await invalidate('fetch:projects');
                         };
                     }}
                 >
