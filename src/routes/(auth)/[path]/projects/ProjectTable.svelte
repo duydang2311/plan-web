@@ -84,7 +84,9 @@
                         <RelativeTime time={updatedTime} />
                     </td>
                     <td>
-                        <DeleteButton project={{ id, name }} {ref} />
+                        <div class="flex items-center">
+                            <DeleteButton project={{ id, name }} {ref} />
+                        </div>
                     </td>
                 </Row>
             {/each}
