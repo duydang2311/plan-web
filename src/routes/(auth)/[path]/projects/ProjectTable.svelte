@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { Link, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
+    import { Link, RelativeTime, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { LocalProject } from './+page.server';
     import { createRef, type Loading } from '~/lib/utils/runes.svelte';
@@ -23,24 +23,24 @@
 {#snippet skeleton()}
     <Row class="animate-pulse">
         <td>
-            <div class="bg-base-3 h-5 w-16"></div>
+            <div class="bg-base-3 h-6 w-16"></div>
         </td>
         <td>
-            <div class="bg-base-3 h-5 w-32"></div>
+            <div class="bg-base-3 h-6 w-32"></div>
         </td>
         <td>
-            <div class="bg-base-3 h-5 w-24"></div>
+            <div class="bg-base-3 h-6 w-24"></div>
         </td>
         <td>
-            <div class="bg-base-3 h-5 w-24"></div>
+            <div class="bg-base-3 h-6 w-24"></div>
         </td>
         <td>
-            <div class="bg-base-3 h-5 w-24"></div>
+            <div class="bg-base-3 h-6 w-8"></div>
         </td>
     </Row>
 {/snippet}
 
-<Table class={['grid-cols-[auto_1fr_auto_auto_auto]', loading.short && 'animate-pulse']}>
+<Table class={['grid-cols-[auto_1fr_auto_auto_auto]', loading.immediate && 'animate-pulse']}>
     <THead>
         <Row class="py-2">
             <ThSort3 name="identifier">Identifier</ThSort3>
@@ -51,15 +51,13 @@
         </Row>
     </THead>
     <tbody>
-        {#if ref.value != null && loading.immediate}
+        {#if ref.value == null && loading.immediate}
             {#each { length: 3 } as _}
                 {@render skeleton()}
             {/each}
         {:else if ref.value == null || ref.value.items.length === 0}
             <Row>
-                <td class="col-span-full">
-                    <span class="text-base-fg-ghost"><italic>No projects yet.</italic></span>
-                </td>
+                <td class="text-base-fg-ghost col-span-full"> No projects found. </td>
             </Row>
         {:else}
             {#each ref.value.items as { id, identifier, name, createdTime, updatedTime } (id)}
@@ -73,16 +71,20 @@
                             {name}
                         </Link>
                     </td>
-                    <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={createdTime}>
-                        {DateTime.fromISO(createdTime).toLocaleString(DateTime.DATE_MED)}
+                    <td
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                        title={DateTime.fromISO(createdTime).toLocaleString(DateTime.DATE_MED)}
+                    >
+                        <RelativeTime time={createdTime} />
                     </td>
-                    <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={updatedTime}>
-                        {DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATE_MED)}
+                    <td
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                        title={DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATE_MED)}
+                    >
+                        <RelativeTime time={updatedTime} />
                     </td>
                     <td>
-                        <div class="flex flex-wrap gap-2">
-                            <DeleteButton project={{ id, name }} {ref} />
-                        </div>
+                        <DeleteButton project={{ id, name }} {ref} />
                     </td>
                 </Row>
             {/each}
