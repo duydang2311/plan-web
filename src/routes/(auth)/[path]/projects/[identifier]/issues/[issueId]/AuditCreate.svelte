@@ -18,7 +18,7 @@
         <Avatar
             seed={audit.user.profile?.name ?? audit.user.email}
             src={imageFromAsset(cloudinary)(audit.user.profile?.image)
-                ?.resize(Resize.fill(32))
+                ?.resize(Resize.fill(64))
                 .toURL()}
             class="size-8"
         />

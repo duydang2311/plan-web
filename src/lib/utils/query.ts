@@ -5,8 +5,7 @@ export const prefetchQuery =
     (queryKey: readonly unknown[], queryFn: () => MaybePromise<unknown>) => {
         queryClient.prefetchQuery({
             queryKey,
-            queryFn,
-            staleTime: 0
+            queryFn
         });
     };
 

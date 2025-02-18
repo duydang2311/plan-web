@@ -244,7 +244,7 @@ export const actions: Actions = {
 
                     const api = yield* ApiClient;
                     const response = yield* api.patch(
-                        `issue-comments/${validation.data.issueCommentId}`,
+                        `issue-audits/comments/${validation.data.id}`,
                         {
                             body: {
                                 patch: {
@@ -340,7 +340,7 @@ export const actions: Actions = {
 
                     const api = yield* ApiClient;
                     const response = yield* api.delete(
-                        `issue-comments/${validation.data.issueCommentId}`
+                        `issue-audits/comments/${validation.data.issueCommentId}`
                     );
 
                     if (!response.ok) {

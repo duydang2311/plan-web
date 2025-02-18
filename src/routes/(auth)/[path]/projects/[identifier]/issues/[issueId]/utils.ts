@@ -3,6 +3,7 @@ import { toStore } from 'svelte/store';
 import { useRuntime } from '~/lib/contexts/runtime.client';
 import { validator } from '~/lib/utils/validation';
 import type { LocalIssue } from './+page.server';
+import { Type } from '~/lib/utils/typebox';
 
 export const validate = validator<{ issueId: string; content: string }>((input, { error }) => {
     if (typeof input !== 'object' || !input) {
@@ -44,25 +45,12 @@ export const validateEditDescription = validator<{ issueId: string; description:
     }
 );
 
-export const validateEditComment = validator<{ issueCommentId: string; content: string }>(
-    (input, { error }) => {
-        if (typeof input !== 'object' || !input) {
-            return error('root', 'object');
-        }
-        if (!('issueCommentId' in input) || typeof input.issueCommentId !== 'string') {
-            return error('issueCommentId', 'string');
-        }
-
-        if (!('content' in input) || typeof input.content !== 'string') {
-            return error('content', 'string');
-        }
-        const content = input.content.trim();
-        if (content.length === 0) {
-            return error('content', 'string');
-        }
-
-        input.content = content;
-    }
+export const validateEditComment = validator(
+    Type.Object({
+        id: Type.Number(),
+        content: Type.String()
+    }),
+    { convert: true, stripLeadingSlash: true }
 );
 
 export const validateDeleteIssue = validator<{ issueId: string }>((input, { error }) => {
@@ -74,14 +62,12 @@ export const validateDeleteIssue = validator<{ issueId: string }>((input, { erro
     }
 });
 
-export const validateDeleteComment = validator<{ issueCommentId: string }>((input, { error }) => {
-    if (typeof input !== 'object' || !input) {
-        return error('root', 'object');
-    }
-    if (!('issueCommentId' in input) || typeof input.issueCommentId !== 'string') {
-        return error('issueCommentId', 'string');
-    }
-});
+export const validateDeleteComment = validator(
+    Type.Object({
+        id: Type.Number()
+    }),
+    { convert: true, stripLeadingSlash: true }
+);
 
 export function decode(formData: FormData) {
     return {
@@ -99,7 +85,7 @@ export function decodeEditDescription(formData: FormData) {
 
 export function decodeEditComment(formData: FormData) {
     return {
-        issueCommentId: formData.get('issueCommentId'),
+        id: formData.get('id'),
         content: formData.get('content')
     };
 }
@@ -112,7 +98,7 @@ export function decodeDeleteIssue(formData: FormData) {
 
 export function decodeDeleteComment(formData: FormData) {
     return {
-        issueCommentId: formData.get('issueCommentId')
+        id: formData.get('id')
     };
 }
 
@@ -140,10 +126,19 @@ export const createIssueQuery = (depsFn: () => { issueId: string }) => {
     );
 };
 
-export const createFetchIssueAuditListQuery = (depsFn: () => { issueId: string }) => {
-    const { issueId } = depsFn();
+export const createIssueAuditListQuery = ({
+    issueId,
+    offset,
+    size
+}: {
+    issueId: string;
+    offset: number;
+    size: number;
+}) => {
     return {
         issueId,
-        select: 'Id,CreatedTime,Action,Data,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+        select: 'Id,CreatedTime,Action,Data,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image',
+        offset,
+        size
     };
 };

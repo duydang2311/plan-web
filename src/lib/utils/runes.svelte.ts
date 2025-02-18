@@ -1,5 +1,6 @@
 import { Duration } from 'effect';
 import { onDestroy, untrack } from 'svelte';
+import { isPromiseLike, unwrapMaybePromise } from './promise';
 
 export interface Loading {
     set(): void;
@@ -13,6 +14,10 @@ export interface Loading {
 export interface Ref<T> {
     get value(): T;
     set value(value: T);
+}
+
+export interface AsyncRef<T> extends Ref<T> {
+    loading: Loading;
 }
 
 export const createEffect: ((fn: () => void | (() => void), depsFn?: () => unknown) => void) & {
@@ -174,14 +179,16 @@ export const createUiStatus = () => {
     return uiStatus;
 };
 
-export const createRef = <T>(f: () => T): Ref<T> => {
-    let value = $state.raw(f());
-    $effect(() => {
-        const v = f();
-        untrack(() => {
-            value = v;
+function __createRef<T>(f: T | (() => T)): Ref<T> {
+    let value = $state.raw(f instanceof Function ? f() : f);
+    if (f instanceof Function) {
+        $effect(() => {
+            const a = f();
+            untrack(() => {
+                value = a;
+            });
         });
-    });
+    }
     return {
         get value() {
             return value;
@@ -190,4 +197,56 @@ export const createRef = <T>(f: () => T): Ref<T> => {
             value = v;
         }
     };
-};
+}
+
+export const createRef = Object.assign(__createRef, {
+    maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<T | undefined> => {
+        const value = f();
+        const loading = createLoading();
+        if (!isPromiseLike(value)) {
+            let state = $state.raw(value);
+            $effect(() => {
+                unwrapMaybePromise(f())((b) => {
+                    untrack(() => {
+                        state = b;
+                    });
+                });
+            });
+            return {
+                get value() {
+                    return state;
+                },
+                set value(v) {
+                    state = v;
+                },
+                loading
+            };
+        }
+
+        let state = $state.raw<T | undefined>(undefined);
+        loading.set();
+        unwrapMaybePromise(value)((a) => {
+            state = a;
+            loading.unset();
+        });
+        $effect(() => {
+            const a = f();
+            untrack(() => {
+                loading.set();
+                unwrapMaybePromise(a)((b) => {
+                    state = b;
+                    loading.unset();
+                });
+            });
+        });
+        return {
+            get value() {
+                return state;
+            },
+            set value(v) {
+                state = v;
+            },
+            loading
+        };
+    }
+});

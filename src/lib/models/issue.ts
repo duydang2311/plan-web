@@ -33,7 +33,8 @@ export interface IssueAudit {
 
 export const IssueAuditActions = {
     none: 0,
-    create: 1
+    create: 1,
+    comment: 4
 } as const;
 
 export const IssuePriorities = {

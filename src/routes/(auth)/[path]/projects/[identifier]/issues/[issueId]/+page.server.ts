@@ -9,11 +9,11 @@ import type { User, UserProfile } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
-import { paginatedQuery, queryParams } from '~/lib/utils/url';
+import { queryParams } from '~/lib/utils/url';
 import type { Actions, PageServerLoad } from './$types';
 import {
-    createFetchIssueAuditListQuery,
     createFetchIssueQuery,
+    createIssueAuditListQuery,
     decode,
     decodeDeleteComment,
     decodeDeleteIssue,
@@ -25,6 +25,7 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
+import { maybeStream } from '~/lib/utils/promise';
 
 export type LocalIssue = Pick<
     Issue,
@@ -63,7 +64,7 @@ export interface LocalComment {
 }
 
 export type LocalIssueAudit = Pick<IssueAudit, 'createdTime' | 'id' | 'action' | 'data'> & {
-    user: Pick<User, 'email'> & {
+    user: Pick<User, 'id' | 'email'> & {
         profile?: Pick<NonNullable<User['profile']>, 'name' | 'displayName' | 'image'>;
     };
 };
@@ -71,12 +72,14 @@ export type LocalIssueAudit = Pick<IssueAudit, 'createdTime' | 'id' | 'action' |
 export const load: PageServerLoad = async ({
     parent,
     url,
-    isDataRequest,
-    locals: { runtime, user }
+    locals: { runtime, user },
+    isDataRequest
 }) => {
     const data = await parent();
     const query = queryParams(url, {
-        'edit-desc': false
+        'edit-desc': false,
+        offset: 0,
+        size: 20
     });
     const exit = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
@@ -88,61 +91,21 @@ export const load: PageServerLoad = async ({
     }).pipe(runtime.runPromiseExit);
 
     if (Exit.isFailure(exit)) {
-        const { status, ...body } = pipe(
-            exit.cause,
-            Cause.failureOption,
-            Option.getOrElse(() => Effect.runSync(LoadResponse.UnknownError()))
-        );
+        const { status, ...body } = LoadResponse.Failure(exit);
         return error(status, body);
     }
 
-    const commentQuery = paginatedQuery(
-        queryParams(url, {
-            offset: 0,
-            size: 10
-        })
-    );
-
-    const commentList = runtime
-        .runPromiseExit(
-            Effect.gen(function* () {
-                const api = yield* ApiClient;
-                const response = yield* api.get(`issues/${exit.value.id}/comments`, {
-                    query: {
-                        offset: 0,
-                        size: commentQuery.offset + commentQuery.size,
-                        select: 'CreatedTime,UpdatedTime,Id,Content,Author.Id,Author.Email,Author.Profile.Image,Author.Profile.Name,Author.Profile.DisplayName'
-                    }
-                });
-                if (!response.ok) {
-                    return yield* Effect.succeed(paginatedList<LocalComment>());
-                }
-                const json = yield* Effect.tryPromise(() =>
-                    response.json<PaginatedList<LocalComment>>()
-                );
-                return {
-                    ...json,
-                    nextOffset: json.items.length >= json.totalCount ? null : json.items.length
-                };
-            })
-        )
-        .then((exit) => (Exit.isSuccess(exit) ? exit.value : paginatedList<LocalComment>()));
-
-    const issueAuditList = fetchIssueAuditList(exit.value.id).pipe(
+    const getAuditList = await fetchIssueAuditList(exit.value.id, query.offset, query.size).pipe(
         Effect.orElseSucceed(() => paginatedList<LocalIssueAudit>()),
-        runtime.runPromise
+        runtime.runPromise,
+        (a) => maybeStream(a)(isDataRequest)
     );
 
     return {
         page: {
             user,
             issue: exit.value,
-            isAuthor: exit.value.authorId === user.id,
-            comment: {
-                query: commentQuery,
-                list: isDataRequest ? commentList : await commentList
-            },
-            issueAuditList,
+            issueAuditList: getAuditList(),
             isEditing: query['edit-desc']
         }
     };
@@ -251,7 +214,7 @@ export const actions: Actions = {
 
         return null;
     },
-    'edit-comment': async ({ request, locals: { runtime } }) => {
+    edit_comment: async ({ request, locals: { runtime } }) => {
         const exit = await runtime.runPromiseExit(
             pipe(
                 Effect.gen(function* () {
@@ -264,11 +227,13 @@ export const actions: Actions = {
 
                     const api = yield* ApiClient;
                     const response = yield* api.patch(
-                        `issue-comments/${validation.data.issueCommentId}`,
+                        `issue-audits/comments/${validation.data.id}`,
                         {
                             body: {
                                 patch: {
-                                    content: validation.data.content
+                                    data: {
+                                        content: validation.data.content
+                                    }
                                 }
                             }
                         }
@@ -327,55 +292,25 @@ export const actions: Actions = {
 
         return redirect(302, `/${params.path}/projects/${params.identifier}/issues`);
     },
-    'delete-comment': async ({ request, locals: { runtime } }) => {
-        const exit = await runtime.runPromiseExit(
-            pipe(
-                Effect.gen(function* () {
-                    const formData = yield* Effect.tryPromise(() => request.formData());
-                    const validation = validateDeleteComment(decodeDeleteComment(formData));
+    delete_comment: ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteComment(decodeDeleteComment(formData))
+            );
 
-                    if (!validation.ok) {
-                        return yield* Effect.fail({ status: 400, errors: validation.errors });
-                    }
-
-                    const api = yield* ApiClient;
-                    const response = yield* api.delete(
-                        `issue-comments/${validation.data.issueCommentId}`
-                    );
-
-                    if (!response.ok) {
-                        return yield* Effect.fail({
-                            status: response.status,
-                            errors: { root: [response.status + ''] }
-                        });
-                    }
-
-                    return yield* Effect.succeed<void>(void 0);
-                }),
-                Effect.catchTags({
-                    ApiError: (e) => Effect.fail({ status: 500, errors: { root: [e.code] } }),
-                    UnknownException: () =>
-                        Effect.fail({ status: 500, errors: { root: ['unknown'] } })
-                })
-            )
-        );
-
-        if (Exit.isFailure(exit)) {
-            const failure = pipe(exit.cause, Cause.failureOption, Option.getOrThrow);
-            return fail(failure.status, {
-                editDescription: { errors: failure.errors as Record<string, string[]> }
-            });
-        }
-
-        return null;
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`issue-audits/${validation.data.id}`)
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
 
-const fetchIssueAuditList = (issueId: string) =>
+const fetchIssueAuditList = (issueId: string, offset: number, size: number) =>
     Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
             (yield* ApiClient).get('issue-audits', {
-                query: createFetchIssueAuditListQuery(() => ({ issueId }))
+                query: createIssueAuditListQuery({ issueId, offset: 0, size: size + offset })
             })
         );
 

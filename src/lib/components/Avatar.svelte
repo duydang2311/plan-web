@@ -22,7 +22,7 @@
     {...props}
     src={src ? src : seed != null ? createAvatarDataUri(seed) : 'data:,'}
     class={clsx(
-        'rounded-full aspect-square object-cover ring-1 ring-offset-1 ring-base-border-1 bg-base-1',
+        'border-base-border-1 bg-base-1 aspect-square rounded-full border object-cover',
         props.class
     )}
 />

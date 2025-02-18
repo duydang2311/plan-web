@@ -1,3 +1,4 @@
+import { Type } from '~/lib/utils/typebox';
 import { validator } from '~/lib/utils/validation';
 
 export const validate = validator<{ issueId: string; content: string }>((input, { error }) => {
@@ -40,25 +41,12 @@ export const validateEditDescription = validator<{ issueId: string; description:
     }
 );
 
-export const validateEditComment = validator<{ issueCommentId: string; content: string }>(
-    (input, { error }) => {
-        if (typeof input !== 'object' || !input) {
-            return error('root', 'object');
-        }
-        if (!('issueCommentId' in input) || typeof input.issueCommentId !== 'string') {
-            return error('issueCommentId', 'string');
-        }
-
-        if (!('content' in input) || typeof input.content !== 'string') {
-            return error('content', 'string');
-        }
-        const content = input.content.trim();
-        if (content.length === 0) {
-            return error('content', 'string');
-        }
-
-        input.content = content;
-    }
+export const validateEditComment = validator(
+    Type.Object({
+        id: Type.Number(),
+        content: Type.String()
+    }),
+    { convert: true, stripLeadingSlash: true }
 );
 
 export const validateDeleteIssue = validator<{ issueId: string }>((input, { error }) => {
@@ -70,14 +58,12 @@ export const validateDeleteIssue = validator<{ issueId: string }>((input, { erro
     }
 });
 
-export const validateDeleteComment = validator<{ issueCommentId: string }>((input, { error }) => {
-    if (typeof input !== 'object' || !input) {
-        return error('root', 'object');
-    }
-    if (!('issueCommentId' in input) || typeof input.issueCommentId !== 'string') {
-        return error('issueCommentId', 'string');
-    }
-});
+export const validateDeleteComment = validator(
+    Type.Object({
+        id: Type.Number()
+    }),
+    { convert: true, stripLeadingSlash: true }
+);
 
 export function decode(formData: FormData) {
     return {
@@ -95,7 +81,7 @@ export function decodeEditDescription(formData: FormData) {
 
 export function decodeEditComment(formData: FormData) {
     return {
-        issueCommentId: formData.get('issueCommentId'),
+        id: formData.get('id'),
         content: formData.get('content')
     };
 }
@@ -108,6 +94,6 @@ export function decodeDeleteIssue(formData: FormData) {
 
 export function decodeDeleteComment(formData: FormData) {
     return {
-        issueCommentId: formData.get('issueCommentId')
+        id: formData.get('id')
     };
 }

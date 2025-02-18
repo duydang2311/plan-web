@@ -1,16 +1,24 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { useQueryClient, type InfiniteData } from '@tanstack/svelte-query';
+    import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
     import { Button, Icon, Tiptap } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import type { AsyncRef } from '~/lib/utils/runes.svelte';
     import type { ValidationResult } from '~/lib/utils/validation';
-    import type { LocalComment } from './+page.server';
+    import type { LocalIssueAudit } from './+page.server';
     import { clientValidate } from './utils.client';
 
-    const { userId, size, issueId }: { userId: string; issueId: string; size: number } = $props();
-    const queryClient = useQueryClient();
+    const {
+        userId,
+        issueId,
+        ref
+    }: {
+        userId: string;
+        issueId: string;
+        ref: AsyncRef<PaginatedList<LocalIssueAudit> | undefined>;
+    } = $props();
     let editor = $state.raw<Editor>();
     let validation = $state.raw<ValidationResult>();
     let formRef = $state.raw<HTMLFormElement>();
@@ -55,64 +63,26 @@
             return;
         }
         const html = editor.getHTML();
-        const queryKey = ['comments', { issueId, size }];
-        const oldData =
-            queryClient.getQueryData<InfiniteData<PaginatedList<LocalComment>, number>>(queryKey);
-        queryClient.setQueryData<
-            InfiniteData<PaginatedList<LocalComment> & { nextOffset: number | null }, number>
-        >(queryKey, (a) => {
-            if (!a) return a;
-            let data: typeof a = undefined!;
-            const totalCount = (a.pages.find((a) => a != null)?.totalCount ?? 0) + 1;
-            const lastPage = a.pages[a.pages.length - 1] ?? paginatedList<LocalComment>();
-            const optimisticComment = {
-                content: html,
-                createdTime: DateTime.now().toISO(),
-                updatedTime: DateTime.now().toISO(),
-                author: {
-                    id: userId,
-                    email: userId,
-                    profile: {
-                        displayName: 'You'
-                    }
-                },
-                id: Math.random() + '',
-                $optimistic: true
-            };
-            if (lastPage.items.length >= size) {
-                const page = a.pageParams[a.pageParams.length - 1] + size;
-                data = {
-                    ...a,
-                    pages: [
-                        ...a.pages.map((a) => ({
-                            ...a,
-                            totalCount,
-                            nextOffset: a.nextOffset ?? page
-                        })),
-                        {
-                            items: [optimisticComment],
-                            totalCount,
-                            nextOffset: null
+        const old = ref.value;
+        ref.value = paginatedList({
+            items: [
+                ...(old?.items ?? []),
+                {
+                    data: {
+                        content: html
+                    },
+                    createdTime: DateTime.now().toISO(),
+                    action: 4,
+                    user: {
+                        id: userId,
+                        email: userId,
+                        profile: {
+                            displayName: 'You'
                         }
-                    ],
-                    pageParams: [...a.pageParams, page]
-                };
-            } else {
-                const lastIndex = a.pages.length - 1;
-                data = {
-                    ...a,
-                    pages: a.pages.map((a, i) =>
-                        i === lastIndex
-                            ? {
-                                  items: [...(a?.items ?? []), optimisticComment],
-                                  totalCount,
-                                  nextOffset: a?.nextOffset ?? null
-                              }
-                            : { ...a, totalCount }
-                    )
-                };
-            }
-            return data;
+                    },
+                    id: Math.random()
+                } as LocalIssueAudit
+            ]
         });
 
         e.formData.set('content', html);
@@ -120,9 +90,9 @@
         return async ({ result }) => {
             if (result.type !== 'success') {
                 editor?.commands.setContent(html);
-                queryClient.setQueryData(queryKey, oldData);
+                ref.value = old;
             }
-            await queryClient.invalidateQueries({ queryKey });
+            await invalidateAll();
         };
     }}
 >
@@ -139,7 +109,7 @@
             variant="primary"
             size="sm"
             filled={false}
-            class="absolute bottom-2 right-3 ml-auto w-fit flex gap-2 items-center"
+            class="absolute bottom-2 right-3 ml-auto flex w-fit items-center gap-2"
             disabled={validation && !validation.ok}
         >
             <Icon name="arrow-up" />

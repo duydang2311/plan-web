@@ -2,40 +2,35 @@
     import { enhance } from '$app/forms';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { addToast, Icon } from '~/lib/components';
+    import { Icon, toast } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import Tiptap from '~/lib/components/Tiptap.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import type { Ref } from '~/lib/utils/runes.svelte';
     import type { ActionData } from './$types';
     import type { LocalIssue } from './+page.server';
-    import { createIssueQuery } from './utils';
 
     interface Props {
         form: ActionData;
         editing: boolean;
-        issueId: string;
+        ref: Ref<LocalIssue>;
         onCancel: () => void;
         onSubmit: () => void;
     }
 
-    const { editing, issueId, onCancel, onSubmit }: Props = $props();
-    const { queryClient } = useRuntime();
-    const queryKey = $derived(['issues', { issueId }]);
-    const query = createIssueQuery(() => ({ issueId }));
-    const issue = $derived($query.data);
+    const { editing, ref, onCancel, onSubmit }: Props = $props();
     let editor = $state.raw<Editor>();
 </script>
 
-{#if issue}
+{#if ref.value}
     <div class="flex gap-4">
         <h1>
-            {issue.title}
+            {ref.value.title}
         </h1>
-        <span class="text-base-fg-ghost font-light text-h1">
-            #{issue.orderNumber}
+        <span class="text-base-fg-ghost text-h1 font-light">
+            #{ref.value.orderNumber}
         </span>
     </div>
-    <div class="max-w-full mt-6 transition-enforcement">
+    <div class="transition-enforcement mt-6 max-w-full">
         {#if editing}
             <div>
                 <form
@@ -48,42 +43,39 @@
                             return;
                         }
 
-                        const old = queryClient.getQueryData<LocalIssue>(queryKey);
-                        const newer = {
+                        const old = ref.value;
+                        const description = editor.getHTML();
+                        ref.value = {
                             ...old,
-                            description: editor.getHTML()
+                            description
                         };
-                        queryClient.setQueryData(queryKey, newer);
-                        e.formData.set('description', newer.description);
+                        e.formData.set('description', description);
                         onSubmit();
                         return ({ result }) => {
                             if (result.type !== 'success') {
-                                queryClient.setQueryData(queryKey, old);
-                                addToast({
-                                    data: {
-                                        title: 'Failed to update description',
-                                        description:
-                                            'An unknown error happened while we were trying to update the description.'
-                                    }
+                                ref.value = old;
+                                toast({
+                                    type: 'negative',
+                                    body: 'An unknown error happened while we were trying to update the description.'
                                 });
                             }
                         };
                     }}
                 >
-                    <input type="hidden" name="issueId" value={issue.id} />
+                    <input type="hidden" name="issueId" value={ref.value.id} />
                     <Tiptap
                         bind:editor
                         name="description"
-                        content={issue.description}
+                        content={ref.value.description}
                         editorProps={{ class: 'pb-8' }}
                     />
-                    <div class="absolute right-2 bottom-2 flex gap-2">
+                    <div class="absolute bottom-2 right-2 flex gap-2">
                         <Button
                             type="button"
                             size="sm"
                             variant="base"
                             onclick={onCancel}
-                            class="flex gap-2 items-center"
+                            class="flex items-center gap-2"
                         >
                             <Icon name="x-mark" />
                             Cancel
@@ -92,7 +84,7 @@
                             type="submit"
                             size="sm"
                             variant="primary"
-                            class="flex gap-2 items-center"
+                            class="flex items-center gap-2"
                         >
                             <Icon name="check" />
                             Save
@@ -102,13 +94,13 @@
             </div>
         {:else}
             <div class="prose max-w-paragraph-lg">
-                {#if issue.description && issue.description !== '<p></p>'}
+                {#if ref.value.description && ref.value.description !== '<p></p>'}
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                    {@html DOMPurify.sanitize(issue.description, {
+                    {@html DOMPurify.sanitize(ref.value.description, {
                         USE_PROFILES: { html: true }
                     })}
                 {:else}
-                    <small class="font-medium text-base-fg-ghost"><i>Not available.</i></small>
+                    <small class="text-base-fg-ghost font-medium"><i>Not available.</i></small>
                 {/if}
             </div>
         {/if}
