@@ -1,0 +1,313 @@
+<script lang="ts">
+    import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+    import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+    import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
+    import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
+    import { pipe } from '@baetheus/fun/fn';
+    import { onMount } from 'svelte';
+    import invariant from 'tiny-invariant';
+    import { Icon, toast } from '~/lib/components';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { TE } from '~/lib/utils/functional';
+    import { compareRank, getRank } from '~/lib/utils/ranking';
+    import { createRef, type Loading } from '~/lib/utils/runes.svelte';
+    import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
+    import Board from './Board.svelte';
+    import { validateDraggableIssueData } from './utils';
+    import BoardSkeleton from './BoardSkeleton.svelte';
+
+    const {
+        statusList,
+        issueLists,
+        loading,
+        projectId,
+        projectIdentifier
+    }: {
+        statusList: PaginatedList<LocalWorkspaceStatus>;
+        issueLists: MaybePromise<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
+        loading: Loading;
+        projectId: string;
+        projectIdentifier: string;
+    } = $props();
+    const issueListsRef = createRef.maybePromise(() => issueLists);
+    const { api } = useRuntime();
+    let preview = $state.raw<{
+        container: HTMLElement;
+        rect: DOMRect;
+        data: Record<string, unknown>;
+    } | null>(null);
+
+    const dragIssue = async ({
+        issueId,
+        source,
+        target
+    }: {
+        issueId: string;
+        source: { statusId: number; statusRank: string };
+        target: {
+            statusRank: string;
+            statusId: number;
+        };
+    }) => {
+        const old = issueListsRef.value;
+        if (!old) {
+            return;
+        }
+
+        const patch = api.patch(`issues/${issueId}`, {
+            body: { patch: { statusRank: target.statusRank, statusId: target.statusId } }
+        });
+        const sourceList = old[source.statusId];
+        const targetList = old[target.statusId];
+
+        invariant(sourceList, 'source list must not be null');
+        invariant(targetList, 'target list must not be null');
+
+        const sourceIssue = sourceList.items.find((a) => a.id === issueId);
+        invariant(sourceIssue, 'source issue must not be null');
+
+        if (source.statusId === target.statusId) {
+            issueListsRef.value = {
+                ...old,
+                [source.statusId]: paginatedList({
+                    items: sourceList.items
+                        .map((a) =>
+                            a.id === issueId ? { ...a, statusRank: target.statusRank } : a
+                        )
+                        .toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
+                    totalCount: sourceList.totalCount
+                })
+            };
+        } else {
+            issueListsRef.value = {
+                ...old,
+                [source.statusId]: paginatedList({
+                    items: sourceList.items.filter((a) => a.id !== issueId),
+                    totalCount: sourceList.totalCount - 1
+                }),
+                [target.statusId]: paginatedList({
+                    items: [
+                        ...targetList.items,
+                        { ...sourceIssue, statusRank: target.statusRank, statusId: target.statusId }
+                    ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
+                    totalCount: targetList.totalCount + 1
+                })
+            };
+        }
+
+        const tryPatch = await pipe(
+            TE.fromPromise(() => patch)(),
+            TE.flatMap((a) => (a.ok ? TE.right(a) : TE.left('http')))
+        )();
+        if (tryPatch.tag === 'Left') {
+            const sourceStatus =
+                sourceIssue.statusId == null
+                    ? null
+                    : statusList.items.find((a) => a.id === sourceIssue.statusId!);
+            const targetStatus =
+                target.statusId === -1
+                    ? null
+                    : statusList.items.find((a) => a.id === target.statusId!);
+            toast({
+                type: 'negative',
+                body: errorDescription,
+                bodyProps: {
+                    title: sourceIssue.title,
+                    from: sourceStatus?.value ?? 'No status',
+                    to: targetStatus?.value ?? 'No status'
+                }
+            });
+            issueListsRef.value = old;
+            return;
+        }
+
+        if (source.statusId === target.statusId) {
+            refetch([source.statusId]);
+        } else {
+            refetch([source.statusId, target.statusId]);
+        }
+    };
+
+    const refetch = async (statusIds: number[]) => {
+        const tryGet = await TE.fromPromise(() =>
+            Promise.all(
+                statusIds.map(async (a) => {
+                    let size = issueListsRef.value?.[a].items.length;
+                    if (size == null || size < 20) {
+                        size = 20;
+                    }
+                    const response = await api.get('issues', {
+                        query: {
+                            projectId,
+                            statusId: a === -1 ? null : a,
+                            nullStatusId: a === -1,
+                            size,
+                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+                            order: 'StatusRank,OrderNumber'
+                        }
+                    });
+                    return response.json<PaginatedList<LocalBoardIssue>>();
+                })
+            )
+        )()();
+        if (tryGet.tag === 'Left') {
+            return;
+        }
+
+        issueListsRef.value = {
+            ...issueListsRef.value,
+            ...Object.fromEntries(statusIds.map((a, i) => [a, tryGet.right[i]]))
+        };
+    };
+
+    onMount(() => {
+        return monitorForElements({
+            canMonitor: ({ source }) => validateDraggableIssueData(source.data).ok,
+            onGenerateDragPreview: ({ location, source, nativeSetDragImage }) => {
+                const rect = source.element.getBoundingClientRect();
+                setCustomNativeDragPreview({
+                    nativeSetDragImage,
+                    getOffset: preserveOffsetOnSource({
+                        element: source.element,
+                        input: location.current.input
+                    }),
+                    render({ container }) {
+                        preview = { container, rect, data: source.data };
+                        return () => {
+                            preview = null;
+                        };
+                    }
+                });
+            },
+            onDrop: ({ source, location }) => {
+                if (location.current.dropTargets.length === 0 || issueListsRef.value == null) {
+                    return;
+                }
+
+                const target = location.current.dropTargets[0];
+                const targetStatusId = target.data['statusId'];
+                const sourceStatusId = source.data['statusId'];
+                const sourceStatusRank = source.data['statusRank'];
+
+                invariant(typeof sourceStatusId === 'number', 'source.statusId must be number');
+                invariant(typeof sourceStatusRank === 'string', 'source.statusRank must be string');
+                invariant(typeof source.data['id'] === 'string', 'source.data.id must be string');
+                invariant(
+                    typeof targetStatusId === 'number',
+                    'target.data.statusId must be number'
+                );
+
+                const targetList = issueListsRef.value[targetStatusId];
+                invariant(targetList, 'target list must not be null');
+                const sourceData = { statusId: sourceStatusId, statusRank: sourceStatusRank };
+                if (target.data['type'] === 'board') {
+                    dragIssue({
+                        issueId: source.data['id'],
+                        source: sourceData,
+                        target: {
+                            statusId: targetStatusId,
+                            statusRank: getRank(null, targetList.items[0]?.statusRank || null)
+                        }
+                    });
+                    return;
+                }
+
+                const targetId = target.data['id'];
+                const targetStatusRank = target.data['statusRank'];
+                invariant(typeof targetId === 'string', 'target.data.id must be string');
+                invariant(
+                    typeof targetStatusRank === 'string',
+                    'target.data.statusRank must be string'
+                );
+
+                const edge = extractClosestEdge(target.data);
+                if (edge === 'top') {
+                    const previousIndex = targetList.items.findIndex((a) => a.id === targetId);
+                    dragIssue({
+                        issueId: source.data['id'],
+                        source: sourceData,
+                        target: {
+                            statusId: targetStatusId,
+                            statusRank: getRank(
+                                previousIndex === 0 || previousIndex === -1
+                                    ? null
+                                    : targetList.items[previousIndex - 1].statusRank || null,
+                                targetStatusRank || null
+                            )
+                        }
+                    });
+                } else {
+                    const nextIndex = targetList.items.findIndex((a) => a.id === targetId);
+                    dragIssue({
+                        issueId: source.data['id'],
+                        source: sourceData,
+                        target: {
+                            statusId: targetStatusId,
+                            statusRank: getRank(
+                                targetStatusRank || null,
+                                nextIndex === targetList.items.length - 1 || nextIndex === -1
+                                    ? null
+                                    : targetList.items[nextIndex + 1].statusRank || null
+                            )
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    function portal(node: HTMLElement, state: NonNullable<typeof preview>) {
+        function update() {
+            state.container.appendChild(node);
+            state.container.style.top = `${state.rect.top}px`;
+            state.container.style.left = `${state.rect.left}px`;
+        }
+
+        update();
+        return {
+            update
+        };
+    }
+</script>
+
+{#snippet errorDescription({ title, from, to }: { title: string; from: string; to: string })}
+    An unexpected error has occured while moving <strong>{title}</strong> from
+    <strong>{from}</strong>
+    to <strong>{to}</strong>.
+{/snippet}
+
+<ol class="flex w-full overflow-x-auto overflow-y-hidden" class:animate-pulse={loading.immediate}>
+    {#each statusList.items as status (status.id)}
+        {@const list = issueListsRef.value?.[status.id]}
+        <li>
+            <ol class="flex h-full w-fit gap-4 p-4">
+                {#if list == null}
+                    <BoardSkeleton />
+                {:else}
+                    <Board issueList={list} identifier={projectIdentifier} {projectId} {status} />
+                {/if}
+            </ol>
+        </li>
+    {/each}
+</ol>
+{#if preview}
+    <div
+        use:portal={preview}
+        style="width: {preview.rect.width}px; height: calc({preview.rect
+            .height}px - 1rem);{navigator.userAgent.includes('Windows')
+            ? ' max-width: 280px; max-height: 280px;'
+            : ''}"
+        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border px-4 opacity-100"
+    >
+        <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
+            <p class="text-sm leading-none">
+                <small>{projectIdentifier}-{preview.data.orderNumber}</small>
+            </p>
+            <Icon name="draggable" class="ml-auto h-4" />
+        </div>
+        <p class="font-medium leading-none">
+            {preview.data.title}
+        </p>
+    </div>
+{/if}

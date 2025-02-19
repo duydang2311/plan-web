@@ -5,41 +5,32 @@
 </script>
 
 <script lang="ts">
-    import { page } from '$app/state';
+    import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
     import {
         dropTargetForElements,
         monitorForElements
     } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import clsx from 'clsx';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { Status } from '~/lib/models/status';
     import { tsap } from '~/lib/utils/transition';
+    import type { LocalBoardIssue } from '../+page.server';
     import BoardIssue from './BoardIssue.svelte';
-    import { createIssueListInfiniteQuery, validateDraggableIssueData } from './utils';
-    import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+    import { validateDraggableIssueData } from './utils';
 
     const {
+        issueList,
         identifier,
-        projectId,
         status
     }: {
+        issueList: PaginatedList<LocalBoardIssue>;
         identifier: string;
         projectId: string;
         status: Pick<Status, 'id' | 'value' | 'color'>;
     } = $props();
-    const query = $derived(
-        createIssueListInfiniteQuery(() => ({
-            projectId,
-            url: page.url,
-            statusId: status.id
-        }))
-    );
     let dragStatus = $state<'dragover' | null>(null);
     let draggingIssueId = $state.raw<string | null>(null);
-
-    const issues = $derived(
-        $query.data?.pages.flatMap((a) => a.items).filter((a) => a.id !== draggingIssueId) ?? []
-    );
 
     function atlas(node: HTMLElement, state: Pick<Status, 'id'>) {
         let cleanup: CleanupFn | undefined = undefined;
@@ -97,7 +88,7 @@
     <h2 class="text-h5 px-4">{status.value}</h2>
     <div class="scrollbar-3 grow overflow-y-auto overflow-x-hidden pt-2">
         <ol class="h-full px-4">
-            {#each issues as issue (issue.id)}
+            {#each issueList.items.filter((a) => a.id !== draggingIssueId) as issue (issue.id)}
                 <li
                     in:tsap={(node, gsap) =>
                         gsap.from(node, {

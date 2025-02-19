@@ -32,9 +32,9 @@
     );
 </script>
 
-<main class="grid grid-rows-[auto_1fr] h-full overflow-auto">
-    <div class="flex justify-between border-b border-b-base-border-2">
-        <div class="flex items-stretch divide-x divide-base-border-2 grow">
+<main class="grid h-full grid-rows-[auto_1fr] overflow-auto">
+    <div class="border-b-base-border-2 flex justify-between border-b">
+        <div class="divide-base-border-2 flex grow items-stretch divide-x">
             <div class="min-w-32">
                 <ViewLayoutSelect {layouts} selected={selectedLayout} />
             </div>
@@ -43,13 +43,13 @@
                     <Input
                         type="text"
                         placeholder="Type to search issue..."
-                        class="pl-8 text-sm border-none rounded focus:shadow-none"
+                        class="rounded border-none pl-8 text-sm focus:shadow-none"
                     />
                     <Icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2" />
                 </div>
             </div>
         </div>
-        <div class="border-l border-l-base-border-2 flex items-center">
+        <div class="border-l-base-border-2 flex items-center border-l">
             <Button
                 as="link"
                 href={createIssueHref}
@@ -57,7 +57,7 @@
                 filled={false}
                 size="sm"
                 flat
-                class="flex items-center gap-2 w-fit h-full pr-6 whitespace-nowrap text-ellipsis overflow-hidden"
+                class="flex h-full w-fit items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap pr-6"
             >
                 <Icon name="plus" />
                 Create issue
@@ -72,8 +72,9 @@
         </Await>
     {:else if $selectedLayout.value === 'board' && data.page.tag === 'board'}
         <BoardLayout
+            statusList={data.page.statusList}
+            issueLists={data.page.issueLists}
             projectId={data.project.id}
-            workspaceId={data.workspace.id}
             projectIdentifier={data.project.identifier}
         />
     {/if}

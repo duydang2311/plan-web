@@ -1,5 +1,4 @@
 import { D } from '@mobily/ts-belt';
-import { error } from '@sveltejs/kit';
 import { Effect, Exit, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
@@ -103,22 +102,21 @@ const loadBoardLayout = async ({
     }
 
     const [statusListExit, issueListExit] = await Promise.all([
-        getStatusListExit,
-        getIssueListsExit
+        maybeStream(
+            getStatusListExit.then((a) =>
+                Exit.isFailure(a) ? paginatedList<LocalWorkspaceStatus>() : a.value
+            )
+        )(isDataRequest),
+        maybeStream(getIssueListsExit.then((a) => (Exit.isFailure(a) ? {} : a.value)))(
+            isDataRequest
+        )
     ]);
-
-    if (Exit.isFailure(issueListExit)) {
-        const { status, ...body } = LoadResponse.Failure(issueListExit);
-        return error(status, body);
-    }
 
     return {
         page: {
             tag: 'board' as const,
-            statusList: Exit.isSuccess(statusListExit)
-                ? statusListExit.value
-                : paginatedList<LocalWorkspaceStatus>(),
-            issueLists: Exit.isSuccess(issueListExit) ? issueListExit.value : {}
+            statusList: statusListExit(),
+            issueLists: issueListExit()
         }
     };
 };
