@@ -26,12 +26,13 @@
     } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
     import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-    import { Icon, Row } from '~/lib/components';
+    import { Row } from '~/lib/components';
+    import { IconDraggable } from '~/lib/components/icons';
     import { createEffect } from '~/lib/utils/runes.svelte';
+    import DropIndicator from '../../projects/[identifier]/issues/_board/DropIndicator.svelte';
     import type { LocalWorkspaceStatus } from './+page.server';
     import DeleteStatus from './DeleteStatus.svelte';
     import { toDraggleStatusData, validateDraggleStatusData } from './utils';
-    import DropIndicator from '../../projects/[identifier]/issues/_board/DropIndicator.svelte';
 
     const { status, queryKey }: { status: LocalWorkspaceStatus; queryKey: unknown[] } = $props();
 
@@ -119,7 +120,7 @@
 
 <Row bind:ref class="relative transition">
     <td class="text-base-fg-ghost cursor-grab content-center pr-0">
-        <Icon name="draggable" />
+        <IconDraggable />
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={0} />
         {/if}

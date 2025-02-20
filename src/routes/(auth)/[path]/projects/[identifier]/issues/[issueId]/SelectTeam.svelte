@@ -3,7 +3,8 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
     import { toStore, writable } from 'svelte/store';
-    import { Button, Icon, SelectBuilder } from '~/lib/components';
+    import { Button, SelectBuilder } from '~/lib/components';
+    import { IconPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Team } from '~/lib/models/team';
     import { createEffect } from '~/lib/utils/runes.svelte';
@@ -102,30 +103,30 @@
 </script>
 
 <div>
-    <div class="flex items-center gap-2 mb-2">
+    <div class="mb-2 flex items-center gap-2">
         <h2 class="c-label">Teams</h2>
         {#if $selected.length > 0}
-            <span class="text-sm font-medium px-2 rounded-full bg-base-3 text-base-fg-3">
+            <span class="bg-base-3 text-base-fg-3 rounded-full px-2 text-sm font-medium">
                 {$selected.length}
             </span>
         {/if}
     </div>
     {#if $selected.length}
-        <ul class="flex gap-1 flex-wrap mb-3">
+        <ul class="mb-3 flex flex-wrap gap-1">
             {#each $selected as option (option.value)}
                 {#if option.identifier}
                     <li class="grow">
                         <a
                             href="/{page.params.path}/teams/{option.identifier}"
-                            class="block w-full text-center rounded-full bg-base-2 dark:bg-base-3 text-base-fg-2 border border-base-border-2 px-2 text-ellipsis overflow-hidden text-sm font-medium
-                            hover:bg-base-4 hover:text-base-fg-1 active:bg-base-active"
+                            class="bg-base-2 dark:bg-base-3 text-base-fg-2 border-base-border-2 hover:bg-base-4 hover:text-base-fg-1 active:bg-base-active block w-full overflow-hidden text-ellipsis rounded-full border px-2
+                            text-center text-sm font-medium"
                         >
                             {option.label}
                         </a>
                     </li>
                 {:else}
                     <li
-                        class="grow text-center rounded-full bg-base-2 dark:bg-base-3 text-base-fg-1 border border-base-border-2 px-2 text-ellipsis overflow-hidden text-sm font-medium"
+                        class="bg-base-2 dark:bg-base-3 text-base-fg-1 border-base-border-2 grow overflow-hidden text-ellipsis rounded-full border px-2 text-center text-sm font-medium"
                     >
                         {option.label}
                     </li>
@@ -181,7 +182,7 @@
                 melt={trigger}
                 class="flex items-center gap-2"
             >
-                <Icon name="plus" />
+                <IconPlus />
                 Add team
             </Button>
             {#if $open}

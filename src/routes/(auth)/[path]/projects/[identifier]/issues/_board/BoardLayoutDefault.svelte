@@ -6,7 +6,8 @@
     import { pipe } from '@baetheus/fun/fn';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
-    import { Icon, toast } from '~/lib/components';
+    import { toast } from '~/lib/components';
+    import { IconDraggable } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
@@ -14,8 +15,8 @@
     import { createRef, type Loading } from '~/lib/utils/runes.svelte';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
     import Board from './Board.svelte';
-    import { validateDraggableIssueData } from './utils';
     import BoardSkeleton from './BoardSkeleton.svelte';
+    import { validateDraggableIssueData } from './utils';
 
     const {
         statusList,
@@ -304,7 +305,7 @@
             <p class="text-sm leading-none">
                 <small>{projectIdentifier}-{preview.data.orderNumber}</small>
             </p>
-            <Icon name="draggable" class="ml-auto h-4" />
+            <IconDraggable class="ml-auto h-4" />
         </div>
         <p class="font-medium leading-none">
             {preview.data.title}

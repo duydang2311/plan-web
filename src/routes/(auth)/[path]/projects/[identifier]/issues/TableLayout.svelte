@@ -1,10 +1,10 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { DateTime } from 'luxon';
-    import { Icon, Link, RelativeTime, Row, Table, Th, THead } from '~/lib/components';
+    import { Link, RelativeTime, Row, Table, Th, THead } from '~/lib/components';
     import Pagination3 from '~/lib/components/Pagination3.svelte';
     import ThSort3 from '~/lib/components/ThSort3.svelte';
-    import { getPriorityIcon, getPriorityLabel, IssuePriorities } from '~/lib/models/issue';
+    import { getPriorityLabel, IssuePriorities, priorityIcons } from '~/lib/models/issue';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Loading } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
@@ -36,35 +36,36 @@
                 {#each { length: 3 } as _}
                     <Row>
                         <td>
-                            <div class="w-16 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-16 animate-pulse"></div>
                         </td>
                         <td>
-                            <div class="w-64 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-64 animate-pulse"></div>
                         </td>
                         <td>
-                            <div class="w-24 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-24 animate-pulse"></div>
                         </td>
                         <td>
-                            <div class="w-24 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-24 animate-pulse"></div>
                         </td>
                         <td>
-                            <div class="w-32 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-32 animate-pulse"></div>
                         </td>
                         <td>
-                            <div class="w-32 h-5 bg-base-3 animate-pulse"></div>
+                            <div class="bg-base-3 h-5 w-32 animate-pulse"></div>
                         </td>
                     </Row>
                 {/each}
             {:else if issueList == null || issueList.items.length === 0}
                 <Row>
-                    <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
+                    <td class="text-base-fg-ghost col-span-full">No issues yet.</td>
                 </Row>
             {:else}
                 {#each issueList.items as row}
+                    {@const IconPriority = priorityIcons[row.priority]}
                     <Row>
                         <td>
                             <div
-                                class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
+                                class="text-base-fg-3/60 block min-w-max content-center text-sm font-bold"
                             >
                                 {row.project.identifier}-{row.orderNumber}
                             </div>
@@ -84,8 +85,7 @@
                             {/if}
                         </td>
                         <td title={getPriorityLabel(row.priority)}>
-                            <Icon
-                                name={getPriorityIcon(row.priority)}
+                            <IconPriority
                                 class={row.priority == IssuePriorities.none
                                     ? 'text-base-fg-ghost'
                                     : undefined}

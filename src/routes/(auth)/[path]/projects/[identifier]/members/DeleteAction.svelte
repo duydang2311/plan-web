@@ -1,7 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { writable } from 'svelte/store';
-    import { Button, Icon, Popover, PopoverBuilder } from '~/lib/components';
+    import { Button, Popover, PopoverBuilder } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -20,10 +21,10 @@
             variant="negative"
             size="sm"
             filled={false}
-            class="flex gap-2 items-center"
+            class="flex items-center gap-2"
             melt={trigger}
         >
-            <Icon name="trash" />
+            <IconTrash />
             Delete
         </Button>
         {#if $open}
@@ -36,7 +37,7 @@
                 <form
                     method="post"
                     action="?/delete-member"
-                    class="flex gap-2 justify-end mt-4 *:w-fit"
+                    class="mt-4 flex justify-end gap-2 *:w-fit"
                     use:enhance={() => {
                         const previous =
                             queryClient.getQueryData<PaginatedList<LocalProjectMember>>(queryKey);
@@ -63,9 +64,9 @@
                         type="submit"
                         variant="negative"
                         outline
-                        class="flex gap-2 items-center"
+                        class="flex items-center gap-2"
                     >
-                        <Icon name="trash" />
+                        <IconTrash />
                         Remove
                     </Button>
                 </form>

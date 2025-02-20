@@ -6,8 +6,21 @@
     import StarterKit from '@tiptap/starter-kit';
     import clsx from 'clsx';
     import type { HTMLAttributes } from 'svelte/elements';
-    import Icon from './Icon.svelte';
     import TiptapButton from './TiptapButton.svelte';
+    import {
+        IconBold,
+        IconH1,
+        IconH2,
+        IconH3,
+        IconH4,
+        IconH5,
+        IconH6,
+        IconItalic,
+        IconLink,
+        IconQuotes,
+        IconStrikeThrough,
+        IconUnderline
+    } from './icons';
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         editor?: Editor;
@@ -68,7 +81,7 @@
                             },
                             'Shift-Enter': () => true,
                             'Mod-Enter': () => {
-                                this.editor.emit('submit');
+                                this.editor.emit('submit', undefined);
                                 return true;
                             }
                         };
@@ -92,14 +105,14 @@
 </script>
 
 <div {...props} class={clsx('c-tiptap', props?.class)}>
-    <div class="bg-base-1 border-b border-b-base-border-3 px-4 py-1 rounded-t-md overflow-hidden">
+    <div class="bg-base-1 border-b-base-border-3 overflow-hidden rounded-t-md border-b px-4 py-1">
         <ul class="flex items-center gap-1 text-sm">
             <li>
                 <TiptapButton
                     onclick={() => editor!.chain().focus().toggleBold().run()}
                     isActive={editor?.isActive('bold')}
                 >
-                    <Icon name="bold" />
+                    <IconBold />
                 </TiptapButton>
             </li>
             <li>
@@ -107,7 +120,7 @@
                     onclick={() => editor!.chain().focus().toggleItalic().run()}
                     isActive={editor?.isActive('italic')}
                 >
-                    <Icon name="italic" />
+                    <IconItalic />
                 </TiptapButton>
             </li>
             <li>
@@ -115,7 +128,7 @@
                     onclick={() => editor!.chain().focus().toggleUnderline().run()}
                     isActive={editor?.isActive('underline')}
                 >
-                    <Icon name="underline" />
+                    <IconUnderline />
                 </TiptapButton>
             </li>
             <li>
@@ -123,7 +136,7 @@
                     onclick={() => editor!.chain().focus().toggleStrike().run()}
                     isActive={editor?.isActive('strike')}
                 >
-                    <Icon name="strike-through" />
+                    <IconStrikeThrough />
                 </TiptapButton>
             </li>
             <li>
@@ -131,7 +144,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 1 }).run()}
                     isActive={editor?.isActive('heading', { level: 1 })}
                 >
-                    <Icon name="h1" />
+                    <IconH1 />
                 </TiptapButton>
             </li>
             <li>
@@ -139,7 +152,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 2 }).run()}
                     isActive={editor?.isActive('heading', { level: 2 })}
                 >
-                    <Icon name="h2" />
+                    <IconH2 />
                 </TiptapButton>
             </li>
             <li>
@@ -147,7 +160,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 3 }).run()}
                     isActive={editor?.isActive('heading', { level: 3 })}
                 >
-                    <Icon name="h3" />
+                    <IconH3 />
                 </TiptapButton>
             </li>
             <li>
@@ -155,7 +168,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 4 }).run()}
                     isActive={editor?.isActive('heading', { level: 4 })}
                 >
-                    <Icon name="h4" />
+                    <IconH4 />
                 </TiptapButton>
             </li>
             <li>
@@ -163,7 +176,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 5 }).run()}
                     isActive={editor?.isActive('heading', { level: 5 })}
                 >
-                    <Icon name="h5" />
+                    <IconH5 />
                 </TiptapButton>
             </li>
             <li>
@@ -171,7 +184,7 @@
                     onclick={() => editor!.chain().focus().toggleHeading({ level: 6 }).run()}
                     isActive={editor?.isActive('heading', { level: 6 })}
                 >
-                    <Icon name="h6" />
+                    <IconH6 />
                 </TiptapButton>
             </li>
             <li>
@@ -179,7 +192,7 @@
                     onclick={() => editor!.chain().focus().toggleBlockquote().run()}
                     isActive={editor?.isActive('blockquote')}
                 >
-                    <Icon name="quotes" />
+                    <IconQuotes />
                 </TiptapButton>
             </li>
             <li>
@@ -209,7 +222,7 @@
                     }}
                     isActive={editor?.isActive('link')}
                 >
-                    <Icon name="link" />
+                    <IconLink />
                 </TiptapButton>
             </li>
         </ul>

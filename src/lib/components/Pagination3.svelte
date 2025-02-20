@@ -7,7 +7,7 @@
     import { tick, untrack, type Snippet } from 'svelte';
     import type { PaginationHandler } from '../utils/table.svelte';
     import { fluentSearchParams } from '../utils/url';
-    import Icon from './Icon.svelte';
+    import { IconChevronLeft, IconChevronRight } from './icons';
 
     interface Props {
         pagination: PaginationHandler;
@@ -127,7 +127,7 @@
                 )}
                 data-sveltekit-replacestate
             >
-                <Icon name="chevron-left" />
+                <IconChevronLeft />
             </a>
         </li>
         {#each pages as page}
@@ -144,7 +144,7 @@
                 )}
                 data-sveltekit-replacestate
             >
-                <Icon name="chevron-right" />
+                <IconChevronRight />
             </a>
         </li>
     </ol>

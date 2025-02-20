@@ -1,12 +1,11 @@
 <script lang="ts">
-    import type { IconName } from '~/lib/components/Icon.svelte';
     import NavigationItem from './NavigationItem.svelte';
 
     interface Props {
         items: {
             href: string;
-            icon: IconName;
-            activeIcon: IconName;
+            icon: SvelteIconComponent;
+            activeIcon: SvelteIconComponent;
             label: string;
             child?: Props;
         }[];

@@ -5,7 +5,7 @@
     import type { HTMLThAttributes } from 'svelte/elements';
     import { scale } from 'svelte/transition';
     import { type FluentSearchParams, fluentSearchParams } from '../utils/url';
-    import Icon from './Icon.svelte';
+    import { IconArrowsUpDown, IconArrowUp } from './icons';
 
     interface Props extends HTMLThAttributes {
         name: string;
@@ -55,15 +55,13 @@
         <div class="transition-enforcement">
             {#if state[0] != null}
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
-                    <Icon
-                        name="arrow-up"
+                    <IconArrowUp
                         class={clsx('transition-transform', state[0] === 'desc' && 'rotate-180')}
                     />
                 </div>
             {:else}
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
-                    <Icon
-                        name="arrows-up-down"
+                    <IconArrowsUpDown
                         class="text-base-fg-ghost transition group-hover:text-current"
                     />
                 </div>

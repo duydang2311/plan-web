@@ -5,7 +5,8 @@
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
-    import { Button, Icon, Input, Row, Table, Th, THead } from '~/lib/components';
+    import { Button, Input, Row, Table, Th, THead } from '~/lib/components';
+    import { IconPlus, IconSearch } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { PageData } from './$types';
@@ -101,28 +102,27 @@
 
 <Table style="grid-template-columns: auto 1fr 1fr auto;">
     <THead class="relative">
-        <Row class="border-b border-b-base-border-2 py-1">
+        <Row class="border-b-base-border-2 border-b py-1">
             <Th style="grid-column: 1 / -1;" class="px-0">
-                <div class="flex justify-between items-center gap-4">
+                <div class="flex items-center justify-between gap-4">
                     <div class="relative">
                         <Input
                             id="search"
                             type="text"
-                            class="w-48 border-none focus:ring-0 shadow-none pl-8"
+                            class="w-48 border-none pl-8 shadow-none focus:ring-0"
                             placeholder="Search by name"
                         />
-                        <Icon
-                            name="search"
-                            class="absolute left-0 top-1/2 translate-x-1/2 -translate-y-1/2 text-base-fg-ghost"
+                        <IconSearch
+                            class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
                         />
                     </div>
                     <Button
                         filled={false}
-                        class="flex gap-2 items-center w-fit min-w-max"
+                        class="flex w-fit min-w-max items-center gap-2"
                         size="sm"
                         onclick={onAddStatusClick}
                     >
-                        <Icon name="plus" />
+                        <IconPlus />
                         Add status
                     </Button>
                 </div>

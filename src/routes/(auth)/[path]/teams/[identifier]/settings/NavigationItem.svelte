@@ -1,17 +1,15 @@
 <script lang="ts">
     import clsx from 'clsx';
-    import type { IconName } from '~/lib/components/Icon.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
 
     interface Props {
         href: string;
-        icon: IconName;
-        activeIcon: IconName;
+        icon: SvelteIconComponent;
+        activeIcon: SvelteIconComponent;
         label: string;
         isActive: boolean;
     }
 
-    const { href, icon, activeIcon, label, isActive }: Props = $props();
+    const { href, icon: Icon, activeIcon: ActiveIcon, label, isActive }: Props = $props();
 </script>
 
 <a
@@ -25,16 +23,11 @@
     )}
 >
     <div class="transition-enforcement">
-        <Icon
-            name={activeIcon}
+        <ActiveIcon
             class={clsx('transition-opacity', !isActive && 'opacity-0')}
             aria-hidden={!isActive}
         />
-        <Icon
-            name={icon}
-            class={clsx('transition-opacity', isActive && 'opacity-0')}
-            aria-hidden={isActive}
-        />
+        <Icon class={clsx('transition-opacity', isActive && 'opacity-0')} aria-hidden={isActive} />
     </div>
     <span class="hidden md:inline">{label}</span>
 </a>

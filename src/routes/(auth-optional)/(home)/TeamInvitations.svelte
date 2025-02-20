@@ -1,7 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { useQueryClient } from '@tanstack/svelte-query';
-    import { addToast, Button, Icon } from '~/lib/components';
+    import { addToast, Button } from '~/lib/components';
+    import { IconCheck, IconXMark } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { TeamInvitation } from '~/lib/models/team';
     import { createTeamInvitationListQuery } from './utils';
@@ -12,17 +13,17 @@
 </script>
 
 {#if $query.data && $query.data.items.length > 0}
-    <div class="p-4 border border-base-border-2 rounded-md">
+    <div class="border-base-border-2 rounded-md border p-4">
         <h2>Team invitations</h2>
         <ul>
             {#each $query.data.items as invitation (invitation.id)}
                 <li
-                    class="flex items-center justify-between gap-4 p-4 border border-base-border-2 rounded-md flex-wrap"
+                    class="border-base-border-2 flex flex-wrap items-center justify-between gap-4 rounded-md border p-4"
                 >
                     <p class="text-h5 text-base-fg-1">
                         {invitation.team.name}
                     </p>
-                    <div class="flex gap-2 flex-wrap">
+                    <div class="flex flex-wrap gap-2">
                         <form
                             method="post"
                             action="?/accept-team-invitation"
@@ -58,9 +59,9 @@
                                 variant="positive"
                                 filled={false}
                                 outline
-                                class="w-fit flex items-center gap-2"
+                                class="flex w-fit items-center gap-2"
                             >
-                                <Icon name="check" />
+                                <IconCheck />
                                 Accept
                             </Button>
                         </form>
@@ -99,9 +100,9 @@
                                 variant="negative"
                                 filled={false}
                                 outline
-                                class="w-fit flex items-center gap-2"
+                                class="flex w-fit items-center gap-2"
                             >
-                                <Icon name="x-mark" />
+                                <IconXMark />
                                 Decline
                             </Button>
                         </form>

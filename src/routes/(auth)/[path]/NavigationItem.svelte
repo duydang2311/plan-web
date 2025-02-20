@@ -1,27 +1,34 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import clsx from 'clsx';
-    import type { Snippet } from 'svelte';
-    import type { IconName } from '~/lib/components/Icon.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
-    import Collapsible from '~/lib/components/Collapsible.svelte';
     import { melt } from '@melt-ui/svelte';
+    import clsx from 'clsx';
+    import type { Snippet, SvelteComponent } from 'svelte';
     import { writable } from 'svelte/store';
     import { IconButton } from '~/lib/components';
+    import Collapsible from '~/lib/components/Collapsible.svelte';
+    import { IconChevronRight } from '~/lib/components/icons';
     import { tsap } from '~/lib/utils/transition';
     import Self from './NavigationItem.svelte';
 
     interface Props {
         href: string;
-        icon: IconName;
-        activeIcon: IconName;
+        icon: typeof SvelteComponent;
+        activeIcon: typeof SvelteComponent;
         label: string;
         children?: Snippet;
         class?: string;
         childItems?: Props[];
     }
 
-    const { href, icon, activeIcon, label, children, childItems, ...props }: Props = $props();
+    const {
+        href,
+        icon: Icon,
+        activeIcon: ActiveIcon,
+        label,
+        children,
+        childItems,
+        ...props
+    }: Props = $props();
     const open = writable(false);
     const isActive = $derived(page.url.pathname === href);
 </script>
@@ -30,7 +37,7 @@
     <Collapsible options={{ open }}>
         {#snippet children({ root, content, trigger })}
             <div use:melt={root}>
-                <Self {href} {icon} {activeIcon} {label} class="pl-8">
+                <Self {href} icon={Icon} activeIcon={ActiveIcon} {label} class="pl-8">
                     <IconButton
                         type="button"
                         variant="base"
@@ -40,8 +47,7 @@
                         )}
                         melt={trigger}
                     >
-                        <Icon
-                            name="chevron-right"
+                        <IconChevronRight
                             class={clsx('transition', $open && 'text-base-fg-1 rotate-90')}
                         />
                     </IconButton>
@@ -86,13 +92,11 @@
     >
         <a {href} class="font-display flex grow items-center gap-2 p-2">
             <div class="transition-enforcement">
-                <Icon
-                    name={activeIcon}
+                <ActiveIcon
                     class={clsx('transition-opacity duration-200', !isActive && 'opacity-0')}
                     aria-hidden={!isActive}
                 />
                 <Icon
-                    name={icon}
                     class={clsx('transition-opacity duration-200', isActive && 'opacity-0')}
                     aria-hidden={isActive}
                 />

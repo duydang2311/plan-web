@@ -1,3 +1,11 @@
+import {
+    IconHome,
+    IconHomeSolid,
+    IconIssues,
+    IconIssuesOutline,
+    IconUsers,
+    IconUsersSolid
+} from '~/lib/components/icons';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ parent, params, data }) => {
@@ -16,20 +24,20 @@ export const load: LayoutLoad = async ({ parent, params, data }) => {
                             {
                                 label: 'Overview',
                                 href: `/${params.path}/projects/${params.identifier}`,
-                                icon: 'home',
-                                activeIcon: 'home-solid'
+                                icon: IconHome,
+                                activeIcon: IconHomeSolid
                             },
                             {
                                 label: 'Issues',
                                 href: `/${params.path}/projects/${params.identifier}/issues`,
-                                icon: 'issues-outline',
-                                activeIcon: 'issues'
+                                icon: IconIssuesOutline,
+                                activeIcon: IconIssues
                             },
                             {
                                 label: 'Members',
                                 href: `/${params.path}/projects/${params.identifier}/members`,
-                                icon: 'users',
-                                activeIcon: 'users-solid'
+                                icon: IconUsers,
+                                activeIcon: IconUsersSolid
                             }
                         ]
                     }

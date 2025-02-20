@@ -8,7 +8,7 @@
     import { tick, untrack, type Snippet } from 'svelte';
     import type { PaginationHandler } from '../utils/table.svelte';
     import { fluentSearchParams } from '../utils/url';
-    import Icon from './Icon.svelte';
+    import { IconChevronLeft, IconChevronRight } from './icons';
 
     interface Props {
         pagination: PaginationHandler;
@@ -142,7 +142,7 @@
                     setPage(pagination.page - 1);
                 }}
             >
-                <Icon name="chevron-left" />
+                <IconChevronLeft />
             </button>
         </li>
         {#each pages as page}
@@ -162,7 +162,7 @@
                     setPage(pagination.page + 1);
                 }}
             >
-                <Icon name="chevron-right" />
+                <IconChevronRight />
             </button>
         </li>
     </ol>

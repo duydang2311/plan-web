@@ -3,8 +3,8 @@
     import clsx from 'clsx';
     import type { HTMLOlAttributes } from 'svelte/elements';
     import { tsap } from '../utils/transition';
-    import Icon from './Icon.svelte';
     import Link from './Link.svelte';
+    import { IconChevronRight } from './icons';
 
     type Props = HTMLOlAttributes;
 
@@ -18,7 +18,7 @@
             {@const notFirst = i !== 0}
             {@const isLast = i === routes.length - 1}
             <li
-                class="flex items-center text-base-fg-3 overflow-hidden text-nowrap"
+                class="text-base-fg-3 flex items-center overflow-hidden text-nowrap"
                 in:tsap={(node, gsap) =>
                     gsap.from(node, {
                         opacity: 0,
@@ -27,10 +27,7 @@
                     })}
             >
                 {#if notFirst}
-                    <Icon
-                        name="chevron-right"
-                        class={clsx('mr-2', isLast ? 'text-base-fg-1' : undefined)}
-                    />
+                    <IconChevronRight class={clsx('mr-2', isLast ? 'text-base-fg-1' : undefined)} />
                 {/if}
                 {#if isLast}
                     <span class="text-base-fg-1 font-bold">

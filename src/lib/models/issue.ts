@@ -1,3 +1,10 @@
+import {
+    IconPriorityHigh,
+    IconPriorityLow,
+    IconPriorityMedium,
+    IconPriorityNone,
+    IconPriorityUrgent
+} from '../components/icons';
 import type { WorkspaceStatus } from './status';
 import type { User } from './user';
 
@@ -74,3 +81,11 @@ export function getPriorityIcon(priority: IssuePriority) {
             return 'priority-urgent';
     }
 }
+
+export const priorityIcons = {
+    [IssuePriorities.none]: IconPriorityNone,
+    [IssuePriorities.low]: IconPriorityLow,
+    [IssuePriorities.medium]: IconPriorityMedium,
+    [IssuePriorities.high]: IconPriorityHigh,
+    [IssuePriorities.urgent]: IconPriorityUrgent
+};

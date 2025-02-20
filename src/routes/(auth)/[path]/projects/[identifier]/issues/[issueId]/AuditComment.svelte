@@ -4,8 +4,9 @@
     import { Resize } from '@cloudinary/url-gen/actions';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { Avatar, Icon, OptionalLink, RelativeTime } from '~/lib/components';
+    import { Avatar, OptionalLink, RelativeTime } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
+    import { IconCheck, IconXMark } from '~/lib/components/icons';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
@@ -108,7 +109,7 @@
                         }}
                         class="flex w-fit items-center gap-2"
                     >
-                        <Icon name="x-mark" />
+                        <IconXMark />
                         Cancel
                     </Button>
                     <Button
@@ -117,7 +118,7 @@
                         size="sm"
                         class="flex w-fit items-center gap-2"
                     >
-                        <Icon name="check" />
+                        <IconCheck />
                         Save
                     </Button>
                 </div>

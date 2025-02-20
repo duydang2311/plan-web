@@ -3,7 +3,8 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
     import { toStore, writable } from 'svelte/store';
-    import { Avatar, Button, Icon, SelectBuilder } from '~/lib/components';
+    import { Avatar, Button, SelectBuilder } from '~/lib/components';
+    import { IconPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { User } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
@@ -114,25 +115,25 @@
 </script>
 
 <div>
-    <div class="flex items-center gap-2 mb-2">
+    <div class="mb-2 flex items-center gap-2">
         <h2 class="c-label">Assignees</h2>
         {#if $selected.length > 0}
-            <span class="text-sm font-medium px-2 rounded-full bg-base-3 text-base-fg-3">
+            <span class="bg-base-3 text-base-fg-3 rounded-full px-2 text-sm font-medium">
                 {$selected.length}
             </span>
         {/if}
     </div>
     {#if $selected.length}
-        <ul class="space-y-2 mb-3">
+        <ul class="mb-3 space-y-2">
             {#each $selected as option (option.value)}
-                <li class="flex gap-2 items-center">
+                <li class="flex items-center gap-2">
                     <Avatar
                         title={option.label}
                         seed={option.email}
                         src={option.image}
                         class="w-8"
                     />
-                    <div class="text-ellipsis overflow-hidden">
+                    <div class="overflow-hidden text-ellipsis">
                         {option.label}
                     </div>
                 </li>
@@ -188,7 +189,7 @@
                 melt={trigger}
                 class="flex items-center gap-2"
             >
-                <Icon name="plus" />
+                <IconPlus />
                 Add assignee
             </Button>
             {#if $open}

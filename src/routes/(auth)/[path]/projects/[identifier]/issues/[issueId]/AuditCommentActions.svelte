@@ -2,7 +2,8 @@
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
     import { writable } from 'svelte/store';
-    import { Button, Icon, Popover, PopoverArrow, PopoverBuilder, toast } from '~/lib/components';
+    import { Button, Popover, PopoverArrow, PopoverBuilder, toast } from '~/lib/components';
+    import { IconEdit, IconTrash } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Ref } from '~/lib/utils/runes.svelte';
     import type { LocalIssueAudit } from './+page.server';
@@ -32,7 +33,7 @@
         }}
         disabled={editing === true}
     >
-        <Icon name="edit" />
+        <IconEdit />
         Edit
     </Button>
     <PopoverBuilder options={{ open, forceVisible: true }}>
@@ -45,7 +46,7 @@
                 class="flex w-fit items-center gap-2"
                 melt={trigger}
             >
-                <Icon name="trash" />
+                <IconTrash />
                 Delete
             </Button>
             {#if $open}

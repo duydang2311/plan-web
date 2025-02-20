@@ -3,7 +3,7 @@
     import { melt } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Icon } from '~/lib/components';
+    import { IconCheck } from '~/lib/components/icons';
     import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -74,14 +74,14 @@
 >
     {#if options}
         {#if options.length === 0}
-            <li class="c-select--option px-2 text-base-fg-ghost">No teams available</li>
+            <li class="c-select--option text-base-fg-ghost px-2">No teams available</li>
         {:else}
             {#each options as item (item.value)}
                 {@const opt = option(item)}
                 {@const selected = isSelected(item.value)}
                 <li use:melt={opt} class="c-select--option">
                     {#if selected}
-                        <Icon name="check" class="c-select--check" />
+                        <IconCheck class="c-select--check" />
                     {/if}
                     {item.label}
                 </li>
@@ -89,7 +89,7 @@
         {/if}
     {:else}
         {#each { length: 3 } as _}
-            <li class="c-select--option bg-base-4 animate-pulse h-7 w-full"></li>
+            <li class="c-select--option bg-base-4 h-7 w-full animate-pulse"></li>
         {/each}
     {/if}
 </ol>

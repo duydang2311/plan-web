@@ -1,7 +1,8 @@
 <script lang="ts">
     import { type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, Label, SelectBuilder } from '~/lib/components';
+    import { Button, Label, SelectBuilder } from '~/lib/components';
+    import { IconChevronUpDown } from '~/lib/components/icons';
     import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import ProjectSelectMenu from './ProjectSelectMenu.svelte';
 
@@ -30,18 +31,15 @@
             autofocus
         >
             {#if $selected}
-                <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
                     {$selected.label}
                 </span>
             {:else}
-                <span class="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
                     Select a project
                 </span>
             {/if}
-            <Icon
-                name="chevron-up-down"
-                class="absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2"
-            />
+            <IconChevronUpDown class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2" />
         </Button>
         {#if $open}
             <ProjectSelectMenu {workspaceId} select={{ menu, option, helpers }} />

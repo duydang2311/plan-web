@@ -6,7 +6,8 @@
     import { circInOut } from 'svelte/easing';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Button, Icon, SelectBuilder, Spinner } from '~/lib/components';
+    import { Button, SelectBuilder, Spinner } from '~/lib/components';
+    import { IconCheck } from '~/lib/components/icons';
     import { createSelectProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -97,13 +98,13 @@
             variant="base"
             outline
             melt={trigger}
-            class="relative text-left w-full max-w-48"
+            class="relative w-full max-w-48 text-left"
         >
             {$selected.label}
             {#if status === 'pending-long'}
                 <div
                     transition:fade={{ duration: 200, easing: circInOut }}
-                    class="absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                    class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 >
                     <Spinner />
                 </div>
@@ -112,7 +113,7 @@
         {#if open}
             <ol
                 use:melt={menu}
-                class="p-1 bg-base-1 border border-base-border-2 rounded shadow-sm space-y-1"
+                class="bg-base-1 border-base-border-2 space-y-1 rounded border p-1 shadow-sm"
             >
                 {#each roles as role (role.value)}
                     {@const opt = option(role)}
@@ -120,16 +121,15 @@
                     <li
                         use:melt={opt}
                         class={clsx(
-                            'relative pl-10 py-2 cursor-default rounded-md w-full',
+                            'relative w-full cursor-default rounded-md py-2 pl-10',
                             selected
                                 ? 'bg-base-2 text-base-fg-1 font-medium'
                                 : 'text-base-fg-3 hover:text-base-fg-1 hover:bg-base-2 data-[highlighted]:bg-base-2 data-[highlighted]:text-base-fg-1'
                         )}
                     >
                         {#if selected}
-                            <Icon
-                                name="check"
-                                class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2 text-primary-1"
+                            <IconCheck
+                                class="text-primary-1 absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
                             />
                         {/if}
                         {role.label}

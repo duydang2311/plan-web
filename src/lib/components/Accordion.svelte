@@ -3,10 +3,17 @@
     import type { Snippet } from 'svelte';
     import type { HTMLAttributes } from 'svelte/elements';
 
-    type Item = Parameters<Parameters<typeof item.subscribe>[0]>[0];
-    type Content = Parameters<Parameters<typeof content.subscribe>[0]>[0];
-    type Trigger = Parameters<Parameters<typeof trigger.subscribe>[0]>[0];
-    type IsSelected = Parameters<Parameters<typeof isSelected.subscribe>[0]>[0];
+    type AccordionReturn = ReturnType<typeof createAccordion>;
+    type Item = Parameters<Parameters<AccordionReturn['elements']['item']['subscribe']>[0]>[0];
+    type Content = Parameters<
+        Parameters<AccordionReturn['elements']['content']['subscribe']>[0]
+    >[0];
+    type Trigger = Parameters<
+        Parameters<AccordionReturn['elements']['trigger']['subscribe']>[0]
+    >[0];
+    type IsSelected = Parameters<
+        Parameters<AccordionReturn['helpers']['isSelected']['subscribe']>[0]
+    >[0];
     type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
         children: Snippet<
             [

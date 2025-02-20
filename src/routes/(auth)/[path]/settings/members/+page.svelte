@@ -1,12 +1,13 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { writable } from 'svelte/store';
-    import { Button, Icon, Input } from '~/lib/components';
+    import { Button, Input } from '~/lib/components';
+    import { IconPlus, IconSearch, IconUserPlus, IconUsersSolid } from '~/lib/components/icons';
     import type { ActionData, PageData } from './$types';
     import ActiveMembers from './ActiveMembers.svelte';
     import InviteMemberDialog from './InviteMemberDialog.svelte';
-    import SelectView from './SelectView.svelte';
     import PendingMembers from './PendingMembers.svelte';
+    import SelectView from './SelectView.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const showInviteMember = writable(false);
@@ -15,10 +16,10 @@
         {
             label: 'Active members',
             value: 'active' as const,
-            icon: 'users-solid' as const,
+            icon: IconUsersSolid,
             default: true
         },
-        { label: 'Pending members', value: 'pending' as const, icon: 'user-plus' as const }
+        { label: 'Pending members', value: 'pending' as const, icon: IconUserPlus }
     ];
     const selectedView = writable(
         view
@@ -33,17 +34,14 @@
     form={form?.inviteMember}
 />
 
-<main class="grid grid-rows-[auto_1fr] h-full overflow-auto divide-y divide-base-border-2">
-    <div class="flex divide-x divide-base-border-2">
+<main class="divide-base-border-2 grid h-full grid-rows-[auto_1fr] divide-y overflow-auto">
+    <div class="divide-base-border-2 flex divide-x">
         <SelectView options={viewOptions} selected={selectedView} />
         <div class="relative grow">
-            <Icon
-                name="search"
-                class="absolute left-2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
-            />
+            <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
             <Input
                 type="text"
-                class="pl-8 border-none focus:shadow-none py-0 h-full"
+                class="h-full border-none py-0 pl-8 focus:shadow-none"
                 placeholder="Search member"
             />
         </div>
@@ -52,13 +50,13 @@
                 variant="base"
                 size="sm"
                 filled={false}
-                class="rounded-none w-fit h-full flex items-center gap-2 pr-8 py-2"
+                class="flex h-full w-fit items-center gap-2 rounded-none py-2 pr-8"
                 flat
                 onclick={() => {
                     $showInviteMember = true;
                 }}
             >
-                <Icon name="plus" />
+                <IconPlus />
                 Invite member
             </Button>
         </div>

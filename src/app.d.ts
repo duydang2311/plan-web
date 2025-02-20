@@ -8,6 +8,7 @@ import type { Cloudinary } from './lib/services/cloudinary.server';
 import type { HttpClient } from './lib/services/http_client';
 import type { Effect, Exit } from 'effect';
 import type { IconName } from './lib/components/Icon.svelte';
+import type { SvelteComponent } from 'svelte';
 
 // for information about these interfaces
 declare global {
@@ -18,9 +19,16 @@ declare global {
         href: string;
         navigation?: {
             label: string;
-            entries: { label: string; href: string; icon: IconName; activeIcon: IconName }[];
+            entries: {
+                label: string;
+                href: string;
+                icon: typeof SvelteComponent;
+                activeIcon: typeof SvelteComponent;
+            }[];
         };
     }
+
+    type SvelteIconComponent = typeof import('~icons/*').default;
 
     namespace App {
         interface Error {

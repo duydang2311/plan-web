@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { Await, Button, Icon, Input } from '~/lib/components';
+    import { Await, Button, Input } from '~/lib/components';
+    import { IconPlus, IconSearch } from '~/lib/components/icons';
     import type { PageData } from './$types';
     import ProjectTable from './ProjectTable.svelte';
 
@@ -16,9 +17,8 @@
                 class="w-48 border-none py-1 pl-8 shadow-none focus:ring-0"
                 placeholder="Search by name"
             />
-            <Icon
-                name="search"
-                class="text-base-fg-ghost absolute top-1/2 left-0 -translate-y-1/2 translate-x-1/2"
+            <IconSearch
+                class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
             />
         </div>
         <Button
@@ -29,7 +29,7 @@
             size="sm"
             class="flex w-fit items-center gap-2"
         >
-            <Icon name="plus" />
+            <IconPlus />
             Create Project
         </Button>
     </div>

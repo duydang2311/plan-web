@@ -3,8 +3,9 @@
     import type { SelectOption } from '@melt-ui/svelte';
     import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
-    import { Await, Button, Icon } from '~/lib/components';
+    import { Await, Button } from '~/lib/components';
     import Input from '~/lib/components/Input.svelte';
+    import { IconColumns, IconPlus, IconRows, IconSearch } from '~/lib/components/icons';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import TableLayout from './TableLayout.svelte';
@@ -17,13 +18,13 @@
         {
             label: 'Table',
             value: 'table',
-            icon: 'rows' as const,
+            icon: IconRows,
             href: page.url.pathname + fluentSearchParams(page.url).delete('layout')
         },
         {
             label: 'Board',
             value: 'board',
-            icon: 'columns' as const,
+            icon: IconColumns,
             href: page.url.pathname + fluentSearchParams(page.url).set('layout', 'board')
         }
     ]);
@@ -45,7 +46,7 @@
                         placeholder="Type to search issue..."
                         class="rounded border-none pl-8 text-sm focus:shadow-none"
                     />
-                    <Icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2" />
+                    <IconSearch class="absolute left-2 top-1/2 -translate-y-1/2" />
                 </div>
             </div>
         </div>
@@ -59,7 +60,7 @@
                 flat
                 class="flex h-full w-fit items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap pr-6"
             >
-                <Icon name="plus" />
+                <IconPlus />
                 Create issue
             </Button>
         </div>

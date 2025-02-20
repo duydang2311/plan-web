@@ -1,8 +1,8 @@
 <script lang="ts">
     import { melt, type SelectOption } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, SelectBuilder } from '~/lib/components';
-    import type { IconName } from '~/lib/components/Icon.svelte';
+    import { Button, SelectBuilder } from '~/lib/components';
+    import { IconCheck, IconChevronUpDown } from '~/lib/components/icons';
     import { select, tsap } from '~/lib/utils/transition';
 
     const {
@@ -10,15 +10,13 @@
         selected
     }: {
         layouts: (SelectOption<string> & {
-            icon: IconName;
+            icon: SvelteIconComponent;
             href: string;
         })[];
         selected: Writable<SelectOption<string>>;
     } = $props();
     const open = writable(false);
-    const selectedLayoutIcon = $derived<'rows' | 'columns'>(
-        $selected.value === 'table' ? 'rows' : 'columns'
-    );
+    const selectedLayout = $derived(layouts.find((a) => a.value === $selected.value));
 </script>
 
 <SelectBuilder
@@ -40,15 +38,14 @@
             filled={false}
             size="sm"
             flat
-            class="relative h-full flex items-center gap-2 pl-6"
+            class="relative flex h-full items-center gap-2 pl-6"
             melt={trigger}
         >
-            <Icon name={selectedLayoutIcon} />
+            {#if selectedLayout}
+                <selectedLayout.icon />
+            {/if}
             {$selected.label}
-            <Icon
-                name="chevron-up-down"
-                class="absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2"
-            />
+            <IconChevronUpDown class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2" />
         </Button>
         {#if $open}
             <ol
@@ -68,9 +65,9 @@
                             data-sveltekit-replacestate
                         >
                             {#if selected}
-                                <Icon name="check" class="c-select--check" />
+                                <IconCheck class="c-select--check" />
                             {/if}
-                            <Icon name={layout.icon} />
+                            <layout.icon />
                             {layout.label}
                         </a>
                     </li>

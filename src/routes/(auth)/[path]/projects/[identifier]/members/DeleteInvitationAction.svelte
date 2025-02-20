@@ -1,12 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon, Popover, PopoverBuilder } from '~/lib/components';
+    import { addToast, Button, Popover, PopoverBuilder } from '~/lib/components';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { validateActionFailureData } from '~/lib/utils/kit.client';
     import type { LocalProjectMember } from './utils';
+    import { IconTrash } from '~/lib/components/icons';
 
     const { queryKey, id, name }: { queryKey: readonly unknown[]; id: number; name: string } =
         $props();
@@ -36,10 +37,10 @@
             variant="negative"
             size="sm"
             filled={false}
-            class="flex gap-2 items-center"
+            class="flex items-center gap-2"
             melt={trigger}
         >
-            <Icon name="trash" />
+            <IconTrash />
             Revoke
         </Button>
         {#if $open}
@@ -53,7 +54,7 @@
                 <form
                     method="post"
                     action="?/delete-invitation"
-                    class="flex gap-2 justify-end mt-4 *:w-fit"
+                    class="mt-4 flex justify-end gap-2 *:w-fit"
                     use:enhance={() => {
                         const previous =
                             queryClient.getQueryData<PaginatedList<LocalProjectMember>>(queryKey);
@@ -115,9 +116,9 @@
                         type="submit"
                         variant="negative"
                         outline
-                        class="flex gap-2 items-center"
+                        class="flex items-center gap-2"
                     >
-                        <Icon name="trash" />
+                        <IconTrash />
                         Revoke invitation
                     </Button>
                 </form>

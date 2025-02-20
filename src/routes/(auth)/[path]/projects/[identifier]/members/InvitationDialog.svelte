@@ -3,14 +3,15 @@
     import { type ComboboxOption, melt } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Button, DialogBuilder, Icon, LoadingMonitor, toast } from '~/lib/components';
+    import { Button, DialogBuilder, LoadingMonitor, toast } from '~/lib/components';
+    import { IconPlus, IconUserPlus } from '~/lib/components/icons';
     import SearchUserCombobox, {
         type SearchUser
     } from '~/lib/components/SearchUserCombobox.svelte';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
     import { createLoading, createUiStatus, watch } from '~/lib/utils/runes.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
     import { type actions } from './+page.server';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
 
     const errorMap = {
         String: 'Find and select a user to invite.',
@@ -48,11 +49,11 @@
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="max-w-paragraph-lg fixed top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 p-8"
+            class="max-w-paragraph-lg fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 p-8"
         >
             <div class="bg-base-1 border-base-border-2 space-y-4 rounded-md border p-8">
                 <div class="text-center">
-                    <Icon name="user-plus" class="mx-auto size-16" />
+                    <IconUserPlus class="mx-auto size-16" />
                     <h2 use:melt={title}>Invite member</h2>
                     <p class="c-label mx-auto text-pretty" use:melt={description}>
                         Find and invite people to your project by their username or email address.
@@ -119,7 +120,7 @@
                                 disabled={loading.immediate}
                             >
                                 <LoadingMonitor {loading} class="size-5">
-                                    <Icon name="plus" class="size-full" />
+                                    <IconPlus class="size-full" />
                                 </LoadingMonitor>
                                 Invite
                             </Button>

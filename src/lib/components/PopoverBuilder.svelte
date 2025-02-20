@@ -2,10 +2,11 @@
     import { createPopover, type CreatePopoverProps } from '@melt-ui/svelte';
     import type { Snippet } from 'svelte';
 
-    type Trigger = Parameters<Parameters<typeof trigger.subscribe>[0]>[0];
-    type Content = Parameters<Parameters<typeof content.subscribe>[0]>[0];
-    type Arrow = Parameters<Parameters<typeof arrow.subscribe>[0]>[0];
-    type Close = Parameters<Parameters<typeof close.subscribe>[0]>[0];
+    type PopoverReturn = ReturnType<typeof createPopover>;
+    type Trigger = Parameters<Parameters<PopoverReturn['elements']['trigger']['subscribe']>[0]>[0];
+    type Content = Parameters<Parameters<PopoverReturn['elements']['content']['subscribe']>[0]>[0];
+    type Arrow = Parameters<Parameters<PopoverReturn['elements']['arrow']['subscribe']>[0]>[0];
+    type Close = Parameters<Parameters<PopoverReturn['elements']['close']['subscribe']>[0]>[0];
 
     interface Props {
         children: Snippet<[{ trigger: Trigger; content: Content; arrow: Arrow; close: Close }]>;

@@ -3,8 +3,8 @@
     import type { ToastData } from './Toaster.svelte';
     import { writable } from 'svelte/store';
     import { onMount } from 'svelte';
-    import Icon from './Icon.svelte';
     import Button from './Button.svelte';
+    import { IconXMark } from './icons';
 
     const {
         elements,
@@ -36,20 +36,20 @@
 
 <div
     use:melt={$content(id)}
-    class="relative rounded-lg bg-base-3 border border-base-border-1 shadow p-4 w-full"
+    class="bg-base-3 border-base-border-1 relative w-full rounded-lg border p-4 shadow"
 >
     <div
         use:melt={$progress}
-        class="absolute left-4 top-4 h-1 w-[10%] overflow-hidden rounded-full bg-primary-1/10"
+        class="bg-primary-1/10 absolute left-4 top-4 h-1 w-[10%] overflow-hidden rounded-full"
     >
         <div
-            class="h-full w-full bg-primary-1"
+            class="bg-primary-1 h-full w-full"
             style={`transform: translateX(-${100 - (100 * ($percentage ?? 0)) / ($max ?? 1)}%)`}
         ></div>
     </div>
 
     <div class="mt-4 text-pretty">
-        <h2 use:melt={$title(id)} class="text-h6 font-semibold mb-2">
+        <h2 use:melt={$title(id)} class="text-h6 mb-2 font-semibold">
             {#if typeof data.title === 'string'}
                 {data.title}
             {:else}
@@ -69,8 +69,8 @@
         variant="negative"
         filled={false}
         size="sm"
-        class="absolute w-fit p-1 right-5 top-5 translate-x-1/2 -translate-y-1/2"
+        class="absolute right-5 top-5 w-fit -translate-y-1/2 translate-x-1/2 p-1"
     >
-        <Icon name="x-mark" />
+        <IconXMark />
     </Button>
 </div>

@@ -3,8 +3,15 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon, SelectBuilder } from '~/lib/components';
-    import { isIconName } from '~/lib/components/Icon.svelte';
+    import { addToast, Button, SelectBuilder } from '~/lib/components';
+    import {
+        IconBacklog,
+        IconCanceled,
+        IconDone,
+        IconDuplicated,
+        IconInProgress,
+        IconTodo
+    } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { WorkspaceStatus } from '~/lib/models/status';
@@ -96,6 +103,19 @@
               }
             : null!
     );
+    const statusIcons = {
+        backlog: IconBacklog,
+        todo: IconTodo,
+        'in-progress': IconInProgress,
+        done: IconDone,
+        canceled: IconCanceled,
+        duplicated: IconDuplicated
+    };
+    const SelectedStatusIcon = $derived(
+        $selected && $selected.value.icon && $selected.value.icon in statusIcons
+            ? statusIcons[$selected.value.icon as keyof typeof statusIcons]
+            : undefined
+    );
 </script>
 
 <SelectBuilder
@@ -117,14 +137,14 @@
             type="button"
             variant="base"
             size="sm"
-            class="flex gap-2 items-center"
+            class="flex items-center gap-2"
             melt={trigger}
         >
             {#if $selected == null}
                 No status
             {:else}
-                {#if $selected?.value.icon && isIconName($selected.value.icon)}
-                    <Icon name={$selected.value.icon} />
+                {#if SelectedStatusIcon}
+                    <SelectedStatusIcon />
                 {/if}
                 <span>
                     {$selected.label}

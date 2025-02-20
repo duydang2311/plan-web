@@ -19,10 +19,10 @@
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types';
     import clsx from 'clsx';
     import { Link } from '~/lib/components';
-    import Icon from '~/lib/components/Icon.svelte';
     import type { LocalBoardIssue } from '../+page.server';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
+    import { IconDraggable } from '~/lib/components/icons';
 
     interface Props {
         identifier: string;
@@ -112,7 +112,7 @@
             <p class="text-sm leading-none">
                 <small>{identifier}-{issue.orderNumber}</small>
             </p>
-            <Icon name="draggable" class="ml-auto h-4" />
+            <IconDraggable class="ml-auto h-4" />
         </div>
         <p class="font-medium leading-none">
             <Link href="/{page.params['path']}/issues/{issue.orderNumber}">

@@ -3,7 +3,8 @@
     import { melt } from '@melt-ui/svelte';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Button, DialogBuilder, Icon } from '~/lib/components';
+    import { Button, DialogBuilder } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import { addToast } from '~/lib/components/Toaster.svelte';
     import type { Issue } from '~/lib/models/issue';
     import { dialog, tsap } from '~/lib/utils/transition';
@@ -19,12 +20,12 @@
 <Button
     variant="negative"
     size="sm"
-    class="flex gap-2 items-center"
+    class="flex items-center gap-2"
     onclick={() => {
         $open = true;
     }}
 >
-    <Icon name="trash" />
+    <IconTrash />
     Delete
 </Button>
 
@@ -43,13 +44,13 @@
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-2 border border-base-border-2"
+            class="bg-base-1 max-w-paragraph-sm lg:max-w-paragraph-lg border-base-border-2 fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 space-y-2 rounded-md border p-8"
         >
             <h4 use:melt={title}>Delete issue?</h4>
             <p>
                 Proceed to delete <span class="font-medium">"{issue.title}"</span>?
             </p>
-            <div class="flex gap-4 w-fit ml-auto">
+            <div class="ml-auto flex w-fit gap-4">
                 <Button variant="base" class="w-fit" outline melt={close}>Cancel</Button>
                 <form
                     method="post"

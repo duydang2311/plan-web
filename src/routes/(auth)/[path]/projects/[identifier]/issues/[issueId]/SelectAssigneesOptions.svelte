@@ -4,7 +4,8 @@
     import { debounce } from '@mobily/ts-belt/Function';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Avatar, Icon, Input } from '~/lib/components';
+    import { Avatar, Input } from '~/lib/components';
+    import { IconCheck, IconSearch } from '~/lib/components/icons';
     import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -88,31 +89,31 @@
 
 <div
     use:melt={menu}
-    class="c-select--menu min-w-52 min-h-60 p-0 grid grid-rows-[auto_1fr]"
+    class="c-select--menu grid min-h-60 min-w-52 grid-rows-[auto_1fr] p-0"
     in:tsap={select.in}
     out:tsap={select.out}
 >
     <div class="relative">
         <Input
-            class="border-none focus:shadow-none pl-8"
+            class="border-none pl-8 focus:shadow-none"
             placeholder="Search for users"
             oninput={(e) => {
                 updateSearch(e.currentTarget.value);
             }}
         />
-        <Icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 text-base-fg-ghost" />
+        <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
     </div>
     <div
-        class="relative p-1 border-t border-t-base-border-3"
+        class="border-t-base-border-3 relative border-t p-1"
         class:animate-pulse={$query.isFetching}
     >
         {#if status === 'pending'}
-            <Spinner2 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-8" />
+            <Spinner2 class="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2" />
         {/if}
         {#if options}
             <ul class="space-y-1">
                 {#if options.length === 0}
-                    <li class="c-select--option px-2 text-base-fg-ghost font-normal">
+                    <li class="c-select--option text-base-fg-ghost px-2 font-normal">
                         No relevant users found.
                     </li>
                 {:else}
@@ -122,7 +123,7 @@
                         <li use:melt={opt} class="c-select--option">
                             <Avatar seed={item.email} src={item.image ?? undefined} class="w-6" />
                             {#if selected}
-                                <Icon name="check" class="c-select--check" />
+                                <IconCheck class="c-select--check" />
                             {/if}
                             {item.label}
                         </li>
@@ -132,7 +133,7 @@
         {:else}
             <ul class="space-y-1">
                 {#each { length: 3 } as _}
-                    <li class="c-select--option bg-base-4 animate-pulse h-7 w-full"></li>
+                    <li class="c-select--option bg-base-4 h-7 w-full animate-pulse"></li>
                 {/each}
             </ul>
         {/if}

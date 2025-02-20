@@ -5,7 +5,7 @@
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
     import { tick, untrack } from 'svelte';
-    import { Icon } from '.';
+    import { IconChevronLeft, IconChevronRight } from './icons';
 
     type T = $$Generic<Row>;
     const { table }: { table: TableHandlerInterface<T> } = $props();
@@ -76,7 +76,7 @@
         disabled={table.currentPage === 1}
         class="c-table--pagination--button relative block w-max min-w-10 content-center rounded-full py-1 transition-colors ease-out"
     >
-        <Icon name="chevron-left" class="mx-auto" />
+        <IconChevronLeft class="mx-auto" />
     </button>
     <button
         type="button"
@@ -84,7 +84,7 @@
         disabled={table.currentPage === table.pageCount}
         class="c-table--pagination--button relative block w-max min-w-10 content-center rounded-full py-1 transition-colors ease-out"
     >
-        <Icon name="chevron-right" class="mx-auto" />
+        <IconChevronRight class="mx-auto" />
     </button>
     <button
         type="button"
@@ -103,14 +103,14 @@
         disabled={table.currentPage === 1}
         class="c-table--pagination--button relative block w-max min-w-10 content-center rounded-full py-1 transition-colors ease-out"
     >
-        <Icon name="chevron-left" class="mx-auto" />
+        <IconChevronLeft class="mx-auto" />
     </button>
     {#each table.pagesWithEllipsis as page}
         {#if page}
             {@render item(page)}
         {:else}
             <div
-                class="w-max min-w-10 content-center text-center py-1 text-base-fg-ghost cursor-default"
+                class="text-base-fg-ghost w-max min-w-10 cursor-default content-center py-1 text-center"
             >
                 ...
             </div>
@@ -122,7 +122,7 @@
         disabled={table.currentPage === table.pageCount}
         class="c-table--pagination--button relative block w-max min-w-10 content-center rounded-full py-1 transition-colors ease-out"
     >
-        <Icon name="chevron-right" class="mx-auto" />
+        <IconChevronRight class="mx-auto" />
     </button>
 {/snippet}
 
@@ -133,7 +133,7 @@
             <div
                 bind:this={activeRef}
                 data-flip-id="pagination-active"
-                class="absolute inset-0 bg-base-5 rounded-full"
+                class="bg-base-5 absolute inset-0 rounded-full"
             ></div>
         {/if}
         <button
@@ -141,7 +141,7 @@
             onclick={() => table.setPage(page)}
             disabled={active}
             class={clsx(
-                'relative font-bold w-max min-w-10 content-center rounded-full py-1 transition-colors ease-out',
+                'relative w-max min-w-10 content-center rounded-full py-1 font-bold transition-colors ease-out',
                 active ? 'text-base-fg-2' : 'text-base-fg-5 hover:text-base-fg-2 hover:bg-base-3'
             )}
         >

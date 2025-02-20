@@ -1,7 +1,7 @@
 <script lang="ts">
     import { melt } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
-    import { Icon } from '~/lib/components';
+    import { IconCheck } from '~/lib/components/icons';
     import { type SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -40,7 +40,7 @@
 <ol use:melt={menu} class="c-select--menu" in:tsap={select.in} out:tsap={select.out}>
     {#if $query.isFetching}
         {#each { length: 4 } as _}
-            <li class="animate-pulse rounded h-8 w-full bg-base-3"></li>
+            <li class="bg-base-3 h-8 w-full animate-pulse rounded"></li>
         {/each}
     {:else if teams != null}
         {#each teams as team (team.value)}
@@ -49,13 +49,13 @@
             <li use:melt={opt} class="c-select--option">
                 <div>
                     {#if selected}
-                        <Icon name="check" class="c-select--check" />
+                        <IconCheck class="c-select--check" />
                     {/if}
                     {team.label}
                 </div>
             </li>
         {/each}
     {:else}
-        <li class="c-select--option pl-2 text-base-fg-ghost">Not available</li>
+        <li class="c-select--option text-base-fg-ghost pl-2">Not available</li>
     {/if}
 </ol>

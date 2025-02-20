@@ -4,8 +4,15 @@
     import { melt } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
     import type { Writable } from 'svelte/store';
-    import { Icon } from '~/lib/components';
-    import { isIconName } from '~/lib/components/Icon.svelte';
+    import {
+        IconBacklog,
+        IconCanceled,
+        IconCheck,
+        IconDone,
+        IconDuplicated,
+        IconInProgress,
+        IconTodo
+    } from '~/lib/components/icons';
     import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
@@ -71,6 +78,14 @@
         },
         () => options
     );
+    const statusIcons = {
+        backlog: IconBacklog,
+        todo: IconTodo,
+        'in-progress': IconInProgress,
+        done: IconDone,
+        canceled: IconCanceled,
+        duplicated: IconDuplicated
+    };
 </script>
 
 <div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
@@ -80,12 +95,16 @@
         {#each options.items as item (item.value.id)}
             {@const opt = option(item)}
             {@const selected = isSelected(item.value)}
+            {@const StatusIcon =
+                item.value.icon && item.value.icon in statusIcons
+                    ? statusIcons[item.value.icon as keyof typeof statusIcons]
+                    : undefined}
             <li use:melt={opt} class="c-select--option">
                 {#if selected}
-                    <Icon name="check" class="c-select--check" />
+                    <IconCheck class="c-select--check" />
                 {/if}
-                {#if item.value.icon && isIconName(item.value.icon)}
-                    <Icon name={item.value.icon} />
+                {#if StatusIcon}
+                    <StatusIcon />
                 {/if}
                 {item.label}
             </li>

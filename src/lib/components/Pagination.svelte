@@ -5,8 +5,8 @@
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
     import { tick, untrack, type Snippet } from 'svelte';
-    import Icon from './Icon.svelte';
     import type { PaginatedList } from '../models/paginatedList';
+    import { IconChevronLeft, IconChevronRight } from './icons';
 
     type Props = (
         | {
@@ -174,7 +174,7 @@
                             : 'hover:bg-base-hover'
                     )}
                 >
-                    <Icon name="chevron-left" />
+                    <IconChevronLeft />
                 </a>
             </li>
             {@render item(1)}
@@ -193,7 +193,7 @@
                             : 'hover:bg-base-hover'
                     )}
                 >
-                    <Icon name="chevron-right" />
+                    <IconChevronRight />
                 </a>
             </li>
         {/if}

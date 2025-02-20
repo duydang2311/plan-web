@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { CreateQueryResult } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
-    import { Icon, Link, Row, Table, THead, ThSort2 } from '~/lib/components';
+    import { Link, Row, Table, THead, ThSort2 } from '~/lib/components';
     import type { Issue } from '~/lib/models/issue';
-    import { getPriorityIcon, getPriorityLabel, IssuePriorities } from '~/lib/models/issue';
+    import { getPriorityLabel, IssuePriorities, priorityIcons } from '~/lib/models/issue';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { type PaginationHandler, type Sort } from '~/lib/utils/table.svelte';
     import Pagination2 from '../Pagination2.svelte';
@@ -44,14 +44,15 @@
         <tbody class:animate-pulse={$query.isFetching}>
             {#if $query.data == null || $query.data.items.length === 0}
                 <Row>
-                    <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
+                    <td class="text-base-fg-ghost col-span-full">No issues yet.</td>
                 </Row>
             {:else}
                 {#each $query.data.items as row}
+                    {@const PriorityIcon = priorityIcons[row.priority]}
                     <Row>
                         <td>
                             <div
-                                class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
+                                class="text-base-fg-3/60 block min-w-max content-center text-sm font-bold"
                             >
                                 {row.project.identifier}-{row.orderNumber}
                             </div>
@@ -69,8 +70,7 @@
                             {/if}
                         </td>
                         <td title={getPriorityLabel(row.priority)}>
-                            <Icon
-                                name={getPriorityIcon(row.priority)}
+                            <PriorityIcon
                                 class={row.priority == IssuePriorities.none
                                     ? 'text-base-fg-ghost'
                                     : undefined}

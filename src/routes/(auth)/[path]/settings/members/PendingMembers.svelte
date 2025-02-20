@@ -4,7 +4,8 @@
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
     import { toStore } from 'svelte/store';
-    import { Icon, IconButton, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { IconButton, Pagination, Row, Table, Th, THead } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import ThSort2 from '~/lib/components/ThSort2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -43,7 +44,7 @@
 <div class="grid grid-rows-[1fr_auto]">
     <Table class="grid-cols-[1fr_auto_auto]">
         <THead>
-            <Row class="py-2 items-center">
+            <Row class="items-center py-2">
                 <Th>User</Th>
                 <ThSort2 field={sort.field('createdTime')}>Created time</ThSort2>
                 <Th>Actions</Th>
@@ -52,23 +53,23 @@
         <tbody>
             {#if !$query.data}
                 <Row>
-                    <td class="col-span-full text-base-fg-ghost">Loading...</td>
+                    <td class="text-base-fg-ghost col-span-full">Loading...</td>
                 </Row>
             {:else if $query.data.items.length === 0}
                 <Row>
-                    <td class="col-span-full text-base-fg-ghost">No invitations available.</td>
+                    <td class="text-base-fg-ghost col-span-full">No invitations available.</td>
                 </Row>
             {:else}
                 {#each $query.data.items as { id, user, createdTime } (id)}
                     <Row>
                         <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
+                            class="overflow-hidden text-ellipsis whitespace-nowrap"
                             title={user.email}
                         >
                             {user.email}
                         </td>
                         <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
+                            class="overflow-hidden text-ellipsis whitespace-nowrap"
                             title={DateTime.fromISO(createdTime).toRelative()}
                         >
                             {DateTime.fromISO(createdTime).toRelative()}
@@ -81,7 +82,7 @@
                                     title="Remove member"
                                     class="w-fit"
                                 >
-                                    <Icon name="trash" />
+                                    <IconTrash />
                                 </IconButton>
                             </div>
                         </td>

@@ -3,13 +3,18 @@
     import { page } from '$app/state';
     import { melt } from '@melt-ui/svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Icon, SelectBuilder } from '~/lib/components';
-    import type { IconName } from '~/lib/components/Icon.svelte';
+    import { Button, SelectBuilder } from '~/lib/components';
+    import { IconCheck, IconChevronUpDown } from '~/lib/components/icons';
     import { fluentSearchParams } from '~/lib/utils/url';
 
     interface Props {
-        options: { label: string; value: string; icon: IconName; default?: boolean }[];
-        selected: Writable<{ label: string; value: string; icon: IconName; default?: boolean }>;
+        options: { label: string; value: string; icon: SvelteIconComponent; default?: boolean }[];
+        selected: Writable<{
+            label: string;
+            value: string;
+            icon: SvelteIconComponent;
+            default?: boolean;
+        }>;
     }
 
     const { options, selected }: Props = $props();
@@ -45,17 +50,17 @@
             flat
             size="sm"
             filled={false}
-            class="relative px-8 w-52 max-w-52 overflow-hidden flex items-center gap-2"
+            class="relative flex w-52 max-w-52 items-center gap-2 overflow-hidden px-8"
             melt={trigger}
             title="View: {$selected.label}"
         >
             {#if selectedOption}
-                <Icon name={selectedOption.icon} />
+                <selectedOption.icon />
             {/if}
-            <span class="text-nowrap text-ellipsis overflow-hidden w-full">
+            <span class="w-full overflow-hidden text-ellipsis text-nowrap">
                 {$selected.label}
             </span>
-            <Icon name="chevron-up-down" class="absolute right-2 top-1/2 -translate-y-1/2" />
+            <IconChevronUpDown class="absolute right-2 top-1/2 -translate-y-1/2" />
         </Button>
         {#if $open}
             <div use:melt={menu} class="c-select--menu">
@@ -65,9 +70,9 @@
                         {@const selected = isSelected(item.value)}
                         <li use:melt={opt} class="c-select--option">
                             {#if selected}
-                                <Icon name="check" class="c-select--check" />
+                                <IconCheck class="c-select--check" />
                             {/if}
-                            <Icon name={item.icon} />
+                            <item.icon />
                             {item.label}
                         </li>
                     {/each}

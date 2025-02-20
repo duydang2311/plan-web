@@ -2,8 +2,9 @@
     import { enhance } from '$app/forms';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { Icon, toast } from '~/lib/components';
+    import { toast } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
+    import { IconCheck, IconXMark } from '~/lib/components/icons';
     import Tiptap from '~/lib/components/Tiptap.svelte';
     import type { Ref } from '~/lib/utils/runes.svelte';
     import type { ActionData } from './$types';
@@ -77,7 +78,7 @@
                             onclick={onCancel}
                             class="flex items-center gap-2"
                         >
-                            <Icon name="x-mark" />
+                            <IconXMark />
                             Cancel
                         </Button>
                         <Button
@@ -86,7 +87,7 @@
                             variant="primary"
                             class="flex items-center gap-2"
                         >
-                            <Icon name="check" />
+                            <IconCheck />
                             Save
                         </Button>
                     </div>

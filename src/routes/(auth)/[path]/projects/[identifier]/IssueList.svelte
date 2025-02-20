@@ -2,9 +2,10 @@
     import { page } from '$app/state';
     import { DateTime } from 'luxon';
     import { Button, Icon } from '~/lib/components';
+    import { IconArrowRight, IconChevronRight } from '~/lib/components/icons';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import type { LocalIssue } from './+page.server';
     import type { Loading } from '~/lib/utils/runes.svelte';
+    import type { LocalIssue } from './+page.server';
 
     const {
         issueList,
@@ -33,7 +34,7 @@
             size="sm"
             class="flex w-fit items-center gap-2"
         >
-            <Icon name="arrow-right" />
+            <IconArrowRight />
             See more
         </Button>
     </div>
@@ -58,20 +59,19 @@
                             'hover:bg-base-3 hover:text-base-fg-1 hover:pl-8'
                         ]}
                     >
-                        <Icon
-                            name="chevron-right"
-                            class="absolute top-1/2 left-0 -translate-y-1/2 translate-x-0 transform opacity-0 transition-[opacity_transform] group-hover:translate-x-1/2 group-hover:opacity-100"
+                        <IconChevronRight
+                            class="absolute left-0 top-1/2 -translate-y-1/2 translate-x-0 transform opacity-0 transition-[opacity_transform] group-hover:translate-x-1/2 group-hover:opacity-100"
                         />
                         <div
-                            class="text-base-fg-5 overflow-hidden text-sm font-medium tracking-tight whitespace-nowrap"
+                            class="text-base-fg-5 overflow-hidden whitespace-nowrap text-sm font-medium tracking-tight"
                         >
                             {page.params.identifier}-{item.orderNumber}
                         </div>
-                        <div class="overflow-hidden font-medium text-ellipsis whitespace-nowrap">
+                        <div class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
                             {item.title}
                         </div>
                         <div
-                            class="text-base-fg-5 overflow-hidden text-sm text-ellipsis whitespace-nowrap"
+                            class="text-base-fg-5 overflow-hidden text-ellipsis whitespace-nowrap text-sm"
                             title={created.toLocaleString(DateTime.DATETIME_MED)}
                         >
                             created {created.toRelative()}

@@ -5,12 +5,12 @@
     import {
         addToast,
         Button,
-        Icon,
         IconButton,
         Popover,
         PopoverArrow,
         PopoverBuilder
     } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import type { WorkspaceStatus } from '~/lib/models/status';
     import type { PageData } from './$types';
 
@@ -52,10 +52,10 @@
             class="w-fit"
             melt={trigger}
         >
-            <Icon name="trash" />
+            <IconTrash />
         </IconButton>
         {#if $open}
-            <Popover melt={content} class="text-pretty w-96">
+            <Popover melt={content} class="w-96 text-pretty">
                 <PopoverArrow melt={arrow}></PopoverArrow>
                 <h2 class="mb-2">Delete the status?</h2>
                 <p>
@@ -64,7 +64,7 @@
                 <form
                     method="post"
                     action="?/delete-status"
-                    class="flex justify-end gap-4 mt-4"
+                    class="mt-4 flex justify-end gap-4"
                     use:enhance={async () => {
                         await queryClient.cancelQueries({ queryKey });
                         const old =

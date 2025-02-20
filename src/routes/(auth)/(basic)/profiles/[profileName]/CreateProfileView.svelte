@@ -9,12 +9,12 @@
         Button,
         Errors,
         Field,
-        Icon,
         IconButton,
         Input,
         Label,
         TextArea
     } from '~/lib/components';
+    import { IconMinus, IconPlus, IconUploadOutline } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { createForm, formValidator, type HelperField } from '~/lib/utils/form.svelte';
     import { TE } from '~/lib/utils/functional';
@@ -128,11 +128,11 @@
     {@render errorDescription('An error occurred while uploading your profile image.')}
 {/snippet}
 
-<main class="lg:max-w-paragraph-lg mx-auto grow content-center w-full">
-    <p class="text-h6 mb-12 text-base-fg-ghost text-center">
+<main class="lg:max-w-paragraph-lg mx-auto w-full grow content-center">
+    <p class="text-h6 text-base-fg-ghost mb-12 text-center">
         It seems like you don't have a profile yet!
     </p>
-    <div class="flex gap-8 items-center mx-auto w-fit">
+    <div class="mx-auto flex w-fit items-center gap-8">
         <Avatar
             alt=""
             src={imageFile != null ? URL.createObjectURL(imageFile) : undefined}
@@ -148,7 +148,7 @@
         method="post"
         action="?/create-profile"
         enctype="multipart/form-data"
-        class="space-y-8 mt-8"
+        class="mt-8 space-y-8"
         use:form
         use:enhance={async (e) => {
             form.validate();
@@ -206,7 +206,7 @@
 
         <fieldset class="space-y-4">
             <legend class="text-h4 text-base-fg-3">Optional details</legend>
-            <Field class="w-full !mt-2">
+            <Field class="!mt-2 w-full">
                 <ProfileImageFileField
                     onInput={(file) => {
                         if (file) {
@@ -216,7 +216,7 @@
                         }
                     }}
                 >
-                    <Icon name="upload-outline" class="mx-auto size-8 text-base-fg-ghost" />
+                    <IconUploadOutline class="text-base-fg-ghost mx-auto size-8" />
                     {#if imageFileInfo}
                         <p>
                             {imageFileInfo.name} ({Math.round(
@@ -258,7 +258,7 @@
                 <Errors errors={fields.bio.state.errors} />
             </Field>
             <fieldset class="w-full">
-                <legend class="c-label w-full flex gap-2 items-center mb-1">
+                <legend class="c-label mb-1 flex w-full items-center gap-2">
                     <span>Social links</span>
                     <IconButton
                         type="button"
@@ -267,7 +267,7 @@
                         }}
                         title="Add social link"
                     >
-                        <Icon name="plus" />
+                        <IconPlus />
                     </IconButton>
                 </legend>
                 <div class="space-y-2">
@@ -293,7 +293,7 @@
                                     }}
                                     class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
                                 >
-                                    <Icon name="minus" />
+                                    <IconMinus />
                                 </IconButton>
                             </div>
                             <Errors errors={socialLink.state.errors} />
@@ -302,7 +302,7 @@
                 </div>
             </fieldset>
         </fieldset>
-        <div class="flex gap-4 justify-end">
+        <div class="flex justify-end gap-4">
             <Button type="reset" variant="base" outline class="w-fit">Reset</Button>
             <Button type="submit" variant="primary" outline class="w-fit">Create</Button>
         </div>

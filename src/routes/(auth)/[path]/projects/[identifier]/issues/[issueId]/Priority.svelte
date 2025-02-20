@@ -3,12 +3,13 @@
     import { A, D, pipe } from '@mobily/ts-belt';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon, SelectBuilder } from '~/lib/components';
+    import { addToast, Button, SelectBuilder } from '~/lib/components';
+    import { IconCheck } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import {
-        getPriorityIcon,
         getPriorityLabel,
         IssuePriorities,
+        priorityIcons,
         type IssuePriority
     } from '~/lib/models/issue';
     import { select, tsap } from '~/lib/utils/transition';
@@ -70,6 +71,7 @@
     const selected = writable<SelectOption<IssuePriority>>(
         items.find((a) => a.value === priority) ?? items[0]
     );
+    const IconPriority = $derived(priorityIcons[$selected.value]);
 </script>
 
 <SelectBuilder
@@ -89,10 +91,10 @@
             type="button"
             variant="base"
             size="sm"
-            class="flex gap-2 items-center"
+            class="flex items-center gap-2"
             melt={trigger}
         >
-            <Icon name={getPriorityIcon($selected.value)} />
+            <IconPriority />
             <span>
                 {getPriorityLabel($selected.value)}
             </span>
@@ -102,10 +104,11 @@
                 {#each items as item (item.value)}
                     {@const opt = option(item)}
                     {@const selected = isSelected(item.value)}
+                    {@const IconPriority = priorityIcons[item.value]}
                     <li use:melt={opt} class="c-select--option">
-                        <Icon name={getPriorityIcon(item.value)} />
+                        <IconPriority />
                         {#if selected}
-                            <Icon name="check" class="c-select--check" />
+                            <IconCheck class="c-select--check" />
                         {/if}
                         {item.label}
                     </li>

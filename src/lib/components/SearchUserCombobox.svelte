@@ -5,13 +5,14 @@
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
     import { untrack } from 'svelte';
     import { toStore, writable, type Writable } from 'svelte/store';
-    import { Avatar, Combobox, Errors, Field, Icon, Input, Label } from '~/lib/components';
+    import { Avatar, Combobox, Errors, Field, Input, Label } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { User } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { watch } from '~/lib/utils/runes.svelte';
     import { select, tsap } from '~/lib/utils/transition';
+    import { IconCheck, IconSearch } from './icons';
 
     export type SearchUser = Pick<User, 'id' | 'email'> & {
         profile?: Pick<NonNullable<User['profile']>, 'name' | 'displayName' | 'image'>;
@@ -108,10 +109,7 @@
                     }}
                     aria-invalid={errors == null ? undefined : true}
                 />
-                <Icon
-                    name="search"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
-                />
+                <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
             </div>
             <Errors {errors} />
         </Field>
@@ -137,7 +135,7 @@
                                     />
                                 {/if}
                                 {#if isSelected(item)}
-                                    <Icon name="check" class="c-select--check" />
+                                    <IconCheck class="c-select--check" />
                                 {/if}
                                 <span>
                                     {#if item.profile}

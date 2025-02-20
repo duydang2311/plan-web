@@ -5,7 +5,8 @@
     import { sineInOut } from 'svelte/easing';
     import type { HTMLThAttributes } from 'svelte/elements';
     import { scale } from 'svelte/transition';
-    import { Button, Icon } from '.';
+    import { Button } from '.';
+    import { IconArrowsUpDown, IconArrowUp } from './icons';
 
     type T = $$Generic<Row>;
     interface Props {
@@ -26,14 +27,13 @@
         size="sm"
         filled={false}
         onclick={() => sort.set()}
-        class="group flex items-center gap-2 w-fit"
+        class="group flex w-fit items-center gap-2"
     >
         {@render children()}
         <div class="transition-enforcement">
             {#if sort.isActive}
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
-                    <Icon
-                        name="arrow-up"
+                    <IconArrowUp
                         class={[
                             'transition-transform duration-75 ease-out',
                             sort.direction === 'desc' && 'rotate-180'
@@ -42,9 +42,8 @@
                 </div>
             {:else}
                 <div transition:scale={{ duration: 150, easing: sineInOut }}>
-                    <Icon
-                        name="arrows-up-down"
-                        class="transition duration-75 ease-out text-base-fg-ghost group-hover:text-base-fg-1"
+                    <IconArrowsUpDown
+                        class="text-base-fg-ghost group-hover:text-base-fg-1 transition duration-75 ease-out"
                     />
                 </div>
             {/if}

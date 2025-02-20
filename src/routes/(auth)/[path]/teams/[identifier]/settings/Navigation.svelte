@@ -4,14 +4,13 @@
     import { page } from '$app/state';
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
-    import type { IconName } from '~/lib/components/Icon.svelte';
     import NavigationItem from './NavigationItem.svelte';
 
     interface Props {
         items: {
             href: string;
-            icon: IconName;
-            activeIcon: IconName;
+            icon: SvelteIconComponent;
+            activeIcon: SvelteIconComponent;
             label: string;
         }[];
     }
@@ -54,14 +53,14 @@
     });
 </script>
 
-<ul class="font-medium group text-sm max-xl:flex max-xl:gap-2 xl:min-w-36">
+<ul class="group text-sm font-medium max-xl:flex max-xl:gap-2 xl:min-w-36">
     {#each items as { href, icon, activeIcon, label } (href)}
         {@const isActive = pathname === href}
         <li class="relative">
             {#if isActive}
                 <div
                     bind:this={activeBar}
-                    class="absolute max-xl:inset-0 max-xl:bg-base-3 max-xl:rounded-full xl:w-0.5 xl:inset-y-0 xl:left-0 xl:bg-base-fg-1 xl:z-50"
+                    class="max-xl:bg-base-3 xl:bg-base-fg-1 absolute max-xl:inset-0 max-xl:rounded-full xl:inset-y-0 xl:left-0 xl:z-50 xl:w-0.5"
                     data-flip-id="active-bar"
                 ></div>
             {/if}

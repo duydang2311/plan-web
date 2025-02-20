@@ -4,13 +4,13 @@
     import { writable } from 'svelte/store';
     import {
         Button,
-        Icon,
         IconButton,
         Popover,
         PopoverArrow,
         PopoverBuilder,
         toast
     } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Project } from '~/lib/models/project';
     import { validateActionFailureData } from '~/lib/utils/kit.client';
@@ -62,7 +62,7 @@
             class="w-fit"
             melt={trigger}
         >
-            <Icon name="trash" />
+            <IconTrash />
         </IconButton>
         {#if $open}
             <Popover melt={content} class="w-96 text-pretty">

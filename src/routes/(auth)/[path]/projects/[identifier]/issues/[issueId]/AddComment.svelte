@@ -3,7 +3,8 @@
     import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
-    import { Button, Icon, Tiptap } from '~/lib/components';
+    import { Button, Tiptap } from '~/lib/components';
+    import { IconArrowUp } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { AsyncRef } from '~/lib/utils/runes.svelte';
     import type { ValidationResult } from '~/lib/utils/validation';
@@ -112,7 +113,7 @@
             class="absolute bottom-2 right-3 ml-auto flex w-fit items-center gap-2"
             disabled={validation && !validation.ok}
         >
-            <Icon name="arrow-up" />
+            <IconArrowUp />
             Send
         </Button>
     </div>

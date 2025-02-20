@@ -1,11 +1,11 @@
 <script lang="ts">
     import clsx from 'clsx';
     import { DateTime } from 'luxon';
-    import { Icon, Link, Row, Table, Th, THead } from '~/lib/components';
+    import { Link, Row, Table, Th, THead } from '~/lib/components';
     import {
-        getPriorityIcon,
         getPriorityLabel,
         IssuePriorities,
+        priorityIcons,
         type Issue
     } from '~/lib/models/issue';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -42,14 +42,15 @@
     <tbody class={clsx(status === 'loading' && 'animate-pulse')}>
         {#if issues == null || issues.items.length === 0}
             <Row>
-                <td class="col-span-full text-base-fg-ghost">No issues yet.</td>
+                <td class="text-base-fg-ghost col-span-full">No issues yet.</td>
             </Row>
         {:else}
             {#each issues.items as issue (issue.id)}
+                {@const PriorityIcon = priorityIcons[issue.priority]}
                 <Row>
                     <td>
                         <div
-                            class="min-w-max block text-sm font-bold text-base-fg-3/60 content-center"
+                            class="text-base-fg-3/60 block min-w-max content-center text-sm font-bold"
                         >
                             {issue.identifier}-{issue.orderNumber}
                         </div>
@@ -67,8 +68,7 @@
                         {/if}
                     </td>
                     <td title={getPriorityLabel(issue.priority)}>
-                        <Icon
-                            name={getPriorityIcon(issue.priority)}
+                        <PriorityIcon
                             class={issue.priority == IssuePriorities.none
                                 ? 'text-base-fg-ghost'
                                 : undefined}

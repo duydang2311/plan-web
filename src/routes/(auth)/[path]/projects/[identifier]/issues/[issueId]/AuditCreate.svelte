@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { Avatar, OptionalLink } from '~/lib/components';
-    import type { LocalIssueAudit } from './+page.server';
-    import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { DateTime } from 'luxon';
+    import { Avatar, OptionalLink, RelativeTime } from '~/lib/components';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import type { LocalIssueAudit } from './+page.server';
 
     interface Props {
         audit: LocalIssueAudit;
@@ -33,7 +32,7 @@
         </OptionalLink>
         created the issue
         <span class="text-base-fg-4">
-            · {DateTime.fromISO(audit.createdTime).toRelative()}
+            · <RelativeTime time={audit.createdTime} />
         </span>
     </div>
 </div>

@@ -33,17 +33,17 @@
             use:melt={content}
             in:tsap={dialog.in({ duration: 0.6 })}
             out:tsap={dialog.out()}
-            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-paragraph-lg focus:outline-none p-4"
+            class="max-w-paragraph-lg fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 p-4 focus:outline-none"
         >
-            <div class="bg-base-1 rounded-lg w-full space-y-4 border border-base-border-2 p-4">
+            <div class="bg-base-1 border-base-border-2 w-full space-y-4 rounded-lg border p-4">
                 <div>
-                    <p class="text-h4 font-medium text-base-fg-1">Edit profile picture</p>
+                    <p class="text-h4 text-base-fg-1 font-medium">Edit profile picture</p>
                     <p class="text-base-fg-3">
                         You can resize and crop the image as you like before uploading.
                     </p>
                 </div>
                 <div
-                    class="relative rounded overflow-hidden h-[32rem] bg-base-3 w-full border border-base-border-2"
+                    class="bg-base-3 border-base-border-2 relative h-[32rem] w-full overflow-hidden rounded border"
                 >
                     {#if file}
                         <Cropper
@@ -52,14 +52,14 @@
                             aspect={1}
                             maxZoom={4}
                             cropShape="round"
-                            on:cropcomplete={(e) => {
-                                cropArea = e.detail.pixels;
+                            oncropcomplete={(e) => {
+                                cropArea = e.pixels;
                             }}
                             zoomSpeed={0.25}
                         />
                     {/if}
                 </div>
-                <div class="flex gap-4 justify-end">
+                <div class="flex justify-end gap-4">
                     <Button type="button" variant="base" outline class="w-fit" melt={close}>
                         Cancel
                     </Button>

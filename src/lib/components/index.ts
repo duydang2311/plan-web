@@ -10,7 +10,6 @@ export { default as DialogBuilder, type DialogProps } from './DialogBuilder.svel
 export { default as Errors } from './Errors.svelte';
 export { default as Field } from './Field.svelte';
 export { default as Flippable } from './Flippable.svelte';
-export { default as Icon } from './Icon.svelte';
 export { default as IconButton } from './IconButton.svelte';
 export { default as Input } from './Input.svelte';
 export { default as Label } from './Label.svelte';

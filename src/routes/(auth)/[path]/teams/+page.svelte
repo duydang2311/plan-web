@@ -7,7 +7,7 @@
     import { backInOut, circInOut } from 'svelte/easing';
     import { fade, scale } from 'svelte/transition';
     import Button from '~/lib/components/Button.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
+    import { IconPlus, IconSettings } from '~/lib/components/icons';
     import Link from '~/lib/components/Link.svelte';
     import Pagination from '~/lib/components/Pagination.svelte';
     import Row from '~/lib/components/Row.svelte';
@@ -71,31 +71,31 @@
     });
 </script>
 
-<main class="divide-y divide-base-border-2 h-full flex flex-col">
-    <div class="flex gap-4 justify-between items-center px-8 py-2">
+<main class="divide-base-border-2 flex h-full flex-col divide-y">
+    <div class="flex items-center justify-between gap-4 px-8 py-2">
         <p>Filter</p>
         <Button
             as="link"
             href="teams/new"
             variant="base"
             size="sm"
-            class="w-fit -mr-4 flex items-center gap-1"
+            class="-mr-4 flex w-fit items-center gap-1"
         >
-            <Icon name="plus" />
+            <IconPlus />
             Add team
         </Button>
     </div>
-    <div class="relative flex flex-col justify-between grow overflow-auto">
+    <div class="relative flex grow flex-col justify-between overflow-auto">
         {#if status === 'pending-long'}
             <div
                 transition:fade={{ easing: circInOut }}
-                class="fixed backdrop-blur-sm z-50 inset-0 bg-black/10"
+                class="fixed inset-0 z-50 bg-black/10 backdrop-blur-sm"
             >
                 <div
                     transition:scale={{ easing: backInOut }}
                     class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 >
-                    <Spinner class="w-8 h-8 text-primary-1" />
+                    <Spinner class="text-primary-1 h-8 w-8" />
                 </div>
             </div>
         {/if}
@@ -144,10 +144,10 @@
                                                 'path'
                                             ]}/teams/{identifier}/settings"
                                             variant="base"
-                                            class="w-fit p-1 text-base-fg-3 hover:text-base-fg-1"
+                                            class="text-base-fg-3 hover:text-base-fg-1 w-fit p-1"
                                             filled={false}
                                         >
-                                            <Icon name="settings" />
+                                            <IconSettings />
                                         </Button>
                                     </div>
                                 </td>

@@ -1,9 +1,9 @@
 <script lang="ts">
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Button, Icon, RelativeTime } from '~/lib/components';
+    import { Button, RelativeTime } from '~/lib/components';
+    import { IconPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { GenericError, HttpError } from '~/lib/models/errors';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { QueryResponse } from '~/lib/utils/query';
     import { createWorkspaceListParams, type LocalWorkspace } from './utils';
@@ -43,13 +43,13 @@
             <li class="flex-1 basis-96">
                 <a
                     href="/{path}"
-                    class="block px-6 py-4 dark:bg-base-2 border border-base-border-3 rounded-md font-display text-medium
-                    transition duration-75 ease-out hover:bg-base-3 hover:text-base-fg-1"
+                    class="dark:bg-base-2 border-base-border-3 font-display text-medium hover:bg-base-3 hover:text-base-fg-1 block rounded-md border
+                    px-6 py-4 transition duration-75 ease-out"
                 >
                     <div class="flex items-end justify-between gap-16">
                         <div class="flex flex-col justify-between self-start">
                             <p
-                                class="flex items-center gap-2 text-base-fg-1 font-bold font-display text-h4"
+                                class="text-base-fg-1 font-display text-h4 flex items-center gap-2 font-bold"
                             >
                                 {name}
                             </p>
@@ -59,11 +59,11 @@
                         </div>
                         <div class="flex flex-wrap gap-4">
                             <div>
-                                <p class="c-label uppercase tracking-tight text-xs">Members</p>
+                                <p class="c-label text-xs uppercase tracking-tight">Members</p>
                                 <p class="text-h2 font-bold">{totalUsers}</p>
                             </div>
                             <div>
-                                <p class="c-label uppercase tracking-tight text-xs">Projects</p>
+                                <p class="c-label text-xs uppercase tracking-tight">Projects</p>
                                 <p class="text-h2 font-bold">{totalProjects}</p>
                             </div>
                         </div>
@@ -71,16 +71,16 @@
                 </a>
             </li>
         {/each}
-        <li class="basis-full grow h-48">
+        <li class="h-48 grow basis-full">
             <Button
                 as="link"
                 href="/new"
                 outline
                 filled={false}
                 variant="base"
-                class="size-full flex justify-center items-center gap-2 px-12 py-4 border-dashed"
+                class="flex size-full items-center justify-center gap-2 border-dashed px-12 py-4"
             >
-                <Icon name="plus" />
+                <IconPlus />
                 Create workspace
             </Button>
         </li>

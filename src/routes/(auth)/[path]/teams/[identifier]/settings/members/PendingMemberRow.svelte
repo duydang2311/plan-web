@@ -6,13 +6,13 @@
     import {
         Badge,
         Button,
-        Icon,
         Popover,
         PopoverArrow,
         PopoverBuilder,
         Row,
         Spinner
     } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { TeamInvitation } from '~/lib/models/team';
     import type { SubmitFunction } from './$types';
@@ -71,19 +71,19 @@
                         type="button"
                         variant="negative"
                         size="sm"
-                        class="flex gap-2 items-center w-fit"
+                        class="flex w-fit items-center gap-2"
                         melt={trigger}
                         disabled={isSubmitting}
                     >
                         {#if isSubmitting}
                             <Spinner class="size-5" />
                         {:else}
-                            <Icon name="trash" class="size-5" />
+                            <IconTrash class="size-5" />
                         {/if}
                         Revoke
                     </Button>
                     {#if $open}
-                        <Popover melt={content} class="text-pretty w-96">
+                        <Popover melt={content} class="w-96 text-pretty">
                             <PopoverArrow melt={arrow} />
                             <h2 class="mb-2">Revoke team invitation?</h2>
                             <p>
@@ -93,7 +93,7 @@
                             <form
                                 method="post"
                                 action="?/revoke-invitation"
-                                class="flex justify-end gap-4 mt-4"
+                                class="mt-4 flex justify-end gap-4"
                                 use:enhance={submit}
                             >
                                 <input type="hidden" name="teamId" value={data.teamId} />

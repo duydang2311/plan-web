@@ -2,7 +2,8 @@
     import { enhance } from '$app/forms';
     import { useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Icon, IconButton, Popover, PopoverBuilder } from '~/lib/components';
+    import { addToast, Button, IconButton, Popover, PopoverBuilder } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { LocalWorkspaceMember } from './+page.server';
@@ -24,7 +25,7 @@
                 class="w-fit"
                 melt={trigger}
             >
-                <Icon name="trash" />
+                <IconTrash />
             </IconButton>
             {#if $open}
                 <Popover melt={content} class="max-w-paragraph-sm">

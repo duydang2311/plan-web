@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { pipe } from '@baetheus/fun/fn';
     import { melt, type ComboboxOption } from '@melt-ui/svelte';
     import { createQuery, type CreateQueryOptions } from '@tanstack/svelte-query';
     import clsx from 'clsx';
@@ -11,23 +12,22 @@
         Button,
         Combobox,
         DialogBuilder,
-        Icon,
         Input,
         Label,
         Spinner,
         StaticErrors,
         type DialogProps
     } from '~/lib/components';
+    import { IconCheck, IconSearch, IconUserPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';
+    import { TE } from '~/lib/utils/functional';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import { flyAndScale, tsap } from '~/lib/utils/transition';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { ActionData } from './$types';
     import { validateInvite } from './utils';
-    import { pipe } from '@baetheus/fun/fn';
-    import { TE } from '~/lib/utils/functional';
 
     interface Props extends DialogProps {
         team: Pick<Team, 'id' | 'name'>;
@@ -153,7 +153,7 @@
         ></div>
         <div
             use:melt={content}
-            class="fixed w-full max-w-paragraph-lg top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-8 focus:outline-none"
+            class="max-w-paragraph-lg fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 p-8 focus:outline-none"
         >
             <div
                 transition:flyAndScale|global={{
@@ -162,13 +162,13 @@
                     duration: 200,
                     easing: circInOut
                 }}
-                class="bg-base-1 border border-base-border-2 shadow-lg rounded-md p-4"
+                class="bg-base-1 border-base-border-2 rounded-md border p-4 shadow-lg"
             >
-                <Icon name="user-plus" class="size-12 text-base-fg-1 mx-auto" />
-                <h1 use:melt={title} class="text-balance text-center text-h3">
+                <IconUserPlus class="text-base-fg-1 mx-auto size-12" />
+                <h1 use:melt={title} class="text-h3 text-balance text-center">
                     Invite member to <strong>{team.name}</strong>
                 </h1>
-                <div use:melt={description} class="text-center text-pretty mt-2">
+                <div use:melt={description} class="mt-2 text-pretty text-center">
                     You can invite anyone to the team using their username or email address.
                 </div>
                 <form
@@ -218,9 +218,8 @@
                                         melt={input}
                                         aria-invalid={!!errors?.['memberId']}
                                     />
-                                    <Icon
-                                        name="search"
-                                        class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
+                                    <IconSearch
+                                        class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
                                     />
                                 </div>
                                 <StaticErrors
@@ -230,7 +229,7 @@
                                 {#if open && $query.data}
                                     <div
                                         use:melt={menu}
-                                        class="c-popover max-w-none p-2 cursor-default"
+                                        class="c-popover max-w-none cursor-default p-2"
                                     >
                                         <ol
                                             class={clsx(
@@ -243,16 +242,15 @@
                                             {:else}
                                                 {#each $query.data.items as item (item.userId)}
                                                     <li
-                                                        class="relative p-2 rounded text-base-fg-ghost data-[highlighted]:bg-base-3 data-[highlighted]:text-base-fg-1 data-[selected]:bg-base-3 data-[selected]:text-base-fg-1 data-[disabled]:opacity-50 pl-9"
+                                                        class="text-base-fg-ghost data-[highlighted]:bg-base-3 data-[highlighted]:text-base-fg-1 data-[selected]:bg-base-3 data-[selected]:text-base-fg-1 relative rounded p-2 pl-9 data-[disabled]:opacity-50"
                                                         use:melt={option({
                                                             value: item,
                                                             label: item.email
                                                         })}
                                                     >
                                                         {#if isSelected(item)}
-                                                            <Icon
-                                                                name="check"
-                                                                class="absolute left-0 translate-x-1/2 top-1/2 -translate-y-1/2"
+                                                            <IconCheck
+                                                                class="absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
                                                             />
                                                         {/if}
                                                         {item.email}
@@ -265,14 +263,14 @@
                             </div>
                         {/snippet}
                     </Combobox>
-                    <div class="flex gap-4 justify-end items-center">
+                    <div class="flex items-center justify-end gap-4">
                         <StaticErrors errors={errors?.['root']} class="grow" />
                         <Button type="button" variant="base" melt={close} class="w-fit">
                             Cancel
                         </Button>
                         <Button
                             variant="primary"
-                            class="w-fit flex"
+                            class="flex w-fit"
                             disabled={(errors != null && !errors['root']) ||
                                 status === 'submitting'}
                         >

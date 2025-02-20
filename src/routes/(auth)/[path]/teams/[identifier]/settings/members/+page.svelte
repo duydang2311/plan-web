@@ -2,7 +2,8 @@
     import { replaceState } from '$app/navigation';
     import { page } from '$app/state';
     import clsx from 'clsx';
-    import { Button, Icon } from '~/lib/components';
+    import { Button } from '~/lib/components';
+    import { IconUserPlus } from '~/lib/components/icons';
     import { none } from '~/lib/utils/transition';
     import { fluentSearchParams, queryParams } from '~/lib/utils/url';
     import type { ActionData, PageData } from './$types';
@@ -35,8 +36,8 @@
         />
     </div>
 {/if}
-<main class="h-full flex flex-col divide divide-y divide-base-border-2">
-    <div class="px-8 py-2 flex gap-4 justify-between items-center whitespace-nowrap">
+<main class="divide divide-base-border-2 flex h-full flex-col divide-y">
+    <div class="flex items-center justify-between gap-4 whitespace-nowrap px-8 py-2">
         <div>
             <h1 class="sr-only">Manage team members</h1>
             <div class="flex gap-4">
@@ -73,10 +74,10 @@
                 variant="base"
                 outline
                 size="sm"
-                class="flex gap-4 items-center"
+                class="flex items-center gap-4"
                 onclick={handleInvite}
             >
-                <Icon name="user-plus" class="size-4" />
+                <IconUserPlus class="size-4" />
                 <span>Invite member</span>
             </Button>
         </div>

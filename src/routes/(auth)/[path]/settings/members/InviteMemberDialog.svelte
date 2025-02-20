@@ -14,10 +14,10 @@
         DialogBuilder,
         Errors,
         Field,
-        Icon,
         Input,
         Label
     } from '~/lib/components';
+    import { IconCheck, IconSearch, IconUserPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { User } from '~/lib/models/user';
@@ -114,12 +114,12 @@
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-sm lg:max-w-paragraph-lg space-y-4 border border-base-border-2"
+            class="bg-base-1 max-w-paragraph-sm lg:max-w-paragraph-lg border-base-border-2 fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 space-y-4 rounded-md border p-8"
         >
             <div>
-                <div class="flex justify-between items-center gap-4">
+                <div class="flex items-center justify-between gap-4">
                     <h2 use:melt={title}>Invite member</h2>
-                    <Icon name="user-plus" class="size-10 text-base-fg-1" />
+                    <IconUserPlus class="text-base-fg-1 size-10" />
                 </div>
                 <p>Add a user to your workspace by their email address or name.</p>
             </div>
@@ -181,9 +181,8 @@
                                     }}
                                     aria-invalid={errors?.search == null ? undefined : true}
                                 />
-                                <Icon
-                                    name="search"
-                                    class="absolute left-2 top-1/2 -translate-y-1/2 text-base-fg-ghost"
+                                <IconSearch
+                                    class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2"
                                 />
                             </div>
                             <Errors errors={errors?.search} errorMap={errorMap.search} />
@@ -219,7 +218,7 @@
                                                     />
                                                 {/if}
                                                 {#if isSelected(item)}
-                                                    <Icon name="check" class="c-select--check" />
+                                                    <IconCheck class="c-select--check" />
                                                 {/if}
                                                 <span>
                                                     {#if item.profile}
@@ -236,7 +235,7 @@
                         {/if}
                     {/snippet}
                 </Combobox>
-                <div class="flex gap-4 w-fit ml-auto">
+                <div class="ml-auto flex w-fit gap-4">
                     <Button type="button" variant="base" class="w-fit" outline melt={close}
                         >Cancel</Button
                     >

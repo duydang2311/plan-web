@@ -1,6 +1,12 @@
 <script lang="ts">
     import { page } from '$app/state';
     import type { Snippet } from 'svelte';
+    import {
+        IconSettings,
+        IconSettingsOutline,
+        IconUsers,
+        IconUsersSolid
+    } from '~/lib/components/icons';
     import Navigation from './Navigation.svelte';
 
     interface Props {
@@ -13,30 +19,30 @@
     );
 </script>
 
-<div class="max-xl:grid max-xl:grid-rows-[auto_1fr] h-full xl:flex xl:h-full">
+<div class="h-full max-xl:grid max-xl:grid-rows-[auto_1fr] xl:flex xl:h-full">
     <div
         class="
-		max-xl:border-b max-xl:border-b-base-border-2 max-xl:py-2 max-xl:px-6
-        xl:border-r xl:border-r-base-border-2"
+		max-xl:border-b-base-border-2 xl:border-r-base-border-2 max-xl:border-b max-xl:px-6
+        max-xl:py-2 xl:border-r"
     >
         <Navigation
             items={[
                 {
                     label: 'General',
                     href: rootPath,
-                    icon: 'settings-outline',
-                    activeIcon: 'settings'
+                    icon: IconSettingsOutline,
+                    activeIcon: IconSettings
                 },
                 {
                     label: 'Members',
                     href: `${rootPath}/members`,
-                    icon: 'users',
-                    activeIcon: 'users-solid'
+                    icon: IconUsers,
+                    activeIcon: IconUsersSolid
                 }
             ]}
         />
     </div>
-    <div class="bg-base-2 max-xl:h-full grow bg-transparent overflow-hidden">
+    <div class="grow overflow-hidden max-xl:h-full">
         {@render children()}
     </div>
 </div>

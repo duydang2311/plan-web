@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Icon } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
+    import { IconEdit } from '~/lib/components/icons';
 
     interface Props {
         editing: boolean;
@@ -14,9 +14,9 @@
     variant="base"
     size="sm"
     disabled={editing}
-    class="flex gap-2 items-center"
+    class="flex items-center gap-2"
     onclick={onClick}
 >
-    <Icon name="edit" />
+    <IconEdit />
     Edit
 </Button>

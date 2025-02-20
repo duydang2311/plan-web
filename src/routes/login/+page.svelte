@@ -2,7 +2,7 @@
     import { enhance } from '$app/forms';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
-    import Icon from '~/lib/components/Icon.svelte';
+    import { IconGoogle } from '~/lib/components/icons';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
     import Link from '~/lib/components/Link.svelte';
@@ -49,14 +49,14 @@
 </script>
 
 <main class="px-8 py-16">
-    <div class="w-full mx-auto">
-        <LogoType class="h-24 mx-auto" />
-        <h1 class="text-center mb-8 mt-8">Sign in</h1>
-        <div class="max-w-[40ch] mx-auto">
+    <div class="mx-auto w-full">
+        <LogoType class="mx-auto h-24" />
+        <h1 class="mb-8 mt-8 text-center">Sign in</h1>
+        <div class="mx-auto max-w-[40ch]">
             <form
                 method="post"
                 action="?/sign-in"
-                class="space-y-6 w-full"
+                class="w-full space-y-6"
                 use:helperForm
                 use:enhance={(e) => {
                     helperForm.validate();
@@ -87,7 +87,7 @@
                     <Errors errors={fields.email.state.errors} errorMap={errorMap.email} />
                 </div>
                 <div class="space-y-1">
-                    <div class="flex justify-between flex-wrap gap-2">
+                    <div class="flex flex-wrap justify-between gap-2">
                         <Label for="password" class="block">Password</Label>
                         <Link
                             href="https://ark-ui.com/react/docs/components/clipboard"
@@ -114,15 +114,15 @@
                     type="submit"
                     variant="base"
                     outline
-                    class="flex items-center gap-4 justify-center"
+                    class="flex items-center justify-center gap-4"
                 >
-                    <Icon name="google" />
+                    <IconGoogle />
                     Sign in with Google
                 </Button>
             </form>
         </div>
-        <div class="mt-8 space-y-4 text-center w-fit mx-auto">
-            <hr class="w-full text-base-border-2" />
+        <div class="mx-auto mt-8 w-fit space-y-4 text-center">
+            <hr class="text-base-border-2 w-full" />
             <p>
                 <small>
                     New user?
