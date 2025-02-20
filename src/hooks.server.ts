@@ -6,6 +6,7 @@ import { Cloudinary } from './lib/services/cloudinary.server';
 import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
+import type { Asset } from './lib/models/asset';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -43,9 +44,25 @@ export const handle: Handle = async ({
         }
 
         const exit = await ApiClient.pipe(
-            Effect.flatMap((a) => a.get(`sessions/${sessionId}`)),
+            Effect.flatMap((a) =>
+                a.get(`sessions/${sessionId}`, {
+                    query: {
+                        select: 'User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+                    }
+                })
+            ),
             Effect.filterOrFail((a) => a.ok),
-            Effect.flatMap((a) => Effect.tryPromise(() => a.json<{ userId: string }>())),
+            Effect.flatMap((a) =>
+                Effect.tryPromise(() =>
+                    a.json<{
+                        user: {
+                            id: string;
+                            email: string;
+                            profile?: { name: string; displayName: string; image?: Asset };
+                        };
+                    }>()
+                )
+            ),
             locals.runtime.runPromiseExit
         );
 
@@ -53,7 +70,7 @@ export const handle: Handle = async ({
             return redirect(302, '/login');
         }
 
-        locals.user = { id: exit.value.userId };
+        locals.user = { ...exit.value.user };
         locals.appLive = Layer.mergeAll(
             HttpClient.Live(fetch),
             Layer.sync(

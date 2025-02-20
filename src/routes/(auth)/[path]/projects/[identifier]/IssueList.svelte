@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { DateTime } from 'luxon';
-    import { Button, Icon } from '~/lib/components';
+    import { Button } from '~/lib/components';
     import { IconArrowRight, IconChevronRight } from '~/lib/components/icons';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { Loading } from '~/lib/utils/runes.svelte';

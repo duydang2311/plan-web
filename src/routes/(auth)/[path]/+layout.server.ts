@@ -5,7 +5,7 @@ import type { LayoutServerLoad } from './$types';
 
 const pathIdMap = new Map<string, string>();
 
-export const load: LayoutServerLoad = async ({ params, locals: { runtime }, url }) => {
+export const load: LayoutServerLoad = async ({ params, locals: { user, runtime }, url }) => {
     const exit = await runtime.runPromiseExit(
         Effect.gen(function* () {
             const apiClient = yield* ApiClient;
@@ -35,6 +35,7 @@ export const load: LayoutServerLoad = async ({ params, locals: { runtime }, url 
         return error(404, { message: 'Workspace does not exist', code: 'workspace_not_found' });
     }
     return {
+        user,
         workspace: exit.value,
         pathname: url.pathname
     };

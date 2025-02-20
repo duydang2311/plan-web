@@ -1,26 +1,33 @@
 <script lang="ts">
     import { page } from '$app/state';
+    import { Resize } from '@cloudinary/url-gen/actions';
     import { gsap } from 'gsap';
     import type { Snippet } from 'svelte';
+    import { Avatar, Button, Input } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import {
         IconCircleDashed,
         IconCircleDashedOutline,
         IconHome,
         IconHomeSolid,
+        IconKeyCommandOutline,
         IconProject,
         IconProjectOutline,
+        IconSearch,
         IconSettings,
         IconSettingsOutline,
         IconUsers,
         IconUsersSolid
     } from '~/lib/components/icons';
     import Logo from '~/lib/components/Logo.svelte';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
     import type { LayoutData } from './$types';
     import DynamicNavigation from './DynamicNavigation.svelte';
     import Navigation from './Navigation.svelte';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
+    const { cloudinary } = useRuntime();
     const route = $derived.by(() => {
         const last = page.data.routes?.at(-1);
         if (last?.breadcrumb === true) {
@@ -52,11 +59,20 @@
     <aside
         class="hidden min-w-60 max-w-60 items-stretch space-y-4 overflow-auto px-4 py-2 lg:flex lg:flex-col"
     >
-        <div class="text-base-fg-1 flex select-none items-center gap-2 font-bold">
-            <Logo class="h-8 w-auto" />
-            <p class="block">plan</p>
+        <div class="text-primary-1 flex select-none items-center justify-center gap-2">
+            <Logo class="h-6 w-auto" />
+            <p class="font-display text-title font-black tracking-tight">Keptrack</p>
         </div>
-        <hr class="border-base-border-2 mx-2 border-dashed" />
+        <div class="relative">
+            <Input placeholder="Search..." class="py-1 pl-8 pr-12" />
+            <IconSearch class="text-base-fg-5 absolute left-2 top-1/2 -translate-y-1/2" />
+            <div
+                class="text-base-fg-1 bg-base-5 absolute right-2 top-1/2 flex -translate-y-1/2 select-none items-center gap-0 rounded-sm px-1 text-sm"
+            >
+                <IconKeyCommandOutline />
+                <span class="font-display">K</span>
+            </div>
+        </div>
         <div class="flex grow flex-col gap-4">
             <ul class="group text-sm font-medium">
                 <Navigation
@@ -78,15 +94,7 @@
                             icon: IconUsers,
                             activeIcon: IconUsersSolid,
                             label: 'Teams'
-                        }
-                    ]}
-                />
-            </ul>
-            <DynamicNavigation />
-            <ul class="group mt-auto text-sm font-medium">
-                <hr class="border-base-border-2 mx-2 mb-4 border-dashed" />
-                <Navigation
-                    items={[
+                        },
                         {
                             href: `/${page.params['path']}/settings`,
                             icon: IconSettingsOutline,
@@ -112,10 +120,26 @@
                     ]}
                 />
             </ul>
+            <DynamicNavigation />
         </div>
+        <Button
+            as="link"
+            href="/profiles/me"
+            variant="base"
+            class="flex items-center gap-2 px-2 text-sm font-medium"
+        >
+            <Avatar
+                src={imageFromAsset(cloudinary)(data.user.profile?.image)
+                    ?.resize(Resize.crop(64))
+                    .toURL()}
+                seed={data.user.profile?.name ?? data.user.email}
+                class="size-5"
+            />
+            {data.user.profile?.displayName ?? data.user.email}
+        </Button>
     </aside>
     <div
-        class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 grid max-h-screen grow grid-rows-[auto_1fr] lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border lg:shadow-sm"
+        class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 lg:shadow-xs grid max-h-screen grow grid-rows-[auto_1fr] lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border"
     >
         <Breadcrumb class="border-b-base-border-2 border-b px-8 py-2" />
         <div class="transition-enforcement overflow-hidden">

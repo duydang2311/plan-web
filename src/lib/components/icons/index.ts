@@ -58,3 +58,4 @@ export { default as IconLink } from '~icons/heroicons/link-16-solid';
 export { default as IconArrowRight } from '~icons/heroicons/arrow-right-16-solid';
 export { default as IconSuccess } from '~icons/heroicons/check-circle-16-solid';
 export { default as IconFailure } from '~icons/heroicons/exclamation-circle-16-solid';
+export { default as IconKeyCommandOutline } from '~icons/ph/command';

@@ -1,14 +1,14 @@
 // See https://kit.svelte.dev/docs/types#app
 
+import type { Effect, Exit } from 'effect';
 import type { Layer } from 'effect/Layer';
+import type { SvelteComponent } from 'svelte';
 import 'unplugin-icons/types/svelte';
 import type { Api } from './lib/api/server';
+import type { Asset } from './lib/models/asset';
 import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
 import type { HttpClient } from './lib/services/http_client';
-import type { Effect, Exit } from 'effect';
-import type { IconName } from './lib/components/Icon.svelte';
-import type { SvelteComponent } from 'svelte';
 
 // for information about these interfaces
 declare global {
@@ -49,6 +49,12 @@ declare global {
             appLive: Layer<HttpClient | ApiClient | Cloudinary>;
             user: {
                 id: string;
+                email: string;
+                profile?: {
+                    name: string;
+                    displayName: string;
+                    image?: Asset;
+                }
             };
             api: Api;
         }

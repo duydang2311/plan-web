@@ -2,18 +2,18 @@
     import { page } from '$app/state';
     import { melt } from '@melt-ui/svelte';
     import clsx from 'clsx';
-    import type { Snippet, SvelteComponent } from 'svelte';
+    import type { Snippet } from 'svelte';
     import { writable } from 'svelte/store';
     import { IconButton } from '~/lib/components';
     import Collapsible from '~/lib/components/Collapsible.svelte';
-    import { IconChevronRight } from '~/lib/components/icons';
+    import { IconChevronLeft } from '~/lib/components/icons';
     import { tsap } from '~/lib/utils/transition';
     import Self from './NavigationItem.svelte';
 
     interface Props {
         href: string;
-        icon: typeof SvelteComponent;
-        activeIcon: typeof SvelteComponent;
+        icon: SvelteIconComponent;
+        activeIcon: SvelteIconComponent;
         label: string;
         children?: Snippet;
         class?: string;
@@ -37,38 +37,42 @@
     <Collapsible options={{ open }}>
         {#snippet children({ root, content, trigger })}
             <div use:melt={root}>
-                <Self {href} icon={Icon} activeIcon={ActiveIcon} {label} class="pl-8">
+                <Self {href} icon={Icon} activeIcon={ActiveIcon} {label} class="pr-4">
                     <IconButton
                         type="button"
                         variant="base"
                         class={clsx(
-                            'absolute left-2 top-1/2 -translate-y-1/2',
+                            'absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2',
                             isActive && 'text-base-fg-1'
                         )}
                         melt={trigger}
                     >
-                        <IconChevronRight
-                            class={clsx('transition', $open && 'text-base-fg-1 rotate-90')}
+                        <IconChevronLeft
+                            class={clsx('transition', $open && 'text-base-fg-1 -rotate-90')}
                         />
                     </IconButton>
                 </Self>
                 {#if $open}
                     <ul
-                        class="pl-8"
+                        class="pl-4"
                         in:tsap={(node, gsap) =>
                             gsap.from(node, {
                                 height: 0,
                                 opacity: 0,
                                 duration: 0.2,
-                                ease: 'power1.inOut',
-                                clearProps: 'height, opacity'
+                                y: '-0.5rem',
+                                ease: 'circ.out',
+                                overflow: 'hidden',
+                                clearProps: 'overflow,height,opacity'
                             })}
                         out:tsap={(node, gsap) =>
                             gsap.to(node, {
                                 height: 0,
                                 opacity: 0,
                                 duration: 0.2,
-                                ease: 'power1.inOut'
+                                y: '-0.5rem',
+                                overflow: 'hidden',
+                                ease: 'circ.in'
                             })}
                         use:melt={content}
                     >
