@@ -23,6 +23,7 @@ export { default as Pagination } from './Pagination.svelte';
 export { default as Popover } from './Popover.svelte';
 export { default as PopoverArrow } from './PopoverArrow.svelte';
 export { default as PopoverBuilder } from './PopoverBuilder.svelte';
+export { Popover as MeltPopoverBuilder } from 'melt/components';
 export { default as RelativeTime } from './RelativeTime.svelte';
 export { default as Row } from './Row.svelte';
 export { default as RowCount } from './RowCount.svelte';

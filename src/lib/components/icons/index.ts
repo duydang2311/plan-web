@@ -59,3 +59,5 @@ export { default as IconArrowRight } from '~icons/heroicons/arrow-right-16-solid
 export { default as IconSuccess } from '~icons/heroicons/check-circle-16-solid';
 export { default as IconFailure } from '~icons/heroicons/exclamation-circle-16-solid';
 export { default as IconKeyCommandOutline } from '~icons/ph/command';
+export { default as IconBell } from '~icons/heroicons/bell-16-solid';
+export { default as IconBellOutline } from '~icons/heroicons/bell';

@@ -1,0 +1,187 @@
+<script lang="ts">
+    import { createInfiniteQuery } from '@tanstack/svelte-query';
+    import { DateTime } from 'luxon';
+    import type { Popover } from 'melt/components';
+    import { toStore } from 'svelte/store';
+    import Spinner2 from '~/lib/components/Spinner2.svelte';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
+    import { QueryResponse } from '~/lib/utils/query';
+    import { createLoading } from '~/lib/utils/runes.svelte';
+    import { formatRelativeDateUi } from '~/lib/utils/time';
+    import { popover as popoverTransition, tsap } from '~/lib/utils/transition';
+
+    interface LocalUserNotification {
+        id: number;
+        createdTime: string;
+        notification:
+            | {
+                  type: (typeof notificationTypes)['projectCreated'];
+                  data: {
+                      identifier: string;
+                      name: string;
+                      workspace: { path: string };
+                  };
+              }
+            | {
+                  type: (typeof notificationTypes)['issueCreated'];
+                  data: {
+                      orderNumber: number;
+                      project: {
+                          identifier: string;
+                          workspace: { path: string };
+                      };
+                  };
+              }
+            | {
+                  type: (typeof notificationTypes)['commentCreated'];
+                  data: {
+                      issue: {
+                          orderNumber: number;
+                          project: {
+                              identifier: string;
+                              workspace: { path: string };
+                          };
+                      };
+                  };
+              };
+    }
+
+    const { userId, builder }: { userId: string; builder: Popover['popover']['content'] } =
+        $props();
+    const { api } = useRuntime();
+    const notificationTypes = {
+        none: 0,
+        projectCreated: 1,
+        issueCreated: 2,
+        commentCreated: 3
+    } as const;
+    const loading = createLoading();
+    const query = createInfiniteQuery(
+        toStore(() => ({
+            queryKey: ['user-notifications', { userId }],
+            initialPageParam: 0,
+            getNextPageParam: (lastPage: { nextOffset: number }) => lastPage.nextOffset,
+            queryFn: async ({ pageParam }: { pageParam: number }) => {
+                try {
+                    loading.set();
+                    const response = await QueryResponse.Fetch(() =>
+                        api.get(`user-notifications/${userId}`, {
+                            query: {
+                                offset: pageParam,
+                                select: 'Id,CreatedTime,Notification.Type,Notification.Data',
+                                selectProject: 'Name,Identifier,Workspace.Path',
+                                selectIssue:
+                                    'OrderNumber,Project.Identifier,Project.Workspace.Path',
+                                selectComment:
+                                    'Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
+                                sort: '-CreatedTime'
+                            }
+                        })
+                    );
+                    const list = await response.json<PaginatedList<LocalUserNotification>>();
+                    return {
+                        ...list,
+                        nextOffset: pageParam + list.items.length
+                    };
+                } finally {
+                    loading.unset();
+                }
+            }
+        }))
+    );
+    const grouped = $derived(
+        $query.data
+            ? $query.data.pages
+                  .flatMap((a) => a.items)
+                  .reduce<Record<string, LocalUserNotification[]>>((acc, cur) => {
+                      const dateTime = DateTime.fromISO(cur.createdTime);
+                      const format = dateTime.toISODate()!;
+                      if (acc[format]) {
+                          acc[format].push(cur);
+                      } else {
+                          acc[format] = [cur];
+                      }
+                      return acc;
+                  }, {})
+            : {}
+    );
+</script>
+
+{#snippet skeleton()}
+    <div class="animate-pulse">
+        <div class="mb-4 flex items-center gap-2">
+            <div class="bg-base-4 h-6 w-32 rounded"></div>
+            <div class="bg-base-border-3 h-px grow rounded"></div>
+        </div>
+        {#each { length: 3 } as _}
+            <div class="bg-base-4 mb-2 h-6 w-full rounded"></div>
+            <div class="bg-base-4 mb-2 h-6 w-full rounded"></div>
+            <div class="bg-base-4 mb-2 h-5 w-8 rounded"></div>
+        {/each}
+    </div>
+{/snippet}
+
+<div
+    class="w-paragraph-sm -translate-x-2 translate-y-2 bg-transparent lg:-translate-x-4"
+    {...builder}
+    in:tsap={popoverTransition.in}
+    out:tsap={popoverTransition.out}
+>
+    <div class="c-popover p-0">
+        <div class="border-b-base-border-2 relative border-b p-2">
+            <h2 class="text-p text-center tracking-tight">Your notifications</h2>
+            {#if loading.short}
+                <Spinner2 class="text-base-fg-ghost absolute left-0 top-1/2 size-5 -translate-y-1/2 translate-x-1/2" />
+            {/if}
+        </div>
+        <div class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2">
+            {#if $query.isPending}
+                {@render skeleton()}
+            {:else if grouped == null || Object.values(grouped).length === 0}
+                <span class="c-label">No notifications found.</span>
+            {:else}
+                {#each Object.entries(grouped) as [isoDate, userNotifications] (isoDate)}
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-p text-base-fg-5 my-2 text-center tracking-tight">
+                            {formatRelativeDateUi(
+                                DateTime.fromFormat(isoDate, 'yyyy-MM-dd', {
+                                    zone: 'utc'
+                                })
+                            )}
+                        </h3>
+                        <div class="bg-base-border-3 h-px grow"></div>
+                    </div>
+                    <ol class="space-y-1">
+                        {#each userNotifications as userNotification (userNotification.id)}
+                            <li>
+                                {#if userNotification.notification.type === notificationTypes.projectCreated}
+                                    <a
+                                        href="/{userNotification.notification.data.workspace
+                                            .path}/projects/{userNotification.notification.data
+                                            .identifier}"
+                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                    >
+                                        <p class="text-pretty">
+                                            New project created —
+                                            <strong class="text-base-fg-1">
+                                                {userNotification.notification.data.name}
+                                            </strong>.
+                                        </p>
+                                        <p class="c-label">
+                                            {DateTime.fromISO(userNotification.createdTime)
+                                                .toLocal()
+                                                .toLocaleString(DateTime.TIME_SIMPLE)}
+                                        </p>
+                                    </a>
+                                {:else}
+                                    Notification type {userNotification.notification.type}
+                                {/if}
+                            </li>
+                        {/each}
+                    </ol>
+                {/each}
+            {/if}
+        </div>
+    </div>
+</div>

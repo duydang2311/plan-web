@@ -25,6 +25,7 @@
     import type { LayoutData } from './$types';
     import DynamicNavigation from './DynamicNavigation.svelte';
     import Navigation from './Navigation.svelte';
+    import NotificationBell from './NotificationBell.svelte';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const { cloudinary } = useRuntime();
@@ -141,7 +142,12 @@
     <div
         class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 lg:shadow-xs grid max-h-screen grow grid-rows-[auto_1fr] lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border"
     >
-        <Breadcrumb class="border-b-base-border-2 border-b px-8 py-2" />
+        <div
+            class="border-b-base-border-2 flex items-center justify-between gap-2 border-b px-8 py-2"
+        >
+            <Breadcrumb />
+            <NotificationBell userId={data.user.id} />
+        </div>
         <div class="transition-enforcement overflow-hidden">
             {#key data.pathname}
                 <div class="overflow-hidden" in:transitateIn>

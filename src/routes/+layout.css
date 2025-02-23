@@ -1,5 +1,7 @@
 @import 'tailwindcss' source('..');
 
+@plugin "@tailwindcss/typography";
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @import '~/lib/stylesheets/themes/light.css' layer(theme);

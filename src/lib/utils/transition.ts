@@ -106,7 +106,7 @@ export const popover: { [k in 'in' | 'out']: TsapCallback } = {
             opacity: 0,
             y: '-0.2rem',
             duration: 0.1,
-            ease: 'power1.out',
+            ease: 'circ.out',
             clearProps: 'opacity,scale,y'
         }),
     out: (node, gsap) =>
@@ -115,6 +115,6 @@ export const popover: { [k in 'in' | 'out']: TsapCallback } = {
             opacity: 0,
             y: '-0.2rem',
             duration: 0.1,
-            ease: 'power1.in'
+            ease: 'circ.in'
         })
 };

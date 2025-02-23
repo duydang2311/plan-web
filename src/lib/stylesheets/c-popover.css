@@ -11,7 +11,7 @@
     background-color: var(--_bg);
     padding: --spacing(4);
     border: 1px solid var(--_border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     max-width: 100%;
     @apply shadow;
 
