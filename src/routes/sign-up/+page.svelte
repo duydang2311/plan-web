@@ -51,27 +51,23 @@
     const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
-<main class="px-8 py-16">
-    <div class="w-full mx-auto">
-        <LogoType class="h-24 mx-auto" />
+<main class="min-h-screen content-center p-8">
+    <div class="mx-auto w-full">
+        <LogoType class="text-primary-1 mx-auto h-16" />
         <div class="transition-enforcement overflow-hidden">
             {#if form?.email}
                 <div
                     in:fly={{ y: '15%', duration: 800, easing: circInOut }}
-                    class="mt-8 mx-auto text-center text-balance prose"
+                    class="prose mx-auto mt-8 text-balance text-center"
                 >
                     <Success email={form.email} />
                 </div>
             {:else}
                 <div out:fly={{ y: '-10%', duration: 800, easing: circInOut }} class="mt-8">
-                    <h1 class="text-center mb-8">Create an account</h1>
-                    <p class="text-center text-balance">
-                        Fill in the form to create a new account.
-                    </p>
-                    <hr class="text-base-border-2/40 max-w-[40ch] mt-2 mb-8 mx-auto" />
+                    <h1 class="mt-8 mb-4 text-center">Sign up</h1>
                     <form
                         method="post"
-                        class="space-y-6 w-full max-w-[40ch] mx-auto"
+                        class="mx-auto w-full max-w-[40ch] space-y-6"
                         onchange={({ currentTarget }) => {
                             const input = decode(new FormData(currentTarget));
                             validation = clientValidate(input);
@@ -144,7 +140,7 @@
                         </div>
                         <Button disabled={status === 'submitting'}>Sign up</Button>
                     </form>
-                    <div class="mt-8 space-y-4 text-center w-fit mx-auto">
+                    <div class="mx-auto mt-8 w-fit space-y-4 text-center">
                         <p>
                             <small>
                                 By signing up, you agree to our <Link href="#"
@@ -153,7 +149,7 @@
                                 and <Link href="#">Data Processing Agreement</Link>.
                             </small>
                         </p>
-                        <hr class="w-full text-base-border-2 mx-auto" />
+                        <hr class="text-base-border-2 mx-auto w-full" />
                         <p>
                             <small>
                                 Already have an account?

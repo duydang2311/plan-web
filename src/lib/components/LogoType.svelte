@@ -10,11 +10,8 @@
 
 <div
     {...props}
-    class={clsx(
-        'select-none flex items-center w-fit gap-2 text-base-fg-1 text-h1 font-display font-bold tracking-tighter',
-        props.class
-    )}
+    class={clsx('text-base-fg-1 flex w-fit select-none items-center gap-2', props.class)}
 >
     <Logo class="h-full w-auto" />
-    <p>plan</p>
+    <p class="font-display text-5xl font-black tracking-tight">Keptrack</p>
 </div>

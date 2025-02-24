@@ -48,10 +48,10 @@
     });
 </script>
 
-<main class="px-8 py-16">
+<main class="p-8 min-h-screen content-center">
     <div class="mx-auto w-full">
-        <LogoType class="mx-auto h-24" />
-        <h1 class="mb-8 mt-8 text-center">Sign in</h1>
+        <LogoType class="mx-auto h-16 text-primary-1" />
+        <h1 class="mt-8 mb-4 text-center">Sign in</h1>
         <div class="mx-auto max-w-[40ch]">
             <form
                 method="post"
