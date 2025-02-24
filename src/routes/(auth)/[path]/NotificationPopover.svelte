@@ -27,6 +27,7 @@
                   type: (typeof notificationTypes)['issueCreated'];
                   data: {
                       orderNumber: number;
+                      title: string;
                       project: {
                           identifier: string;
                           workspace: { path: string };
@@ -38,6 +39,7 @@
                   data: {
                       issue: {
                           orderNumber: number;
+                          title: string;
                           project: {
                               identifier: string;
                               workspace: { path: string };
@@ -72,9 +74,9 @@
                                 select: 'Id,CreatedTime,Notification.Type,Notification.Data',
                                 selectProject: 'Name,Identifier,Workspace.Path',
                                 selectIssue:
-                                    'OrderNumber,Project.Identifier,Project.Workspace.Path',
+                                    'OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
                                 selectComment:
-                                    'Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
+                                    'Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
                                 sort: '-CreatedTime'
                             }
                         })
@@ -174,8 +176,44 @@
                                                 .toLocaleString(DateTime.TIME_SIMPLE)}
                                         </p>
                                     </a>
-                                {:else}
-                                    Notification type {userNotification.notification.type}
+                                {:else if userNotification.notification.type === notificationTypes.issueCreated}
+                                    <a
+                                        href="/{userNotification.notification.data.project.workspace
+                                            .path}/projects/{userNotification.notification.data
+                                            .project.identifier}/issues/{userNotification.notification.data.orderNumber}"
+                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                    >
+                                        <p class="text-pretty">
+                                            New issue created —
+                                            <strong class="text-base-fg-1">
+                                                {userNotification.notification.data.title}
+                                            </strong>.
+                                        </p>
+                                        <p class="c-label">
+                                            {DateTime.fromISO(userNotification.createdTime)
+                                                .toLocal()
+                                                .toLocaleString(DateTime.TIME_SIMPLE)}
+                                        </p>
+                                    </a>
+                                {:else if userNotification.notification.type === notificationTypes.commentCreated}
+                                    <a
+                                        href="/{userNotification.notification.data.issue.project.workspace
+                                            .path}/projects/{userNotification.notification.data
+                                            .issue.project.identifier}/issues/{userNotification.notification.data.issue.orderNumber}"
+                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                    >
+                                        <p class="text-pretty">
+                                            New comment added —
+                                            <strong class="text-base-fg-1">
+                                                {userNotification.notification.data.issue.title}
+                                            </strong>.
+                                        </p>
+                                        <p class="c-label">
+                                            {DateTime.fromISO(userNotification.createdTime)
+                                                .toLocal()
+                                                .toLocaleString(DateTime.TIME_SIMPLE)}
+                                        </p>
+                                    </a>
                                 {/if}
                             </li>
                         {/each}

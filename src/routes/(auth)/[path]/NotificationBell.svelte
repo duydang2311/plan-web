@@ -8,7 +8,7 @@
 
 <MeltPopoverBuilder forceVisible>
     {#snippet children(popover)}
-        <IconButton type="button" variant="base" {...popover.trigger}>
+        <IconButton type="button" variant="base" {...popover.trigger} class={popover.open ? 'bg-base-active' : undefined}>
             <IconBellOutline />
         </IconButton>
         {#if popover.open}
