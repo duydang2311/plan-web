@@ -134,7 +134,9 @@
         <div class="border-b-base-border-2 relative border-b p-2">
             <h2 class="text-p text-center tracking-tight">Your notifications</h2>
             {#if loading.short}
-                <Spinner2 class="text-base-fg-ghost absolute left-0 top-1/2 size-5 -translate-y-1/2 translate-x-1/2" />
+                <Spinner2
+                    class="text-base-fg-ghost absolute left-0 top-1/2 size-5 -translate-y-1/2 translate-x-1/2"
+                />
             {/if}
         </div>
         <div class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2">
@@ -180,7 +182,8 @@
                                     <a
                                         href="/{userNotification.notification.data.project.workspace
                                             .path}/projects/{userNotification.notification.data
-                                            .project.identifier}/issues/{userNotification.notification.data.orderNumber}"
+                                            .project.identifier}/issues/{userNotification
+                                            .notification.data.orderNumber}"
                                         class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
@@ -197,9 +200,10 @@
                                     </a>
                                 {:else if userNotification.notification.type === notificationTypes.commentCreated}
                                     <a
-                                        href="/{userNotification.notification.data.issue.project.workspace
-                                            .path}/projects/{userNotification.notification.data
-                                            .issue.project.identifier}/issues/{userNotification.notification.data.issue.orderNumber}"
+                                        href="/{userNotification.notification.data.issue.project
+                                            .workspace.path}/projects/{userNotification.notification
+                                            .data.issue.project.identifier}/issues/{userNotification
+                                            .notification.data.issue.orderNumber}"
                                         class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
