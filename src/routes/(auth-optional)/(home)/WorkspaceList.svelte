@@ -35,10 +35,9 @@
     Loading...
 {:else if $query.error}
     {$query.error.toString()}
-{:else if $query.data == null || $query.data.items.length === 0}
-    <p class="c-label">No workspaces found.</p>
 {:else}
     <ol class="flex flex-wrap gap-2">
+        {#if $query.data != null}
         {#each $query.data.items as { createdTime, name, path, totalProjects, totalUsers } (path)}
             <li class="flex-1 basis-96">
                 <a
@@ -71,6 +70,7 @@
                 </a>
             </li>
         {/each}
+        {/if}
         <li class="h-48 grow basis-full">
             <Button
                 as="link"
