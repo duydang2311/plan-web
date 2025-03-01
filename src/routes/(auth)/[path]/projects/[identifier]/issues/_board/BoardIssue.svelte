@@ -115,7 +115,10 @@
             <IconDraggable class="ml-auto h-4" />
         </div>
         <p class="font-medium leading-none">
-            <Link href="/{page.params['path']}/issues/{issue.orderNumber}">
+            <Link
+                href="/{page.params.path}/projects/{page.params
+                    .identifier}/issues/{issue.orderNumber}"
+            >
                 {issue.title}
             </Link>
         </p>
