@@ -106,7 +106,7 @@
                                             seed={item.user.profile.name}
                                             alt={item.user.profile.displayName}
                                             src={imageFromAsset(cloudinary)(item.user.profile.image)
-                                                ?.resize(Resize.crop(32))
+                                                ?.resize(Resize.fill(64))
                                                 .toURL()}
                                             class="size-8"
                                         />

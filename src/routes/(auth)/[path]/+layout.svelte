@@ -131,7 +131,7 @@
         >
             <Avatar
                 src={imageFromAsset(cloudinary)(data.user.profile?.image)
-                    ?.resize(Resize.crop(64))
+                    ?.resize(Resize.fill(64))
                     .toURL()}
                 seed={data.user.profile?.name ?? data.user.email}
                 class="size-5"

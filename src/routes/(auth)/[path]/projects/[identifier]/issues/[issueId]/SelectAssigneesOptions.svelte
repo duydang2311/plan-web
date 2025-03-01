@@ -64,7 +64,7 @@
                   value: a.id,
                   email: a.email,
                   image: imageFromAsset(cloudinary)(a.profile?.image)
-                      ?.resize(Resize.fill(32))
+                      ?.resize(Resize.fill(64))
                       .toURL()
               }))
             : null

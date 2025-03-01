@@ -129,7 +129,7 @@
                                     <Avatar
                                         seed={item.profile.name}
                                         src={imageFromAsset(cloudinary)(item.profile.image)
-                                            ?.resize(Resize.fill(32))
+                                            ?.resize(Resize.fill(64))
                                             .toURL()}
                                         class="size-8"
                                     />

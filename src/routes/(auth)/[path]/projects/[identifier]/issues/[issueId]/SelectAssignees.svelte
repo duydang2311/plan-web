@@ -105,7 +105,7 @@
                     value: a.id,
                     email: a.email,
                     imageHref: a.profile
-                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(32))
+                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(64))
                         : null
                 }));
             }
