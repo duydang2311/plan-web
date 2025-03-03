@@ -127,6 +127,7 @@
             as="link"
             href="/profiles/me"
             variant="base"
+            filled={false}
             class="flex items-center gap-2 px-2 text-sm font-medium"
         >
             <Avatar
@@ -134,9 +135,16 @@
                     ?.resize(Resize.fill(64))
                     .toURL()}
                 seed={data.user.profile?.name ?? data.user.email}
-                class="size-5"
+                class="size-10"
             />
-            {data.user.profile?.displayName ?? data.user.email}
+            <div class="grid grid-rows-2 text-start">
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap text-base-fg-1">
+                    {data.user.profile?.displayName ?? data.user.email}
+                </span>
+                {#if data.user.profile}
+                    <span class="text-base-fg-ghost">{data.user.profile.name}</span>
+                {/if}
+            </div>
         </Button>
     </aside>
     <div
