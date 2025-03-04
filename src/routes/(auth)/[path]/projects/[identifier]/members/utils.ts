@@ -4,7 +4,7 @@ import type { User, UserProfile } from '~/lib/models/user';
 import { queryParamsStrict } from '~/lib/utils/url';
 
 export type LocalProjectMember = Pick<ProjectMember, 'createdTime' | 'id'> & {
-    role: Pick<Role, 'name'>;
+    role: Pick<Role, 'id' | 'name'>;
     user: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
 };
 
@@ -23,7 +23,7 @@ export const MemberListQuery = {
             ...queryParamsStrict(url, { page: 1, size: 20, order: null }),
             ...rest,
             projectId,
-            select: 'CreatedTime,Id,Role.Name,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+            select: 'CreatedTime,Id,Role.Id,Role.Name,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
         } as const;
     },
     key: ({ params }: { params: Record<PropertyKey, unknown> }) => {

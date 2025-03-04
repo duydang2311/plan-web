@@ -1,17 +1,24 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { invalidateAll } from '$app/navigation';
     import { writable } from 'svelte/store';
-    import { addToast, Button, Popover, PopoverBuilder } from '~/lib/components';
+    import { Button, Popover, PopoverBuilder, toast } from '~/lib/components';
+    import { IconTrash } from '~/lib/components/icons';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { validateActionFailureData } from '~/lib/utils/kit.client';
-    import type { LocalProjectMember } from './utils';
-    import { IconTrash } from '~/lib/components/icons';
+    import type { Ref } from '~/lib/utils/runes.svelte';
+    import type { LocalProjectMemberInvitation } from './utils';
 
-    const { queryKey, id, name }: { queryKey: readonly unknown[]; id: number; name: string } =
-        $props();
-    const { queryClient } = useRuntime();
+    const {
+        id,
+        name,
+        ref
+    }: {
+        id: number;
+        name: string;
+        ref: Ref<PaginatedList<LocalProjectMemberInvitation>>;
+    } = $props();
     const open = writable(false);
 </script>
 
@@ -56,57 +63,46 @@
                     action="?/delete-invitation"
                     class="mt-4 flex justify-end gap-2 *:w-fit"
                     use:enhance={() => {
-                        const previous =
-                            queryClient.getQueryData<PaginatedList<LocalProjectMember>>(queryKey);
-                        queryClient.setQueryData(
-                            queryKey,
-                            previous
-                                ? {
-                                      items: previous.items.filter((a) => a.id !== id),
-                                      totalCount: previous.totalCount - 1
-                                  }
-                                : previous
-                        );
+                        const old = ref.value;
+                        if (old) {
+                            ref.value = {
+                                items: old.items.filter((a) => a.id !== id),
+                                totalCount: old.totalCount - 1
+                            };
+                        }
                         return async ({ result }) => {
                             if (result.type === 'failure') {
-                                queryClient.setQueryData(queryKey, previous);
+                                ref.value = old;
                                 const validation = validateActionFailureData(result.data);
                                 if (validation.ok && validation.data.errors.root?.includes('403')) {
-                                    addToast({
-                                        data: {
-                                            title: 'Could not revoke invitation',
-                                            description: forbidden,
-                                            descriptionProps: name
-                                        }
+                                    toast({
+                                        type: 'negative',
+                                        body: forbidden,
+                                        bodyProps: name
                                     });
                                 } else {
-                                    addToast({
-                                        data: {
-                                            title: 'Could not revoke invitation',
-                                            description: generic,
-                                            descriptionProps: {
-                                                code: validation.ok
-                                                    ? Object.entries(validation.data.errors)
-                                                          .map(([k, v]) => `'${k}' - ${v.join()}`)
-                                                          .join(', ')
-                                                    : 'unknown',
-                                                name
-                                            }
+                                    toast({
+                                        type: 'negative',
+                                        body: generic,
+                                        bodyProps: {
+                                            code: validation.ok
+                                                ? Object.entries(validation.data.errors)
+                                                      .map(([k, v]) => `'${k}' - ${v.join()}`)
+                                                      .join(', ')
+                                                : 'unknown',
+                                            name
                                         }
                                     });
                                 }
                             } else {
-                                addToast({
-                                    data: {
-                                        title: 'Invitation revoked',
-                                        description: success,
-                                        descriptionProps: name
-                                    }
+                                toast({
+                                    type: 'positive',
+                                    body: success,
+                                    bodyProps: name
                                 });
                             }
-                            await queryClient.invalidateQueries({
-                                queryKey: ['project-member-invitations']
-                            });
+                            await new Promise((resolve) => setTimeout(resolve, 2000));
+                            await invalidateAll();
                         };
                     }}
                 >

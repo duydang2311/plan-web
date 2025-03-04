@@ -1,10 +1,11 @@
 <script lang="ts">
     import { page } from '$app/state';
     import type { SelectOption } from '@melt-ui/svelte';
-    import { untrack } from 'svelte';
     import { writable } from 'svelte/store';
-    import { Button, Input, Main } from '~/lib/components';
+    import { Await, Button, Input, Main } from '~/lib/components';
     import { IconPlus, IconSearch, IconUserPlus, IconUsers } from '~/lib/components/icons';
+    import { createRef } from '~/lib/utils/runes.svelte';
+    import { tsap } from '~/lib/utils/transition';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import InvitationDialog from './InvitationDialog.svelte';
@@ -31,17 +32,16 @@
             icon: IconUserPlus
         }
     ]);
-    const selectedView = writable<SelectOption<string>>(
-        untrack(() => views.find((a) => a.value === page.url.searchParams.get('view')) ?? views[0])
-    );
+    const invitationListRef = createRef.maybePromise(() => data.memberInvitationList);
+    $inspect(page.url);
 </script>
 
-<InvitationDialog projectId={data.project.id} open={invitationDialogOpen} />
+<InvitationDialog projectId={data.project.id} open={invitationDialogOpen} ref={invitationListRef} />
 
 <Main class="grid grid-rows-[auto_1fr] overflow-hidden p-0">
     <div class="border-b-base-border-2 divide-base-border-3 flex divide-x border-b">
         <div>
-            <SelectView selected={selectedView} {views} />
+            <SelectView {views} />
         </div>
         <div class="relative grow">
             <Input
@@ -68,10 +68,50 @@
         </Button>
     </div>
     <div class="overflow-auto">
-        {#if $selectedView.value === 'pending'}
-            <InvitationList projectId={data.project.id} />
-        {:else}
-            <ProjectMemberList projectId={data.project.id} />
-        {/if}
+        <div class="transition-enforcement h-full">
+            {#if page.url.searchParams.get('view') === 'pending'}
+                <div
+                    in:tsap={(node, gsap) =>
+                        gsap.from(node, {
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            duration: 0.2,
+                            ease: 'steps(4)'
+                        })}
+                    out:tsap={(node, gsap) =>
+                        gsap.to(node, {
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            duration: 0.2,
+                            ease: 'steps(4)'
+                        })}
+                >
+                    <InvitationList ref={invitationListRef} loading={invitationListRef.loading} />
+                </div>
+            {:else}
+                <div
+                    in:tsap={(node, gsap) =>
+                        gsap.from(node, {
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            duration: 0.2,
+                            ease: 'steps(4)'
+                        })}
+                    out:tsap={(node, gsap) =>
+                        gsap.to(node, {
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            duration: 0.2,
+                            ease: 'steps(4)'
+                        })}
+                >
+                    <Await resolve={data.memberList}>
+                        {#snippet children({ value, loading })}
+                            <ProjectMemberList list={value} {loading} />
+                        {/snippet}
+                    </Await>
+                </div>
+            {/if}
+        </div>
     </div>
 </Main>

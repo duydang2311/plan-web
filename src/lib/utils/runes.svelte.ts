@@ -12,8 +12,8 @@ export interface Loading {
 }
 
 export interface Ref<T> {
-    get value(): T;
-    set value(value: T);
+    get value(): T | undefined;
+    set value(value: T | undefined);
 }
 
 export interface AsyncRef<T> extends Ref<T> {
@@ -179,7 +179,7 @@ export const createUiStatus = () => {
     return uiStatus;
 };
 
-function __createRef<T>(f: T | (() => T)): Ref<T> {
+function __createRef<T>(f: T | (() => T)): Ref<NonNullable<T>> {
     let value = $state.raw(f instanceof Function ? f() : f);
     if (f instanceof Function) {
         $effect(() => {
@@ -191,7 +191,7 @@ function __createRef<T>(f: T | (() => T)): Ref<T> {
     }
     return {
         get value() {
-            return value;
+            return value as NonNullable<T>;
         },
         set value(v) {
             value = v;
@@ -200,7 +200,7 @@ function __createRef<T>(f: T | (() => T)): Ref<T> {
 }
 
 export const createRef = Object.assign(__createRef, {
-    maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<T | undefined> => {
+    maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<NonNullable<T>> => {
         const value = f();
         const loading = createLoading();
         if (!isPromiseLike(value)) {
@@ -214,7 +214,7 @@ export const createRef = Object.assign(__createRef, {
             });
             return {
                 get value() {
-                    return state;
+                    return state as NonNullable<T>;
                 },
                 set value(v) {
                     state = v;
@@ -241,7 +241,7 @@ export const createRef = Object.assign(__createRef, {
         });
         return {
             get value() {
-                return state;
+                return state as NonNullable<T>;
             },
             set value(v) {
                 state = v;

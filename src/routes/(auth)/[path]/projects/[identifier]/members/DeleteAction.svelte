@@ -1,16 +1,19 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { invalidateAll } from '$app/navigation';
     import { writable } from 'svelte/store';
     import { Button, Popover, PopoverBuilder } from '~/lib/components';
     import { IconTrash } from '~/lib/components/icons';
     import PopoverArrow from '~/lib/components/PopoverArrow.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
+    import type { Ref } from '~/lib/utils/runes.svelte';
     import type { LocalProjectMember } from './utils';
 
-    const { queryKey, id, name }: { queryKey: readonly unknown[]; id: number; name: string } =
-        $props();
-    const { queryClient } = useRuntime();
+    const {
+        ref,
+        id,
+        name
+    }: { ref: Ref<PaginatedList<LocalProjectMember>>; id: number; name: string } = $props();
     const open = writable(false);
 </script>
 
@@ -39,22 +42,18 @@
                     action="?/delete-member"
                     class="mt-4 flex justify-end gap-2 *:w-fit"
                     use:enhance={() => {
-                        const previous =
-                            queryClient.getQueryData<PaginatedList<LocalProjectMember>>(queryKey);
-                        queryClient.setQueryData(
-                            queryKey,
-                            previous
-                                ? {
-                                      items: previous.items.filter((a) => a.id !== id),
-                                      totalCount: previous.totalCount - 1
-                                  }
-                                : previous
-                        );
+                        const old = ref.value;
+                        if (old) {
+                            ref.value = {
+                                items: old.items.filter((a) => a.id !== id),
+                                totalCount: old.totalCount - 1
+                            };
+                        }
                         return async ({ result }) => {
                             if (result.type === 'failure') {
-                                queryClient.setQueryData(queryKey, previous);
+                                ref.value = old;
                             }
-                            await queryClient.invalidateQueries({ queryKey: ['project-members'] });
+                            await invalidateAll();
                         };
                     }}
                 >

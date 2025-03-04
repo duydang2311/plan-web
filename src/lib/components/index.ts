@@ -1,3 +1,4 @@
+export { Popover as MeltPopoverBuilder } from 'melt/components';
 export { default as Accordion } from './Accordion.svelte';
 export { default as Avatar } from './Avatar.svelte';
 export { default as Await } from './Await.svelte';
@@ -20,10 +21,10 @@ export { default as LogoType } from './LogoType.svelte';
 export { default as Main } from './Main.svelte';
 export { default as OptionalLink } from './OptionalLink.svelte';
 export { default as Pagination } from './Pagination.svelte';
+export { default as Pagination3 } from './Pagination3.svelte';
 export { default as Popover } from './Popover.svelte';
 export { default as PopoverArrow } from './PopoverArrow.svelte';
 export { default as PopoverBuilder } from './PopoverBuilder.svelte';
-export { Popover as MeltPopoverBuilder } from 'melt/components';
 export { default as RelativeTime } from './RelativeTime.svelte';
 export { default as Row } from './Row.svelte';
 export { default as RowCount } from './RowCount.svelte';
@@ -44,3 +45,4 @@ export { default as Tiptap } from './Tiptap.svelte';
 export { default as TiptapButton } from './TiptapButton.svelte';
 export { addToast, default as Toaster } from './Toaster.svelte';
 export { default as ToastItem } from './ToastItem.svelte';
+

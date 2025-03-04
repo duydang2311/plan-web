@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { type ComboboxOption, melt } from '@melt-ui/svelte';
+    import { invalidateAll } from '$app/navigation';
+    import { melt, type ComboboxOption } from '@melt-ui/svelte';
+    import { DateTime } from 'luxon';
     import { writable, type Writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
     import { Button, DialogBuilder, LoadingMonitor, toast } from '~/lib/components';
@@ -8,10 +10,11 @@
     import SearchUserCombobox, {
         type SearchUser
     } from '~/lib/components/SearchUserCombobox.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { createLoading, createUiStatus, watch } from '~/lib/utils/runes.svelte';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { createLoading, createUiStatus, watch, type Ref } from '~/lib/utils/runes.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
     import { type actions } from './+page.server';
+    import type { LocalProjectMemberInvitation } from './utils';
 
     const errorMap = {
         String: 'Find and select a user to invite.',
@@ -21,11 +24,18 @@
         member_already: 'The user has already been a member in the project.'
     };
 
-    const { projectId, open }: { projectId: string; open: Writable<boolean> } = $props();
+    const {
+        ref,
+        projectId,
+        open
+    }: {
+        ref: Ref<PaginatedList<LocalProjectMemberInvitation>>;
+        projectId: string;
+        open: Writable<boolean>;
+    } = $props();
     const selected = writable<ComboboxOption<SearchUser>>() as
         | Writable<ComboboxOption<SearchUser>>
         | undefined;
-    const { queryClient } = useRuntime();
     let status = createUiStatus();
     const loading = createLoading();
 
@@ -64,17 +74,38 @@
                     method="post"
                     action="?/invite-member"
                     use:enhance={() => {
+                        if (!$selected) {
+                            status.fail(['String']);
+                            return;
+                        }
+
                         status.reset();
                         loading.set();
-
                         const name =
-                            $selected?.value.profile?.displayName ??
-                            $selected?.value.email ??
-                            'N/A';
+                            $selected.value.profile?.displayName ?? $selected.value.email ?? 'N/A';
 
                         return async ({ result }) => {
                             loading.unset();
+                            const old = ref.value;
+                            if (old) {
+                                ref.value = paginatedList({
+                                    items: [
+                                        {
+                                            createdTime: DateTime.now().toISO(),
+                                            id: Math.random(),
+                                            role: { name: 'Member' },
+                                            user: {
+                                                email: $selected.value.email,
+                                                profile: $selected.value.profile
+                                            }
+                                        },
+                                        ...old.items
+                                    ],
+                                    totalCount: old.totalCount + 1
+                                });
+                            }
                             if (result.type === 'failure') {
+                                ref.value = old;
                                 const a = result.data as Exclude<
                                     Awaited<ReturnType<(typeof actions)['invite-member']>>,
                                     void
@@ -94,9 +125,7 @@
                                     bodyProps: name
                                 });
                             }
-                            await queryClient.invalidateQueries({
-                                queryKey: ['project-member-invitations']
-                            });
+                            await invalidateAll();
                         };
                     }}
                 >

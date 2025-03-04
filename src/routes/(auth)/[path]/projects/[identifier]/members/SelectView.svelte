@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { replaceState } from '$app/navigation';
     import { page } from '$app/state';
     import { melt, type SelectOption } from '@melt-ui/svelte';
-    import { writable, type Writable } from 'svelte/store';
+    import { untrack } from 'svelte';
+    import { writable } from 'svelte/store';
     import { Button, SelectBuilder } from '~/lib/components';
     import { IconCheck, IconChevronUpDown } from '~/lib/components/icons';
     import { select, tsap } from '~/lib/utils/transition';
-    import { fluentSearchParams } from '~/lib/utils/url';
 
     const {
-        views,
-        selected
+        views
     }: {
         views: (SelectOption<string> & { href: string; icon: SvelteIconComponent })[];
-        selected: Writable<SelectOption<string>> | undefined;
     } = $props();
     const open = writable(false);
+    const selected = writable<SelectOption<string>>(
+        untrack(() => views.find((a) => a.value === page.url.searchParams.get('view')) ?? views[0])
+    );
     const view = $derived($selected ? views.find((a) => a.value === $selected.value) : undefined);
 </script>
 
@@ -23,14 +23,6 @@
     options={{
         open,
         selected,
-        onSelectedChange: ({ next }) => {
-            replaceState(
-                views.find((a) => a.value === next?.value)?.href ??
-                    `${page.url.pathname}${fluentSearchParams(page.url).delete('view')}`,
-                page.state
-            );
-            return next;
-        },
         positioning: {
             placement: 'bottom-start',
             sameWidth: false
@@ -66,12 +58,19 @@
                 {#each views as v (v.value)}
                     {@const opt = option(v)}
                     {@const selected = isSelected(v.value)}
-                    <li use:melt={opt} class="c-select--option">
-                        {#if selected}
-                            <IconCheck class="c-select--check" />
-                        {/if}
-                        <v.icon />
-                        {v.label}
+                    <li>
+                        <a
+                            href={v.href}
+                            class="c-select--option"
+                            use:melt={opt}
+                            data-sveltekit-replacestate
+                        >
+                            {#if selected}
+                                <IconCheck class="c-select--check" />
+                            {/if}
+                            <v.icon />
+                            {v.label}
+                        </a>
                     </li>
                 {/each}
             </ol>
