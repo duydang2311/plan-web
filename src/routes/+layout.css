@@ -34,16 +34,18 @@
     --text-h3: 1.602rem;
     --text-h2: 1.802rem;
     --text-h1: 2.488rem;
-    --text-title: var(--text-h5);
-    --container-paragraph-sm: var(--container-sm);
-    --container-paragraph-lg: var(--container-2xl);
     --radius-full: calc(infinity * 1px);
+}
 
+@theme inline {
     --cubic-out: cubic-bezier(0.33, 1, 0.68, 1);
     --cubic-in: cubic-bezier(0.32, 0, 0.67, 0);
     --cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
     --default-transition-timing-function: var(--cubic-out);
+    --text-title: var(--text-h5);
+    --container-paragraph-sm: var(--container-sm);
+    --container-paragraph-lg: var(--container-2xl);
 }
 
 @layer base {

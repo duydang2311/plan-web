@@ -138,7 +138,7 @@
                 class="size-10"
             />
             <div class="grid grid-rows-2 text-start">
-                <span class="overflow-hidden text-ellipsis whitespace-nowrap text-base-fg-1">
+                <span class="text-base-fg-1 overflow-hidden text-ellipsis whitespace-nowrap">
                     {data.user.profile?.displayName ?? data.user.email}
                 </span>
                 {#if data.user.profile}

@@ -1,4 +1,4 @@
-&:where([data-theme='dark'], [data-theme='dark'] *) {
+:where([data-theme=dark], [data-theme=dark] *) {
     --color-bg: oklch(0% 0 0);
 
     --color-base-1: oklch(16.08% 0.0027 298.4);
