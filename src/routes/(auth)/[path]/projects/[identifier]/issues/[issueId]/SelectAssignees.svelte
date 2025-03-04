@@ -104,9 +104,9 @@
                     label: a.profile?.displayName ?? a.email,
                     value: a.id,
                     email: a.email,
-                    imageHref: a.profile
-                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(64))
-                        : null
+                    image: a.profile
+                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(64)).toURL()
+                        : undefined
                 }));
             }
         },
@@ -131,7 +131,7 @@
                         title={option.label}
                         seed={option.email}
                         src={option.image}
-                        class="w-8"
+                        class="w-10"
                     />
                     <div class="overflow-hidden text-ellipsis">
                         {option.label}
