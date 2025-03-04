@@ -20,7 +20,7 @@
     });
 </script>
 
-<div class="grid grid-rows-[1fr_auto]">
+<div class="grid grid-rows-[1fr_auto] h-full">
     <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
         <THead>
             <Row class="py-2">

@@ -39,7 +39,7 @@
                 src={imageFromAsset(cloudinary)(audit.user.profile?.image)
                     ?.resize(Resize.fill(64))
                     .toURL()}
-                class="size-8"
+                class="size-10"
             />
         </OptionalLink>
         <div class="text-sm">

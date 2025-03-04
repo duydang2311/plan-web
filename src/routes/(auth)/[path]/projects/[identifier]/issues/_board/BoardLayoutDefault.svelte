@@ -278,7 +278,7 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-<ol class="flex w-full overflow-x-auto overflow-y-hidden" class:animate-pulse={loading.immediate}>
+<ol class="flex size-full overflow-x-auto overflow-y-hidden" class:animate-pulse={loading.immediate}>
     {#each statusList.items as status (status.id)}
         {@const list = issueListsRef.value?.[status.id]}
         <li>

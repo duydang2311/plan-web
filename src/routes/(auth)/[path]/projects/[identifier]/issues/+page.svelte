@@ -6,6 +6,7 @@
     import { Await, Button } from '~/lib/components';
     import Input from '~/lib/components/Input.svelte';
     import { IconColumns, IconPlus, IconRows, IconSearch } from '~/lib/components/icons';
+    import { tsap } from '~/lib/utils/transition';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { PageData } from './$types';
     import TableLayout from './TableLayout.svelte';
@@ -65,18 +66,55 @@
             </Button>
         </div>
     </div>
-    {#if $selectedLayout.value === 'table' && data.page.tag === 'table'}
-        <Await resolve={data.page.issueList}>
-            {#snippet children({ value, loading })}
-                <TableLayout issueList={value} {loading} />
-            {/snippet}
-        </Await>
-    {:else if $selectedLayout.value === 'board' && data.page.tag === 'board'}
-        <BoardLayout
-            statusList={data.page.statusList}
-            issueLists={data.page.issueLists}
-            projectId={data.project.id}
-            projectIdentifier={data.project.identifier}
-        />
-    {/if}
+    <div class="transition-enforcement h-full">
+        {#if $selectedLayout.value === 'table' && data.page.tag === 'table'}
+            <div
+                in:tsap={(node, gsap) =>
+                    gsap.from(node, {
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                        duration: 0.2,
+                        ease: 'steps(4)'
+                    })}
+                out:tsap={(node, gsap) =>
+                    gsap.to(node, {
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                        duration: 0.2,
+                        ease: 'steps(4)'
+                    })}
+            >
+                <Await resolve={data.page.issueList}>
+                    {#snippet children({ value, loading })}
+                        <TableLayout issueList={value} {loading} />
+                    {/snippet}
+                </Await>
+            </div>
+        {:else if $selectedLayout.value === 'board' && data.page.tag === 'board'}
+            <div
+                in:tsap={(node, gsap) =>
+                    gsap.from(node, {
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                        duration: 0.2,
+                        ease: 'steps(4)'
+                    })}
+                out:tsap={(node, gsap) =>
+                    gsap.to(node, {
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                        duration: 0.2,
+                        ease: 'steps(4)'
+                    })}
+                class="transition-enforcement overflow-hidden"
+            >
+                <BoardLayout
+                    statusList={data.page.statusList}
+                    issueLists={data.page.issueLists}
+                    projectId={data.project.id}
+                    projectIdentifier={data.project.identifier}
+                />
+            </div>
+        {/if}
+    </div>
 </main>
