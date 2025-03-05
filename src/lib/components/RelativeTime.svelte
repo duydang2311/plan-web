@@ -51,4 +51,8 @@
     });
 </script>
 
-{ref.value.format}
+{#if ref.value}
+    <time datetime={ref.value.time.toFormat('yyyy-MM-dd HH:mm')}>
+        {ref.value.format}
+    </time>
+{/if}
