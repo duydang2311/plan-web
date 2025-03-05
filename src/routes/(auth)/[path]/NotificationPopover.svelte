@@ -157,7 +157,7 @@
                         <div class="bg-base-border-3 h-px grow"></div>
                     </div>
                     <ol class="space-y-1">
-                        {#each userNotifications as userNotification (userNotification.id)}
+                        {#each userNotifications.filter((a) => a.notification.data != null) as userNotification (userNotification.id)}
                             <li>
                                 {#if userNotification.notification.type === notificationTypes.projectCreated}
                                     <a
