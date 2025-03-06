@@ -75,11 +75,6 @@
                 Extension.create({
                     addKeyboardShortcuts() {
                         return {
-                            Enter: () => {
-                                this.editor.commands.setHardBreak();
-                                return true;
-                            },
-                            'Shift-Enter': () => true,
                             'Mod-Enter': () => {
                                 this.editor.emit('submit', undefined);
                                 return true;
