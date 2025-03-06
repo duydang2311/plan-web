@@ -31,9 +31,9 @@
 >
     <div class="flex items-center gap-4">
         {#if type === 'positive'}
-            <IconSuccess class="text-positive-1 size-6" />
+            <IconSuccess class="text-positive-1 size-6 shrink-0" />
         {:else if type === 'negative'}
-            <IconFailure class="text-negative-1 size-6" />
+            <IconFailure class="text-negative-1 size-6 shrink-0" />
         {/if}
         {@render bodySnippet()}
     </div>
