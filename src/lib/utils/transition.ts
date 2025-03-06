@@ -73,7 +73,6 @@ export const select: Record<'in' | 'out', TsapCallback> = {
             y: '-0.5rem',
             duration: 0.075,
             force3D: true,
-            clearProps: 'opacity,scaleY,y',
             ease: 'circ.in'
         })
 };
