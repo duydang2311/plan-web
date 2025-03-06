@@ -148,7 +148,7 @@
         </Button>
     </aside>
     <div
-        class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 lg:shadow-xs grid max-h-screen grow grid-rows-[auto_1fr] lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border"
+        class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 lg:shadow-xs grid max-h-screen grow grid-rows-[auto_1fr] overflow-hidden lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border"
     >
         <div
             class="border-b-base-border-2 flex items-center justify-between gap-2 border-b px-8 py-2"
