@@ -75,14 +75,12 @@
                     editing = false;
                     const old = ref.value;
                     if (old) {
-                        console.log('before', ref.value);
                         ref.value = paginatedList({
                             items: old.items.map((a) =>
                                 a.id === audit.id ? { ...a, data: { content: html } } : a
                             ),
                             totalCount: old.totalCount
                         });
-                        console.log('after', ref.value);
                     }
                     return async ({ result }) => {
                         if (result.type === 'failure') {

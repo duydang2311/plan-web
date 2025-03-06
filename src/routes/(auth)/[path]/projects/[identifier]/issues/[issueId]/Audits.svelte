@@ -12,10 +12,10 @@
     import AuditComment from './AuditComment.svelte';
     import AuditCreate from './AuditCreate.svelte';
 
-    const {
+    let {
         ref,
         currentUserId,
-        scrollRef
+        scrollRef,
     }: {
         ref: AsyncRef<PaginatedList<LocalIssueAudit> | undefined>;
         issueId: string;
@@ -28,6 +28,7 @@
     } as const;
     let infiniteLoading = createLoading();
     let containerRef = $state.raw<HTMLElement>();
+    let startMargin = $state.raw(0);
 
     const fetchNext = async () => {
         infiniteLoading.set();
@@ -55,6 +56,10 @@
             keepFocus: true
         });
         infiniteLoading.unset();
+    };
+
+    export function invalidateScrollOffset() {
+        startMargin = containerRef?.offsetTop ?? 0;
     };
 </script>
 
@@ -101,7 +106,7 @@
         {#if scrollRef}
             <div class="-mt-6">
                 <Virtualizer
-                    startMargin={containerRef?.offsetTop ?? 0}
+                    {startMargin}
                     data={ref.value.items}
                     getKey={(item) => item.id}
                     {scrollRef}
@@ -152,20 +157,20 @@
             {/if}
         {:else}
             <ol class="space-y-6">
-            {#each ref.value.items.slice(0, 5) as audit (audit.id)}
-                {#if audit.action in auditComponents}
-                    {@const Component =
-                        auditComponents[audit.action as keyof typeof auditComponents]}
-                    <li class="group relative">
-                        <Component {audit} {currentUserId} {ref} />
-                        <div
-                            class="bg-base-border-3 absolute bottom-0 left-5 h-8 w-px translate-y-full group-last:hidden"
-                        ></div>
-                    </li>
-                {:else}
-                    Audit {audit.action}
-                {/if}
-            {/each}
+                {#each ref.value.items.slice(0, 5) as audit (audit.id)}
+                    {#if audit.action in auditComponents}
+                        {@const Component =
+                            auditComponents[audit.action as keyof typeof auditComponents]}
+                        <li class="group relative">
+                            <Component {audit} {currentUserId} {ref} />
+                            <div
+                                class="bg-base-border-3 absolute bottom-0 left-5 h-8 w-px translate-y-full group-last:hidden"
+                            ></div>
+                        </li>
+                    {:else}
+                        Audit {audit.action}
+                    {/if}
+                {/each}
             </ol>
         {/if}
     {/if}

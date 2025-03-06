@@ -10,18 +10,33 @@
     import SelectAssignees from './SelectAssignees.svelte';
     import SelectTeam from './SelectTeam.svelte';
     import Status from './Status.svelte';
+    import { onMount } from 'svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     let editing = $state.raw(false);
     let scrollRef = $state.raw<HTMLElement>();
     const issueRef = createRef(() => data.page.issue);
     const auditListRef = createRef.maybePromise(() => data.page.issueAuditList);
+    let issueContainerRef = $state.raw<HTMLElement>();
+    let auditsComponent = $state.raw<Audits>();
+
+    onMount(() => {
+        const resizeObserver = new ResizeObserver(() => {
+            auditsComponent?.invalidateScrollOffset();
+        });
+        if (issueContainerRef) {
+            resizeObserver.observe(issueContainerRef);
+        }
+        return () => {
+            resizeObserver.disconnect();
+        };
+    });
 </script>
 
 <main class="divide-base-border-2 flex h-full items-stretch divide-x divide-dashed overflow-hidden">
     <div class="relative h-full grow overflow-auto" bind:this={scrollRef} style="contain: strict;">
         <div class="relative flex min-h-full flex-col p-4">
-            <div class="max-w-paragraph-lg mx-auto w-full">
+            <div bind:this={issueContainerRef} class="max-w-paragraph-lg mx-auto w-full">
                 <Issue
                     {form}
                     {editing}
@@ -43,14 +58,9 @@
                         issueId={data.page.issue.id}
                         currentUserId={data.page.user.id}
                         {scrollRef}
+                        bind:this={auditsComponent}
                     />
                 </div>
-                <!-- <Comments
-                    authorId={data.page.user.id}
-                    issueId={data.page.issue.id}
-                    size={commentQuery.size}
-                    {scrollRef}
-                /> -->
                 <div class="mt-8">
                     <AddComment
                         userId={data.page.user.id}
