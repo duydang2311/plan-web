@@ -1,7 +1,7 @@
 .c-table {
     --_bg: var(--color-base-1);
-    --_bg-2: var(--color-base-1);
-    --_hover: var(--color-base-2);
+    --_bg-2: var(--color-base-2);
+    --_hover: var(--color-base-3);
     --_border: var(--color-base-border-2);
 
     @variant dark {
@@ -23,12 +23,12 @@
         grid-template-columns: subgrid;
     }
 
-    :where(& > tbody > .c-table--row:nth-child(2n + 1)) {
+    & > tbody > .c-table--row:nth-child(2n) {
         background-color: var(--_bg-2);
     }
 
-    :where(& > tbody > .c-table--row:hover),
-    :where(& > div.c-table--tbody > .c-table--row:hover) {
+    & > tbody > .c-table--row:hover,
+    & > div.c-table--tbody > .c-table--row:hover {
         background-color: var(--_hover);
     }
 }
@@ -50,6 +50,7 @@
     padding: --spacing(4);
     transition: background-color 50ms ease-in-out;
     text-align: left;
+    background-color: var(--_bg);
 
     :where(& > *) {
         padding-inline: --spacing(4);
