@@ -1,6 +1,6 @@
 <script lang="ts" module>
     const dragStatusClasses = {
-        dragover: 'bg-base-3 border-primary-border/20'
+        dragover: 'bg-base-4 border-primary-border/20'
     };
 </script>
 
@@ -80,14 +80,19 @@
 
 <li
     class={clsx(
-        'flex min-w-96 flex-col rounded-lg py-4 transition duration-75',
+        'bg-base-2 flex w-80 flex-col rounded-lg py-4 transition duration-75',
         dragStatus != null && dragStatusClasses[dragStatus]
     )}
     use:atlas={{ id: status.id }}
 >
-    <h2 class="text-h5 px-4">{status.value}</h2>
+    <h2
+        class="text-p text-base-fg-2 px-4 font-medium tracking-tight"
+        class:opacity-40={status.id === -1}
+    >
+        {status.value}
+    </h2>
     <div class="scrollbar-3 grow overflow-y-auto overflow-x-hidden pt-2">
-        <ol class="h-full px-4">
+        <ol class="h-full px-2">
             {#each issueList.items.filter((a) => a.id !== draggingIssueId) as issue (issue.id)}
                 <li
                     in:tsap={(node, gsap) =>

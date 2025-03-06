@@ -102,7 +102,7 @@
     <div
         class={clsx(
             'relative w-full cursor-grab rounded-md border p-4 transition duration-75',
-            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-2/40 border-base-border-2'
+            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 dark:bg-base-3/20 border-base-border-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}

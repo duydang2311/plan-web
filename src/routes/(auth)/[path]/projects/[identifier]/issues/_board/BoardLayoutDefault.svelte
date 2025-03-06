@@ -278,20 +278,32 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-<ol class="flex size-full overflow-x-auto overflow-y-hidden" class:animate-pulse={loading.immediate}>
+<div class="overflow-x-auto overflow-y-hidden">
+<ol
+    class="grid grid-flow-col h-max"
+    class:animate-pulse={loading.immediate}
+>
     {#each statusList.items as status (status.id)}
         {@const list = issueListsRef.value?.[status.id]}
-        <li>
-            <ol class="flex h-full w-fit gap-4 p-4">
-                {#if list == null}
-                    <BoardSkeleton />
-                {:else}
-                    <Board issueList={list} identifier={projectIdentifier} {projectId} {status} />
-                {/if}
-            </ol>
-        </li>
+        {#if status.id !== -1 || (list != null && list.totalCount > 0)}
+            <li class="h-full min-h-128 group">
+                <ol class="flex h-full w-fit py-4 pr-4 group-first:pl-4">
+                    {#if list == null}
+                        <BoardSkeleton />
+                    {:else}
+                        <Board
+                            issueList={list}
+                            identifier={projectIdentifier}
+                            {projectId}
+                            {status}
+                        />
+                    {/if}
+                </ol>
+            </li>
+        {/if}
     {/each}
 </ol>
+</div>
 {#if preview}
     <div
         use:portal={preview}
