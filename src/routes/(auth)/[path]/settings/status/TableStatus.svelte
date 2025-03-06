@@ -5,8 +5,7 @@
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
-    import { Button, Input, Row, Table, Th, THead } from '~/lib/components';
-    import { IconPlus, IconSearch } from '~/lib/components/icons';
+    import { Row, Table, Th, THead } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { PageData } from './$types';
@@ -14,7 +13,7 @@
     import StatusRow from './StatusRow.svelte';
     import { validateDraggleStatusData } from './utils';
 
-    const { data, onAddStatusClick }: { data: PageData; onAddStatusClick: () => void } = $props();
+    const { data }: { data: PageData } = $props();
     const queryKey = ['workspace-statuses', { workspaceId: data.workspace.id }];
     const query = createQuery({
         queryKey,
@@ -100,34 +99,8 @@
     });
 </script>
 
-<Table style="grid-template-columns: auto 1fr 1fr auto;">
-    <THead class="relative">
-        <Row class="border-b-base-border-2 border-b py-1">
-            <Th style="grid-column: 1 / -1;" class="px-0">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="relative">
-                        <Input
-                            id="search"
-                            type="text"
-                            class="w-48 border-none pl-8 shadow-none focus:ring-0"
-                            placeholder="Search by name"
-                        />
-                        <IconSearch
-                            class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
-                        />
-                    </div>
-                    <Button
-                        filled={false}
-                        class="flex w-fit min-w-max items-center gap-2"
-                        size="sm"
-                        onclick={onAddStatusClick}
-                    >
-                        <IconPlus />
-                        Add status
-                    </Button>
-                </div>
-            </Th>
-        </Row>
+<Table class="grid-cols-[auto_1fr_1fr_auto] h-full overflow-auto">
+    <THead>
         <Row class="py-2">
             <Th></Th>
             <Th>Name</Th>
@@ -138,13 +111,11 @@
     <tbody>
         {#if !$query.data}
             <Row>
-                <td style="grid-column: 1 / -1;" class="text-base-fg-ghost">Loading data...</td>
+                <td class="text-base-fg-ghost col-span-full">Loading data...</td>
             </Row>
         {:else if $query.data.items.length === 0}
             <Row>
-                <td style="grid-column: 1 / -1;" class="text-base-fg-ghost">
-                    No data to be displayed.
-                </td>
+                <td class="text-base-fg-ghost col-span-full"> No data to be displayed. </td>
             </Row>
         {:else}
             {#each $query.data.items as status (status.id)}
