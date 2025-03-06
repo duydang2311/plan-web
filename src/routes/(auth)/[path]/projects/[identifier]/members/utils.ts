@@ -9,7 +9,7 @@ export type LocalProjectMember = Pick<ProjectMember, 'createdTime' | 'id'> & {
 };
 
 export type LocalProjectMemberInvitation = Pick<ProjectMemberInvitation, 'createdTime' | 'id'> & {
-    role: Pick<Role, 'name'>;
+    role: Pick<Role, 'id' | 'name'>;
     user: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
 };
 

@@ -33,7 +33,6 @@
         }
     ]);
     const invitationListRef = createRef.maybePromise(() => data.memberInvitationList);
-    $inspect(page.url);
 </script>
 
 <InvitationDialog projectId={data.project.id} open={invitationDialogOpen} ref={invitationListRef} />

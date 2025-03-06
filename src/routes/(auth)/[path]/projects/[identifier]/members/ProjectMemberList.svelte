@@ -18,6 +18,7 @@
     import { createRef, type Loading } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
     import DeleteAction from './DeleteAction.svelte';
+    import MemberRole from './MemberRole.svelte';
     import { type LocalProjectMember } from './utils';
 
     const {
@@ -70,7 +71,7 @@
             {:else}
                 {#each ref.value.items as item (item.id)}
                     {@const createdTime = DateTime.fromISO(item.createdTime)}
-                    <Row>
+                    <Row class="relative">
                         <td>
                             <OptionalLink
                                 href={item.user.profile
@@ -78,6 +79,7 @@
                                     : undefined}
                                 class="block w-fit"
                             >
+                                <span class="absolute inset-0"></span>
                                 {#if item.user.profile == null}
                                     {item.user.email}
                                 {:else}
@@ -98,17 +100,23 @@
                             </OptionalLink>
                         </td>
                         <td title={createdTime.toLocaleString(DateTime.DATETIME_MED)}>
-                            {createdTime.toRelative()}
+                            <span class="isolate">
+                                {createdTime.toRelative()}
+                            </span>
                         </td>
                         <td>
-                            {item.role.name}
+                            <div class="isolate">
+                                <MemberRole projectMemberId={item.id} defaultRole={item.role} />
+                            </div>
                         </td>
                         <td>
-                            <DeleteAction
-                                {ref}
-                                id={item.id}
-                                name={item.user.profile?.displayName ?? item.user.email}
-                            />
+                            <div class="isolate">
+                                <DeleteAction
+                                    {ref}
+                                    id={item.id}
+                                    name={item.user.profile?.displayName ?? item.user.email}
+                                />
+                            </div>
                         </td>
                     </Row>
                 {/each}

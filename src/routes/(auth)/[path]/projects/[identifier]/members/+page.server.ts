@@ -2,10 +2,10 @@ import { Effect } from 'effect';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
+import { queryParams } from '~/lib/utils/url';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import {
     InvitationListQuery,
-    MemberListQuery,
     type LocalProjectMember,
     type LocalProjectMemberInvitation
 } from './utils';
@@ -35,14 +35,15 @@ const loadMembers = async ({
 }: PageServerLoadEvent) => {
     const data = await parent();
 
-    const queryParams = MemberListQuery.params({
+    const params = {
+        ...queryParams(url, { page: 1, size: 20, order: null }),
         projectId: data.project.id,
-        url
-    });
+        select: 'CreatedTime,Id,Role.Id,Role.Name,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+    };
     const memberList = Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
             (yield* ApiClient).get('project-members', {
-                query: queryParams
+                query: params
             })
         );
         return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalProjectMember>>());
