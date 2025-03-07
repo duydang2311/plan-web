@@ -2,6 +2,7 @@ import type { Cloudinary } from '@cloudinary/url-gen';
 import { type QueryClient } from '@tanstack/svelte-query';
 import defineLazyProperty from 'define-lazy-prop';
 import type { Context } from 'effect';
+import type Sqids from 'sqids';
 import { getContext, setContext } from 'svelte';
 import type { HttpClient } from '../services/http_client';
 import { type Realtime } from '../services/realtime.client';
@@ -11,6 +12,7 @@ interface Runtime {
     readonly realtime: Realtime;
     readonly cloudinary: Cloudinary;
     readonly queryClient: QueryClient;
+    readonly idHasher: Sqids;
 }
 
 export function setRuntime(value: Record<keyof Runtime, () => Runtime[keyof Runtime]>) {

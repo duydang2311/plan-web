@@ -11,6 +11,7 @@
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
     import type { LayoutData } from './$types';
     import './+layout.css';
+    import { createIdHasher } from '~/lib/services/id_hasher';
 
     const { data, children }: { data: LayoutData; children: Snippet } = $props();
     const runtime = setRuntime({
@@ -33,7 +34,8 @@
                 },
                 url: { secure: true }
             }),
-        queryClient: () => data.queryClient
+        queryClient: () => data.queryClient,
+        idHasher: createIdHasher
     });
 
     function onColorSchemePreferenceChange(e: MediaQueryListEvent) {
