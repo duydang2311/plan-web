@@ -7,6 +7,8 @@ import { HttpClient } from './lib/services/http_client';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
 import type { Asset } from './lib/models/asset';
+import Sqids from 'sqids';
+import { IdHasher } from './lib/services/id_hasher.server';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -85,7 +87,8 @@ export const handle: Handle = async ({
                         cookies
                     })
             ),
-            Cloudinary.Live
+            Cloudinary.Live,
+            IdHasher.Live,
         );
         locals.runtime = {
             runPromise: makeRunPromise(locals.appLive),
@@ -111,7 +114,8 @@ const initLocals = (locals: App.Locals, fetch: typeof globalThis.fetch) => {
                     })
                 })
         ),
-        Cloudinary.Live
+        Cloudinary.Live,
+        IdHasher.Live
     );
     locals.runtime = {
         runPromise: makeRunPromise(locals.appLive),
