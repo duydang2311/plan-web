@@ -60,6 +60,7 @@
         "prettier-plugin-svelte": "^3.3.3",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "sanitize.css": "^13.0.0",
+        "sqids": "^0.3.0",
         "svelte": "^5.22.5",
         "svelte-adapter-bun": "^0.5.2",
         "svelte-check": "^4.1.5",
