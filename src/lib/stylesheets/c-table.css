@@ -1,7 +1,7 @@
 .c-table {
     --_bg: var(--color-base-1);
-    --_bg-2: var(--color-base-2);
-    --_hover: var(--color-base-3);
+    --_bg-2: color-mix(in oklab, var(--color-base-2) 50%, var(--color-base-1));
+    --_hover: var(--color-base-2);
     --_border: var(--color-base-border-2);
 
     @variant dark {
