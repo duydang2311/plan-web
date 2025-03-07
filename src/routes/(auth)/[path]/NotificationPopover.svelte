@@ -11,12 +11,14 @@
     import { formatRelativeDateUi } from '~/lib/utils/time';
     import { popover as popoverTransition, tsap } from '~/lib/utils/transition';
 
+    type NotificationType = typeof notificationTypes;
+
     interface LocalUserNotification {
         id: number;
         createdTime: string;
         notification:
             | {
-                  type: (typeof notificationTypes)['projectCreated'];
+                  type: NotificationType['projectCreated'];
                   data: {
                       identifier: string;
                       name: string;
@@ -24,7 +26,7 @@
                   };
               }
             | {
-                  type: (typeof notificationTypes)['issueCreated'];
+                  type: NotificationType['issueCreated'];
                   data: {
                       orderNumber: number;
                       title: string;
@@ -35,7 +37,7 @@
                   };
               }
             | {
-                  type: (typeof notificationTypes)['commentCreated'];
+                  type: NotificationType['commentCreated'];
                   data: {
                       issue: {
                           orderNumber: number;
@@ -46,17 +48,28 @@
                           };
                       };
                   };
+              }
+            | {
+                  type: NotificationType['projectMemberInvited'];
+                  data: {
+                      id: number;
+                      project: {
+                          identifier: string;
+                          name: string;
+                      };
+                  };
               };
     }
 
     const { userId, builder }: { userId: string; builder: Popover['popover']['content'] } =
         $props();
-    const { api } = useRuntime();
+    const { api, idHasher } = useRuntime();
     const notificationTypes = {
         none: 0,
         projectCreated: 1,
         issueCreated: 2,
-        commentCreated: 3
+        commentCreated: 3,
+        projectMemberInvited: 4
     } as const;
     const loading = createLoading();
     const query = createInfiniteQuery(
@@ -77,6 +90,7 @@
                                     'OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
                                 selectComment:
                                     'Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
+                                selectProjectMemberInvitation: 'Id,Project.Name,Project.Identifier',
                                 sort: '-CreatedTime'
                             }
                         })
@@ -210,6 +224,25 @@
                                             New comment added —
                                             <strong class="text-base-fg-1">
                                                 {userNotification.notification.data.issue.title}
+                                            </strong>.
+                                        </p>
+                                        <p class="c-label">
+                                            {DateTime.fromISO(userNotification.createdTime)
+                                                .toLocal()
+                                                .toLocaleString(DateTime.TIME_SIMPLE)}
+                                        </p>
+                                    </a>
+                                {:else if userNotification.notification.type === notificationTypes.projectMemberInvited}
+                                    <a
+                                        href="/project-invites/{idHasher.encode([
+                                            userNotification.notification.data.id
+                                        ])}"
+                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                    >
+                                        <p class="text-pretty">
+                                            You have been invited a project —
+                                            <strong class="text-base-fg-1">
+                                                {userNotification.notification.data.project.name}
                                             </strong>.
                                         </p>
                                         <p class="c-label">
