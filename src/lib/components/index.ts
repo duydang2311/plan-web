@@ -32,6 +32,7 @@ export { default as SelectBuilder } from './SelectBuilder.svelte';
 export { default as Sonner, toast } from './Sonner.svelte';
 export { default as SonnerToast } from './SonnerToast.svelte';
 export { default as Spinner } from './Spinner.svelte';
+export { default as Spinner2 } from './Spinner2.svelte';
 export { default as StaticErrors } from './StaticErrors.svelte';
 export { default as Table } from './Table.svelte';
 export { default as TagsInputBuilder } from './TagsInputBuilder.svelte';
