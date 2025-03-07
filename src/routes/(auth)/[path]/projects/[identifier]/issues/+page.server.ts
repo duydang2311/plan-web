@@ -165,7 +165,7 @@ const getWorkspaceStatusList = (workspaceId: string) =>
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
             api.get(`workspaces/${workspaceId}/statuses`, {
-                query: { select: 'Id,Value,Color' }
+                query: { select: 'Id,Value,Color,Rank', order: 'Rank' }
             })
         );
 
