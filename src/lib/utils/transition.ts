@@ -117,3 +117,23 @@ export const popover: { [k in 'in' | 'out']: TsapCallback } = {
             ease: 'circ.in'
         })
 };
+
+export const pageBlur = {
+    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+        gsap.from(node, {
+            opacity: 0,
+            blur: 'filter(4px)',
+            duration: 0.15,
+            ease: 'steps(4)',
+            clearProps: 'opacity,filter',
+            ...vars
+        }),
+    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+        gsap.to(node, {
+            opacity: 0,
+            blur: 'filter(4px)',
+            duration: 0.15,
+            ease: 'steps(4)',
+            ...vars
+        })
+} as const;
