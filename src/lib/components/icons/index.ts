@@ -61,3 +61,4 @@ export { default as IconFailure } from '~icons/heroicons/exclamation-circle-16-s
 export { default as IconKeyCommandOutline } from '~icons/ph/command';
 export { default as IconBell } from '~icons/heroicons/bell-16-solid';
 export { default as IconBellOutline } from '~icons/heroicons/bell';
+export { default as IconBack } from '~icons/heroicons/arrow-uturn-left-16-solid';
