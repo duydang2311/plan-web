@@ -103,7 +103,8 @@
                 } finally {
                     loading.unset();
                 }
-            }
+            },
+            staleTime: 1000
         }))
     );
     const grouped = $derived(
@@ -153,13 +154,16 @@
                 />
             {/if}
         </div>
-        <div class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2">
+        <div
+            class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2"
+            class:animate-pulse={$query.isFetching}
+        >
             {#if $query.isPending}
                 {@render skeleton()}
             {:else if grouped == null || Object.values(grouped).length === 0}
                 <span class="c-label">No notifications found.</span>
             {:else}
-                {#each Object.entries(grouped) as [isoDate, userNotifications] (isoDate)}
+                {#each Object.entries(grouped).filter( (a) => a[1].filter((b) => b.notification.data != null) ) as [isoDate, userNotifications] (isoDate)}
                     <div class="flex items-center gap-2">
                         <h3 class="text-p text-base-fg-5 my-2 text-center tracking-tight">
                             {formatRelativeDateUi(
@@ -171,14 +175,14 @@
                         <div class="bg-base-border-3 h-px grow"></div>
                     </div>
                     <ol class="space-y-1">
-                        {#each userNotifications.filter((a) => a.notification.data != null) as userNotification (userNotification.id)}
+                        {#each userNotifications as userNotification (userNotification.id)}
                             <li>
                                 {#if userNotification.notification.type === notificationTypes.projectCreated}
                                     <a
                                         href="/{userNotification.notification.data.workspace
                                             .path}/projects/{userNotification.notification.data
                                             .identifier}"
-                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
                                             New project created —
@@ -198,7 +202,7 @@
                                             .path}/projects/{userNotification.notification.data
                                             .project.identifier}/issues/{userNotification
                                             .notification.data.orderNumber}"
-                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
                                             New issue created —
@@ -218,7 +222,7 @@
                                             .workspace.path}/projects/{userNotification.notification
                                             .data.issue.project.identifier}/issues/{userNotification
                                             .notification.data.issue.orderNumber}"
-                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
                                             New comment added —
@@ -237,7 +241,7 @@
                                         href="/project-invites/{idHasher.encode([
                                             userNotification.notification.data.id
                                         ])}"
-                                        class="bg-base-1 hover:bg-base-3 text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                     >
                                         <p class="text-pretty">
                                             You have been invited a project —
