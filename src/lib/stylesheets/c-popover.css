@@ -1,10 +1,10 @@
 .c-popover {
     --_border: var(--color-base-border-1);
     --_bg: var(--color-base-1);
-}
 
-:root[data-theme='dark'] .c-popover {
-    --_bg: var(--color-base-2);
+    @variant dark {
+        --_bg: var(--color-base-2);
+    }
 }
 
 .c-popover {
