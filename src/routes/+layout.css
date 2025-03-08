@@ -10,6 +10,7 @@
 
 @import '~/lib/assets/fonts/Inter/font-face.css' layer(theme);
 @import '~/lib/assets/fonts/RedditSans/font-face.css' layer(theme);
+@import '~/lib/assets/fonts/DMMono/font-face.css' layer(theme);
 
 @import '~/lib/stylesheets/c-input.css' layer(components);
 @import '~/lib/stylesheets/c-button.css' layer(components);
@@ -26,6 +27,7 @@
 @theme {
     --font-display: InterVariable, var(--font-sans);
     --font-body: 'Reddit Sans', InterVariable, var(--font-sans);
+    --font-mono: 'DM Mono', InterVariable, var(--font-sans);
     --text-sm: 0.9028rem;
     --text-p: 1rem;
     --text-h6: 1.125rem;

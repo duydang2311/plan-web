@@ -13,13 +13,7 @@
         <div class="max-w-paragraph-lg mx-auto text-center">
             <h1 class="text-9xl font-black">{page.status}</h1>
             <p class="text-base-fg-ghost">Oops, something went wrong!</p>
-            <p class="mt-4">
-                Error details: "{page.error.message}"
-                {#if page.error.code}
-                    (<strong>{page.error.code}</strong>).
-                {/if}
-            </p>
-            <pre class="text-base-fg-5 mx-auto mt-4 w-fit text-left">{JSON.stringify(
+            <pre class="mx-auto mt-4 w-fit text-left">{JSON.stringify(
                     page.error,
                     null,
                     4
