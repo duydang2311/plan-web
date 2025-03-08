@@ -26,6 +26,7 @@
     import DynamicNavigation from './DynamicNavigation.svelte';
     import Navigation from './Navigation.svelte';
     import NotificationBell from './NotificationBell.svelte';
+    import { pageBlur, tsap } from '~/lib/utils/transition';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const { cloudinary } = useRuntime();
@@ -158,7 +159,7 @@
         </div>
         <div class="transition-enforcement overflow-hidden">
             {#key data.pathname}
-                <div class="overflow-hidden" in:transitateIn>
+                <div class="overflow-hidden" in:tsap={pageBlur.in()} out:tsap={pageBlur.out()}>
                     {@render children()}
                 </div>
             {/key}
