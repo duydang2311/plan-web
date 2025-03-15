@@ -1,8 +1,7 @@
 <script lang="ts" module>
     const borderClass = {
-        none: 'border-base-border-3',
-        positive: 'border-positive-border/20 dark:border-positive-border/60',
-        negative: 'border-negative-border/20 dark:border-negative-border/40'
+        positive: 'border-b-positive-border/40 dark:border-b-positive-border/60',
+        negative: 'border-b-negative-border/40 dark:border-b-negative-border/40'
     };
 </script>
 
@@ -25,8 +24,8 @@
 
 <div
     class={[
-        'bg-base-1 dark:bg-base-2 w-(--width) relative rounded-lg border p-4 shadow-sm',
-        borderClass[type ?? 'none']
+        'bg-base-1 dark:bg-base-2 w-(--width) border-base-border-3 relative rounded-lg border p-4 shadow-sm',
+        type ? borderClass[type] : undefined
     ]}
 >
     <div class="flex items-center gap-4">
@@ -44,8 +43,7 @@
             `text-base-fg-1 bg-base-1 dark:bg-base-2 border-base-border-3
             hover:bg-negative-1 hover:text-negative-fg-1 hover:border-negative-border
             absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 rounded-full border transition
-            group-[[data-expanded=false][data-front=false]]:hidden`,
-            borderClass[type ?? 'none']
+            group-[[data-expanded=false][data-front=false]]:hidden`
         ]}
     >
         <IconXMark />
