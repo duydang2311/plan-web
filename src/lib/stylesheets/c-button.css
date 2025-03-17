@@ -10,6 +10,71 @@
     --_border: var(--color-base-border-2);
     --_border-disabled: var(--color-base-border-2);
 
+    &:where(.c-button--filled) {
+        --_bg: var(--color-base-1);
+        --_bg-hover: var(--color-base-2);
+        --_bg-active: var(--color-base-active);
+        --_bg-disabled: var(--color-base-2);
+
+        &:where([data-theme='dark'], [data-theme='dark'] &) {
+            --_bg: var(--color-base-3);
+            --_bg-hover: var(--color-base-4);
+            --_bg-active: var(--color-base-active);
+        }
+    }
+}
+
+.c-button--primary {
+    --_fg: var(--color-primary-2);
+    --_fg-hover: var(--color-primary-1);
+    --_border: var(--color-primary-border);
+
+    &:where(.c-button--filled) {
+        --_bg: var(--color-primary-1);
+        --_fg: var(--color-primary-fg-2);
+        --_fg-hover: var(--color-primary-fg-1);
+        --_bg-hover: var(--color-primary-hover);
+        --_bg-active: var(--color-primary-active);
+    }
+}
+
+.c-button--negative {
+    --_fg: var(--color-negative-2);
+    --_fg-hover: var(--color-negative-1);
+    --_border: var(--color-negative-border);
+
+    &:where(.c-button--filled) {
+        --_bg: var(--color-negative-1);
+        --_fg: var(--color-negative-fg-2);
+        --_fg-hover: var(--color-negative-fg-1);
+        --_bg-hover: var(--color-negative-hover);
+        --_bg-active: var(--color-negative-active);
+    }
+}
+
+.c-button--positive {
+    --_fg: var(--color-positive-2);
+    --_fg-hover: var(--color-positive-1);
+    --_border: var(--color-positive-border);
+
+    &:where(.c-button--filled) {
+        --_bg: var(--color-positive-1);
+        --_fg: var(--color-positive-fg-2);
+        --_fg-hover: var(--color-positive-fg-1);
+        --_bg-hover: var(--color-positive-hover);
+        --_bg-active: var(--color-positive-active);
+    }
+}
+
+.c-button--sm {
+    font-size: theme('fontSize[sm]');
+    &:where(:not(.c-button--flat)) {
+        padding: --spacing(1) --spacing(3);
+        border-radius: var(--radius-sm);
+    }
+}
+
+.c-button {
     width: 100%;
     text-align: center;
     font-family: var(--font-display);
@@ -35,15 +100,19 @@
         &:where(.c-button--outline) {
             border: 1px solid var(--_border);
         }
-        &:hover {
+        &:where(:hover) {
             color: var(--_fg-hover);
             background-color: var(--_bg-hover);
         }
-        &:active {
+        &:where(:active) {
             background-color: var(--_bg-active);
         }
         /* popover trigger has a bug that the state is always open */
-        &:not([data-melt-popover-trigger])[data-state='open'] {
+        &:where(:not([data-melt-popover-trigger])[data-state='open']) {
+            color: var(--_fg-hover);
+            background-color: var(--_bg-active);
+        }
+        &:where([data-melt-next-popover-trigger][data-state='open']) {
             color: var(--_fg-hover);
             background-color: var(--_bg-active);
         }
@@ -52,78 +121,13 @@
     &:where(:disabled) {
         color: var(--_fg-disabled);
         background-color: var(--_bg-disabled);
-        &.c-button--outline {
+        &:where(.c-button--outline) {
             border: 1px solid var(--_border-disabled);
-        }
-    }
-
-    &:where(.c-button--filled) {
-        --_bg: var(--color-base-2);
-        --_bg-hover: var(--color-base-4);
-        --_bg-active: var(--color-base-active);
-        --_bg-disabled: var(--color-base-2);
-    }
-
-    &:where(:root[data-theme='dark'] &) {
-        &.c-button--filled {
-            --_bg: var(--color-base-3);
-            --_bg-hover: var(--color-base-4);
-            --_bg-active: var(--color-base-active);
         }
     }
 
     &:where(:focus-visible) {
         outline: 2px solid var(--_border);
         outline-offset: 2px;
-    }
-}
-
-.c-button--primary {
-    --_fg: var(--color-primary-2);
-    --_fg-hover: var(--color-primary-1);
-    --_border: var(--color-primary-border);
-
-    &.c-button--filled {
-        --_bg: var(--color-primary-1);
-        --_fg: var(--color-primary-fg-2);
-        --_fg-hover: var(--color-primary-fg-1);
-        --_bg-hover: var(--color-primary-hover);
-        --_bg-active: var(--color-primary-active);
-    }
-}
-
-.c-button--negative {
-    --_fg: var(--color-negative-2);
-    --_fg-hover: var(--color-negative-1);
-    --_border: var(--color-negative-border);
-
-    &.c-button--filled {
-        --_bg: var(--color-negative-1);
-        --_fg: var(--color-negative-fg-2);
-        --_fg-hover: var(--color-negative-fg-1);
-        --_bg-hover: var(--color-negative-hover);
-        --_bg-active: var(--color-negative-active);
-    }
-}
-
-.c-button--positive {
-    --_fg: var(--color-positive-2);
-    --_fg-hover: var(--color-positive-1);
-    --_border: var(--color-positive-border);
-
-    &.c-button--filled {
-        --_bg: var(--color-positive-1);
-        --_fg: var(--color-positive-fg-2);
-        --_fg-hover: var(--color-positive-fg-1);
-        --_bg-hover: var(--color-positive-hover);
-        --_bg-active: var(--color-positive-active);
-    }
-}
-
-.c-button--sm {
-    font-size: theme('fontSize[sm]');
-    &:where(:not(.c-button--flat)) {
-        padding: --spacing(1) --spacing(3);
-        border-radius: var(--radius-sm);
     }
 }

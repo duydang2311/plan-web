@@ -98,19 +98,19 @@ export const dialog = {
         })
 } as const;
 
-export const popover: { [k in 'in' | 'out']: TsapCallback } = {
+export const popover: Record<'in' | 'out', TsapCallback> = {
     in: (node, gsap) =>
         gsap.from(node, {
-            scale: 0.95,
+            scaleY: 0.98,
             opacity: 0,
             y: '-0.2rem',
             duration: 0.1,
             ease: 'circ.out',
-            clearProps: 'opacity,scale,y'
+            clearProps: 'opacity,scaleY,y'
         }),
     out: (node, gsap) =>
         gsap.to(node, {
-            scale: 0.98,
+            scaleY: 0.98,
             opacity: 0,
             y: '-0.2rem',
             duration: 0.1,

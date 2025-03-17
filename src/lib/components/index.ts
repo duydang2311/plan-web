@@ -46,4 +46,3 @@ export { default as Tiptap } from './Tiptap.svelte';
 export { default as TiptapButton } from './TiptapButton.svelte';
 export { addToast, default as Toaster } from './Toaster.svelte';
 export { default as ToastItem } from './ToastItem.svelte';
-

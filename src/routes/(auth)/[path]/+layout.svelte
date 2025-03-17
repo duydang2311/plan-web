@@ -1,7 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { gsap } from 'gsap';
     import type { Snippet } from 'svelte';
     import { Avatar, Button, Input } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
@@ -22,11 +21,12 @@
     import Logo from '~/lib/components/Logo.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import { pageBlur, tsap } from '~/lib/utils/transition';
     import type { LayoutData } from './$types';
     import DynamicNavigation from './DynamicNavigation.svelte';
+    import FriendsButton from './FriendsButton.svelte';
     import Navigation from './Navigation.svelte';
     import NotificationBell from './NotificationBell.svelte';
-    import { pageBlur, tsap } from '~/lib/utils/transition';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const { cloudinary } = useRuntime();
@@ -36,19 +36,6 @@
             return last;
         }
     });
-
-    function transitateIn(node: Element) {
-        const tween = gsap.from(node, {
-            opacity: 0,
-            y: '0.1rem',
-            duration: 0.2,
-            ease: 'power2.out',
-            clearProps: 'y,scale,opacity'
-        });
-        return {
-            duration: tween.totalDuration() * 1000
-        };
-    }
 </script>
 
 <svelte:head>
@@ -155,7 +142,10 @@
             class="border-b-base-border-2 flex items-center justify-between gap-2 border-b px-8 py-2"
         >
             <Breadcrumb />
-            <NotificationBell userId={data.user.id} />
+            <div class="flex items-center gap-2">
+                <NotificationBell userId={data.user.id} />
+                <FriendsButton userId={data.user.id} />
+            </div>
         </div>
         <div class="transition-enforcement overflow-hidden">
             {#key data.pathname}

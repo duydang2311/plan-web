@@ -9,7 +9,7 @@
 
     @apply ring-0;
 
-    &:hover {
+    &:where(:hover) {
         transition:
             transform 120ms ease-in-out,
             color 75ms ease-in-out,
@@ -18,45 +18,53 @@
         @apply ring-1;
     }
 
-    &:focus-visible {
+    &:where(:focus-visible) {
         outline: none;
     }
 }
 
 .c-icon-button--base {
-    color: var(--color-base-fg-2);
+    --_text: var(--color-base-fg-2);
+    --_text-hover: var(--color-base-fg-1);
+    --_text-active: var(--color-base-fg-3);
+    --_bg: transparent;
+    --_bg-hover: color-mix(in oklch, var(--color-base-fg-2) 20%, transparent);
     @apply ring-base-fg-2/20;
 
-    &:hover {
-        color: var(--color-base-fg-1);
-        @apply bg-base-fg-2/20;
-    }
-
-    &:active {
-        color: var(--color-base-fg-3);
-    }
-
-    &:focus-visible {
-        @apply ring ring-base-border-2 ring-offset-1 ring-offset-base-1;
+    &:where(:focus-visible) {
+        @apply ring-base-border-2 ring-offset-base-1 ring-offset-1;
     }
 }
 
 .c-icon-button--negative {
-    color: var(--color-negative-1);
-    border-radius: var(--radius-md);
-    padding: --spacing(0.5);
+    --_text: var(--color-negative-1);
+    --_text-hover: var(--color-negative-2);
+    --_text-active: var(--color-negative-3);
+    --_bg: transparent;
+    --_bg-hover: color-mix(in oklch, var(--color-negative-1) 20%, transparent);
     @apply ring-negative-1/20;
 
-    &:hover {
-        color: var(--color-negative-2);
-        @apply bg-negative-1/20;
+    &:where(:focus-visible) {
+        @apply ring-negative-3 ring-offset-base-1 ring-offset-1;
+    }
+}
+
+.c-icon-button {
+    background-color: var(--_bg);
+    color: var(--_text);
+
+    &:where(:hover) {
+        background-color: var(--_bg-hover);
+        color: var(--_text-hover);
     }
 
-    &:active {
-        color: var(--color-negative-3);
+    &:where(:active) {
+        background-color: var(--_bg-active);
     }
 
-    &:focus-visible {
-        @apply ring ring-negative-3 ring-offset-1 ring-offset-base-1;
+    &:where(:not([data-melt-popover-trigger])[data-state='open']),
+    &:where([data-melt-next-popover-trigger][data-state='open']) {
+        color: var(--_text-hover);
+        background-color: var(--_bg-hover);
     }
 }

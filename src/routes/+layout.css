@@ -168,3 +168,7 @@
 [data-sonner-toaster] {
     font-family: var(--font-body);
 }
+
+[popover] {
+    color: var(--color-base-fg-2);
+}
