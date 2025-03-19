@@ -1,13 +1,28 @@
 <script lang="ts">
+    import { size } from '@floating-ui/dom';
     import { IconButton, MeltPopoverBuilder } from '~/lib/components';
     import { IconUsersSolid } from '~/lib/components/icons';
-    import FriendList from './FriendList.svelte';
-    import { tsap, popover as popoverTransitions } from '~/lib/utils/transition';
+    import { popover as popoverTransitions, tsap } from '~/lib/utils/transition';
+    import FriendPopover from './FriendPopover.svelte';
 
     const { userId }: { userId: string } = $props();
+    let open = $state.raw(true);
 </script>
 
-<MeltPopoverBuilder forceVisible>
+<MeltPopoverBuilder
+    computePositionOptions={{
+        middleware: [
+            size({
+                apply: ({ availableWidth, availableHeight, elements }) => {
+                    Object.assign(elements.floating.style, {
+                        maxWidth: `${Math.max(0, availableWidth - 16)}px`,
+                        maxHeight: `${Math.max(0, availableHeight - 16)}px`
+                    });
+                }
+            })
+        ]
+    }}
+>
     {#snippet children(popover)}
         <IconButton
             variant="base"
@@ -19,14 +34,14 @@
         >
             <IconUsersSolid />
         </IconButton>
-        {#if popover.open}
+        {#if open}
             <div
                 in:tsap={popoverTransitions.in}
                 out:tsap={popoverTransitions.out}
-                class="c-popover -translate-x-2 translate-y-2 lg:-translate-x-4 w-paragraph-sm"
+                class="c-popover w-paragraph-sm -translate-x-2 translate-y-2 p-0 lg:-translate-x-4"
                 {...popover.content}
             >
-                <FriendList {userId} />
+                <FriendPopover {userId} />
             </div>
         {/if}
     {/snippet}

@@ -66,14 +66,6 @@
     }
 }
 
-.c-button--sm {
-    font-size: theme('fontSize[sm]');
-    &:where(:not(.c-button--flat)) {
-        padding: --spacing(1) --spacing(3);
-        border-radius: var(--radius-sm);
-    }
-}
-
 .c-button {
     width: 100%;
     text-align: center;
@@ -104,9 +96,6 @@
             color: var(--_fg-hover);
             background-color: var(--_bg-hover);
         }
-        &:where(:active) {
-            background-color: var(--_bg-active);
-        }
         /* popover trigger has a bug that the state is always open */
         &:where(:not([data-melt-popover-trigger])[data-state='open']) {
             color: var(--_fg-hover);
@@ -114,6 +103,9 @@
         }
         &:where([data-melt-next-popover-trigger][data-state='open']) {
             color: var(--_fg-hover);
+            background-color: var(--_bg-active);
+        }
+        &:where(:active) {
             background-color: var(--_bg-active);
         }
     }
@@ -129,5 +121,13 @@
     &:where(:focus-visible) {
         outline: 2px solid var(--_border);
         outline-offset: 2px;
+    }
+}
+
+.c-button--sm {
+    font-size: theme('fontSize[sm]');
+    &:where(:not(.c-button--flat)) {
+        padding: --spacing(1) --spacing(3);
+        border-radius: var(--radius-sm);
     }
 }

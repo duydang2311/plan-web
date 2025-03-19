@@ -48,6 +48,8 @@
     --text-title: var(--text-h5);
     --container-paragraph-sm: var(--container-sm);
     --container-paragraph-lg: var(--container-2xl);
+    --size-avatar-md: calc(var(--spacing) * 10);
+    --size-avatar-sm: calc(var(--spacing) * 8);
 }
 
 @layer base {

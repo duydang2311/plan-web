@@ -8,7 +8,7 @@
         | ({ as: 'link' } & HTMLAnchorAttributes)
         | ({ as?: never } & HTMLButtonAttributes)
     ) & {
-        variant?: 'base' | 'negative';
+        variant?: 'base' | 'positive' | 'negative';
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
         action?: Action;
     };

@@ -40,3 +40,4 @@ export const load: LayoutServerLoad = async ({ params, locals: { user, runtime }
         pathname: url.pathname
     };
 };
+

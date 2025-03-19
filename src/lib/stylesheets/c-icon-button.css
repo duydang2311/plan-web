@@ -36,6 +36,19 @@
     }
 }
 
+.c-icon-button--positive {
+    --_text: var(--color-positive-1);
+    --_text-hover: var(--color-positive-2);
+    --_text-active: var(--color-positive-3);
+    --_bg: transparent;
+    --_bg-hover: color-mix(in oklch, var(--color-positive-1) 20%, transparent);
+    @apply ring-positive-1/20;
+
+    &:where(:focus-visible) {
+        @apply ring-positive-3 ring-offset-base-1 ring-offset-1;
+    }
+}
+
 .c-icon-button--negative {
     --_text: var(--color-negative-1);
     --_text-hover: var(--color-negative-2);
@@ -58,13 +71,13 @@
         color: var(--_text-hover);
     }
 
-    &:where(:active) {
-        background-color: var(--_bg-active);
-    }
-
     &:where(:not([data-melt-popover-trigger])[data-state='open']),
     &:where([data-melt-next-popover-trigger][data-state='open']) {
         color: var(--_text-hover);
         background-color: var(--_bg-hover);
+    }
+
+    &:where(:active) {
+        background-color: var(--_bg-active);
     }
 }

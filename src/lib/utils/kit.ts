@@ -190,14 +190,15 @@ export const EndpointResponse = {
             }
             return response;
         }),
+    FormData: (f: () => Promise<FormData>) =>
+        Effect.tryPromise({
+            try: f,
+            catch: () => json({ errors: { root: ['form_data'] } }, { status: 400 })
+        }),
     JSON: <T = unknown>(f: () => Promise<T>) =>
-        pipe(
-            Effect.promise(f),
-            Effect.tapDefect((e) => Effect.logError('could not convert json', e)),
-            Effect.catchAllDefect(() =>
-                Effect.fail(json({ errors: { root: ['json'] } }, { status: 400 }))
-            ),
-            Effect.annotateLogs('scope', 'EndpointResponse.JSON')
-        ),
+        Effect.tryPromise({
+            try: f,
+            catch: () => json({ errors: { root: ['json'] } }, { status: 400 })
+        }),
     Die: () => json({ errors: { root: ['die'] } }, { status: 500 })
 } as const;
