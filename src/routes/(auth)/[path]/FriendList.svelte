@@ -10,7 +10,7 @@
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { QueryResponse } from '~/lib/utils/query';
 
-    interface LocalFriend {
+    interface LocalUser {
         id: string;
         email: string;
         profile?: {
@@ -23,7 +23,7 @@
     const { userId }: { userId: string } = $props();
     const { api, cloudinary } = useRuntime();
     const select =
-        'CreatedTime,Friend.Id,Friend.Email,Friend.Profile.Name,Friend.Profile.DisplayName,Friend.Profile.Image';
+        'CreatedTime,Friend.Id,Friend.Email,Friend.Profile.Name,Friend.Profile.DisplayName,Friend.Profile.Image,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image';
     const query = createQuery(
         toStore(() => ({
             queryKey: [
@@ -37,12 +37,20 @@
             ],
             queryFn: async () => {
                 const response = await QueryResponse.HTTP(() =>
-                    api.get(`user-friends`, { query: { userId, friendId: userId, select } })
+                    api.get(`user-friends`, {
+                        query: {
+                            userId,
+                            friendId: userId,
+                            ignoreUserId: userId,
+                            select
+                        }
+                    })
                 );
                 return await QueryResponse.JSON(() =>
                     response.json<
                         PaginatedList<{
-                            friend: LocalFriend;
+                            user: LocalUser;
+                            friend: LocalUser;
                         }>
                     >()
                 );
@@ -63,14 +71,32 @@
     </div>
 {/snippet}
 
-{#snippet friend(friend: LocalFriend)}
-    <div class="flex items-center gap-2 py-2">
+{#snippet friend(user: LocalUser)}
+    <div
+        class={[
+            'relative flex items-center gap-2 p-2',
+            user.profile ? 'hover:bg-base-hover active:bg-base-active rounded' : undefined
+        ]}
+    >
+        {#if user.profile}
+            <a
+                href="/profiles/{user.profile.name}"
+                aria-labelledby="friendlist-{user.id}"
+                class="absolute inset-0"
+            ></a>
+        {/if}
         <Avatar
-            src={imageFromAsset(cloudinary)(friend.profile?.image)?.resize(Resize.fill(64)).toURL()}
-            seed={friend.profile?.name ?? friend.email}
+            src={imageFromAsset(cloudinary)(user.profile?.image)?.resize(Resize.fill(64)).toURL()}
+            seed={user.profile?.name ?? user.email}
             class="size-avatar-sm"
         />
-        {friend.email}
+        <span id="friendlist-{user.id}">
+            {#if user.profile}
+                {user.profile.displayName} <span class="text-base-fg-5">({user.profile.name})</span>
+            {:else}
+                {user.email}
+            {/if}
+        </span>
     </div>
 {/snippet}
 
@@ -92,9 +118,11 @@
             <p class="c-label mt-2">No friends found.</p>
         {:else}
             <ol>
-                {#each $query.data.items as userFriend (userFriend.friend.id)}
+                {#each $query.data.items as userFriend (userFriend.user.id === userId ? userFriend.friend.id : userFriend.user.id)}
                     <li>
-                        {@render friend(userFriend.friend)}
+                        {@render friend(
+                            userFriend.user.id === userId ? userFriend.friend : userFriend.user
+                        )}
                     </li>
                 {/each}
             </ol>
