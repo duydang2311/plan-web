@@ -19,6 +19,10 @@
         --font-size-h2: var(--text-h4);
         font-weight: 600;
     }
+
+    &:where(:focus) {
+        outline: none;
+    }
 }
 
 .c-popover--arrow {

@@ -24,6 +24,7 @@ export const actions: Actions = {
     },
     decline_friend_request: ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
+            yield* ActionResponse.UnknownError();
             const formData = yield* ActionResponse.FormData(() => request.formData());
             const validation = yield* ActionResponse.Validation(
                 validateDeclineFriendRequest(decodeDeclineFriendRequest(formData))
@@ -32,6 +33,22 @@ export const actions: Actions = {
                 (yield* ApiClient).delete(
                     `user-friend-requests/${validation.data.senderId}/${validation.data.receiverId}`
                 )
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    add_friend: ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateAddFriend(decodeAddFriend(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).post('user-friend-requests', {
+                    body: {
+                        senderId: validation.data.senderId,
+                        receiverId: validation.data.receiverId
+                    }
+                })
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
@@ -54,3 +71,6 @@ const decodeAcceptFriendRequest = (formData: FormData) => {
 
 const validateDeclineFriendRequest = validateAcceptFriendRequest;
 const decodeDeclineFriendRequest = decodeAcceptFriendRequest;
+
+const validateAddFriend = validateAcceptFriendRequest;
+const decodeAddFriend = decodeAcceptFriendRequest;

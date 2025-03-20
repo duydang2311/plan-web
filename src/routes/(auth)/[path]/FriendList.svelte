@@ -2,8 +2,8 @@
     import { Resize } from '@cloudinary/url-gen/actions';
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Avatar, IconButton, Input } from '~/lib/components';
-    import { IconSearch, IconUserPlus } from '~/lib/components/icons';
+    import { Avatar, Input } from '~/lib/components';
+    import { IconSearch } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Asset } from '~/lib/models/asset';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -84,15 +84,12 @@
             />
             <IconSearch class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2" />
         </div>
-        <IconButton variant="base">
-            <IconUserPlus />
-        </IconButton>
     </div>
     <div>
-        {#if $query.isLoading}
+        {#if $query.isPending}
             {@render skeleton()}
         {:else if $query.data == null || $query.data.items.length === 0}
-            <span class="c-label">No friends found.</span>
+            <p class="c-label mt-2">No friends found.</p>
         {:else}
             <ol>
                 {#each $query.data.items as userFriend (userFriend.friend.id)}

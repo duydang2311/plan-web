@@ -122,7 +122,7 @@
         </Button>
         {#if $open}
             <div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
-                {#if $query.isLoading}
+                {#if $query.isPending}
                     {@render skeleton()}
                 {:else if $query.data == null || $query.data.items.length === 0}
                     Empty

@@ -1,4 +1,7 @@
 .c-icon-button {
+    --_text-disabled: var(--color-base-fg-5);
+    --_bg-disabled: transparent;
+
     border-radius: var(--radius-sm);
     padding: --spacing(0.5);
     transition:
@@ -9,7 +12,7 @@
 
     @apply ring-0;
 
-    &:where(:hover) {
+    &:where(:not(:disabled):hover) {
         transition:
             transform 120ms ease-in-out,
             color 75ms ease-in-out,
@@ -29,6 +32,7 @@
     --_text-active: var(--color-base-fg-3);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-base-fg-2) 20%, transparent);
+    --_bg-active: color-mix(in oklch, var(--color-base-fg-2) 5%, transparent);
     @apply ring-base-fg-2/20;
 
     &:where(:focus-visible) {
@@ -42,6 +46,7 @@
     --_text-active: var(--color-positive-3);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-positive-1) 20%, transparent);
+    --_bg-active: color-mix(in oklch, var(--color-positive-1) 5%, transparent);
     @apply ring-positive-1/20;
 
     &:where(:focus-visible) {
@@ -55,6 +60,7 @@
     --_text-active: var(--color-negative-3);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-negative-1) 20%, transparent);
+    --_bg-active: color-mix(in oklch, var(--color-negative-1) 5%, transparent);
     @apply ring-negative-1/20;
 
     &:where(:focus-visible) {
@@ -71,13 +77,17 @@
         color: var(--_text-hover);
     }
 
-    &:where(:not([data-melt-popover-trigger])[data-state='open']),
-    &:where([data-melt-next-popover-trigger][data-state='open']) {
+    &:where([data-state='open']) {
         color: var(--_text-hover);
         background-color: var(--_bg-hover);
     }
 
     &:where(:active) {
         background-color: var(--_bg-active);
+    }
+
+    &:where(:disabled) {
+        color: var(--_text-disabled);
+        background-color: var(--_bg-disabled);
     }
 }

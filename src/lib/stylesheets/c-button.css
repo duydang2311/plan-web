@@ -96,12 +96,7 @@
             color: var(--_fg-hover);
             background-color: var(--_bg-hover);
         }
-        /* popover trigger has a bug that the state is always open */
-        &:where(:not([data-melt-popover-trigger])[data-state='open']) {
-            color: var(--_fg-hover);
-            background-color: var(--_bg-active);
-        }
-        &:where([data-melt-next-popover-trigger][data-state='open']) {
+        &:where([data-state='open']) {
             color: var(--_fg-hover);
             background-color: var(--_bg-active);
         }

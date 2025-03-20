@@ -4,7 +4,7 @@
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
     import { Avatar, IconButton, Input } from '~/lib/components';
-    import { IconCheck, IconSearch, IconUserPlus, IconXMark } from '~/lib/components/icons';
+    import { IconCheck, IconSearch, IconXMark } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Asset } from '~/lib/models/asset';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -52,7 +52,6 @@
             staleTime: 0
         }))
     );
-    let declineForm = $state.raw<HTMLFormElement>();
 </script>
 
 {#snippet skeleton()}
@@ -79,7 +78,7 @@
         <form
             method="post"
             action="/actions?/accept_friend_request"
-            use:enhance={() => {
+            use:enhance={async () => {
                 const old = $query.data;
                 if (old) {
                     queryClient.setQueryData(queryKey, {
@@ -104,8 +103,7 @@
         <form
             method="post"
             action="/actions?/decline_friend_request"
-            bind:this={declineForm}
-            use:enhance={() => {
+            use:enhance={async () => {
                 const old = $query.data;
                 if (old) {
                     queryClient.setQueryData(queryKey, {
@@ -140,15 +138,12 @@
             />
             <IconSearch class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2" />
         </div>
-        <IconButton variant="base">
-            <IconUserPlus />
-        </IconButton>
     </div>
     <div>
-        {#if $query.isLoading}
+        {#if $query.isPending}
             {@render skeleton()}
         {:else if $query.data == null || $query.data.items.length === 0}
-            <span class="c-label">No friend requests found.</span>
+            <p class="c-label mt-2">No friend requests found.</p>
         {:else}
             <ol class="grid grid-cols-[auto_1fr_auto] gap-2">
                 {#each $query.data.items as userFriendRequest (userFriendRequest.sender.id)}
