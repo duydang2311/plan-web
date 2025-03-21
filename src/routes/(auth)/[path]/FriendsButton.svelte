@@ -10,14 +10,9 @@
     const open = writable(false);
 </script>
 
-<PopoverBuilder options={{ open }}>
+<PopoverBuilder options={{ open, forceVisible: true }}>
     {#snippet children({ trigger, content })}
-        <IconButton
-            variant="base"
-            type="button"
-            melt={trigger}
-            title="Friends"
-        >
+        <IconButton variant="base" type="button" melt={trigger} title="Friends">
             <IconUsersSolid />
         </IconButton>
         {#if $open}
