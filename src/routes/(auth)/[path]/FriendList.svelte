@@ -22,28 +22,25 @@
 
     const { userId }: { userId: string } = $props();
     const { api, cloudinary } = useRuntime();
-    const select =
-        'CreatedTime,Friend.Id,Friend.Email,Friend.Profile.Name,Friend.Profile.DisplayName,Friend.Profile.Image,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image';
+    const params = $derived({
+        userId,
+        friendId: userId,
+        select: 'CreatedTime,Friend.Id,Friend.Email,Friend.Profile.Name,Friend.Profile.DisplayName,Friend.Profile.Image,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image',
+        size: 5
+    });
     const query = createQuery(
         toStore(() => ({
             queryKey: [
                 'user-friends',
                 {
                     userId,
-                    params: {
-                        select
-                    }
+                    params
                 }
             ],
             queryFn: async () => {
                 const response = await QueryResponse.HTTP(() =>
                     api.get(`user-friends`, {
-                        query: {
-                            userId,
-                            friendId: userId,
-                            ignoreUserId: userId,
-                            select
-                        }
+                        query: params
                     })
                 );
                 return await QueryResponse.JSON(() =>
