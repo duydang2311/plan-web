@@ -122,18 +122,17 @@ export const pageBlur = {
     in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,
-            filter: 'blur(4px)',
-            duration: 0.15,
-            ease: 'steps(4)',
+            filter: 'blur(2px)',
+            duration: 0.1,
+            ease: 'sine.in',
             clearProps: 'opacity,filter',
             ...vars
         }),
     out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
         gsap.to(node, {
             opacity: 0,
-            filter: 'blur(4px)',
-            duration: 0.15,
-            ease: 'steps(4)',
+            duration: 0.1,
+            ease: 'sine.out',
             ...vars
         })
 } as const;
