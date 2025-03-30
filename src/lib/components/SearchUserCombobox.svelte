@@ -36,7 +36,8 @@
         toStore(() => {
             const params = {
                 query: debouncedSearch,
-                select: 'Id,Email,Profile.Name,Profile.DisplayName,Profile.Image'
+                select: 'Id,Email,Profile.Name,Profile.DisplayName,Profile.Image',
+                size: 5
             };
             return {
                 queryKey: [

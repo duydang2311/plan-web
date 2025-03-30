@@ -1,7 +1,7 @@
 .c-input {
     --_border: var(--color-base-border-2);
     --_border-hover: var(--color-base-border-1);
-    --_border-focus: var(--_border-hover);
+    --_border-focus: var(--color-base-fg-5);
 
     width: 100%;
     padding: --spacing(2) --spacing(2);
@@ -14,20 +14,20 @@
         border-color 150ms var(--cubic-out),
         box-shadow 150ms var(--cubic-out);
 
-    &:hover {
+    &:where(:hover) {
         border-color: var(--_border-hover);
     }
 
-    &:focus-visible {
+    &:where(:focus-visible) {
         border-color: var(--_border-focus);
         box-shadow: 0 0 2px rgb(0 0 0 / 0.1);
     }
 
-    &::placeholder {
+    &:where(::placeholder) {
         color: var(--color-base-fg-ghost);
     }
 
-    &[aria-invalid] {
+    &:where([aria-invalid]) {
         border-color: color-mix(in srgb, var(--color-negative-1) 50%, transparent);
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 5%, transparent);
 
@@ -44,12 +44,12 @@
 }
 
 .c-input--file {
-    &:focus-visible + label > div {
+    &:where(:focus-visible + label > div) {
         border-color: color-mix(in srgb, var(--color-base-border-2) 50%, var(--color-base-fg-1));
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-base-border-2) 40%, transparent);
     }
 
-    &[aria-invalid] + label > div {
+    &:where([aria-invalid] + label > div) {
         border-color: color-mix(in srgb, var(--color-negative-1) 50%, transparent);
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 5%, transparent);
 

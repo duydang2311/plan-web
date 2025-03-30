@@ -95,6 +95,7 @@
 
     body {
         font-size: var(--text-p);
+        overflow: hidden;
     }
 
     h1,

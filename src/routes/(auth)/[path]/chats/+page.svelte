@@ -1,0 +1,1 @@
+Select a chat to view its messages

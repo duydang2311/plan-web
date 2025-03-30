@@ -92,11 +92,12 @@
         &:where(.c-button--outline) {
             border: 1px solid var(--_border);
         }
-        &:where(:hover) {
+        &:where(:hover), &:where(:focus-visible) {
             color: var(--_fg-hover);
             background-color: var(--_bg-hover);
         }
-        &:where([data-state='open']) {
+        &:where(:not([data-melt-popover-trigger])[data-state='open']),
+        &:where([data-melt-popover-trigger][data-custom-state='open']) {
             color: var(--_fg-hover);
             background-color: var(--_bg-active);
         }

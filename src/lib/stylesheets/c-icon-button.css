@@ -77,7 +77,8 @@
         color: var(--_text-hover);
     }
 
-    &:where([data-state='open']) {
+    &:where(:not([data-melt-popover-trigger])[data-state='open']),
+    &:where([data-melt-popover-trigger][data-custom-state='open']) {
         color: var(--_text-hover);
         background-color: var(--_bg-hover);
     }

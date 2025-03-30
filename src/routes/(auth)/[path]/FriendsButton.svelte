@@ -12,7 +12,13 @@
 
 <PopoverBuilder options={{ open, forceVisible: true }}>
     {#snippet children({ trigger, content })}
-        <IconButton variant="base" type="button" melt={trigger} title="Friends">
+        <IconButton
+            variant="base"
+            type="button"
+            melt={trigger}
+            title="Friends"
+            data-custom-state={$open ? 'open' : undefined}
+        >
             <IconUsersSolid />
         </IconButton>
         {#if $open}

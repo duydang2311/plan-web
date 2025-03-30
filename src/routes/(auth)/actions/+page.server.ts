@@ -51,6 +51,21 @@ export const actions: Actions = {
                 })
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    create_chat: async ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateCreateChat(decodeCreateChat(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).post('chats', {
+                    body: {
+                        memberIds: validation.data.memberIds
+                    }
+                })
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
 
@@ -74,3 +89,16 @@ const decodeDeclineFriendRequest = decodeAcceptFriendRequest;
 
 const validateAddFriend = validateAcceptFriendRequest;
 const decodeAddFriend = decodeAcceptFriendRequest;
+
+const decodeCreateChat = (formData: FormData) => {
+    return {
+        memberIds: formData.getAll('memberIds[]')
+    };
+};
+
+const validateCreateChat = validator(
+    Type.Object({
+        memberIds: Type.Array(Type.String())
+    }),
+    { stripLeadingSlash: true }
+);

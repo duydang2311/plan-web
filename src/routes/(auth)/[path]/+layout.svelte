@@ -5,6 +5,10 @@
     import { Avatar, Button, Input } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import {
+        IconBell,
+        IconBellOutline,
+        IconChat,
+        IconChatOutline,
         IconCircleDashed,
         IconCircleDashedOutline,
         IconHome,
@@ -44,7 +48,9 @@
     {/if}
 </svelte:head>
 
-<div class="min-w-screen bg-base-2 dark:bg-base-1 flex h-full min-h-screen w-full lg:p-2 lg:pl-0">
+<div
+    class="min-w-screen bg-base-2 dark:bg-base-1 grid h-full min-h-screen w-full grid-cols-1 lg:grid-cols-[auto_1fr] lg:p-2 lg:pl-0"
+>
     <aside
         class="hidden min-w-60 max-w-60 items-stretch space-y-4 overflow-auto px-4 py-2 lg:flex lg:flex-col"
     >
@@ -111,29 +117,43 @@
             </ul>
             <DynamicNavigation />
         </div>
-        <Button
-            as="link"
-            href="/profiles/me"
-            variant="base"
-            filled={false}
-            class="flex items-center gap-2 px-2 text-sm font-medium"
-        >
-            <Avatar
-                src={imageFromAsset(cloudinary)(data.user.profile?.image)
-                    ?.resize(Resize.fill(64))
-                    .toURL()}
-                seed={data.user.profile?.name ?? data.user.email}
-                class="size-10"
-            />
-            <div class="grid grid-rows-2 text-start">
-                <span class="text-base-fg-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                    {data.user.profile?.displayName ?? data.user.email}
-                </span>
-                {#if data.user.profile}
-                    <span class="text-base-fg-ghost">{data.user.profile.name}</span>
-                {/if}
-            </div>
-        </Button>
+        <div>
+            <ul class="group mb-2 text-sm font-medium">
+                <Navigation
+                    items={[
+                        {
+                            href: `/${page.params['path']}/chats`,
+                            icon: IconChatOutline,
+                            activeIcon: IconChat,
+                            label: 'Chat'
+                        }
+                    ]}
+                />
+            </ul>
+            <Button
+                as="link"
+                href="/profiles/me"
+                variant="base"
+                filled={false}
+                class="flex items-center gap-2 px-2 text-sm font-medium"
+            >
+                <Avatar
+                    src={imageFromAsset(cloudinary)(data.user.profile?.image)
+                        ?.resize(Resize.fill(64))
+                        .toURL()}
+                    seed={data.user.profile?.name ?? data.user.email}
+                    class="size-10"
+                />
+                <div class="grid grid-rows-2 text-start">
+                    <span class="text-base-fg-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                        {data.user.profile?.displayName ?? data.user.email}
+                    </span>
+                    {#if data.user.profile}
+                        <span class="text-base-fg-ghost">{data.user.profile.name}</span>
+                    {/if}
+                </div>
+            </Button>
+        </div>
     </aside>
     <div
         class="bg-base-1 dark:bg-base-2 lg:border-base-border-2 lg:shadow-xs grid max-h-screen grow grid-rows-[auto_1fr] overflow-hidden lg:max-h-[calc(100vh-1rem)] lg:rounded-xl lg:border"
@@ -148,7 +168,9 @@
             </div>
         </div>
         <div class="transition-enforcement overflow-hidden">
-            {#key data.pathname}
+            {#key data.pathname.includes('chats') ? data.pathname
+                      .split('/', 3)
+                      .join('') : data.pathname}
                 <div class="overflow-hidden" in:tsap={pageBlur.in()} out:tsap={pageBlur.out()}>
                     {@render children()}
                 </div>
