@@ -1,24 +1,24 @@
 :where([data-theme=dark], [data-theme=dark] *) {
     --color-bg: oklch(0% 0 0);
 
-    --color-base-1: oklch(16.08% 0.0027 298.4);
-    --color-base-2: oklch(18.08% 0.0027 298.4);
-    --color-base-3: oklch(20.08% 0.0027 298.4);
-    --color-base-4: oklch(24.08% 0.0027 298.4);
-    --color-base-5: oklch(26.08% 0.0027 298.4);
-    --color-base-hover: oklch(28.08% 0.0027 298.4);
-    --color-base-active: oklch(22.08% 0.0027 298.4);
-    --color-base-disabled: oklch(26.08% 0.0027 295.22);
-    --color-base-fg-1: oklch(97.29% 0.0027 298.26);
-    --color-base-fg-2: oklch(75.29% 0.0027 298.26);
-    --color-base-fg-3: oklch(70.29% 0.0027 298.26);
-    --color-base-fg-4: oklch(60.29% 0.0027 298.26);
-    --color-base-fg-5: oklch(45.29% 0.0027 298.26);
-    --color-base-fg-ghost: oklch(40.29% 0.0027 298.26);
-    --color-base-fg-disabled: oklch(50.29% 0.0027 298.26);
-    --color-base-border-1: oklch(30.08% 0.0027 298.4);
-    --color-base-border-2: oklch(28.08% 0.0027 298.4);
-    --color-base-border-3: oklch(24.08% 0.0027 298.4);
+    --color-base-1: oklch(16% 0.002 287.91);
+    --color-base-2: oklch(18% 0.002 287.91);
+    --color-base-3: oklch(20% 0.002 287.91);
+    --color-base-4: oklch(22% 0.002 287.91);
+    --color-base-5: oklch(24% 0.002 287.91);
+    --color-base-hover: oklch(28% 0.002 287.91);
+    --color-base-active: oklch(22% 0.002 287.91);
+    --color-base-disabled: oklch(26% 0.002 287.91);
+    --color-base-fg-1: oklch(97.29% 0.002 287.91);
+    --color-base-fg-2: oklch(82.29% 0.002 287.91);
+    --color-base-fg-3: oklch(70.29% 0.002 287.91);
+    --color-base-fg-4: oklch(60.29% 0.002 287.91);
+    --color-base-fg-5: oklch(45.29% 0.002 287.91);
+    --color-base-fg-ghost: oklch(40.29% 0.002 287.91);
+    --color-base-fg-disabled: oklch(50.29% 0.002 287.91);
+    --color-base-border-1: oklch(30.08% 0.002 287.91);
+    --color-base-border-2: oklch(28.08% 0.002 287.91);
+    --color-base-border-3: oklch(24.08% 0.002 287.91);
 
     --color-primary-1: oklch(68.45% 0.1768 287.91);
     --color-primary-2: oklch(60.45% 0.1768 287.91);

@@ -1,14 +1,7 @@
 .c-table {
-    --_bg: var(--color-base-1);
-    --_bg-2: color-mix(in oklab, var(--color-base-2) 50%, var(--color-base-1));
-    --_hover: var(--color-base-2);
-    --_border: var(--color-base-border-2);
-
-    @variant dark {
-        --_bg: var(--color-base-2);
-        --_bg-2: var(--color-base-1);
-        --_hover: color-mix(in oklab, var(--color-base-3) 25%, var(--color-base-2));
-    }
+    --_bg: transparent;
+    --_hover: var(--color-base-3);
+    --_border: var(--color-base-border-3);
 }
 
 .c-table {
@@ -23,10 +16,6 @@
         grid-template-columns: subgrid;
     }
 
-    & > tbody > .c-table--row:nth-child(2n) {
-        background-color: var(--_bg-2);
-    }
-
     & > tbody > .c-table--row:hover,
     & > div.c-table--tbody > .c-table--row:hover {
         background-color: var(--_hover);
@@ -38,7 +27,6 @@
     top: 0;
     background-color: var(--_bg);
     border-bottom: 1px solid var(--_border);
-    border-style: dashed;
     font-family: var(--font-display);
 }
 
