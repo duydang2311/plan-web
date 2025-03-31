@@ -19,6 +19,7 @@ export { default as IconUploadOutline } from '~icons/heroicons/cloud-arrow-up';
 export { default as IconUpload } from '~icons/heroicons/cloud-arrow-up-16-solid';
 export { default as IconSettingsOutline } from '~icons/heroicons/cog-6-tooth';
 export { default as IconSettings } from '~icons/heroicons/cog-6-tooth-16-solid';
+export { default as IconOptionsOutline } from '~icons/heroicons/ellipsis-horizontal-circle';
 export { default as IconFailure } from '~icons/heroicons/exclamation-circle-16-solid';
 export { default as IconLink } from '~icons/heroicons/link-16-solid';
 export { default as IconSearch } from '~icons/heroicons/magnifying-glass-16-solid';
@@ -67,4 +68,3 @@ export { default as IconHome } from '~icons/ph/house-bold';
 export { default as IconHomeSolid } from '~icons/ph/house-fill';
 export { default as IconPriorityUrgent } from '~icons/ph/warning-fill';
 export { default as IconCanceled, default as IconDuplicated } from '~icons/ph/x-circle';
-
