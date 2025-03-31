@@ -36,19 +36,17 @@
     };
 
     $effect(() => {
-        if (!editor) return;
+        const currentEditor = editor;
+        if (!currentEditor) return;
 
-        editor.on('create', handle);
-        editor.on('update', handle);
-        editor.on('submit', submit);
+        currentEditor.on('create', handle);
+        currentEditor.on('update', handle);
+        currentEditor.on('submit', submit);
 
         return () => {
-            if (!editor) {
-                return;
-            }
-            editor.off('create', handle);
-            editor.off('update', handle);
-            editor.off('submit', submit);
+            currentEditor.off('create', handle);
+            currentEditor.off('update', handle);
+            currentEditor.off('submit', submit);
         };
     });
 </script>

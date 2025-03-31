@@ -30,33 +30,33 @@
 </script>
 
 <div class="border-base-border-3 dark:bg-base-3 shadow-xs -mx-4 rounded-lg border p-4">
-    <div class="flex items-center gap-2">
-        <OptionalLink
-            href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
-        >
-            <Avatar
-                seed={audit.user.email}
-                src={imageFromAsset(cloudinary)(audit.user.profile?.image)
-                    ?.resize(Resize.fill(64))
-                    .toURL()}
-                class="size-10"
-            />
-        </OptionalLink>
-        <div class="text-sm">
+    <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
             <OptionalLink
                 href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
             >
-                <span class="font-bold">
-                    {audit.user.profile?.displayName ?? audit.user.email}
-                </span>
+                <Avatar
+                    seed={audit.user.email}
+                    src={imageFromAsset(cloudinary)(audit.user.profile?.image)
+                        ?.resize(Resize.fill(64))
+                        .toURL()}
+                    class="size-10"
+                />
             </OptionalLink>
-            added a comment
-            <span class="text-base-fg-4"> · <RelativeTime time={audit.createdTime} /></span>
+            <div class="text-sm">
+                <OptionalLink
+                    href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
+                >
+                    <span class="font-bold">
+                        {audit.user.profile?.displayName ?? audit.user.email}
+                    </span>
+                </OptionalLink>
+                added a comment
+                <span class="text-base-fg-4"> · <RelativeTime time={audit.createdTime} /></span>
+            </div>
         </div>
         {#if isAuthor}
-            <div class="ml-auto">
-                <AuditCommentActions {ref} auditId={audit.id} bind:editing />
-            </div>
+            <AuditCommentActions {ref} auditId={audit.id} bind:editing />
         {/if}
     </div>
     <div class="mt-2">
