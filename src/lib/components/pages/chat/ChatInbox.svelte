@@ -11,19 +11,12 @@
     import ChatInput from '~/lib/components/pages/chat/ChatInput.svelte';
     import RelativeTime from '~/lib/components/RelativeTime.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { ChatMessage } from '~/lib/models/chat';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import type { User, UserPreset, UserProfile } from '~/lib/models/user';
+    import type { UserPreset } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { QueryResponse } from '~/lib/utils/query';
     import { watch } from '~/lib/utils/runes.svelte';
-    import { tryPromise } from '~/lib/utils/try';
-
-    export type LocalChatMessage = Pick<ChatMessage, 'id' | 'createdTime' | 'content'> & {
-        sender: Pick<User, 'id' | 'email'> & {
-            profile: Pick<UserProfile, 'name' | 'displayName' | 'image'>;
-        };
-    };
+    import { getChatMessage, infinitizeChatMessageData, type LocalChatMessage } from './utils';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
     const { api, cloudinary, realtime, queryClient } = useRuntime();
@@ -66,47 +59,6 @@
     let scrollRef = $state.raw<HTMLElement>();
     let atBottom = true;
     let shift = $state.raw(false);
-
-    const getChatMessage = async (chatMessageId: number) => {
-        const tryGet = await tryPromise(() =>
-            api.get(`chat-messages/${chatMessageId}`, { query: { select } })
-        )();
-
-        if (!tryGet.ok || !tryGet.data.ok) {
-            return;
-        }
-
-        const tryJson = await tryPromise(() => tryGet.data.json<LocalChatMessage>())();
-        if (!tryJson.ok) {
-            return;
-        }
-
-        queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey, (a) => {
-            if (!a) {
-                return a;
-            }
-
-            const size = 20;
-            const all = [tryJson.data, ...a.pages.flatMap((a) => a.items)].toSorted(
-                (a, b) => b.id - a.id
-            );
-            const partitions = Array(Math.ceil(all.length / size))
-                .fill(0)
-                .map((_, i) => all.slice(i * size, i * size + size));
-            return {
-                pages: partitions.map((b) => ({
-                    items: b,
-                    totalCount: (a.pages[0]?.totalCount ?? 0) + 1
-                })),
-                pageParams: partitions.map((_, i) => {
-                    if (i === 0) {
-                        return undefined;
-                    }
-                    return partitions[i - 1].at(-1)?.id;
-                })
-            };
-        });
-    };
 
     watch(() => [virtualHandle, scrollRef])(() => {
         if (!virtualHandle || !scrollRef) {
@@ -177,22 +129,41 @@
                 if (messages.some((a) => a.id === json.chatMessageId)) {
                     continue;
                 }
-                getChatMessage(json.chatMessageId);
+
+                const getChatMessageAttempt = await getChatMessage(api)(json.chatMessageId);
+                if (!getChatMessageAttempt.ok) {
+                    return;
+                }
+
+                queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
+                    queryKey,
+                    (a) => {
+                        if (!a) {
+                            return a;
+                        }
+
+                        return infinitizeChatMessageData(
+                            [
+                                getChatMessageAttempt.data,
+                                ...a.pages.flatMap((a) => a.items)
+                            ].toSorted((a, b) => b.id - a.id),
+                            (a.pages[0]?.totalCount ?? 0) + 1
+                        );
+                    }
+                );
             }
         })();
         return () => {
             subscription?.unsubscribe();
         };
     });
+
+    $inspect($query.data);
 </script>
 
 {#snippet messageSnippet(message: LocalChatMessage)}
     {@const isUser = message.sender.id === user.id}
-    <div
-        class="max-w-3/4 flex w-fit items-end gap-2"
-        class:ml-auto={isUser}
-        class:flex-row-reverse={isUser}
-    >
+    <div class="max-w-3/4 flex w-fit gap-2" class:ml-auto={isUser} class:flex-row-reverse={isUser}>
         <Avatar
             src={imageFromAsset(cloudinary)(message.sender.profile?.image)
                 ?.resize(Resize.fill(64))

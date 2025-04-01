@@ -6,11 +6,11 @@
     import { DateTime } from 'luxon';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
-    import type { LocalChatMessage } from '~/lib/components/pages/chat/ChatInbox.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { UserPreset } from '~/lib/models/user';
     import { tryPromise } from '~/lib/utils/try';
+    import { infinitizeChatMessageData, type LocalChatMessage } from './utils';
 
     const { user, chatId }: { user: UserPreset['basicProfile']; chatId: string } = $props();
     const { api, queryClient } = useRuntime();
@@ -20,36 +20,40 @@
     const submit = async () => {
         invariant(editor, 'editor must not be null');
 
-        const content = editor.getHTML().trim();
-        editor.commands.clearContent();
-        if (content.length === 0) {
+        if (editor.isEmpty) {
             return;
         }
 
-        const optimisticId = -Date.now();
+        const content = editor.getHTML().trim();
+        editor.commands.clearContent();
+
+        const optimisticId = Date.now();
         const data = queryClient.getQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>([
             'chat-messages',
             { chatId }
         ]);
         if (data) {
-            queryClient.setQueryData(['chat-messages', { chatId }], {
-                pages: [
-                    {
-                        items: [
+            queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
+                ['chat-messages', { chatId }],
+                (a) => {
+                    if (!a) {
+                        return a;
+                    }
+
+                    return infinitizeChatMessageData(
+                        [
                             {
                                 id: optimisticId,
                                 sender: user,
                                 createdTime: DateTime.now().toISO(),
                                 content
                             },
-                            ...data.pages[0].items
-                        ],
-                        totalCount: data.pages[0].totalCount + 1
-                    },
-                    ...data.pages.slice(1)
-                ],
-                pageParams: data.pageParams
-            });
+                            ...a.pages.flatMap((b) => b.items)
+                        ].toSorted((a, b) => b.id - a.id),
+                        a.pages[0]?.totalCount ?? 0
+                    );
+                }
+            );
         }
         const tryCreateMessage = await tryPromise(() =>
             api.post('chat-messages', {
@@ -60,27 +64,47 @@
             })
         )();
         if (!tryCreateMessage.ok) {
-            invariant(
-                editor.storage.characterCount != null &&
-                    typeof editor.storage.characterCount.characters === 'function',
-                'editor.storage.characterCount.characters() must be a function'
-            );
-            if (editor.storage.characterCount.characters() === 0) {
+            if (editor.isEmpty) {
                 editor.commands.setContent(content);
             }
             queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
                 ['chat-messages', { chatId }],
-                (a) =>
-                    a
-                        ? {
-                              pages: a.pages.filter(
-                                  (b) =>
-                                      b.items.length !== 1 ||
-                                      b.items.every((c) => c.id !== optimisticId)
-                              ),
-                              pageParams: a.pageParams.filter((b) => b !== optimisticId)
-                          }
-                        : undefined
+                (a) => {
+                    if (!a) {
+                        return a;
+                    }
+
+                    return infinitizeChatMessageData(
+                        a.pages.flatMap((b) => b.items).filter((b) => b.id !== optimisticId),
+                        a.pages[0]?.totalCount ?? 0
+                    );
+                }
+            );
+        } else {
+            const json = await tryCreateMessage.data.json<{ id: number }>();
+            invariant(typeof json.id === 'number', 'json.id must be a number');
+            queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
+                ['chat-messages', { chatId }],
+                (a) => {
+                    if (!a) {
+                        return a;
+                    }
+
+                    return infinitizeChatMessageData(
+                        a.pages
+                            .flatMap((b) => b.items)
+                            .map((b) =>
+                                b.id === optimisticId
+                                    ? {
+                                          ...b,
+                                          id: json.id
+                                      }
+                                    : b
+                            )
+                            .toSorted((a, b) => b.id - a.id),
+                        a.pages[0]?.totalCount ?? 0
+                    );
+                }
             );
         }
     };
