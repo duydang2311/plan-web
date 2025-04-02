@@ -55,7 +55,7 @@
 @layer base {
     :root {
         color-scheme: light dark;
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 400;
         line-height: 1.5;
         font-synthesis: none;

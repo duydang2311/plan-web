@@ -12,8 +12,10 @@ export const load: LayoutServerLoad = async ({ locals: { user, runtime }, isData
             (yield* ApiClient).get('chats', {
                 query: {
                     userId: user.id,
-                    select: 'CreatedTime,Id,Type,Title,Members.Id,Members.Email,Members.Profile.Name,Members.Profile.DisplayName,Members.Profile.Image',
-                    order: '-CreatedTime',
+                    select: 'CreatedTime,Id,Type,Title',
+                    selectChatMember:
+                        'LastReadMessageId,Member.Id,Member.Email,Member.Profile.Name,Member.Profile.DisplayName,Member.Profile.Image',
+                    order: '-ChatMessageCreatedTime'
                 }
             })
         );

@@ -157,8 +157,6 @@
             subscription?.unsubscribe();
         };
     });
-
-    $inspect($query.data);
 </script>
 
 {#snippet messageSnippet(message: LocalChatMessage)}

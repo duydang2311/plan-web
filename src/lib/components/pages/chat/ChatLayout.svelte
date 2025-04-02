@@ -15,7 +15,6 @@
     import type { Snippet } from 'svelte';
     import { Avatar, Button, Input, Spinner2 } from '~/lib/components';
     import { IconSearch } from '~/lib/components/icons';
-    import ChatInbox from '~/lib/components/pages/chat/ChatInbox.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { ChatTypes } from '~/lib/models/chat';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -54,38 +53,40 @@
 {/snippet}
 
 {#snippet chatSnippet(chat: LocalChat)}
-    <Button
-        as="link"
-        href={buildChatHref(chat)}
-        type="button"
-        onclick={() => {
-            replaceState(`${page.url.pathname}/${chat.id}`, { chatId: chat.id });
-        }}
-        variant="base"
-        class={[
-            'col-span-full grid grid-cols-subgrid items-center gap-2 px-2 text-left font-normal',
-            selectedChatId === chat.id && 'bg-base-active text-base-fg-1 font-semibold'
-        ]}
-    >
-        {#if chat.type === ChatTypes.OneOnOne}
-            {@const otherUser = chat.members.find((p) => p.id !== user.id)}
-            {#if otherUser}
-                <Avatar
-                    src={imageFromAsset(cloudinary)(otherUser.profile?.image)
-                        ?.resize(Resize.fill(64))
-                        .toURL()}
-                    seed={otherUser.profile?.name ?? otherUser.email}
-                    alt={otherUser.profile?.displayName ?? otherUser.email}
-                    class="size-avatar-sm"
-                />
-                <div>
-                    <p class="font-display">
-                        {otherUser.profile?.displayName ?? otherUser.email}
-                    </p>
-                </div>
-            {/if}
-        {/if}
-    </Button>
+    {@const otherUser = chat.chatMembers.find((a) => a.member.id !== user.id)}
+    {#if otherUser}
+        <li class="col-span-full grid grid-cols-subgrid">
+            <Button
+                as="link"
+                href={buildChatHref(chat)}
+                type="button"
+                onclick={() => {
+                    replaceState(`${page.url.pathname}/${chat.id}`, { chatId: chat.id });
+                }}
+                variant="base"
+                class={[
+                    'col-span-full grid grid-cols-subgrid items-center gap-2 px-2 text-left font-normal',
+                    selectedChatId === chat.id && 'bg-base-active text-base-fg-1 font-semibold'
+                ]}
+            >
+                {#if chat.type === ChatTypes.OneOnOne}
+                    <Avatar
+                        src={imageFromAsset(cloudinary)(otherUser.member.profile?.image)
+                            ?.resize(Resize.fill(64))
+                            .toURL()}
+                        seed={otherUser.member.profile?.name ?? otherUser.member.email}
+                        alt={otherUser.member.profile?.displayName ?? otherUser.member.email}
+                        class="size-avatar-sm"
+                    />
+                    <div>
+                        <p class="font-display">
+                            {otherUser.member.profile?.displayName ?? otherUser.member.email}
+                        </p>
+                    </div>
+                {/if}
+            </Button>
+        </li>
+    {/if}
 {/snippet}
 
 <div class="divide-base-border-2 grid h-full grid-cols-[auto_1fr] divide-x overflow-hidden">
@@ -111,9 +112,7 @@
             {:else}
                 <ol class="grid grid-cols-[auto_1fr] gap-1">
                     {#each chatListRef.value.items as chat}
-                        <li class="col-span-full grid grid-cols-subgrid">
-                            {@render chatSnippet(chat)}
-                        </li>
+                        {@render chatSnippet(chat)}
                     {/each}
                 </ol>
             {/if}

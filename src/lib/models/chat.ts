@@ -7,6 +7,7 @@ export interface Chat {
     type: ChatType;
     title?: string;
     lastChatMessage?: ChatMessage;
+    chatMembers?: ChatMember[];
     members?: User[];
 }
 
@@ -29,7 +30,6 @@ export interface ChatMember {
     lastReadMessageId?: number;
     lastReadMessage?: ChatMessage;
 }
-
 
 export const ChatTypes = {
     None: 0,
