@@ -1,21 +1,25 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { DateTime } from 'luxon';
     import { backInOut, circInOut } from 'svelte/easing';
     import { fade, scale } from 'svelte/transition';
-    import { Input, Pagination3, ThSort3 } from '~/lib/components';
-    import Button from '~/lib/components/Button.svelte';
-    import { IconPlus, IconSearch, IconSettings } from '~/lib/components/icons';
-    import Link from '~/lib/components/Link.svelte';
-    import Row from '~/lib/components/Row.svelte';
-    import Spinner from '~/lib/components/Spinner.svelte';
-    import Table from '~/lib/components/Table.svelte';
-    import Th from '~/lib/components/Th.svelte';
-    import THead from '~/lib/components/THead.svelte';
+    import {
+        Button,
+        Input,
+        Link,
+        Pagination3,
+        RelativeTime,
+        Row,
+        Spinner,
+        Table,
+        THead,
+        ThSort3
+    } from '~/lib/components';
+    import { IconPlus, IconSearch } from '~/lib/components/icons';
     import { paginatedList } from '~/lib/models/paginatedList';
     import { createRef } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
+    import { DateTime } from 'luxon';
 
     const { data }: { data: PageData } = $props();
     const ref = createRef.maybePromise(() => data.teamList);
@@ -28,10 +32,10 @@
 
 <main class="divide-base-border-2 flex h-full flex-col divide-y">
     <div class="divide-base-border-3 flex items-stretch justify-between divide-x">
-        <div class="relative grow pl-8 content-center">
+        <div class="relative grow content-center pl-8">
             <Input
                 type="text"
-                class="border-transparent pl-6 active:outline-none h-full py-0"
+                class="h-full border-transparent py-0 pl-6 active:outline-none"
                 placeholder="Search for teams..."
             />
             <IconSearch class="text-base-fg-ghost absolute left-8 top-1/2 -translate-y-1/2" />
@@ -82,18 +86,26 @@
                     </Row>
                 {:else}
                     {#each ref.value.items as { id, createdTime, updatedTime, name, identifier } (id)}
-                        <Row>
+                        <Row class="relative">
                             <td>
-                                <Link href="/{page.params['path']}/teams/{identifier}">
+                                <a
+                                    href="/{page.params['path']}/teams/{identifier}"
+                                    class="absolute inset-0"
+                                    aria-labelledby="team-{id}"
+                                >
+                                </a>
+                                <span id="team-{id}">
                                     {name}
-                                </Link>
-                            </td>
-                            <td>{identifier}</td>
-                            <td>
-                                {DateTime.fromISO(createdTime).toLocaleString(DateTime.DATE_MED)}
+                                </span>
                             </td>
                             <td>
-                                {DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATE_MED)}
+                                {identifier}
+                            </td>
+                            <td title={DateTime.fromISO(createdTime).toLocaleString()}>
+                                <RelativeTime time={createdTime} />
+                            </td>
+                            <td title={DateTime.fromISO(updatedTime).toLocaleString()}>
+                                <RelativeTime time={updatedTime} />
                             </td>
                         </Row>
                     {/each}

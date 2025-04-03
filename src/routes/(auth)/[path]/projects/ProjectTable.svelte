@@ -61,26 +61,25 @@
             </Row>
         {:else}
             {#each ref.value.items as { id, identifier, name, createdTime, updatedTime } (id)}
-                <Row>
-                    <td
-                        class="text-base-fg-3 overflow-hidden text-ellipsis whitespace-nowrap"
-                        title={identifier}>{identifier}</td
-                    >
-                    <td class="overflow-hidden text-ellipsis whitespace-nowrap">
-                        <Link href="/{page.params['path']}/projects/{identifier}" title={name}>
-                            {name}
-                        </Link>
+                <Row class="relative">
+                    <td class="text-base-fg-3 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <a
+                            href="/{page.params['path']}/projects/{identifier}"
+                            class="absolute inset-0"
+                            aria-labelledby="project-{id}"
+                        >
+                        </a>
+                        {identifier}
                     </td>
-                    <td
-                        class="overflow-hidden text-ellipsis whitespace-nowrap"
-                        title={DateTime.fromISO(createdTime).toLocaleString(DateTime.DATE_MED)}
-                    >
+                    <td class="overflow-hidden text-ellipsis whitespace-nowrap">
+                        <span id="project-{id}">
+                            {name}
+                        </span>
+                    </td>
+                    <td class="overflow-hidden text-ellipsis whitespace-nowrap">
                         <RelativeTime time={createdTime} />
                     </td>
-                    <td
-                        class="overflow-hidden text-ellipsis whitespace-nowrap"
-                        title={DateTime.fromISO(updatedTime).toLocaleString(DateTime.DATE_MED)}
-                    >
+                    <td class="overflow-hidden text-ellipsis whitespace-nowrap">
                         <RelativeTime time={updatedTime} />
                     </td>
                     <td>
