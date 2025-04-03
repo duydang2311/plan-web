@@ -1,7 +1,6 @@
 <script lang="ts">
     import { createInfiniteQuery } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
-    import type { Popover } from 'melt/components';
     import { toStore } from 'svelte/store';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -9,7 +8,6 @@
     import { QueryResponse } from '~/lib/utils/query';
     import { createLoading } from '~/lib/utils/runes.svelte';
     import { formatRelativeDateUi } from '~/lib/utils/time';
-    import { popover as popoverTransition, tsap } from '~/lib/utils/transition';
 
     type NotificationType = typeof notificationTypes;
 
@@ -61,8 +59,7 @@
               };
     }
 
-    const { userId, builder }: { userId: string; builder: Popover['popover']['content'] } =
-        $props();
+    const { userId }: { userId: string } = $props();
     const { api, idHasher } = useRuntime();
     const notificationTypes = {
         none: 0,
@@ -139,128 +136,115 @@
     </div>
 {/snippet}
 
-<div
-    class="w-paragraph-sm -translate-x-2 translate-y-2 bg-transparent lg:-translate-x-4"
-    {...builder}
-    in:tsap={popoverTransition.in}
-    out:tsap={popoverTransition.out}
->
-    <div class="c-popover p-0">
-        <div class="border-b-base-border-2 relative border-b p-2">
-            <h2 class="text-p text-center tracking-tight">Your notifications</h2>
-            {#if loading.short}
-                <Spinner2
-                    class="text-base-fg-ghost absolute left-0 top-1/2 size-5 -translate-y-1/2 translate-x-1/2"
-                />
-            {/if}
-        </div>
-        <div
-            class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2"
-            class:animate-pulse={$query.isFetching}
-        >
-            {#if $query.isPending}
-                {@render skeleton()}
-            {:else if grouped == null || Object.values(grouped).length === 0}
-                <span class="c-label">No notifications found.</span>
-            {:else}
-                {#each Object.entries(grouped).filter( (a) => a[1].filter((b) => b.notification.data != null) ) as [isoDate, userNotifications] (isoDate)}
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-p text-base-fg-5 my-2 text-center tracking-tight">
-                            {formatRelativeDateUi(
-                                DateTime.fromFormat(isoDate, 'yyyy-MM-dd', {
-                                    zone: 'utc'
-                                })
-                            )}
-                        </h3>
-                        <div class="bg-base-border-3 h-px grow"></div>
-                    </div>
-                    <ol class="space-y-1">
-                        {#each userNotifications as userNotification (userNotification.id)}
-                            <li>
-                                {#if userNotification.notification.type === notificationTypes.projectCreated}
-                                    <a
-                                        href="/{userNotification.notification.data.workspace
-                                            .path}/projects/{userNotification.notification.data
-                                            .identifier}"
-                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
-                                    >
-                                        <p class="text-pretty">
-                                            New project created —
-                                            <strong class="text-base-fg-1">
-                                                {userNotification.notification.data.name}
-                                            </strong>.
-                                        </p>
-                                        <p class="c-label">
-                                            {DateTime.fromISO(userNotification.createdTime)
-                                                .toLocal()
-                                                .toLocaleString(DateTime.TIME_SIMPLE)}
-                                        </p>
-                                    </a>
-                                {:else if userNotification.notification.type === notificationTypes.issueCreated}
-                                    <a
-                                        href="/{userNotification.notification.data.project.workspace
-                                            .path}/projects/{userNotification.notification.data
-                                            .project.identifier}/issues/{userNotification
-                                            .notification.data.orderNumber}"
-                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
-                                    >
-                                        <p class="text-pretty">
-                                            New issue created —
-                                            <strong class="text-base-fg-1">
-                                                {userNotification.notification.data.title}
-                                            </strong>.
-                                        </p>
-                                        <p class="c-label">
-                                            {DateTime.fromISO(userNotification.createdTime)
-                                                .toLocal()
-                                                .toLocaleString(DateTime.TIME_SIMPLE)}
-                                        </p>
-                                    </a>
-                                {:else if userNotification.notification.type === notificationTypes.commentCreated}
-                                    <a
-                                        href="/{userNotification.notification.data.issue.project
-                                            .workspace.path}/projects/{userNotification.notification
-                                            .data.issue.project.identifier}/issues/{userNotification
-                                            .notification.data.issue.orderNumber}"
-                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
-                                    >
-                                        <p class="text-pretty">
-                                            New comment added —
-                                            <strong class="text-base-fg-1">
-                                                {userNotification.notification.data.issue.title}
-                                            </strong>.
-                                        </p>
-                                        <p class="c-label">
-                                            {DateTime.fromISO(userNotification.createdTime)
-                                                .toLocal()
-                                                .toLocaleString(DateTime.TIME_SIMPLE)}
-                                        </p>
-                                    </a>
-                                {:else if userNotification.notification.type === notificationTypes.projectMemberInvited}
-                                    <a
-                                        href="/project-invites/{idHasher.encode([
-                                            userNotification.notification.data.id
-                                        ])}"
-                                        class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
-                                    >
-                                        <p class="text-pretty">
-                                            You have been invited a project —
-                                            <strong class="text-base-fg-1">
-                                                {userNotification.notification.data.project.name}
-                                            </strong>.
-                                        </p>
-                                        <p class="c-label">
-                                            {DateTime.fromISO(userNotification.createdTime)
-                                                .toLocal()
-                                                .toLocaleString(DateTime.TIME_SIMPLE)}
-                                        </p>
-                                    </a>
-                                {/if}
-                            </li>
-                        {/each}
-                    </ol>
+<div class="border-b-base-border-2 relative border-b p-2">
+    <h2 class="text-p text-center tracking-tight">Your notifications</h2>
+    {#if loading.short}
+        <Spinner2
+            class="text-base-fg-ghost absolute left-0 top-1/2 size-5 -translate-y-1/2 translate-x-1/2"
+        />
+    {/if}
+</div>
+<div class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2" class:animate-pulse={$query.isFetching}>
+    {#if $query.isPending}
+        {@render skeleton()}
+    {:else if grouped == null || Object.values(grouped).length === 0}
+        <span class="c-label">No notifications found.</span>
+    {:else}
+        {#each Object.entries(grouped).filter( (a) => a[1].filter((b) => b.notification.data != null) ) as [isoDate, userNotifications] (isoDate)}
+            <div class="flex items-center gap-2">
+                <h3 class="text-p text-base-fg-5 my-2 text-center tracking-tight">
+                    {formatRelativeDateUi(
+                        DateTime.fromFormat(isoDate, 'yyyy-MM-dd', {
+                            zone: 'utc'
+                        })
+                    )}
+                </h3>
+                <div class="bg-base-border-3 h-px grow"></div>
+            </div>
+            <ol class="space-y-1">
+                {#each userNotifications as userNotification (userNotification.id)}
+                    <li>
+                        {#if userNotification.notification.type === notificationTypes.projectCreated}
+                            <a
+                                href="/{userNotification.notification.data.workspace
+                                    .path}/projects/{userNotification.notification.data.identifier}"
+                                class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                            >
+                                <p class="text-pretty">
+                                    New project created —
+                                    <strong class="text-base-fg-1">
+                                        {userNotification.notification.data.name}
+                                    </strong>.
+                                </p>
+                                <p class="c-label">
+                                    {DateTime.fromISO(userNotification.createdTime)
+                                        .toLocal()
+                                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                                </p>
+                            </a>
+                        {:else if userNotification.notification.type === notificationTypes.issueCreated}
+                            <a
+                                href="/{userNotification.notification.data.project.workspace
+                                    .path}/projects/{userNotification.notification.data.project
+                                    .identifier}/issues/{userNotification.notification.data
+                                    .orderNumber}"
+                                class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                            >
+                                <p class="text-pretty">
+                                    New issue created —
+                                    <strong class="text-base-fg-1">
+                                        {userNotification.notification.data.title}
+                                    </strong>.
+                                </p>
+                                <p class="c-label">
+                                    {DateTime.fromISO(userNotification.createdTime)
+                                        .toLocal()
+                                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                                </p>
+                            </a>
+                        {:else if userNotification.notification.type === notificationTypes.commentCreated}
+                            <a
+                                href="/{userNotification.notification.data.issue.project.workspace
+                                    .path}/projects/{userNotification.notification.data.issue
+                                    .project.identifier}/issues/{userNotification.notification.data
+                                    .issue.orderNumber}"
+                                class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                            >
+                                <p class="text-pretty">
+                                    New comment added —
+                                    <strong class="text-base-fg-1">
+                                        {userNotification.notification.data.issue.title}
+                                    </strong>.
+                                </p>
+                                <p class="c-label">
+                                    {DateTime.fromISO(userNotification.createdTime)
+                                        .toLocal()
+                                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                                </p>
+                            </a>
+                        {:else if userNotification.notification.type === notificationTypes.projectMemberInvited}
+                            <a
+                                href="/project-invites/{idHasher.encode([
+                                    userNotification.notification.data.id
+                                ])}"
+                                class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                            >
+                                <p class="text-pretty">
+                                    You have been invited a project —
+                                    <strong class="text-base-fg-1">
+                                        {userNotification.notification.data.project.name}
+                                    </strong>.
+                                </p>
+                                <p class="c-label">
+                                    {DateTime.fromISO(userNotification.createdTime)
+                                        .toLocal()
+                                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                                </p>
+                            </a>
+                        {/if}
+                    </li>
                 {/each}
-            {/if}
-        </div>
-    </div>
+            </ol>
+        {/each}
+    {/if}
 </div>
