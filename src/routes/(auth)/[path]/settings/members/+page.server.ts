@@ -42,12 +42,13 @@ const loadActiveMembersView = async ({
     const {
         workspace: { id }
     } = await parent();
+    const params = workspaceMembersParams({ url });
     const exitPromise = runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
                 const api = yield* ApiClient;
                 const response = yield* api.get(`workspaces/${id}/members`, {
-                    query: workspaceMembersParams({ url })
+                    query: params
                 });
                 if (!response.ok) {
                     return yield* Effect.fail(HttpError.from(response));
@@ -95,12 +96,13 @@ const loadPendingMembersView = async ({
     const {
         workspace: { id }
     } = await parent();
+    const params = pendingMembersParams({ url, workspaceId: id });
     const exitPromise = runtime.runPromiseExit(
         pipe(
             Effect.gen(function* () {
                 const response = yield* LoadResponse.HTTP(
                     (yield* ApiClient).get(`workspace-invitations`, {
-                        query: pendingMembersParams({ url, workspaceId: id })
+                        query: params
                     })
                 );
 
