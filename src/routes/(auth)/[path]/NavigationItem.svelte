@@ -42,7 +42,7 @@
                         type="button"
                         variant="base"
                         class={clsx(
-                            'absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2',
+                            'not-hover:not-active:data-[state=open]:bg-transparent absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2',
                             isActive && 'text-base-fg-1'
                         )}
                         melt={trigger}
