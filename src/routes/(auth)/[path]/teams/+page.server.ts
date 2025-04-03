@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ isDataRequest, parent, locals: { ru
             page: 1,
             size: 20,
             order: '',
-            select: 'CreatedTime,UpdatedTime,Name,Identifier'
+            select: 'Id,CreatedTime,UpdatedTime,Name,Identifier'
         })
     );
 
