@@ -26,7 +26,7 @@
                 in:tsap={popoverTransitions.in}
                 out:tsap={popoverTransitions.out}
                 use:melt={content}
-                class="c-popover w-paragraph-sm -translate-x-2 translate-y-2 p-0 lg:-translate-x-4"
+                class="c-popover w-paragraph-sm translate-y-2 p-0 lg:-translate-x-2"
             >
                 <FriendPopover {userId} />
             </div>

@@ -22,7 +22,7 @@
         </IconButton>
         {#if $open}
             <div
-                class="w-paragraph-sm -translate-x-2 translate-y-2 bg-transparent lg:-translate-x-4"
+                class="w-paragraph-sm translate-y-2 bg-transparent lg:-translate-x-2"
                 use:melt={content}
                 in:tsap={popover.in}
                 out:tsap={popover.out}
