@@ -15,9 +15,8 @@
         <IconButton
             type="button"
             variant="base"
-            class="data-[state=open]:bg-base-active"
             melt={trigger}
-            data-state={$open ? 'open' : undefined}
+            data-custom-state={$open ? 'open' : 'closed'}
         >
             <IconBellOutline />
         </IconButton>
