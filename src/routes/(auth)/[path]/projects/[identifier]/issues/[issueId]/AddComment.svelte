@@ -3,10 +3,10 @@
     import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
-    import { Button, Tiptap } from '~/lib/components';
+    import { Button, TiptapEditor } from '~/lib/components';
     import { IconArrowUp } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-    import type { AsyncRef } from '~/lib/utils/runes.svelte';
+    import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { LocalIssueAudit } from './+page.server';
     import { clientValidate } from './utils.client';
@@ -34,21 +34,6 @@
     const submit = () => {
         formRef?.requestSubmit();
     };
-
-    $effect(() => {
-        const currentEditor = editor;
-        if (!currentEditor) return;
-
-        currentEditor.on('create', handle);
-        currentEditor.on('update', handle);
-        currentEditor.on('submit', submit);
-
-        return () => {
-            currentEditor.off('create', handle);
-            currentEditor.off('update', handle);
-            currentEditor.off('submit', submit);
-        };
-    });
 </script>
 
 <form
@@ -97,11 +82,26 @@
 >
     <input type="hidden" name="issueId" value={issueId} />
     <div class="relative">
-        <Tiptap
+        <TiptapEditor
             bind:editor
-            placeholder="Write your comment..."
             editorProps={{
-                class: 'bg-base-1 min-h-24 max-h-60'
+                attributes: {
+                    class: 'dark:bg-base-3 h-60 overflow-auto custom-scrollbar',
+                    style: '--_border: var(--color-base-3)'
+                }
+            }}
+            onCreate={({ editor }) => {
+                handle({ editor });
+                editor.on('submit', submit);
+            }}
+            onTransaction={({ editor }) => {
+                handle({ editor });
+            }}
+            onDestroy={() => {
+                if (!editor) {
+                    return;
+                }
+                editor.off('submit', submit);
             }}
         />
         <Button

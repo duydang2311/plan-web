@@ -2,11 +2,17 @@
     --_border: var(--color-base-border-2);
     --_border-hover: var(--color-base-border-1);
     --_border-focus: var(--color-base-fg-5);
+    --_bg: transparent;
+
+    @variant dark {
+        --_bg: var(--color-base-3);
+    }
 
     width: 100%;
     padding: --spacing(2) --spacing(2);
     border: 1px solid var(--_border);
     border-radius: var(--radius-md);
+    background-color: var(--_bg);
     outline: none;
     transition:
         color 150ms var(--cubic-out),

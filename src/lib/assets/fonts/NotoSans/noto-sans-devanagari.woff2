@@ -1,0 +1,12 @@
+--2025-04-05 03:00:07--  https://fonts.gstatic.com/s/notosans/v39/o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a_du2ui.woff2
+Resolving fonts.gstatic.com (fonts.gstatic.com)... 2404:6800:4003:c05::5e, 142.251.10.94
+Connecting to fonts.gstatic.com (fonts.gstatic.com)|2404:6800:4003:c05::5e|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 99236 (97K) [font/woff2]
+Saving to: 'o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a_du2ui.woff2'
+
+     0K .......... .......... .......... .......... .......... 51%  868K 0s
+    50K .......... .......... .......... .......... ......    100% 1.12M=0.1s
+
+2025-04-05 03:00:07 (985 KB/s) - 'o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a_du2ui.woff2' saved [99236/99236]
+

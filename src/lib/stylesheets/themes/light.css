@@ -2,12 +2,12 @@
     --color-bg: oklch(100% 0 0);
 
     --color-base-1: oklch(100% 0 0);
-    --color-base-2: oklch(98.5% 0 0);
+    --color-base-2: oklch(98% 0 0);
     --color-base-3: oklch(97% 0 0);
     --color-base-4: oklch(95.5% 0 0);
     --color-base-5: oklch(94% 0 0);
     --color-base-hover: oklch(93% 0 0);
-    --color-base-active: oklch(92% 0 0);
+    --color-base-active: oklch(96% 0 0);
     --color-base-disabled: oklch(90% 0 0);
     --color-base-fg-1: oklch(16% 0 0);
     --color-base-fg-2: oklch(35% 0 0);

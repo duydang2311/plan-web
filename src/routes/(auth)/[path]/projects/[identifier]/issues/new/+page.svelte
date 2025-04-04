@@ -3,11 +3,11 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { Editor } from '@tiptap/core';
     import { writable } from 'svelte/store';
+    import { TiptapEditor } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import Errors from '~/lib/components/Errors.svelte';
     import Input from '~/lib/components/Input.svelte';
     import Label from '~/lib/components/Label.svelte';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
     import { createEffect } from '~/lib/utils/runes.svelte';
     import type { ActionData, PageData } from './$types';
@@ -77,8 +77,8 @@
     );
 </script>
 
-<main class="max-w-screen-lg mx-auto p-8 max-h-full overflow-auto">
-    <div class="border-b border-b-base-border-3 pb-1 mb-8">
+<main class="mx-auto max-h-full max-w-screen-lg overflow-auto p-8">
+    <div class="border-b-base-border-3 mb-8 border-b pb-1">
         <h2>Create issue</h2>
         <p>Fill in the form below to create a new issue.</p>
     </div>
@@ -109,8 +109,8 @@
             };
         }}
     >
-        <div class="flex gap-4 flex-wrap">
-            <fieldset class="space-y-1 min-w-60 w-60 max-sm:basis-full">
+        <div class="flex flex-wrap gap-4">
+            <fieldset class="w-60 min-w-60 space-y-1 max-sm:basis-full">
                 <ProjectSelect workspaceId={data.workspace.id} {selected} />
                 <input
                     use:fields.projectId
@@ -122,7 +122,7 @@
                 />
                 <Errors errors={fields.projectId.state.errors} errorMap={errorMap.projectId} />
             </fieldset>
-            <fieldset class="space-y-1 flex-1">
+            <fieldset class="flex-1 space-y-1">
                 <Label for="title">Title</Label>
                 <Input
                     useField={fields.title}
@@ -134,14 +134,15 @@
                 <Errors errors={fields.title.state.errors} errorMap={errorMap.title} />
             </fieldset>
         </div>
-        <fieldset class="space-y-1 grow">
+        <fieldset class="grow space-y-1">
             <Label for="description">Description (optional)</Label>
             <div>
-                <Tiptap
+                <TiptapEditor
                     bind:editor
-                    placeholder="Add more detail to the issue..."
                     editorProps={{
-                        class: 'h-80'
+                        attributes: {
+                            class: 'h-80 overflow-auto'
+                        }
                     }}
                 />
             </div>

@@ -11,8 +11,8 @@
     --_border-disabled: var(--color-base-border-2);
 
     &:where(.c-button--filled) {
-        --_bg: var(--color-base-1);
-        --_bg-hover: var(--color-base-2);
+        --_bg: var(--color-base-2);
+        --_bg-hover: var(--color-base-hover);
         --_bg-active: var(--color-base-active);
         --_bg-disabled: var(--color-base-2);
 

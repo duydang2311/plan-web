@@ -8,6 +8,7 @@ export { default as Button } from './Button.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as DatatablePagination } from './DatatablePagination.svelte';
 export { default as DialogBuilder, type DialogProps } from './DialogBuilder.svelte';
+export { default as TiptapEditor } from './editor/TiptapEditor.svelte';
 export { default as Errors } from './Errors.svelte';
 export { default as Field } from './Field.svelte';
 export { default as Flippable } from './Flippable.svelte';
