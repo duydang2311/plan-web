@@ -97,7 +97,7 @@ export const watch = (depsFn: () => unknown) => {
     return (fn: () => void | (() => void)) => {
         $effect(() => {
             depsFn();
-            untrack(() => fn());
+            return untrack(() => fn());
         });
     };
 };
