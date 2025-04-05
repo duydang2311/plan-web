@@ -1,6 +1,12 @@
 .c-select--menu {
+    --_bg: var(--color-base-1);
+
+    @variant dark {
+        --_bg: var(--color-base-3);
+    }
+
     padding: --spacing(1);
-    background-color: var(--color-base-1);
+    background-color: var(--_bg);
     border: 1px solid var(--color-base-border-1);
     border-radius: var(--radius-md);
     min-width: --spacing(40);

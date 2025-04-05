@@ -3,7 +3,7 @@
     --_bg: var(--color-base-1);
 
     @variant dark {
-        --_bg: var(--color-base-2);
+        --_bg: var(--color-base-3);
     }
 }
 
