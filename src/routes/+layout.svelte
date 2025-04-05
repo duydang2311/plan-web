@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
     import { page } from '$app/state';
     import { env } from '$env/dynamic/public';
     import { Cloudinary } from '@cloudinary/url-gen/index';
@@ -7,11 +6,11 @@
     import { onMount, type Snippet } from 'svelte';
     import { Sonner, Toaster } from '~/lib/components';
     import { setRuntime } from '~/lib/contexts/runtime.client';
+    import { createIdHasher } from '~/lib/services/id_hasher';
     import { NATSRealtime } from '~/lib/services/realtime.client';
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
     import type { LayoutData } from './$types';
     import './+layout.css';
-    import { createIdHasher } from '~/lib/services/id_hasher';
 
     const { data, children }: { data: LayoutData; children: Snippet } = $props();
     const runtime = setRuntime({
@@ -57,15 +56,6 @@
         }
         return async () => {
             runtime.realtime.dispose();
-        };
-    });
-
-    onMount(() => {
-        const interval = setInterval(() => {
-            invalidateAll();
-        }, 60 * 1000);
-        return () => {
-            clearInterval(interval);
         };
     });
 </script>
