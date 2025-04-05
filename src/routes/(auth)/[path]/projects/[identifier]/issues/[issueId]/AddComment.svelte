@@ -10,13 +10,14 @@
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { LocalIssueAudit } from './+page.server';
     import { clientValidate } from './utils.client';
+    import type { UserPreset } from '~/lib/models/user';
 
     const {
-        userId,
+        user,
         issueId,
         ref
     }: {
-        userId: string;
+        user: UserPreset['basicProfile'];
         issueId: string;
         ref: AsyncRef<PaginatedList<LocalIssueAudit> | undefined>;
     } = $props();
@@ -57,16 +58,11 @@
                     },
                     createdTime: DateTime.now().toISO(),
                     action: 4,
-                    user: {
-                        id: userId,
-                        email: userId,
-                        profile: {
-                            displayName: 'You'
-                        }
-                    },
+                    user,
                     id: Math.random()
                 } as LocalIssueAudit
-            ]
+            ],
+            totalCount: (old?.totalCount ?? 0) + 1
         });
 
         e.formData.set('content', html);
@@ -76,7 +72,6 @@
                 editor?.commands.setContent(html);
                 ref.value = old;
             }
-            await invalidateAll();
         };
     }}
 >

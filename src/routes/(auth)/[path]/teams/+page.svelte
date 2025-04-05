@@ -1,11 +1,11 @@
 <script lang="ts">
     import { page } from '$app/state';
+    import { DateTime } from 'luxon';
     import { backInOut, circInOut } from 'svelte/easing';
     import { fade, scale } from 'svelte/transition';
     import {
         Button,
         Input,
-        Link,
         Pagination3,
         RelativeTime,
         Row,
@@ -19,7 +19,6 @@
     import { createRef } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
-    import { DateTime } from 'luxon';
 
     const { data }: { data: PageData } = $props();
     const ref = createRef.maybePromise(() => data.teamList);

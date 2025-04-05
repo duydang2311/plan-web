@@ -63,7 +63,7 @@
                 </div>
                 <div class="mt-8">
                     <AddComment
-                        userId={data.page.user.id}
+                        user={data.page.user}
                         issueId={data.page.issue.id}
                         ref={auditListRef}
                     />

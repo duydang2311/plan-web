@@ -1,12 +1,15 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+    import { replaceState } from '$app/navigation';
     import { page } from '$app/state';
-    import { Virtualizer } from 'virtua/svelte';
+    import { debounce } from '@mobily/ts-belt/Function';
+    import { Virtualizer, type VirtualizerHandle } from 'virtua/svelte';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
     import { IssueAuditActions } from '~/lib/models/issue';
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import { createLoading, type AsyncRef } from '~/lib/utils/runes.svelte';
+    import { watch, type AsyncRef } from '~/lib/utils/runes.svelte';
     import { tsap } from '~/lib/utils/transition';
+    import { attempt } from '~/lib/utils/try';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { LocalIssueAudit } from './+page.server';
     import AuditComment from './AuditComment.svelte';
@@ -14,8 +17,9 @@
 
     let {
         ref,
+        issueId,
         currentUserId,
-        scrollRef,
+        scrollRef
     }: {
         ref: AsyncRef<PaginatedList<LocalIssueAudit> | undefined>;
         issueId: string;
@@ -26,41 +30,80 @@
         [IssueAuditActions.create]: AuditCreate,
         [IssueAuditActions.comment]: AuditComment
     } as const;
-    let infiniteLoading = createLoading();
+    const { api } = useRuntime();
     let containerRef = $state.raw<HTMLElement>();
     let startMargin = $state.raw(0);
+    let virtualizer = $state.raw<VirtualizerHandle>();
+    let mounted = false;
 
-    const fetchNext = async () => {
-        infiniteLoading.set();
-
-        const size = Number(page.url.searchParams.get('size') ?? '20');
+    const updateScrollOffset = () => {
+        if (!virtualizer) {
+            return;
+        }
+        const index = virtualizer.findStartIndex();
         const searchParams = fluentSearchParams(page.url);
-        const offset = ref.value?.items.length ?? 0;
-
-        if (offset === 0) {
+        if (index === 0) {
             searchParams.delete('offset');
         } else {
-            searchParams.set('offset', offset + '');
+            searchParams.set('offset', index + '');
         }
-        if (isNaN(size) || size === 20) {
-            searchParams.delete('size');
-        } else {
-            searchParams.set('size', size + '');
+        replaceState(`${page.url.pathname}${searchParams}`, page.state);
+    };
+
+    const fetchNext = async () => {
+        ref.loading.set();
+
+        const lastId = ref.value?.items.at(-1)?.id;
+        const getAttempt = await attempt.promise(() =>
+            api.get('issue-audits', {
+                query: {
+                    issueId,
+                    cursor: lastId,
+                    select: 'Id,CreatedTime,Action,Data,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image',
+                    order: 'Id'
+                }
+            })
+        )();
+
+        if (!getAttempt.ok || !getAttempt.data.ok) {
+            ref.loading.unset();
+            return;
         }
 
-        await goto(`${page.url.pathname}${searchParams.toString()}`, {
-            state: page.state,
-            replaceState: true,
-            invalidateAll: false,
-            noScroll: true,
-            keepFocus: true
-        });
-        infiniteLoading.unset();
+        const jsonAttempt = await attempt.promise(() =>
+            getAttempt.data.json<PaginatedList<LocalIssueAudit>>()
+        )();
+        if (!jsonAttempt.ok) {
+            ref.loading.unset();
+            return;
+        }
+
+        ref.value = {
+            items: [...(ref.value?.items ?? []), ...jsonAttempt.data.items].toSorted(
+                (a, b) => a.id - b.id
+            ),
+            totalCount: jsonAttempt.data.totalCount
+        };
+        ref.loading.unset();
     };
+
+    watch(() => [virtualizer])(() => {
+        if (mounted || !virtualizer) {
+            return;
+        }
+        const offset = Number(page.url.searchParams.get('offset'));
+        if (!isNaN(offset) && virtualizer) {
+            virtualizer.scrollToIndex(offset);
+        }
+    });
+
+    watch(() => containerRef)(() => {
+        invalidateScrollOffset();
+    });
 
     export function invalidateScrollOffset() {
         startMargin = containerRef?.offsetTop ?? 0;
-    };
+    }
 </script>
 
 {#snippet skeleton()}
@@ -106,6 +149,7 @@
         {#if scrollRef}
             <div class="-mt-6">
                 <Virtualizer
+                    bind:this={virtualizer}
                     {startMargin}
                     data={ref.value.items}
                     getKey={(item) => item.id}
@@ -114,17 +158,25 @@
                         if (
                             !containerRef ||
                             !ref?.value ||
-                            infiniteLoading.immediate ||
+                            ref.loading.immediate ||
                             ref.value.items.length >= ref.value.totalCount
                         ) {
                             return;
                         }
+
                         if (
                             e + scrollRef.offsetHeight + 500 >
                             containerRef.offsetTop + containerRef.offsetHeight
                         ) {
                             fetchNext();
                         }
+                    }}
+                    onscrollend={() => {
+                        if (!mounted) {
+                            mounted = true;
+                            return;
+                        }
+                        updateScrollOffset();
                     }}
                 >
                     {#snippet children(audit)}
@@ -139,7 +191,7 @@
                     {/snippet}
                 </Virtualizer>
             </div>
-            {#if infiniteLoading.short}
+            {#if ref.loading.short}
                 <div
                     in:tsap={(node, gsap) =>
                         gsap.from(node, {
@@ -157,7 +209,7 @@
             {/if}
         {:else}
             <ol class="space-y-6">
-                {#each ref.value.items.slice(0, 5) as audit (audit.id)}
+                {#each ref.value.items.slice(0, 20) as audit (audit.id)}
                     {#if audit.action in auditComponents}
                         {@const Component =
                             auditComponents[audit.action as keyof typeof auditComponents]}
