@@ -98,7 +98,8 @@
         <Button
             variant="base"
             melt={trigger}
-            class="dark:bg-base-4 dark:hover:bg-base-hover dark:active:bg-base-active w-28 min-w-max leading-none"
+            class="dark:bg-base-4 dark:hover:bg-base-hover dark:active:bg-base-active dark:data-[custom-state=open]:bg-base-hover w-28 min-w-max leading-none"
+            data-custom-state={$open ? 'open' : 'closed'}
         >
             {selectedOption?.buttonLabel ?? 'Paragraph'}
         </Button>

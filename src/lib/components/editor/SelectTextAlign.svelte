@@ -87,7 +87,8 @@
         <Button
             variant="base"
             melt={trigger}
-            class="dark:bg-base-4 dark:hover:bg-base-hover dark:active:bg-base-active w-fit p-2"
+            class="dark:bg-base-4 dark:hover:bg-base-hover dark:active:bg-base-active dark:data-[custom-state=open]:bg-base-hover w-fit p-2"
+            data-custom-state={$open ? 'open' : 'closed'}
         >
             {#if selectedOption}
                 <selectedOption.icon />
