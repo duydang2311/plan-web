@@ -154,32 +154,30 @@
 
 {#snippet messageSnippet(message: LocalChatMessage)}
     {@const isUser = message.sender.id === user.id}
-    <div class="max-w-3/4 flex w-fit gap-2" class:ml-auto={isUser} class:flex-row-reverse={isUser}>
+    <div class={['max-w-3/4 flex w-fit gap-2', isUser && 'ml-auto flex-row-reverse']}>
         <Avatar
             src={imageFromAsset(cloudinary)(message.sender.profile?.image)
                 ?.resize(Resize.fill(64))
                 .toURL()}
             seed={message.sender.profile?.name ?? message.sender.email}
-            class="size-avatar-md"
+            class="size-avatar-lg"
         />
         <div>
+            <p class={['c-label mb-1', isUser && 'ml-auto']}>
+                {message.sender.profile?.displayName ?? message.sender.email} · <RelativeTime
+                    time={message.createdTime}
+                />
+            </p>
             <div
                 class={[
-                    'prose w-fit rounded-xl p-2',
-                    isUser
-                        ? 'bg-primary-3 text-primary-fg-2 ml-auto rounded-br-sm'
-                        : 'bg-base-3 dark:bg-base-4 dark:border-base-border-2 rounded-bl-sm'
+                    'prose border-base-border-3 bg-base-4 dark:bg-base-5 prose-li:first:mt-0 prose-li:first:prose-p:mt-0 w-fit rounded-xl border px-4 py-2',
+                    isUser ? 'ml-auto rounded-tr-sm' : 'rounded-tl-sm'
                 ]}
             >
                 {@html DOMPurify.sanitize(message.content, {
                     USE_PROFILES: { html: true }
                 })}
             </div>
-            <p class={['c-label', isUser && 'ml-auto']}>
-                {message.sender.profile?.displayName ?? message.sender.email} · <RelativeTime
-                    time={message.createdTime}
-                />
-            </p>
         </div>
     </div>
 {/snippet}
@@ -203,7 +201,7 @@
         <div>
             <div
                 class={[
-                    'w-paragraph-lg bg-base-3 dark:bg-base-4 dark:border-base-border-2 h-16 rounded-xl rounded-bl-sm p-2'
+                    'w-paragraph-lg bg-base-3 dark:bg-base-4 dark:border-base-border-2aaaa h-16 rounded-xl rounded-bl-sm p-2'
                 ]}
             ></div>
             <div class="mt-1 flex gap-2">
@@ -230,7 +228,7 @@
 {/snippet}
 
 <div class="transition-enforcement h-full w-full">
-    <div class="grid grid-rows-[1fr_auto] overflow-hidden">
+    <div class="grid grid-rows-[1fr_auto] gap-1 overflow-hidden">
         {#if $query.isPending}
             <div>
                 {@render skeleton()}

@@ -1,8 +1,6 @@
 <script lang="ts">
     import type { InfiniteData } from '@tanstack/svelte-query';
-    import { Editor, Extension } from '@tiptap/core';
-    import Placeholder from '@tiptap/extension-placeholder';
-    import StarterKit from '@tiptap/starter-kit';
+    import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
@@ -10,7 +8,11 @@
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { UserPreset } from '~/lib/models/user';
     import { tryPromise } from '~/lib/utils/try';
+    import { createEditor } from '../../editor/utils';
     import { infinitizeChatMessageData, type LocalChatMessage } from './utils';
+    import { Button } from '../..';
+    import { IconSend } from '../../icons';
+    import { enhance } from '$app/forms';
 
     const { user, chatId }: { user: UserPreset['basicProfile']; chatId: string } = $props();
     const { api, queryClient } = useRuntime();
@@ -113,36 +115,23 @@
         if (!tiptapContainerRef) {
             return;
         }
-        const e = new Editor({
+
+        const e = createEditor({
             element: tiptapContainerRef,
-            content: '',
             editorProps: {
                 attributes: {
-                    class: 'focus:outline-none p-4'
+                    class:
+                        'focus:outline-none prose max-w-full p-4 pr-32 rounded-b-lg ' +
+                        'border-base-border-3 bg-base-4 dark:bg-base-5 hover:border-base-border-2 relative max-h-96 overflow-auto rounded-lg border custom-scrollbar',
+                    style: '--_border: var(--color-base-4);'
                 }
             },
-            extensions: [
-                StarterKit,
-                Placeholder.configure({
-                    placeholder: 'Send a message...'
-                }),
-                Extension.create({
-                    addKeyboardShortcuts() {
-                        return {
-                            'Mod-Enter': () => {
-                                this.editor.emit('submit', undefined);
-                                return true;
-                            }
-                        };
-                    },
-                    onCreate() {
-                        this.editor.on('submit', submit);
-                    },
-                    onDestroy() {
-                        this.editor.off('submit', submit);
-                    }
-                })
-            ],
+            onCreate: ({ editor }) => {
+                editor.on('submit', submit);
+            },
+            onDestroy: () => {
+                e.off('submit', submit);
+            },
             onTransaction: ({ editor: e }) => {
                 editor = undefined;
                 editor = e;
@@ -156,7 +145,27 @@
     });
 </script>
 
-<div
-    bind:this={tiptapContainerRef}
-    class="border-base-border-2 bg-base-1 dark:bg-base-4 hover:border-base-border-1 relative mx-2 mb-2 max-h-96 overflow-auto rounded-lg border"
-></div>
+<div class="relative mb-2 px-2">
+    <div bind:this={tiptapContainerRef}></div>
+    {#if editor}
+        <form
+            method="post"
+            action="/actions?/create_chat_message"
+            use:enhance={async (e) => {
+                e.cancel();
+                await submit();
+                return () => {};
+            }}
+        >
+            <Button
+                variant="primary"
+                size="sm"
+                filled={false}
+                class="absolute bottom-1.5 right-4 flex w-fit items-center gap-2"
+            >
+                <IconSend />
+                <span>Send</span>
+            </Button>
+        </form>
+    {/if}
+</div>

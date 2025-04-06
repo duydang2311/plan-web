@@ -17,9 +17,9 @@
     --color-base-fg-5: oklch(45.29% 0.0079 287.91);
     --color-base-fg-ghost: oklch(40.29% 0.0079 287.91);
     --color-base-fg-disabled: oklch(50.29% 0.0079 287.91);
-    --color-base-border-1: oklch(31.69% 0.0079 287.91);
-    --color-base-border-2: oklch(29.69% 0.0079 287.91);
-    --color-base-border-3: oklch(27.69% 0.0079 287.91);
+    --color-base-border-1: oklch(29.69% 0.0079 287.91);
+    --color-base-border-2: oklch(27.69% 0.0079 287.91);
+    --color-base-border-3: oklch(25.69% 0.0079 287.91);
 
     --color-primary-1: oklch(68.45% 0.1768 287.91);
     --color-primary-2: oklch(60.45% 0.1768 287.91);
