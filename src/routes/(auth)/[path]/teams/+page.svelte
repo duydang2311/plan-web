@@ -26,7 +26,6 @@
         syncList: () => ref.value ?? paginatedList(),
         syncUrl: () => page.url
     });
-    $inspect(ref.value);
 </script>
 
 <main class="divide-base-border-2 flex h-full flex-col divide-y">
