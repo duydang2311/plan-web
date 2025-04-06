@@ -16,9 +16,9 @@
         --_bg-active: var(--color-base-active);
         --_bg-disabled: var(--color-base-2);
 
-        &:where([data-theme='dark'], [data-theme='dark'] &) {
+        @variant dark {
             --_bg: var(--color-base-3);
-            --_bg-hover: var(--color-base-4);
+            --_bg-hover: var(--color-base-hover);
             --_bg-active: var(--color-base-active);
         }
     }
