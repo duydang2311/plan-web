@@ -55,13 +55,12 @@
     const messages = $derived($query.data?.pages.flatMap((a) => a.items).toReversed() ?? []);
 
     let loadMoreRef = $state.raw<HTMLElement>();
-    let virtualHandle = $state.raw<VListHandle>();
+    let virtualizer = $state.raw<VListHandle>();
     let scrollRef = $state.raw<HTMLElement>();
-    let atBottom = true;
-    let shift = $state.raw(false);
+    let dirtyScroll = false;
 
-    watch(() => [virtualHandle, scrollRef])(() => {
-        if (!virtualHandle || !scrollRef) {
+    watch(() => [virtualizer, scrollRef])(() => {
+        if (!virtualizer || !scrollRef) {
             return;
         }
 
@@ -92,24 +91,6 @@
         return () => {
             observer.disconnect();
         };
-    });
-
-    watch(() => chatId)(() => {
-        atBottom = true;
-    });
-
-    watch(() => [virtualHandle, messages, atBottom])(() => {
-        if (virtualHandle && messages.length && atBottom) {
-            virtualHandle.scrollToIndex(messages.length - 1);
-            atBottom = false;
-        }
-    });
-
-    watch(() => [scrollRef, messages])(() => {
-        if (!scrollRef) {
-            return;
-        }
-        shift = scrollRef.scrollHeight > scrollRef.clientHeight;
     });
 
     onMount(() => {
@@ -157,6 +138,18 @@
             subscription?.unsubscribe();
         };
     });
+
+    watch(() => [messages, virtualizer])(() => {
+        if (dirtyScroll || !virtualizer) {
+            return;
+        }
+
+        virtualizer.scrollToIndex(messages.length - 1);
+    });
+
+    watch(() => chatId)(() => {
+        dirtyScroll = false;
+    });
 </script>
 
 {#snippet messageSnippet(message: LocalChatMessage)}
@@ -172,7 +165,7 @@
         <div>
             <div
                 class={[
-                    'w-fit rounded-xl p-2',
+                    'prose w-fit rounded-xl p-2',
                     isUser
                         ? 'bg-primary-3 text-primary-fg-2 ml-auto rounded-br-sm'
                         : 'bg-base-3 dark:bg-base-4 dark:border-base-border-2 rounded-bl-sm'
@@ -247,14 +240,22 @@
                 <p class="c-label">No messages found.</p>
             </div>
         {:else}
-            <div class="h-full overflow-auto px-2 py-1" bind:this={scrollRef}>
+            <div
+                class="h-full overflow-auto px-2 py-1"
+                bind:this={scrollRef}
+                onscroll={(e) => {
+                    const isAtBottom =
+                        e.currentTarget.scrollHeight - e.currentTarget.scrollTop <=
+                        e.currentTarget.clientHeight + 1;
+                    dirtyScroll = !isAtBottom;
+                }}
+            >
                 <Virtualizer
                     data={[{ id: 'load-more' }, ...messages]}
                     {scrollRef}
                     getKey={(item) => item.id}
                     horizontal={false}
-                    {shift}
-                    bind:this={virtualHandle}
+                    bind:this={virtualizer}
                 >
                     {#snippet children(message)}
                         {#if message.id === 'load-more'}
