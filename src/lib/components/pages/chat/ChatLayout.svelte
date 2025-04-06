@@ -120,7 +120,9 @@
             {/if}
         </div>
     </div>
-    <div class="dark:bg-base-3 min-w-0 overflow-hidden">
+    <div
+        class="dark:bg-base-3 min-w-0 max-w-full overflow-hidden break-words [overflow-wrap:anywhere]"
+    >
         {@render children()}
     </div>
 </div>
