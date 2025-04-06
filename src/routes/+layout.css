@@ -99,17 +99,6 @@
         overflow: hidden;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        color: var(--color-base-fg-1);
-        font-family: var(--font-display);
-        font-weight: 600;
-    }
-
     h6 {
         font-size: var(--text-h6);
     }
@@ -153,8 +142,10 @@
 
     .custom-scrollbar {
         --_border: var(--color-base-3);
+        --_bg: color-mix(in oklch, var(--color-base-fg-2) 30%, var(--color-base-1));
         &::-webkit-scrollbar-thumb {
             border: --spacing(0.5) solid var(--_border);
+            background-color: var(--_bg);
         }
     }
 
@@ -176,6 +167,14 @@
     }
 }
 
+@layer utilities {
+    .prose {
+        @variant dark {
+            --tw-prose-pre-bg: var(--color-base-5);
+        }
+    }
+}
+
 [data-sonner-toaster] {
     font-family: var(--font-body);
 }
@@ -184,10 +183,8 @@
     color: var(--color-base-fg-2);
 }
 
-@layer utilities {
-    .prose {
-        @variant dark {
-            --tw-prose-pre-bg: var(--color-base-5);
-        }
-    }
+:where(h1, h2, h3, h4, h5, h6) {
+    color: var(--color-base-fg-1);
+    font-family: var(--font-display);
+    font-weight: 600;
 }
