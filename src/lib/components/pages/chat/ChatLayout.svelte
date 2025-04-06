@@ -65,8 +65,10 @@
                 }}
                 variant="base"
                 class={[
-                    'col-span-full grid grid-cols-subgrid items-center gap-2 px-2 text-left font-normal',
-                    selectedChatId === chat.id && 'bg-base-active text-base-fg-1 font-semibold'
+                    'col-span-full grid grid-cols-subgrid items-center gap-2 px-2 text-left',
+                    selectedChatId === chat.id
+                        ? 'not-hover:not-active:bg-base-selected text-base-fg-1 font-semibold'
+                        : 'not-hover:not-active:bg-transparent font-normal'
                 ]}
             >
                 {#if chat.type === ChatTypes.OneOnOne}
@@ -89,7 +91,7 @@
     {/if}
 {/snippet}
 
-<div class="divide-base-border-2 grid h-full grid-cols-[auto_1fr] divide-x overflow-hidden">
+<div class="divide-base-border-2 grid h-full grid-cols-[auto_1fr] divide-x">
     <div class="w-paragraph-sm grid grid-rows-[auto_1fr] overflow-hidden">
         <div class="border-b-base-border-3 flex gap-2 border-b">
             <div class="relative grow">
@@ -118,7 +120,7 @@
             {/if}
         </div>
     </div>
-    <div class="dark:bg-base-3 overflow-hidden">
+    <div class="dark:bg-base-3 min-w-0 overflow-hidden">
         {@render children()}
     </div>
 </div>
