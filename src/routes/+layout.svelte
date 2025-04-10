@@ -6,6 +6,7 @@
     import { onMount, type Snippet } from 'svelte';
     import { Sonner, Toaster } from '~/lib/components';
     import { setRuntime } from '~/lib/contexts/runtime.client';
+    import { createSignalRHub } from '~/lib/services/hub.client';
     import { createIdHasher } from '~/lib/services/id_hasher';
     import { NATSRealtime } from '~/lib/services/realtime.client';
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
@@ -13,6 +14,12 @@
     import './+layout.css';
 
     const { data, children }: { data: LayoutData; children: Snippet } = $props();
+    const getApi = () =>
+        new UniversalHttpClient({
+            baseUrl: `${page.url.origin}/api`,
+            version: 'v1',
+            fetch: globalThis.fetch
+        });
     const runtime = setRuntime({
         realtime: () =>
             new NATSRealtime({
@@ -20,12 +27,7 @@
                 username: env.PUBLIC_REALTIME_USERNAME,
                 password: env.PUBLIC_REALTIME_PASSWORD
             }),
-        api: () =>
-            new UniversalHttpClient({
-                baseUrl: `${page.url.origin}/api`,
-                version: 'v1',
-                fetch: globalThis.fetch
-            }),
+        api: getApi,
         cloudinary: () =>
             new Cloudinary({
                 cloud: {
@@ -34,7 +36,14 @@
                 url: { secure: true }
             }),
         queryClient: () => data.queryClient,
-        idHasher: createIdHasher
+        idHasher: createIdHasher,
+        chatHub: () =>
+            createSignalRHub(env.PUBLIC_SIGNALR_ORIGIN + '/hubs/chat', async () => {
+                const api = getApi();
+                const response = await api.get('/hubs/token');
+                const json = await response.json<{ accessToken: string }>();
+                return json.accessToken;
+            })
     });
 
     function onColorSchemePreferenceChange(e: MediaQueryListEvent) {

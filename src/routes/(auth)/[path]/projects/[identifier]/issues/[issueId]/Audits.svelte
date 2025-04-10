@@ -1,7 +1,6 @@
 <script lang="ts">
     import { replaceState } from '$app/navigation';
     import { page } from '$app/state';
-    import { debounce } from '@mobily/ts-belt/Function';
     import { Virtualizer, type VirtualizerHandle } from 'virtua/svelte';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';

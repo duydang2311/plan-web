@@ -6,6 +6,7 @@ import type Sqids from 'sqids';
 import { getContext, setContext } from 'svelte';
 import type { HttpClient } from '../services/http_client';
 import { type Realtime } from '../services/realtime.client';
+import type { Hub } from '../services/hub.client';
 
 interface Runtime {
     readonly api: Context.Tag.Service<HttpClient>;
@@ -13,6 +14,7 @@ interface Runtime {
     readonly cloudinary: Cloudinary;
     readonly queryClient: QueryClient;
     readonly idHasher: Sqids;
+    readonly chatHub: Hub;
 }
 
 export function setRuntime(value: Record<keyof Runtime, () => Runtime[keyof Runtime]>) {

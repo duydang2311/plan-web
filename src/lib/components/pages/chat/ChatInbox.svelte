@@ -2,8 +2,6 @@
     import { Resize } from '@cloudinary/url-gen/actions';
     import { createInfiniteQuery, type InfiniteData } from '@tanstack/svelte-query';
     import DOMPurify from 'isomorphic-dompurify';
-    import type { Subscription } from 'nats.ws';
-    import { onMount } from 'svelte';
     import { toStore } from 'svelte/store';
     import invariant from 'tiny-invariant';
     import { Virtualizer, type VListHandle } from 'virtua/svelte';
@@ -19,7 +17,7 @@
     import { getChatMessage, infinitizeChatMessageData, type LocalChatMessage } from './utils';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
-    const { api, cloudinary, realtime, queryClient } = useRuntime();
+    const { api, cloudinary, realtime, queryClient, chatHub } = useRuntime();
     const select =
         'Id,CreatedTime,Content,Sender.Id,Sender.Email,Sender.Profile.Name,Sender.Profile.DisplayName,Sender.Profile.Image';
     const queryKey = $derived(['chat-messages', { chatId }]);
@@ -93,52 +91,6 @@
         };
     });
 
-    onMount(() => {
-        let subscription: Subscription | undefined;
-        (async () => {
-            const trySubscribe = await realtime.subscribe(`chats.${chatId}.messages.created`);
-            if (trySubscribe.isErr()) {
-                return;
-            }
-            subscription = trySubscribe.value;
-            for await (const msg of subscription) {
-                const json = msg.json<{ chatMessageId: number }>();
-                invariant(
-                    typeof json.chatMessageId === 'number',
-                    'json.chatMessageId must be a number'
-                );
-                if (messages.some((a) => a.id === json.chatMessageId)) {
-                    continue;
-                }
-
-                const getChatMessageAttempt = await getChatMessage(api)(json.chatMessageId);
-                if (!getChatMessageAttempt.ok) {
-                    return;
-                }
-
-                queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
-                    queryKey,
-                    (a) => {
-                        if (!a) {
-                            return a;
-                        }
-
-                        return infinitizeChatMessageData(
-                            [
-                                getChatMessageAttempt.data,
-                                ...a.pages.flatMap((a) => a.items)
-                            ].toSorted((a, b) => b.id - a.id),
-                            (a.pages[0]?.totalCount ?? 0) + 1
-                        );
-                    }
-                );
-            }
-        })();
-        return () => {
-            subscription?.unsubscribe();
-        };
-    });
-
     watch(() => [messages, virtualizer])(() => {
         if (dirtyScroll || !virtualizer) {
             return;
@@ -149,6 +101,31 @@
 
     watch(() => chatId)(() => {
         dirtyScroll = false;
+    });
+
+    chatHub.on('new_chat_message', async (data: { ChatMessageId: number }) => {
+        invariant(typeof data.ChatMessageId === 'number', 'data.ChatMessageId must be a number');
+        if (messages.some((a) => a.id === data.ChatMessageId)) {
+            return;
+        }
+
+        const getChatMessageAttempt = await getChatMessage(api)(data.ChatMessageId);
+        if (!getChatMessageAttempt.ok) {
+            return;
+        }
+
+        queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey, (a) => {
+            if (!a) {
+                return a;
+            }
+
+            return infinitizeChatMessageData(
+                [getChatMessageAttempt.data, ...a.pages.flatMap((a) => a.items)].toSorted(
+                    (a, b) => b.id - a.id
+                ),
+                (a.pages[0]?.totalCount ?? 0) + 1
+            );
+        });
     });
 </script>
 
