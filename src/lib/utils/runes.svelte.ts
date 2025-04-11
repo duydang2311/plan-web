@@ -93,14 +93,26 @@ export const when: (
     }
 };
 
-export const watch = (depsFn: () => unknown) => {
-    return (fn: () => void | (() => void)) => {
-        $effect(() => {
-            depsFn();
-            return untrack(() => fn());
-        });
-    };
-};
+export const watch = Object.assign(
+    function (depsFn: () => unknown) {
+        return (fn: () => void | (() => void)) => {
+            $effect(() => {
+                depsFn();
+                return untrack(() => fn());
+            });
+        };
+    },
+    {
+        pre(depsFn: () => unknown) {
+            return (fn: () => void | (() => void)) => {
+                $effect.pre(() => {
+                    depsFn();
+                    return untrack(() => fn());
+                });
+            };
+        }
+    }
+);
 
 export const createLoading = (): Loading => {
     let status = $state.raw(0);

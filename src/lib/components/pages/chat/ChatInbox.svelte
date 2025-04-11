@@ -20,6 +20,7 @@
         sortChatMessages,
         type LocalChatMessage
     } from './utils';
+    import { untrack } from 'svelte';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
     const { api, cloudinary, queryClient, chatHub } = useRuntime();
@@ -61,6 +62,7 @@
     let virtualizer = $state.raw<VListHandle>();
     let scrollRef = $state.raw<HTMLElement>();
     let dirtyScroll = false;
+    let previousScrollHeight = 0;
 
     watch(() => [virtualizer, scrollRef])(() => {
         if (!virtualizer || !scrollRef) {
@@ -102,6 +104,24 @@
         }
 
         virtualizer.scrollToIndex(messages.length - 1);
+    });
+
+    watch.pre(() => messages)(() => {
+        if (!scrollRef) {
+            return;
+        }
+        previousScrollHeight = scrollRef.scrollHeight;
+    });
+
+    watch(() => messages)(() => {
+        if (!scrollRef) {
+            return;
+        }
+        if (previousScrollHeight !== scrollRef.scrollHeight) {
+            const old = scrollRef.scrollTop;
+            scrollRef.scrollTop += scrollRef.scrollHeight - previousScrollHeight;
+            previousScrollHeight = scrollRef.scrollHeight;
+        }
     });
 
     watch(() => chatId)(() => {
