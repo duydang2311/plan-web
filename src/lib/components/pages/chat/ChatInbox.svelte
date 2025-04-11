@@ -14,10 +14,15 @@
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { QueryResponse } from '~/lib/utils/query';
     import { watch } from '~/lib/utils/runes.svelte';
-    import { getChatMessage, infinitizeChatMessageData, type LocalChatMessage } from './utils';
+    import {
+        getChatMessage,
+        infinitizeChatMessageData,
+        sortChatMessages,
+        type LocalChatMessage
+    } from './utils';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
-    const { api, cloudinary, realtime, queryClient, chatHub } = useRuntime();
+    const { api, cloudinary, queryClient, chatHub } = useRuntime();
     const select =
         'Id,CreatedTime,Content,Sender.Id,Sender.Email,Sender.Profile.Name,Sender.Profile.DisplayName,Sender.Profile.Image';
     const queryKey = $derived(['chat-messages', { chatId }]);
@@ -103,30 +108,60 @@
         dirtyScroll = false;
     });
 
-    chatHub.on('new_chat_message', async (data: { ChatMessageId: number }) => {
-        invariant(typeof data.ChatMessageId === 'number', 'data.ChatMessageId must be a number');
-        if (messages.some((a) => a.id === data.ChatMessageId)) {
-            return;
-        }
+    chatHub.on(
+        'new_chat_message',
+        async (data: { ChatMessageId: number; OptimisticId?: string }) => {
+            invariant(
+                typeof data.ChatMessageId === 'number',
+                'data.ChatMessageId must be a number'
+            );
 
-        const getChatMessageAttempt = await getChatMessage(api)(data.ChatMessageId);
-        if (!getChatMessageAttempt.ok) {
-            return;
-        }
+            const queryData =
+                queryClient.getQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey);
+            const all = queryData?.pages.flatMap((a) => a.items) ?? [];
 
-        queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey, (a) => {
-            if (!a) {
-                return a;
+            if (all.some((a) => a.id === data.ChatMessageId)) {
+                return;
             }
 
-            return infinitizeChatMessageData(
-                [getChatMessageAttempt.data, ...a.pages.flatMap((a) => a.items)].toSorted(
-                    (a, b) => b.id - a.id
-                ),
-                (a.pages[0]?.totalCount ?? 0) + 1
+            if (data.OptimisticId) {
+                const index = all.findIndex((b) => b.optimisticId === data.OptimisticId);
+                if (index !== -1) {
+                    all[index] = {
+                        ...all[index],
+                        id: data.ChatMessageId,
+                        optimisticId: undefined
+                    };
+                    queryClient.setQueryData(
+                        queryKey,
+                        infinitizeChatMessageData(all, queryData?.pages[0]?.totalCount ?? 0)
+                    );
+                    return;
+                }
+            }
+
+            const getChatMessageAttempt = await getChatMessage(api)(data.ChatMessageId);
+            if (!getChatMessageAttempt.ok) {
+                return;
+            }
+
+            queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
+                queryKey,
+                (a) => {
+                    if (!a) {
+                        return a;
+                    }
+
+                    return infinitizeChatMessageData(
+                        [getChatMessageAttempt.data, ...a.pages.flatMap((a) => a.items)].toSorted(
+                            sortChatMessages
+                        ),
+                        (a.pages[0]?.totalCount ?? 0) + 1
+                    );
+                }
             );
-        });
-    });
+        }
+    );
 </script>
 
 {#snippet messageSnippet(message: LocalChatMessage)}
@@ -228,7 +263,7 @@
                 <Virtualizer
                     data={[{ id: 'load-more' }, ...messages]}
                     {scrollRef}
-                    getKey={(item) => item.id}
+                    getKey={(item) => item.id ?? item.optimisticId}
                     horizontal={false}
                     bind:this={virtualizer}
                 >

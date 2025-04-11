@@ -4,9 +4,13 @@ import type { UserPreset } from '~/lib/models/user';
 import type { HttpClient } from '~/lib/services/http_client';
 import { attempt, tryPromise, type Attempt } from '~/lib/utils/try';
 
-export type LocalChatMessage = Pick<ChatMessage, 'id' | 'createdTime' | 'content'> & {
-    sender: UserPreset['basicProfile'];
-};
+export type LocalChatMessage = (
+    | { id: number; optimisticId?: never }
+    | { id?: never; optimisticId: string }
+) &
+    Pick<ChatMessage, 'createdTime' | 'content'> & {
+        sender: UserPreset['basicProfile'];
+    };
 
 export const getChatMessage =
     (http: Context.Tag.Service<HttpClient>) =>
@@ -46,4 +50,17 @@ export const infinitizeChatMessageData = (arr: LocalChatMessage[], totalCount: n
         })),
         pageParams: partitions.map((_, i) => (i === 0 ? undefined : partitions[i - 1].at(-1)?.id))
     };
+};
+
+export const sortChatMessages = (a: LocalChatMessage, b: LocalChatMessage) => {
+    if (a.optimisticId && b.optimisticId) {
+        return a.optimisticId.localeCompare(b.optimisticId);
+    }
+    if (a.optimisticId) {
+        return -1;
+    }
+    if (b.optimisticId) {
+        return 1;
+    }
+    return b.id! - a.id!;
 };

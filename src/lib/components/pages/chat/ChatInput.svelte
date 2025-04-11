@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { enhance } from '$app/forms';
     import type { InfiniteData } from '@tanstack/svelte-query';
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
@@ -8,11 +9,10 @@
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { UserPreset } from '~/lib/models/user';
     import { tryPromise } from '~/lib/utils/try';
-    import { createEditor } from '../../editor/utils';
-    import { infinitizeChatMessageData, type LocalChatMessage } from './utils';
     import { Button } from '../..';
+    import { createEditor } from '../../editor/utils';
     import { IconSend } from '../../icons';
-    import { enhance } from '$app/forms';
+    import { infinitizeChatMessageData, sortChatMessages, type LocalChatMessage } from './utils';
 
     const { user, chatId }: { user: UserPreset['basicProfile']; chatId: string } = $props();
     const { api, queryClient } = useRuntime();
@@ -29,7 +29,7 @@
         const content = editor.getHTML().trim();
         editor.commands.clearContent();
 
-        const optimisticId = Date.now();
+        const optimisticId = crypto.randomUUID();
         const data = queryClient.getQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>([
             'chat-messages',
             { chatId }
@@ -45,13 +45,13 @@
                     return infinitizeChatMessageData(
                         [
                             {
-                                id: optimisticId,
+                                optimisticId,
                                 sender: user,
                                 createdTime: DateTime.now().toISO(),
                                 content
                             },
                             ...a.pages.flatMap((b) => b.items)
-                        ].toSorted((a, b) => b.id - a.id),
+                        ],
                         a.pages[0]?.totalCount ?? 0
                     );
                 }
@@ -61,7 +61,8 @@
             api.post('chat-messages', {
                 body: {
                     chatId,
-                    content
+                    content,
+                    optimisticId
                 }
             })
         )();
@@ -77,7 +78,9 @@
                     }
 
                     return infinitizeChatMessageData(
-                        a.pages.flatMap((b) => b.items).filter((b) => b.id !== optimisticId),
+                        a.pages
+                            .flatMap((b) => b.items)
+                            .filter((b) => b.optimisticId !== optimisticId),
                         a.pages[0]?.totalCount ?? 0
                     );
                 }
@@ -96,14 +99,15 @@
                         a.pages
                             .flatMap((b) => b.items)
                             .map((b) =>
-                                b.id === optimisticId
+                                b.optimisticId === optimisticId
                                     ? {
                                           ...b,
-                                          id: json.id
+                                          id: json.id,
+                                          optimisticId: undefined
                                       }
                                     : b
                             )
-                            .toSorted((a, b) => b.id - a.id),
+                            .toSorted(sortChatMessages),
                         a.pages[0]?.totalCount ?? 0
                     );
                 }
