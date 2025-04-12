@@ -115,48 +115,7 @@ export const watch = Object.assign(
 );
 
 export const createLoading = (): Loading => {
-    let status = $state.raw(0);
-    let timeout: number;
-
-    const loading = {
-        set: () => {
-            if (timeout || status !== 0) {
-                return;
-            }
-            status = 0b1;
-            timeout = setTimeout(() => {
-                status |= 0b10;
-                timeout = setTimeout(() => {
-                    status |= 0b100;
-                    timeout = setTimeout(() => {
-                        status |= 0b1000;
-                        timeout = 0;
-                    }, 3000) as unknown as number;
-                }, 1000) as unknown as number;
-            }, 1000) as unknown as number;
-        },
-        unset: () => {
-            if (timeout) {
-                clearTimeout(timeout);
-                timeout = 0;
-            }
-            status = 0;
-        },
-        get immediate() {
-            return (status & 0b1) === 0b1;
-        },
-        get short() {
-            return (status & 0b10) === 0b10;
-        },
-        get medium() {
-            return (status & 0b100) === 0b100;
-        },
-        get long() {
-            return (status & 0b1000) === 0b1000;
-        }
-    };
-
-    return loading;
+    return new SvelteLoading();
 };
 
 export const createUiStatus = () => {
@@ -191,54 +150,94 @@ export const createUiStatus = () => {
     return uiStatus;
 };
 
-function __createRef<T>(f: T | (() => T)): Ref<NonNullable<T>> {
-    let value = $state.raw(f instanceof Function ? f() : f);
-    if (f instanceof Function) {
-        $effect(() => {
-            const a = f();
-            untrack(() => {
-                value = a;
-            });
-        });
-    }
-    return {
-        get value() {
-            return value as NonNullable<T>;
-        },
-        set value(v) {
-            value = v;
+export const createRef = Object.assign(
+    function <T>(f: T | (() => T)): Ref<NonNullable<T>> {
+        return new SvelteRef(f) as Ref<NonNullable<T>>;
+    },
+    {
+        maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<NonNullable<T>> => {
+            return new SvelteAsyncRef(f) as AsyncRef<NonNullable<T>>;
         }
-    };
+    }
+);
+
+class SvelteLoading {
+    status = $state.raw(0);
+    timeout: number | undefined = undefined;
+
+    public set() {
+        if (this.timeout || this.status !== 0) {
+            return;
+        }
+        this.status = 0b1;
+        this.timeout = setTimeout(() => {
+            this.status |= 0b10;
+            this.timeout = setTimeout(() => {
+                this.status |= 0b100;
+                this.timeout = setTimeout(() => {
+                    this.status |= 0b1000;
+                    this.timeout = 0;
+                }, 3000) as unknown as number;
+            }, 1000) as unknown as number;
+        }, 1000) as unknown as number;
+    }
+    public unset() {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = 0;
+        }
+        this.status = 0;
+    }
+    get immediate() {
+        return (this.status & 0b1) === 0b1;
+    }
+    get short() {
+        return (this.status & 0b10) === 0b10;
+    }
+    get medium() {
+        return (this.status & 0b100) === 0b100;
+    }
+    get long() {
+        return (this.status & 0b1000) === 0b1000;
+    }
 }
 
-export const createRef = Object.assign(__createRef, {
-    maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<NonNullable<T>> => {
-        const value = f();
+class SvelteRef<T> implements Ref<T> {
+    value = $state<T>();
+    constructor(f: T | (() => T)) {
+        if (f instanceof Function) {
+            $effect(() => {
+                const a = f();
+                untrack(() => {
+                    this.value = a;
+                });
+            });
+        } else {
+            this.value = f;
+        }
+    }
+}
+
+class SvelteAsyncRef<T> implements AsyncRef<T> {
+    value = $state.raw<T>();
+    loading = createLoading();
+    constructor(f: () => MaybePromise<T>) {
+        const initialValue = f();
         const loading = createLoading();
-        if (!isPromiseLike(value)) {
-            let state = $state.raw(value);
+        if (!isPromiseLike(initialValue)) {
+            this.value = initialValue;
             $effect(() => {
                 unwrapMaybePromise(f())((b) => {
                     untrack(() => {
-                        state = b;
+                        this.value = b;
                     });
                 });
             });
-            return {
-                get value() {
-                    return state as NonNullable<T>;
-                },
-                set value(v) {
-                    state = v;
-                },
-                loading
-            };
         }
 
-        let state = $state.raw<T | undefined>(undefined);
         loading.set();
-        unwrapMaybePromise(value)((a) => {
-            state = a;
+        unwrapMaybePromise(initialValue)((a) => {
+            this.value = a;
             loading.unset();
         });
         $effect(() => {
@@ -246,19 +245,10 @@ export const createRef = Object.assign(__createRef, {
             untrack(() => {
                 loading.set();
                 unwrapMaybePromise(a)((b) => {
-                    state = b;
+                    this.value = b;
                     loading.unset();
                 });
             });
         });
-        return {
-            get value() {
-                return state as NonNullable<T>;
-            },
-            set value(v) {
-                state = v;
-            },
-            loading
-        };
     }
-});
+}
