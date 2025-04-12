@@ -20,8 +20,7 @@
         class={[
             'p-2',
             editor.isActive(name)
-                ? 'bg-base-hover text-base-fg-1'
-                : 'dark:bg-base-4 dark:hover:bg-base-5 dark:active:bg-base-active'
+                && 'not-hover:not-active:bg-base-selected text-base-fg-1'
         ]}
     >
         <Icon />

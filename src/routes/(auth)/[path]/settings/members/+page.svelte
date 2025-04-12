@@ -41,7 +41,7 @@
             <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
             <Input
                 type="text"
-                class="h-full border-none py-0 pl-8 focus:shadow-none"
+                class="h-full border-none py-0 pl-8 focus:shadow-none bg-transparent"
                 placeholder="Search member"
             />
         </div>

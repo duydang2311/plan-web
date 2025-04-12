@@ -98,7 +98,7 @@
                 <Input
                     type="text"
                     placeholder="Search chat..."
-                    class="w-full border-none py-1 pl-10"
+                    class="w-full border-none bg-transparent py-1 pl-10"
                 />
                 <IconSearch class="text-base-fg-ghost absolute left-4 top-1/2 -translate-y-1/2" />
             </div>

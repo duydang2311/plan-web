@@ -20,7 +20,7 @@
                     onclick={() => {
                         activeView = 'all';
                     }}
-                    class="data-[friend-active]:not-[:hover,:active]:bg-base-4 data-[friend-active]:not-[:hover,:active]:text-base-fg-1 capitalize"
+                    class="data-[friend-active]:not-[:hover,:active]:bg-base-selected data-[friend-active]:not-[:hover,:active]:text-base-fg-1 capitalize"
                 >
                     All friends
                 </Button>
@@ -30,7 +30,7 @@
                     variant="base"
                     size="sm"
                     data-friend-active={activeView === 'requests' ? true : undefined}
-                    class="data-[friend-active]:not-[:hover,:active]:bg-base-4 data-[friend-active]:not-[:hover,:active]:text-base-fg-1 capitalize"
+                    class="data-[friend-active]:not-[:hover,:active]:bg-base-selected data-[friend-active]:not-[:hover,:active]:text-base-fg-1 capitalize"
                     onclick={() => {
                         activeView = 'requests';
                     }}
@@ -43,7 +43,7 @@
             variant="base"
             title="Add friend"
             data-friend-active={activeView === 'add-friend' ? true : undefined}
-            class="data-[friend-active]:not-[:hover,:active]:bg-base-4 data-[friend-active]:not-[:hover,:active]:text-base-fg-1"
+            class="data-[friend-active]:not-[:hover,:active]:bg-base-selected data-[friend-active]:not-[:hover,:active]:text-base-fg-1"
             onclick={() => {
                 activeView = 'add-friend';
             }}

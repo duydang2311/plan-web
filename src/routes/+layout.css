@@ -24,6 +24,7 @@
 @import '~/lib/stylesheets/c-icon-button.css' layer(components);
 @import '~/lib/stylesheets/c-select.css' layer(components);
 @import '~/lib/stylesheets/c-main.css' layer(components);
+@import '~/lib/stylesheets/c-dialog.css' layer(components);
 
 @theme {
     --font-display: InterVariable, var(--font-sans);
@@ -188,4 +189,53 @@
     color: var(--color-base-fg-1);
     font-family: var(--font-display);
     font-weight: 600;
+}
+
+.mesh-gradient {
+    --_gradient-blend-mode: normal;
+    --_gradient:
+        radial-gradient(
+            at 81% 11%,
+            color-mix(in oklch, var(--color-primary-1) 100%, transparent) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 45% 22%,
+            color-mix(in oklch, var(--color-primary-1) 60%, transparent) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 28% 14%,
+            color-mix(in oklch, var(--color-primary-1) 40%, transparent) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 52% 18%,
+            color-mix(in oklch, var(--color-primary-1) 20%, transparent) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 89% 47%,
+            color-mix(in oklch, var(--color-primary-1) 0%, transparent) 0px,
+            transparent 50%
+        );
+
+    background: var(--_gradient) var(--color-base-1);
+    mix-blend-mode: var(--_gradient-blend-mode);
+}
+.noise {
+    --_noise-texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'><defs><filter id='n' x='0' y='0' width='100%' height='100%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.3' numOctaves='3' stitchTiles='stitch' result='t'/><feColorMatrix type='saturate' values='0' in='t' result='g'/><feComponentTransfer in='g' result='a'><feFuncA type='linear' slope='0.5'/></feComponentTransfer></filter></defs><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --_noise-size: 8vmin;
+
+    background-image: var(--_noise-texture);
+    background-size: var(--_noise-size);
+    background-position: center;
+    background-repeat: repeat;
+}
+
+.frosted-backdrop {
+    --_gradient-blur: 200px;
+
+    backdrop-filter: blur(var(--_gradient-blur)) contrast(100%) brightness(100%);
+    -webkit-backdrop-filter: blur(var(--_gradient-blur)) contrast(100%) brightness(100%);
 }

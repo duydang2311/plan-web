@@ -87,7 +87,7 @@
         <Button
             variant="base"
             melt={trigger}
-            class="dark:bg-base-4 dark:hover:bg-base-hover dark:active:bg-base-active dark:data-[custom-state=open]:bg-base-hover w-fit p-2"
+            class="dark:data-[custom-state=open]:bg-base-selected w-fit p-2"
             data-custom-state={$open ? 'open' : 'closed'}
         >
             {#if selectedOption}
@@ -95,7 +95,7 @@
             {/if}
         </Button>
         {#if $open}
-            <div class="c-select--menu w-fit" use:melt={menu}>
+            <div class="c-select--menu bg-base-5 w-fit" use:melt={menu}>
                 {#each options as o (o.value)}
                     {@const opt = option(o)}
                     <button

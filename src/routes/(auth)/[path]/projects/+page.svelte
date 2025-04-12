@@ -9,25 +9,26 @@
 </script>
 
 <main class="grid h-full grid-rows-[auto_1fr] content-start overflow-auto">
-    <div class="border-b-base-border-2 flex justify-between border-b px-4 py-1">
-        <div class="relative">
+    <div class="border-b-base-border-2 flex justify-between border-b divide-x divide-base-border-3">
+        <div class="relative pl-8 grow">
             <Input
                 id="search"
                 type="text"
-                class="w-48 border-none py-1 pl-8 shadow-none focus:ring-0"
+                class="border-none py-1 pl-8 shadow-none bg-transparent h-full w-full"
                 placeholder="Search by name"
             />
             <IconSearch
-                class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
+                class="text-base-fg-ghost absolute left-8 top-1/2 -translate-y-1/2"
             />
         </div>
         <Button
             as="link"
             href="/{page.params['path']}/projects/new"
-            variant="primary"
+            variant="base"
+            flat
             filled={false}
             size="sm"
-            class="flex w-fit items-center gap-2"
+            class="flex w-fit items-center gap-2 pr-8"
         >
             <IconPlus />
             Create Project

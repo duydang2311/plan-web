@@ -20,7 +20,6 @@
         sortChatMessages,
         type LocalChatMessage
     } from './utils';
-    import { untrack } from 'svelte';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
     const { api, cloudinary, queryClient, chatHub } = useRuntime();
@@ -118,7 +117,6 @@
             return;
         }
         if (previousScrollHeight !== scrollRef.scrollHeight) {
-            const old = scrollRef.scrollTop;
             scrollRef.scrollTop += scrollRef.scrollHeight - previousScrollHeight;
             previousScrollHeight = scrollRef.scrollHeight;
         }

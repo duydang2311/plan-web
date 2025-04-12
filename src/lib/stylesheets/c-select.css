@@ -1,17 +1,24 @@
 .c-select--menu {
     --_bg: var(--color-base-1);
+    --_border: var(--color-base-border-2);
 
     @variant dark {
         --_bg: var(--color-base-3);
+        --_border: var(--color-base-border-3);
+        --_border-top: var(--color-base-border-1);
     }
 
     padding: --spacing(1);
     background-color: var(--_bg);
-    border: 1px solid var(--color-base-border-1);
     border-radius: var(--radius-md);
     min-width: --spacing(40);
     cursor: default;
     @apply shadow-sm;
+
+    border: 1px solid var(--_border);
+    @variant dark {
+        border-top-color: var(--_border-top);
+    }
 
     &[data-melt-select-multiple] .c-select--option[aria-selected='true'] {
         background-color: var(--color-base-5);

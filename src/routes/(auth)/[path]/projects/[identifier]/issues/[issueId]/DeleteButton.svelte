@@ -35,43 +35,41 @@
     }}
 >
     {#snippet children({ overlay, content, title, close })}
-        <div
-            transition:fade={{ duration: 200 }}
-            use:melt={overlay}
-            class="fixed inset-0 bg-black/20"
-        ></div>
+        <div transition:fade={{ duration: 200 }} use:melt={overlay} class="c-dialog--overlay"></div>
         <div
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="bg-base-1 max-w-paragraph-sm lg:max-w-paragraph-lg border-base-border-2 fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 space-y-2 rounded-md border p-8"
+            class="c-dialog-wrapper"
         >
-            <h4 use:melt={title}>Delete issue?</h4>
-            <p>
-                Proceed to delete <span class="font-medium">"{issue.title}"</span>?
-            </p>
-            <div class="ml-auto flex w-fit gap-4">
-                <Button variant="base" class="w-fit" outline melt={close}>Cancel</Button>
-                <form
-                    method="post"
-                    action="?/delete-issue"
-                    use:enhance={() => {
-                        return async ({ result, update }) => {
-                            if (result.type === 'redirect') {
-                                addToast({
-                                    data: {
-                                        title: 'Issue deleted',
-                                        description
-                                    }
-                                });
-                            }
-                            await update();
-                        };
-                    }}
-                >
-                    <input type="hidden" name="issueId" value={issue.id} />
-                    <Button variant="negative" outline class="w-fit">Delete</Button>
-                </form>
+            <div class="c-dialog space-y-2">
+                <h4 use:melt={title}>Delete issue?</h4>
+                <p>
+                    Proceed to delete <span class="font-medium">"{issue.title}"</span>?
+                </p>
+                <div class="ml-auto flex w-fit gap-4">
+                    <Button variant="base" class="w-fit" outline melt={close}>Cancel</Button>
+                    <form
+                        method="post"
+                        action="?/delete-issue"
+                        use:enhance={() => {
+                            return async ({ result, update }) => {
+                                if (result.type === 'redirect') {
+                                    addToast({
+                                        data: {
+                                            title: 'Issue deleted',
+                                            description
+                                        }
+                                    });
+                                }
+                                await update();
+                            };
+                        }}
+                    >
+                        <input type="hidden" name="issueId" value={issue.id} />
+                        <Button variant="negative" outline class="w-fit">Delete</Button>
+                    </form>
+                </div>
             </div>
         </div>
     {/snippet}

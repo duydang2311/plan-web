@@ -33,7 +33,7 @@
         <div class="relative grow content-center pl-8">
             <Input
                 type="text"
-                class="h-full border-transparent py-0 pl-6 active:outline-none"
+                class="h-full bg-transparent border-transparent py-0 pl-6 active:outline-none"
                 placeholder="Search for teams..."
             />
             <IconSearch class="text-base-fg-ghost absolute left-8 top-1/2 -translate-y-1/2" />
@@ -43,6 +43,7 @@
             href="teams/new"
             flat
             variant="base"
+            filled={false}
             size="sm"
             class="flex w-fit items-center gap-1 pr-8"
         >

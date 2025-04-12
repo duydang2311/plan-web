@@ -1,25 +1,27 @@
 @theme {
     --color-bg: oklch(100% 0 0);
 
-    --color-base-1: oklch(98.38% 0.0079 274.22);
-    --color-base-2: oklch(97.38% 0.0079 274.22);
-    --color-base-3: oklch(96.38% 0.0079 274.22);
-    --color-base-4: oklch(95.38% 0.0079 274.22);
-    --color-base-5: oklch(94.38% 0.0079 274.22);
-    --color-base-hover: oklch(92.38% 0.0079 274.22);
-    --color-base-active: oklch(93.38% 0.0079 274.22);
-    --color-base-disabled: oklch(89.38% 0.0079 274.22);
-    --color-base-selected: oklch(93.38% 0.0079 274.22);
-    --color-base-fg-1: oklch(16% 0.0079 274.22);
-    --color-base-fg-2: oklch(35% 0.0079 274.22);
-    --color-base-fg-3: oklch(45% 0.0079 274.22);
-    --color-base-fg-4: oklch(55% 0.0079 274.22);
-    --color-base-fg-5: oklch(65% 0.0079 274.22);
-    --color-base-fg-ghost: oklch(80% 0.0079 274.22);
-    --color-base-fg-disabled: oklch(70% 0.0079 274.22);
-    --color-base-border-1: oklch(82.38% 0.0079 274.22);
-    --color-base-border-2: oklch(88.38% 0.0079 274.22);
-    --color-base-border-3: oklch(92.38% 0.0079 274.22);
+    --color-base-1: oklch(98.38% 0.003 274.22);
+    --color-base-2: oklch(96.38% 0.003 274.22);
+    --color-base-3: oklch(94.88% 0.003 274.22);
+    --color-base-4: oklch(93.88% 0.003 274.22);
+    --color-base-5: oklch(92.88% 0.003 274.22);
+    --color-base-hover: oklch(90.38% 0.003 274.22);
+    --color-base-active: oklch(92.88% 0.003 274.22);
+    --color-base-disabled: oklch(97.38% 0.003 274.22);
+    --color-base-selected: oklch(92.88% 0.003 274.22);
+    --color-base-fg-1: oklch(16% 0.003 274.22);
+    --color-base-fg-2: oklch(32% 0.003 274.22);
+    --color-base-fg-3: oklch(45% 0.003 274.22);
+    --color-base-fg-4: oklch(55% 0.003 274.22);
+    --color-base-fg-5: oklch(65% 0.003 274.22);
+    --color-base-fg-ghost: oklch(80% 0.003 274.22);
+    --color-base-fg-disabled: oklch(70% 0.003 274.22);
+    --color-base-border-1: oklch(82.38% 0.003 274.22);
+    --color-base-border-2: oklch(88.38% 0.003 274.22);
+    --color-base-border-3: oklch(92.38% 0.003 274.22);
+    --color-base-border-hover: oklch(82.38% 0.003 274.22);
+    --color-base-border-focus: oklch(75.38% 0.003 274.22);
 
     --color-primary-1: oklch(48.32% 0.2931 274.22);
     --color-primary-2: oklch(52.32% 0.2931 274.22);

@@ -1,9 +1,11 @@
 .c-popover {
-    --_border: var(--color-base-border-1);
     --_bg: var(--color-base-1);
+    --_border: var(--color-base-border-1);
 
     @variant dark {
         --_bg: var(--color-base-3);
+        --_border: var(--color-base-border-3);
+        --_border-top: var(--color-base-border-1);
     }
 }
 
@@ -12,6 +14,12 @@
     padding: --spacing(4);
     border: 1px solid var(--_border);
     border-radius: var(--radius-md);
+
+    border: 1px solid var(--_border);
+    @variant dark {
+        border-top-color: var(--_border-top);
+    }
+
     max-width: 100%;
     @apply shadow;
 

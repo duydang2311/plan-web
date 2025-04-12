@@ -1,0 +1,49 @@
+.c-dialog-wrapper {
+    padding: --spacing(2);
+    max-width: var(--container-paragraph-lg);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 100%;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.c-dialog {
+    --_bg: var(--color-base-1);
+    --_border: var(--color-base-border-1);
+
+    @variant dark {
+        --_bg: var(--color-base-2);
+        --_border: var(--color-base-border-3);
+        --_border-top: var(--color-base-border-1);
+    }
+}
+
+.c-dialog {
+    background-color: var(--_bg);
+    border-radius: var(--radius-xl);
+    padding: --spacing(8);
+
+    border: 1px solid var(--_border);
+    @variant dark {
+        border-top-color: var(--_border-top);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.c-dialog--overlay {
+    position: fixed;
+    inset: 0;
+    background-color: oklch(0% 0 0 / 0.3);
+
+    @variant dark {
+        background-color: oklch(0% 0 0 / 0.6);
+    }
+}

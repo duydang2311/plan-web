@@ -24,7 +24,7 @@
                 <Input
                     id="search"
                     type="text"
-                    class="bg-base-1 w-full border-none pl-8 shadow-none focus:ring-0"
+                    class="bg-transparent rounded-none w-full border-none pl-8 shadow-none"
                     placeholder="Search by name"
                 />
                 <IconSearch

@@ -1,11 +1,11 @@
 .c-input {
     --_border: var(--color-base-border-2);
-    --_border-hover: var(--color-base-border-1);
-    --_border-focus: var(--color-base-fg-5);
+    --_border-hover: var(--color-base-border-hover);
+    --_border-focus: var(--color-base-border-focus);
     --_bg: transparent;
 
     @variant dark {
-        --_bg: var(--color-base-3);
+        --_bg: color-mix(in oklch, var(--color-base-3) 50%, var(--color-base-2));
     }
 
     width: 100%;

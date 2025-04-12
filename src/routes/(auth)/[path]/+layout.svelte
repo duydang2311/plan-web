@@ -5,8 +5,6 @@
     import { Avatar, Button, Input } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import {
-        IconBell,
-        IconBellOutline,
         IconChat,
         IconChatOutline,
         IconCircleDashed,
