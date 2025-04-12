@@ -3,12 +3,14 @@
     import clsx from 'clsx';
     import type { HTMLInputAttributes } from 'svelte/elements';
     import type { Action } from 'svelte/action';
+    import { noop } from '../utils';
 
     interface Props extends HTMLInputAttributes {
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
         ref?: HTMLInputElement;
         errors?: string[];
         useField?: Action;
+        action?: Action;
     }
 
     let {
@@ -16,7 +18,8 @@
         melt: useMelt,
         ref = $bindable(),
         errors,
-        useField,
+        useField = noop,
+        action = noop,
         ...props
     }: Props = $props();
     let initial = $state.snapshot(value);
@@ -29,7 +32,6 @@
     });
 
     const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
-    const fieldAction = $derived(useField ? useField : () => {});
 </script>
 
 <input
@@ -39,5 +41,6 @@
     class={clsx('c-input', props.class)}
     {...useMelt}
     use:meltAction
-    use:fieldAction
+    use:useField
+    use:action
 />

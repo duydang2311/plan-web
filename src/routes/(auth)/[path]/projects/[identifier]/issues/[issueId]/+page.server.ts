@@ -9,7 +9,10 @@ import type { User, UserProfile } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
+import { maybeStream } from '~/lib/utils/promise';
+import { Type } from '~/lib/utils/typebox';
 import { queryParams } from '~/lib/utils/url';
+import { validator } from '~/lib/utils/validation';
 import type { Actions, PageServerLoad } from './$types';
 import {
     createFetchIssueQuery,
@@ -25,7 +28,6 @@ import {
     validateEditComment,
     validateEditDescription
 } from './utils';
-import { maybeStream } from '~/lib/utils/promise';
 
 export type LocalIssue = Pick<
     Issue,
@@ -303,6 +305,24 @@ export const actions: Actions = {
                 (yield* ApiClient).delete(`issue-audits/${validation.data.id}`)
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    edit_title: ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateEditTitle(decodeEditTitle(formData))
+            );
+
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).patch(`issues/${validation.data.issueId}`, {
+                    body: {
+                        patch: {
+                            title: validation.data.title
+                        }
+                    }
+                })
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
 
@@ -316,3 +336,18 @@ const fetchIssueAuditList = (issueId: string, offset: number, size: number) =>
 
         return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssueAudit>>());
     });
+
+const decodeEditTitle = (formData: FormData) => {
+    return {
+        issueId: formData.get('issueId'),
+        title: formData.get('title')
+    };
+};
+
+const validateEditTitle = validator(
+    Type.Object({
+        issueId: Type.String(),
+        title: Type.String()
+    }),
+    { stripLeadingSlash: true }
+);

@@ -91,7 +91,7 @@
             return;
         }
         const offset = Number(page.url.searchParams.get('offset'));
-        if (!isNaN(offset) && virtualizer) {
+        if (!isNaN(offset) && offset > 0 && virtualizer) {
             virtualizer.scrollToIndex(offset);
         }
     });
