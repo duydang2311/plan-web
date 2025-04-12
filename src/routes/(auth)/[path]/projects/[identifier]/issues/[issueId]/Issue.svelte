@@ -2,10 +2,9 @@
     import { enhance } from '$app/forms';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { toast } from '~/lib/components';
+    import { TiptapEditor, toast } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import { IconCheck, IconXMark } from '~/lib/components/icons';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
     import type { Ref } from '~/lib/utils/runes.svelte';
     import type { ActionData } from './$types';
     import type { LocalIssue } from './+page.server';
@@ -46,10 +45,12 @@
 
                         const old = ref.value;
                         const description = editor.getHTML();
-                        ref.value = {
-                            ...old,
-                            description
-                        };
+                        if (old) {
+                            ref.value = {
+                                ...old,
+                                description
+                            };
+                        }
                         e.formData.set('description', description);
                         onSubmit();
                         return ({ result }) => {
@@ -64,19 +65,24 @@
                     }}
                 >
                     <input type="hidden" name="issueId" value={ref.value.id} />
-                    <Tiptap
-                        bind:editor
-                        name="description"
-                        content={ref.value.description}
-                        editorProps={{ class: 'pb-8' }}
-                    />
-                    <div class="absolute bottom-2 right-2 flex gap-2">
+                        <TiptapEditor
+                            bind:editor
+                            content={ref.value.description}
+                            class="max-w-paragraph-lg"
+                            editorProps={{
+                                attributes: {
+                                    class: 'h-128 overflow-auto'
+                                }
+                            }}
+                        />
+                </form>
+                    <div class="flex gap-2 w-fit ml-auto mt-2">
                         <Button
                             type="button"
                             size="sm"
                             variant="base"
                             onclick={onCancel}
-                            class="flex items-center gap-2"
+                            class="flex items-center gap-2 flex-1"
                         >
                             <IconXMark />
                             Cancel
@@ -85,16 +91,15 @@
                             type="submit"
                             size="sm"
                             variant="primary"
-                            class="flex items-center gap-2"
+                            class="flex items-center gap-2 flex-1"
                         >
                             <IconCheck />
                             Save
                         </Button>
                     </div>
-                </form>
             </div>
         {:else}
-            <div class="prose max-w-paragraph-lg">
+            <div class="prose max-w-paragraph-lg wrap-anywhere">
                 {#if ref.value.description && ref.value.description !== '<p></p>'}
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                     {@html DOMPurify.sanitize(ref.value.description, {

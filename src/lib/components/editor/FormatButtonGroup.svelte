@@ -19,8 +19,7 @@
         {onclick}
         class={[
             'p-2',
-            editor.isActive(name)
-                && 'not-hover:not-active:bg-base-selected text-base-fg-1'
+            editor.isActive(name) && 'not-hover:not-active:bg-base-selected text-base-fg-1'
         ]}
     >
         <Icon />

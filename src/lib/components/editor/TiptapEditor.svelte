@@ -9,14 +9,18 @@
     import { createEditor } from './utils';
 
     let {
+        class: cls,
         editor = $bindable(),
         editorProps,
+        content,
         onCreate,
         onTransaction,
         onDestroy
     }: {
+        class?: string;
         editor?: Editor;
         editorProps?: EditorProps;
+        content?: string;
         onCreate?: (props: EditorEvents['create']) => void;
         onTransaction?: (props: EditorEvents['transaction']) => void;
         onDestroy?: (props: EditorEvents['destroy']) => void;
@@ -42,19 +46,21 @@
             };
         }
 
+        const noop = () => {};
         const e = createEditor({
+            content,
             editorProps: {
                 ...editorProps,
                 attributes
             },
             element: editorNode,
-            onCreate,
+            onCreate: onCreate ?? noop,
             onTransaction: (props) => {
                 editor = undefined;
                 editor = props.editor;
                 onTransaction?.(props);
             },
-            onDestroy
+            onDestroy: onDestroy ?? noop
         });
         editor = e;
         return () => {
@@ -63,7 +69,7 @@
     });
 </script>
 
-<div class="border-base-border-2 bg-base-2 dark:bg-base-3 rounded-lg border">
+<div class={['border-base-border-2 bg-base-2 dark:bg-base-3 rounded-lg border', cls]}>
     {#if editor}
         <div class="border-base-border-3 flex gap-2 border-b p-2">
             {#if !editor.isActive('codeBlock')}

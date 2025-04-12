@@ -2,12 +2,11 @@
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { Editor } from '@tiptap/core';
+    import type { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { Avatar, OptionalLink, RelativeTime } from '~/lib/components';
+    import { Avatar, OptionalLink, RelativeTime, TiptapEditor } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import { IconCheck, IconXMark } from '~/lib/components/icons';
-    import Tiptap from '~/lib/components/Tiptap.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
@@ -91,12 +90,17 @@
                 }}
             >
                 <input type="hidden" name="id" value={audit.id} />
-                <Tiptap
-                    bind:editor
-                    name="content"
-                    content={data.content}
-                    editorProps={{ class: 'pb-8' }}
-                />
+                <div class="mt-4">
+                    <TiptapEditor
+                        bind:editor
+                        content={data.content}
+                        editorProps={{
+                            attributes: {
+                                class: 'pb-12'
+                            }
+                        }}
+                    />
+                </div>
                 <div class="absolute bottom-2 right-2 flex gap-2">
                     <Button
                         type="button"
@@ -122,7 +126,7 @@
                 </div>
             </form>
         {:else}
-            <div class="prose max-w-full">
+            <div class="prose max-w-full wrap-anywhere">
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html DOMPurify.sanitize(data.content, { USE_PROFILES: { html: true } })}
             </div>
