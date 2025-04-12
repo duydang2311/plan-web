@@ -81,12 +81,12 @@
                         api.get(`user-notifications/${userId}`, {
                             query: {
                                 offset: pageParam,
-                                select: 'Id,CreatedTime,Notification.Type,Notification.Data',
-                                selectProject: 'Name,Identifier,Workspace.Path',
+                                select: 'CreatedTime,Notification.Id,Notification.Type,Notification.Data',
+                                selectProject: 'Id,Name,Identifier,Workspace.Path',
                                 selectIssue:
-                                    'OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
+                                    'Id,OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
                                 selectComment:
-                                    'Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
+                                    'Id,Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
                                 selectProjectMemberInvitation: 'Id,Project.Name,Project.Identifier',
                                 sort: '-CreatedTime'
                             }
