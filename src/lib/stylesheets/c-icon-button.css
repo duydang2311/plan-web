@@ -68,6 +68,20 @@
     }
 }
 
+.c-icon-button--info {
+    --_text: var(--color-info-1);
+    --_text-hover: var(--color-info-2);
+    --_text-active: var(--color-info-3);
+    --_bg: transparent;
+    --_bg-hover: color-mix(in oklch, var(--color-info-1) 20%, transparent);
+    --_bg-active: color-mix(in oklch, var(--color-info-1) 5%, transparent);
+    @apply ring-info-1/20;
+
+    &:where(:focus-visible) {
+        @apply ring-info-3 ring-offset-base-1 ring-offset-1;
+    }
+}
+
 .c-icon-button {
     background-color: var(--_bg);
     color: var(--_text);
