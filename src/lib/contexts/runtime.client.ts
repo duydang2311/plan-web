@@ -14,7 +14,7 @@ interface Runtime {
     readonly cloudinary: Cloudinary;
     readonly queryClient: QueryClient;
     readonly idHasher: Sqids;
-    readonly chatHub: Hub;
+    readonly hub: Hub;
 }
 
 export function setRuntime(value: Record<keyof Runtime, () => Runtime[keyof Runtime]>) {

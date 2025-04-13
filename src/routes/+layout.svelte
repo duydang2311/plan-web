@@ -37,8 +37,8 @@
             }),
         queryClient: () => data.queryClient,
         idHasher: createIdHasher,
-        chatHub: () =>
-            createSignalRHub(env.PUBLIC_SIGNALR_ORIGIN + '/hubs/chat', async () => {
+        hub: () =>
+            createSignalRHub(env.PUBLIC_SIGNALR_ORIGIN + '/hub', async () => {
                 const api = getApi();
                 const response = await api.get('/hubs/token');
                 const json = await response.json<{ accessToken: string }>();

@@ -22,7 +22,7 @@
     } from './utils';
 
     const { chatId, user }: { chatId: string; user: UserPreset['basicProfile'] } = $props();
-    const { api, cloudinary, queryClient, chatHub } = useRuntime();
+    const { api, cloudinary, queryClient, hub } = useRuntime();
     const select =
         'Id,CreatedTime,Content,Sender.Id,Sender.Email,Sender.Profile.Name,Sender.Profile.DisplayName,Sender.Profile.Image';
     const queryKey = $derived(['chat-messages', { chatId }]);
@@ -126,7 +126,7 @@
         dirtyScroll = false;
     });
 
-    chatHub.on(
+    hub.on(
         'new_chat_message',
         async (data: { ChatMessageId: number; OptimisticId?: string }) => {
             invariant(

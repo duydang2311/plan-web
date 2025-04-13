@@ -1,4 +1,9 @@
-import { HubConnectionBuilder, LogLevel, type HubConnection } from '@microsoft/signalr';
+import {
+    HubConnectionBuilder,
+    HubConnectionState,
+    LogLevel,
+    type HubConnection
+} from '@microsoft/signalr';
 import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 import { onMount } from 'svelte';
 
@@ -32,8 +37,18 @@ class SignalRHub implements Hub {
     }
 
     public on(name: string, callback: (...args: any[]) => void) {
+        const firstTime = this.#connection === null;
         onMount(() => {
             this.connection.on(name, callback);
+            if (
+                firstTime && 
+                this.connection.state !== HubConnectionState.Connecting &&
+                this.connection.state !== HubConnectionState.Connected
+            ) {
+                this.connection
+                    .start()
+                    .catch((err) => console.error('Error while starting connection: ' + err));
+            }
             return () => {
                 this.connection.off(name, callback);
             };
