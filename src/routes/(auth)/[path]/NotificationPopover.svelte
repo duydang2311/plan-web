@@ -81,7 +81,7 @@
                         api.get(`user-notifications/${userId}`, {
                             query: {
                                 offset: pageParam,
-                                select: 'CreatedTime,Notification.Id,Notification.Type,Notification.Data',
+                                select: 'Id,CreatedTime,Notification.Id,Notification.Type,Notification.Data',
                                 selectProject: 'Id,Name,Identifier,Workspace.Path',
                                 selectIssue:
                                     'Id,OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
