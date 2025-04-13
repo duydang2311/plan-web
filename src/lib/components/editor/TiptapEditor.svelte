@@ -69,7 +69,12 @@
     });
 </script>
 
-<div class={['border-base-border-2 bg-base-2 dark:bg-base-3 rounded-lg border', cls]}>
+<div
+    class={[
+        'border-base-border-2 bg-base-2 dark:bg-base-3 focus-within:border-base-border-focus not-focus-within:hover:border-base-border-hover rounded-lg border',
+        cls
+    ]}
+>
     {#if editor}
         <div class="border-base-border-3 flex gap-2 border-b p-2">
             {#if !editor.isActive('codeBlock')}
