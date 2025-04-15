@@ -235,9 +235,11 @@ class SvelteLoading {
 }
 
 class SvelteRef<T> implements Ref<T> {
-    value = $state<T>();
+    value = $state.raw<T>();
     constructor(f: T | (() => T)) {
         if (f instanceof Function) {
+            const a = f();
+            this.value = a;
             $effect(() => {
                 const a = f();
                 untrack(() => {
