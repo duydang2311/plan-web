@@ -1,12 +1,11 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { Link, RelativeTime, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-    import type { LocalProject } from './+page.server';
-    import { createRef, type Loading } from '~/lib/utils/runes.svelte';
-    import { DateTime } from 'luxon';
+    import { RelativeTime, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
     import Pagination3 from '~/lib/components/Pagination3.svelte';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { createRef, type Loading } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
+    import type { LocalProject } from './+page.server';
     import DeleteButton from './DeleteButton.svelte';
 
     const {
@@ -82,7 +81,7 @@
                     <td class="overflow-hidden text-ellipsis whitespace-nowrap">
                         <RelativeTime time={updatedTime} />
                     </td>
-                    <td>
+                    <td class="isolate">
                         <div class="flex items-center">
                             <DeleteButton project={{ id, name }} {ref} />
                         </div>
