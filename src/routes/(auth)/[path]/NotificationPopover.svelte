@@ -1,125 +1,117 @@
 <script lang="ts">
-    import { createInfiniteQuery } from '@tanstack/svelte-query';
     import { DateTime } from 'luxon';
-    import { toStore } from 'svelte/store';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { notificationTypes } from '~/lib/models/notification';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { QueryResponse } from '~/lib/utils/query';
-    import { createLoading } from '~/lib/utils/runes.svelte';
+    import { createLoading, watch, type AsyncRef } from '~/lib/utils/runes.svelte';
     import { formatRelativeDateUi } from '~/lib/utils/time';
+    import { attempt } from '~/lib/utils/try';
+    import type { LocalUserNotification } from './utils';
 
-    type NotificationType = typeof notificationTypes;
-
-    interface LocalUserNotification {
-        id: number;
-        createdTime: string;
-        notification:
-            | {
-                  type: NotificationType['projectCreated'];
-                  data: {
-                      identifier: string;
-                      name: string;
-                      workspace: { path: string };
-                  };
-              }
-            | {
-                  type: NotificationType['issueCreated'];
-                  data: {
-                      orderNumber: number;
-                      title: string;
-                      project: {
-                          identifier: string;
-                          workspace: { path: string };
-                      };
-                  };
-              }
-            | {
-                  type: NotificationType['commentCreated'];
-                  data: {
-                      issue: {
-                          orderNumber: number;
-                          title: string;
-                          project: {
-                              identifier: string;
-                              workspace: { path: string };
-                          };
-                      };
-                  };
-              }
-            | {
-                  type: NotificationType['projectMemberInvited'];
-                  data: {
-                      id: number;
-                      project: {
-                          identifier: string;
-                          name: string;
-                      };
-                  };
-              };
-    }
-
-    const { userId }: { userId: string } = $props();
+    let {
+        userId,
+        ref,
+        scrollTop = $bindable(0)
+    }: {
+        userId: string;
+        ref: AsyncRef<PaginatedList<LocalUserNotification>>;
+        scrollTop?: number;
+    } = $props();
     const { api, idHasher } = useRuntime();
-    const notificationTypes = {
-        none: 0,
-        projectCreated: 1,
-        issueCreated: 2,
-        commentCreated: 3,
-        projectMemberInvited: 4
-    } as const;
     const loading = createLoading();
-    const query = createInfiniteQuery(
-        toStore(() => ({
-            queryKey: ['user-notifications', { userId }],
-            initialPageParam: 0,
-            getNextPageParam: (lastPage: { nextOffset: number }) => lastPage.nextOffset,
-            queryFn: async ({ pageParam }: { pageParam: number }) => {
-                try {
-                    loading.set();
-                    const response = await QueryResponse.Fetch(() =>
-                        api.get(`user-notifications/${userId}`, {
-                            query: {
-                                offset: pageParam,
-                                select: 'Id,CreatedTime,Notification.Id,Notification.Type,Notification.Data',
-                                selectProject: 'Id,Name,Identifier,Workspace.Path',
-                                selectIssue:
-                                    'Id,OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
-                                selectComment:
-                                    'Id,Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
-                                selectProjectMemberInvitation: 'Id,Project.Name,Project.Identifier',
-                                sort: '-CreatedTime'
-                            }
-                        })
-                    );
-                    const list = await response.json<PaginatedList<LocalUserNotification>>();
-                    return {
-                        ...list,
-                        nextOffset: pageParam + list.items.length
-                    };
-                } finally {
-                    loading.unset();
+    const loadMore = async () => {
+        loading.set();
+        const cursor = ref.value?.items.at(-1)?.id;
+        const getAttempt = await attempt.promise(() =>
+            api.get(`user-notifications/${userId}`, {
+                query: {
+                    cursor,
+                    select: 'Id,CreatedTime,Notification.Id,Notification.Type,Notification.Data',
+                    selectProject: 'Id,Name,Identifier,Workspace.Path',
+                    selectIssue: 'Id,OrderNumber,Title,Project.Identifier,Project.Workspace.Path',
+                    selectComment:
+                        'Id,Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
+                    selectProjectMemberInvitation: 'Id,Project.Name,Project.Identifier',
+                    sort: '-Id'
                 }
-            },
-            staleTime: 1000
-        }))
-    );
+            })
+        )();
+        if (!getAttempt.ok || !getAttempt.data.ok) {
+            loading.unset();
+            return;
+        }
+
+        const jsonAttempt = await attempt.promise(() =>
+            getAttempt.data.json<PaginatedList<LocalUserNotification>>()
+        )();
+        if (!jsonAttempt.ok) {
+            loading.unset();
+            return;
+        }
+
+        ref.value = {
+            items: [...(ref.value?.items ?? []), ...jsonAttempt.data.items],
+            totalCount: jsonAttempt.data.totalCount
+        };
+        loading.unset();
+    };
     const grouped = $derived(
-        $query.data
-            ? $query.data.pages
-                  .flatMap((a) => a.items)
-                  .reduce<Record<string, LocalUserNotification[]>>((acc, cur) => {
-                      const dateTime = DateTime.fromISO(cur.createdTime);
-                      const format = dateTime.toISODate()!;
-                      if (acc[format]) {
-                          acc[format].push(cur);
-                      } else {
-                          acc[format] = [cur];
-                      }
-                      return acc;
-                  }, {})
+        ref.value
+            ? ref.value.items.reduce<Record<string, LocalUserNotification[]>>((acc, cur) => {
+                  const dateTime = DateTime.fromISO(cur.createdTime);
+                  const format = dateTime.toISODate()!;
+                  if (acc[format]) {
+                      acc[format].push(cur);
+                  } else {
+                      acc[format] = [cur];
+                  }
+                  return acc;
+              }, {})
             : {}
     );
+
+    let scrollEl = $state.raw<HTMLElement>();
+    let loadMoreEl = $state.raw<HTMLElement>();
+
+    if (ref.value == null && !ref.loading.immediate) {
+        loadMore();
+    }
+
+    watch(() => [loadMoreEl, scrollEl])(() => {
+        if (!loadMoreEl || !scrollEl) {
+            return;
+        }
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (
+                    entries.some((a) => a.target === loadMoreEl && a.isIntersecting) &&
+                    !ref.loading.immediate
+                ) {
+                    loadMore();
+                }
+            },
+            {
+                root: scrollEl,
+                rootMargin: '0px 0px 200px 0px',
+                threshold: 0
+            }
+        );
+        observer.observe(loadMoreEl);
+        return () => {
+            observer.disconnect();
+        };
+    });
+
+    watch(() => scrollEl)(() => {
+        const el = scrollEl;
+        if (!el) {
+            return;
+        }
+        requestAnimationFrame(() => {
+            el.scrollTop = scrollTop;
+        });
+    });
 </script>
 
 {#snippet skeleton()}
@@ -144,8 +136,15 @@
         />
     {/if}
 </div>
-<div class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2" class:animate-pulse={$query.isFetching}>
-    {#if $query.isPending}
+<div
+    class="max-h-[calc(100vh-7.5rem)] overflow-auto p-2"
+    class:animate-pulse={ref.loading.immediate}
+    bind:this={scrollEl}
+    onscrollend={(e) => {
+        scrollTop = e.currentTarget.scrollTop;
+    }}
+>
+    {#if ref.value == null && ref.loading.immediate}
         {@render skeleton()}
     {:else if grouped == null || Object.values(grouped).length === 0}
         <span class="c-label">No notifications found.</span>
@@ -244,7 +243,9 @@
                         {/if}
                     </li>
                 {/each}
+                <li class="hidden"></li>
             </ol>
+            <div bind:this={loadMoreEl}></div>
         {/each}
     {/if}
 </div>

@@ -21,7 +21,7 @@
     }
 
     max-width: 100%;
-    @apply shadow;
+    @apply shadow-sm;
 
     & h2 {
         --font-size-h2: var(--text-h4);
@@ -34,7 +34,10 @@
 }
 
 .c-popover--arrow {
-    --arrow-size: 0.7rem;
+    --_border: var(--color-base-border-1);
+    --_size: 0.7rem;
     border-top: 1px solid var(--_border);
     border-left: 1px solid var(--_border);
+    width: var(--_size);
+    height: var(--_size);
 }

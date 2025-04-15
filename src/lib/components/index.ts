@@ -1,4 +1,3 @@
-export { Popover as MeltPopoverBuilder } from 'melt/components';
 export { default as Accordion } from './Accordion.svelte';
 export { default as Avatar } from './Avatar.svelte';
 export { default as Await } from './Await.svelte';

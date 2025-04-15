@@ -1,35 +1,66 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
-    import { IconButton, PopoverBuilder } from '~/lib/components';
+    import { Popover } from 'melt/builders';
+    import { IconButton } from '~/lib/components';
     import { IconUsersSolid } from '~/lib/components/icons';
     import { popover as popoverTransitions, tsap } from '~/lib/utils/transition';
     import FriendPopover from './FriendPopover.svelte';
-    import { melt } from '@melt-ui/svelte';
+    import { offset } from '@floating-ui/dom';
 
     const { userId }: { userId: string } = $props();
-    const open = writable(false);
+    let open = $state.raw(false);
+    let pos = $state.raw<{ x: number; y: number }>();
+    const builder = new Popover({
+        open: () => open,
+        onOpenChange(value) {
+            open = value;
+        },
+        forceVisible: true,
+        floatingConfig: {
+            computePosition: {
+                placement: 'bottom',
+                middleware: [
+                    offset({
+                        mainAxis: 8
+                    }),
+                    {
+                        name: 'window-rightmost',
+                        fn: (state) => {
+                            return {
+                                x:
+                                    window.innerWidth >= 1024
+                                        ? window.innerWidth -
+                                          state.elements.floating.clientWidth -
+                                          16
+                                        : window.innerWidth -
+                                          state.elements.floating.clientWidth -
+                                          8,
+                                y: state.y
+                            };
+                        }
+                    }
+                ]
+            }
+        }
+    });
 </script>
 
-<PopoverBuilder options={{ open, forceVisible: true }}>
-    {#snippet children({ trigger, content })}
-        <IconButton
-            variant="base"
-            type="button"
-            melt={trigger}
-            title="Friends"
-            data-custom-state={$open ? 'open' : undefined}
-        >
-            <IconUsersSolid />
-        </IconButton>
-        {#if $open}
-            <div
-                in:tsap={popoverTransitions.in}
-                out:tsap={popoverTransitions.out}
-                use:melt={content}
-                class="c-popover w-paragraph-sm translate-y-2 p-0 lg:-translate-x-2"
-            >
-                <FriendPopover {userId} />
-            </div>
-        {/if}
-    {/snippet}
-</PopoverBuilder>
+<IconButton
+    variant="base"
+    type="button"
+    {...builder.trigger}
+    title="Friends"
+    data-custom-state={open ? 'open' : undefined}
+>
+    <IconUsersSolid />
+</IconButton>
+{#if open}
+    <div
+        in:tsap={popoverTransitions.in}
+        out:tsap={popoverTransitions.out}
+        {...builder.content}
+        class="c-popover w-paragraph-sm overflow-visible p-0"
+        style="top: {pos?.y ?? 0}px; left: {pos?.x ?? 0}px;"
+    >
+        <FriendPopover {userId} />
+    </div>
+{/if}
