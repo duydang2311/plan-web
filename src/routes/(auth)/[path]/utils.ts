@@ -1,11 +1,11 @@
-import type { NotificationType } from '~/lib/models/notification';
+import type { notificationTypes } from '~/lib/models/notification';
 
 export interface LocalUserNotification {
     id: number;
     createdTime: string;
     notification:
         | {
-              type: NotificationType['projectCreated'];
+              type: (typeof notificationTypes)['projectCreated'];
               data: {
                   identifier: string;
                   name: string;
@@ -13,7 +13,7 @@ export interface LocalUserNotification {
               };
           }
         | {
-              type: NotificationType['issueCreated'];
+              type: (typeof notificationTypes)['issueCreated'];
               data: {
                   orderNumber: number;
                   title: string;
@@ -24,7 +24,7 @@ export interface LocalUserNotification {
               };
           }
         | {
-              type: NotificationType['commentCreated'];
+              type: (typeof notificationTypes)['issueCommentCreated'];
               data: {
                   issue: {
                       orderNumber: number;
@@ -37,7 +37,7 @@ export interface LocalUserNotification {
               };
           }
         | {
-              type: NotificationType['projectMemberInvited'];
+              type: (typeof notificationTypes)['projectMemberInvited'];
               data: {
                   id: number;
                   project: {

@@ -2,7 +2,7 @@ export const notificationTypes = {
     none: 0,
     projectCreated: 1,
     issueCreated: 2,
-    commentCreated: 3,
+    issueCommentCreated: 3,
     projectMemberInvited: 4
 } as const;
 
@@ -11,8 +11,9 @@ export const notificationTypeNames = {
     1: 'ProjectCreated',
     2: 'IssueCreated',
     3: 'IssueCommentCreated',
-    4: 'ProjectMemberInvited',
+    4: 'ProjectMemberInvited'
 } as const;
 
-export type NotificationType = typeof notificationTypes;
-export type NotificationTypeName = typeof notificationTypeNames;
+export type NotificationType = (typeof notificationTypes)[keyof typeof notificationTypes];
+export type NotificationTypeName =
+    (typeof notificationTypeNames)[keyof typeof notificationTypeNames];

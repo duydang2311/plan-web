@@ -7,9 +7,7 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import {
         notificationTypeNames,
-        notificationTypes,
-        type NotificationType,
-        type NotificationTypeName
+        notificationTypes
     } from '~/lib/models/notification';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { createRef, watch } from '~/lib/utils/runes.svelte';
@@ -62,27 +60,27 @@
         UserNotificationId: number;
     } & (
         | {
-              Type: NotificationTypeName[NotificationType['projectCreated']];
+              Type: (typeof notificationTypeNames)[(typeof notificationTypes)['projectCreated']];
               Identifier: string;
               Name: string;
               WorkspacePath: string;
           }
         | {
-              Type: NotificationTypeName[NotificationType['issueCreated']];
+              Type: (typeof notificationTypeNames)[(typeof notificationTypes)['issueCreated']];
               OrderNumber: number;
               Title: string;
               ProjectIdentifier: string;
               WorkspacePath: string;
           }
         | {
-              Type: NotificationTypeName[NotificationType['commentCreated']];
+              Type: (typeof notificationTypeNames)[(typeof notificationTypes)['issueCommentCreated']];
               OrderNumber: number;
               Title: string;
               ProjectIdentifier: string;
               WorkspacePath: string;
           }
         | {
-              Type: NotificationTypeName[NotificationType['projectMemberInvited']];
+              Type: (typeof notificationTypeNames)[(typeof notificationTypes)['projectMemberInvited']];
               ProjectMemberInvitationId: number;
               ProjectIdentifier: string;
               ProjectName: string;
@@ -93,7 +91,9 @@
         if (!open) {
             ++unreadCount;
         }
-        console.log(data);
+        if (data.Type === notificationTypeNames[notificationTypes.projectCreated]) {
+            data.Type;
+        }
         switch (data.Type) {
             case notificationTypeNames[notificationTypes.projectCreated]:
                 ref.value = {
@@ -138,14 +138,14 @@
                     totalCount: (ref.value?.totalCount ?? 0) + 1
                 };
                 break;
-            case notificationTypeNames[notificationTypes.commentCreated]:
+            case notificationTypeNames[notificationTypes.issueCommentCreated]:
                 ref.value = {
                     items: [
                         {
                             id: data.UserNotificationId,
                             createdTime: DateTime.now().toISO(),
                             notification: {
-                                type: notificationTypes.commentCreated,
+                                type: notificationTypes.issueCommentCreated,
                                 data: {
                                     issue: {
                                         orderNumber: data.OrderNumber,

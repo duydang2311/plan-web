@@ -201,7 +201,7 @@
                                         .toLocaleString(DateTime.TIME_SIMPLE)}
                                 </p>
                             </a>
-                        {:else if userNotification.notification.type === notificationTypes.commentCreated}
+                        {:else if userNotification.notification.type === notificationTypes.issueCommentCreated}
                             <a
                                 href="/{userNotification.notification.data.issue.project.workspace
                                     .path}/projects/{userNotification.notification.data.issue
