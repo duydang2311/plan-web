@@ -1,14 +1,13 @@
 import { env } from '$env/dynamic/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { Effect, Exit, Layer } from 'effect';
+import type { Asset } from './lib/models/asset';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { Cloudinary } from './lib/services/cloudinary.server';
-import { HttpClient } from './lib/services/http_client';
+import { IdHasher } from './lib/services/id_hasher.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
-import type { Asset } from './lib/models/asset';
-import Sqids from 'sqids';
-import { IdHasher } from './lib/services/id_hasher.server';
+import { attempt } from './lib/utils/try';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -29,13 +28,17 @@ export const handle: Handle = async ({
         if (!request.headers.has('Authorization')) {
             const session = cookies.get('plan_session');
             if (session) {
-                request.headers.set('Authorization', `Basic ${cookies.get('plan_session')}`);
+                request.headers.set('Authorization', `Basic ${session}`);
             }
         }
         return globalThis.fetch(`${env.API_ORIGIN}${url.pathname}${url.search}`, request);
     }
 
-    initLocals(locals, fetch);
+    const httpClient = new UniversalHttpClient({
+        baseUrl: env.API_BASE_URL,
+        version: env.API_VERSION,
+        fetch
+    });
 
     const isAuthRoute = routeId.includes('(auth)');
     const isAuthOptionalRoute = routeId.includes('(auth-optional)');
@@ -45,73 +48,74 @@ export const handle: Handle = async ({
             return redirect(302, '/login');
         }
 
-        const exit = await ApiClient.pipe(
-            Effect.flatMap((a) =>
-                a.get(`sessions/${sessionId}`, {
-                    query: {
-                        select: 'User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
-                    }
-                })
-            ),
-            Effect.filterOrFail((a) => a.ok),
-            Effect.flatMap((a) =>
-                Effect.tryPromise(() =>
-                    a.json<{
-                        user: {
-                            id: string;
-                            email: string;
-                            profile?: { name: string; displayName: string; image?: Asset };
-                        };
-                    }>()
-                )
-            ),
-            locals.runtime.runPromiseExit
-        );
+        const getSessionAttempt = await attempt.promise(() =>
+            httpClient.get(`sessions/${sessionId}`, {
+                query: {
+                    select: 'User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+                }
+            })
+        )();
 
-        if (Exit.isFailure(exit)) {
-            return redirect(302, '/login');
+        if (!getSessionAttempt.ok || !getSessionAttempt.data.ok) {
+            if (isAuthRoute) {
+                return redirect(302, '/login');
+            }
+
+            initLocals(locals, httpClient);
+            return resolve(event);
         }
 
-        locals.user = { ...exit.value.user };
+        const jsonAttempt = await attempt.promise(() =>
+            getSessionAttempt.data.json<{
+                user: {
+                    id: string;
+                    email: string;
+                    profile?: { name: string; displayName: string; image?: Asset };
+                };
+            }>()
+        )();
+
+        if (!jsonAttempt.ok) {
+            if (isAuthRoute) {
+                return redirect(302, '/login');
+            }
+
+            initLocals(locals, httpClient);
+            return resolve(event);
+        }
+
+        locals.user = { ...jsonAttempt.data.user };
         locals.appLive = Layer.mergeAll(
-            HttpClient.Live(fetch),
             Layer.sync(
                 ApiClient,
                 () =>
                     new KitBasicHttpApiClient({
-                        httpClient: new UniversalHttpClient({
-                            baseUrl: env.API_BASE_URL,
-                            version: env.API_VERSION,
-                            fetch
-                        }),
+                        httpClient,
                         cookies
                     })
             ),
             Cloudinary.Live,
-            IdHasher.Live,
+            IdHasher.Live
         );
         locals.runtime = {
             runPromise: makeRunPromise(locals.appLive),
             runPromiseExit: makeRunPromiseExit(locals.appLive)
         };
+
+        return resolve(event);
     }
 
-    const response = await resolve(event);
-    return response;
+    initLocals(locals, httpClient);
+    return resolve(event);
 };
 
-const initLocals = (locals: App.Locals, fetch: typeof globalThis.fetch) => {
+const initLocals = (locals: App.Locals, httpClient: UniversalHttpClient) => {
     locals.appLive = Layer.mergeAll(
-        HttpClient.Live(fetch),
         Layer.sync(
             ApiClient,
             () =>
                 new HttpApiClient({
-                    httpClient: new UniversalHttpClient({
-                        baseUrl: env.API_BASE_URL,
-                        version: env.API_VERSION,
-                        fetch
-                    })
+                    httpClient
                 })
         ),
         Cloudinary.Live,

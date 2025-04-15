@@ -47,7 +47,7 @@ declare global {
                     options?: { readonly signal?: AbortSignal } | undefined
                 ): Promise<Exit.Exit<A, E>>;
             };
-            appLive: Layer<HttpClient | ApiClient | Cloudinary | IdHasher>;
+            appLive: Layer<ApiClient | Cloudinary | IdHasher>;
             user: {
                 id: string;
                 email: string;
