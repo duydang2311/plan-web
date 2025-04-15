@@ -17,7 +17,7 @@ export interface Ref<T> {
 }
 
 export interface AsyncRef<T> extends Ref<T> {
-    loading: Loading;
+    readonly loading: Loading;
 }
 
 export const createEffect: ((fn: () => void | (() => void), depsFn?: () => unknown) => void) & {
@@ -155,8 +155,40 @@ export const createRef = Object.assign(
         return new SvelteRef(f) as Ref<NonNullable<T>>;
     },
     {
+        async: <T>(initialValue?: T): AsyncRef<NonNullable<T>> => {
+            return new SvelteAsyncRef(initialValue) as AsyncRef<NonNullable<T>>;
+        },
         maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<NonNullable<T>> => {
-            return new SvelteAsyncRef(f) as AsyncRef<NonNullable<T>>;
+            const initialValue = f();
+            if (!isPromiseLike(initialValue)) {
+                const ref = new SvelteAsyncRef(initialValue);
+                $effect(() => {
+                    unwrapMaybePromise(f())((b) => {
+                        untrack(() => {
+                            ref.value = b;
+                        });
+                    });
+                });
+                return ref as AsyncRef<NonNullable<T>>;
+            }
+
+            const ref = new SvelteAsyncRef<T>();
+            ref.loading.set();
+            unwrapMaybePromise(initialValue)((a) => {
+                ref.value = a;
+                ref.loading.unset();
+            });
+            $effect(() => {
+                const a = f();
+                untrack(() => {
+                    ref.loading.set();
+                    unwrapMaybePromise(a)((b) => {
+                        ref.value = b;
+                        ref.loading.unset();
+                    });
+                });
+            });
+            return ref as AsyncRef<NonNullable<T>>;
         }
     }
 );
@@ -220,8 +252,9 @@ class SvelteRef<T> implements Ref<T> {
 
 class SvelteAsyncRef<T> implements AsyncRef<T> {
     value = $state.raw<T>();
-    loading = createLoading();
-    constructor(f: () => MaybePromise<T>) {
+    #loading = createLoading();
+
+    constructor2(f: () => MaybePromise<T>) {
         const initialValue = f();
         const loading = createLoading();
         if (!isPromiseLike(initialValue)) {
@@ -250,5 +283,13 @@ class SvelteAsyncRef<T> implements AsyncRef<T> {
                 });
             });
         });
+    }
+
+    constructor(initialValue?: T) {
+        this.value = initialValue;
+    }
+
+    get loading() {
+        return this.#loading;
     }
 }
