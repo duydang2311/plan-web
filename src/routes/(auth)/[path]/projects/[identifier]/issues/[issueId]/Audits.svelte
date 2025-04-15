@@ -33,7 +33,7 @@
     let containerRef = $state.raw<HTMLElement>();
     let startMargin = $state.raw(0);
     let virtualizer = $state.raw<VirtualizerHandle>();
-    let mounted = false;
+    let suppressScrollEnd = false;
 
     const updateScrollOffset = () => {
         if (!virtualizer) {
@@ -87,11 +87,12 @@
     };
 
     watch(() => [virtualizer])(() => {
-        if (mounted || !virtualizer) {
+        if (!virtualizer) {
             return;
         }
         const offset = Number(page.url.searchParams.get('offset'));
         if (!isNaN(offset) && offset > 0 && virtualizer) {
+            suppressScrollEnd = true;
             virtualizer.scrollToIndex(offset);
         }
     });
@@ -171,8 +172,8 @@
                         }
                     }}
                     onscrollend={() => {
-                        if (!mounted) {
-                            mounted = true;
+                        if (suppressScrollEnd) {
+                            suppressScrollEnd = false;
                             return;
                         }
                         updateScrollOffset();

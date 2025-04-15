@@ -1,15 +1,14 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { TiptapEditor, toast, InlineEdit, Input } from '~/lib/components';
+    import { InlineEdit, Input, TiptapEditor, toast } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import { IconCheck, IconXMark } from '~/lib/components/icons';
     import type { Ref } from '~/lib/utils/runes.svelte';
     import type { ActionData } from './$types';
     import type { LocalIssue } from './+page.server';
-    import { invalidateAll } from '$app/navigation';
-    import { tick } from 'svelte';
 
     interface Props {
         form: ActionData;
