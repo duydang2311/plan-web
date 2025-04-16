@@ -5,7 +5,7 @@
     --_bg: transparent;
 
     @variant dark {
-        --_bg: color-mix(in oklch, var(--color-base-3) 50%, var(--color-base-2));
+        --_bg: var(--color-base-3);
     }
 
     width: 100%;
