@@ -51,8 +51,7 @@
                         }>
                     >()
                 );
-            },
-            staleTime: 0
+            }
         }))
     );
 </script>
@@ -103,9 +102,9 @@
             <Input
                 type="text"
                 placeholder="Search for friends..."
-                class="w-full border-none py-0 pl-6 pr-0 outline-none ring-0"
+                class="w-full bg-transparent pl-8 pr-2"
             />
-            <IconSearch class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2" />
+            <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
         </div>
     </div>
     <div>
