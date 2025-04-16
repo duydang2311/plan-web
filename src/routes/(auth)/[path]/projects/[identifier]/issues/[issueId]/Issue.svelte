@@ -14,13 +14,12 @@
         form: ActionData;
         editing: boolean;
         ref: Ref<LocalIssue>;
-        onCancel: () => void;
-        onSubmit: () => void;
     }
 
-    let { editing, ref = $bindable(), onCancel, onSubmit }: Props = $props();
+    let { editing = $bindable(), ref = $bindable() }: Props = $props();
     let editor = $state.raw<Editor>();
     let titleEditing = $state.raw(false);
+    let descFormEl = $state.raw<HTMLFormElement>();
 </script>
 
 {#if ref.value}
@@ -102,6 +101,7 @@
         {#if editing}
             <div>
                 <form
+                    bind:this={descFormEl}
                     method="post"
                     action="?/edit-description"
                     class="relative"
@@ -120,13 +120,13 @@
                             };
                         }
                         e.formData.set('description', description);
-                        onSubmit();
-                        return ({ result }) => {
+                        editing = false;
+                        return async ({ result }) => {
                             if (result.type !== 'success') {
                                 ref.value = old;
                                 toast({
                                     type: 'negative',
-                                    body: 'An unknown error happened while we were trying to update the description.'
+                                    body: 'An unknown error happened while trying to update the description.'
                                 });
                             }
                         };
@@ -142,29 +142,37 @@
                                 class: 'h-128 overflow-auto'
                             }
                         }}
+                        onCreate={(e) => {
+                            e.editor.on('submit', () => {
+                                descFormEl?.requestSubmit();
+                            });
+                            e.editor.commands.focus('end');
+                        }}
                     />
+                    <div class="ml-auto mt-2 flex w-fit gap-2">
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="base"
+                            onclick={() => {
+                                editing = false;
+                            }}
+                            class="flex flex-1 items-center gap-2"
+                        >
+                            <IconXMark />
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            variant="primary"
+                            class="flex flex-1 items-center gap-2"
+                        >
+                            <IconCheck />
+                            Save
+                        </Button>
+                    </div>
                 </form>
-                <div class="ml-auto mt-2 flex w-fit gap-2">
-                    <Button
-                        type="button"
-                        size="sm"
-                        variant="base"
-                        onclick={onCancel}
-                        class="flex flex-1 items-center gap-2"
-                    >
-                        <IconXMark />
-                        Cancel
-                    </Button>
-                    <Button
-                        type="submit"
-                        size="sm"
-                        variant="primary"
-                        class="flex flex-1 items-center gap-2"
-                    >
-                        <IconCheck />
-                        Save
-                    </Button>
-                </div>
             </div>
         {:else}
             <div class="prose max-w-paragraph-lg wrap-anywhere">
