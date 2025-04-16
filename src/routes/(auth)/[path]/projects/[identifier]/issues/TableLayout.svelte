@@ -20,7 +20,7 @@
     });
 </script>
 
-<div class="grid grid-rows-[1fr_auto] h-full">
+<div class="grid h-full grid-rows-[1fr_auto]">
     <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
         <THead>
             <Row class="py-2">
@@ -62,20 +62,22 @@
             {:else}
                 {#each issueList.items as row}
                     {@const IconPriority = priorityIcons[row.priority]}
-                    <Row>
+                    <Row class="relative">
                         <td>
+                            <a
+                                href="/{page.params.path}/projects/{page.params
+                                    .identifier}/issues/{row.orderNumber}"
+                                aria-labelledby="issue-{row.orderNumber}"
+                                class="absolute inset-0"
+                            ></a>
                             <div
                                 class="text-base-fg-3/60 block min-w-max content-center text-sm font-bold"
                             >
                                 {row.project.identifier}-{row.orderNumber}
                             </div>
                         </td>
-                        <td>
-                            <Link
-                                href={`/${page.params.path}/projects/${page.params.identifier}/issues/${row.orderNumber}`}
-                            >
-                                {row.title}
-                            </Link>
+                        <td id="issue-{row.orderNumber}">
+                            {row.title}
                         </td>
                         <td>
                             {#if row.status?.value}
