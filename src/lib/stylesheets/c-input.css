@@ -69,3 +69,7 @@
         }
     }
 }
+
+.c-input--sm {
+    padding: --spacing(1) --spacing(2);
+}

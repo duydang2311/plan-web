@@ -1,16 +1,17 @@
 <script lang="ts">
     import type { AnyMeltElement } from '@melt-ui/svelte';
     import clsx from 'clsx';
-    import type { HTMLInputAttributes } from 'svelte/elements';
     import type { Action } from 'svelte/action';
+    import type { HTMLInputAttributes } from 'svelte/elements';
     import { noop } from '../utils';
 
-    interface Props extends HTMLInputAttributes {
+    interface Props extends Omit<HTMLInputAttributes, 'size'> {
         melt?: Parameters<Parameters<AnyMeltElement['subscribe']>[0]>[0];
         ref?: HTMLInputElement;
         errors?: string[];
         useField?: Action;
         action?: Action;
+        size?: 'sm';
     }
 
     let {
@@ -20,6 +21,7 @@
         errors,
         useField = noop,
         action = noop,
+        size,
         ...props
     }: Props = $props();
     let initial = $state.snapshot(value);
@@ -38,7 +40,7 @@
     bind:this={ref}
     {...props}
     bind:value
-    class={clsx('c-input', props.class)}
+    class={clsx('c-input', size && `c-input--${size}`, props.class)}
     {...useMelt}
     use:meltAction
     use:useField

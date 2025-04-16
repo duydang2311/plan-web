@@ -39,14 +39,8 @@
             <div bind:this={issueContainerRef} class="max-w-paragraph-lg mx-auto w-full">
                 <Issue
                     {form}
-                    {editing}
                     ref={issueRef}
-                    onCancel={() => {
-                        editing = false;
-                    }}
-                    onSubmit={() => {
-                        editing = false;
-                    }}
+                    bind:editing
                 />
             </div>
             <hr class="border-base-border-2 -mx-4 my-8 border-dashed" />

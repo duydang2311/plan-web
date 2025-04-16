@@ -1,12 +1,10 @@
 <script lang="ts">
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { melt } from '@melt-ui/svelte';
-    import { debounce } from '@mobily/ts-belt/Function';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
+    import type { Combobox } from 'melt/builders';
     import { toStore } from 'svelte/store';
-    import { Avatar, Input } from '~/lib/components';
-    import { IconCheck, IconSearch } from '~/lib/components/icons';
-    import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
+    import { Avatar } from '~/lib/components';
+    import { IconCheck } from '~/lib/components/icons';
     import Spinner2 from '~/lib/components/Spinner2.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { PaginatedList } from '~/lib/models/paginatedList';
@@ -17,24 +15,16 @@
 
     interface Props {
         workspaceId: string;
-        builders: {
-            menu: SelectChildrenProps['menu'];
-            option: SelectChildrenProps['option'];
-        };
-        helpers: {
-            isSelected: SelectChildrenProps['helpers']['isSelected'];
-        };
+        builder: Combobox<string, true>;
+        search: string;
     }
 
     type LocalUser = Pick<User, 'id' | 'email' | 'createdTime'> & {
         profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;
     };
 
-    const { workspaceId, builders, helpers }: Props = $props();
-    const { menu, option } = $derived(builders);
-    const { isSelected } = $derived(helpers);
+    let { workspaceId, builder, search }: Props = $props();
     const { api, cloudinary } = useRuntime();
-    let search = $state.raw('');
     let status = $state.raw<'pending' | null>(null);
     const query = createQuery<PaginatedList<LocalUser> | null>(
         toStore(() => ({
@@ -69,9 +59,6 @@
               }))
             : null
     );
-    const updateSearch = debounce(300)((value: string) => {
-        search = value;
-    });
     when(
         () => $query.isFetching,
         () => {
@@ -88,54 +75,38 @@
 </script>
 
 <div
-    use:melt={menu}
-    class="c-select--menu grid min-h-60 min-w-52 grid-rows-[auto_1fr] p-0"
+    class="c-select--menu min-h-60"
+    class:animate-pulse={$query.isFetching}
     in:tsap={select.in}
     out:tsap={select.out}
+    {...builder.content}
 >
-    <div class="relative">
-        <Input
-            class="border-none pl-8 focus:shadow-none"
-            placeholder="Search for users"
-            oninput={(e) => {
-                updateSearch(e.currentTarget.value);
-            }}
-        />
-        <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
-    </div>
-    <div
-        class="border-t-base-border-3 relative border-t p-1"
-        class:animate-pulse={$query.isFetching}
-    >
-        {#if status === 'pending'}
-            <Spinner2 class="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2" />
-        {/if}
-        {#if options}
-            <ul class="space-y-1">
-                {#if options.length === 0}
-                    <li class="c-select--option text-base-fg-ghost px-2 font-normal">
-                        No relevant users found.
+    {#if status === 'pending'}
+        <Spinner2 class="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2" />
+    {/if}
+    {#if options}
+        <ul class="space-y-1">
+            {#if options.length === 0}
+                <li class="c-select--option text-base-fg-ghost px-2 font-normal">
+                    No relevant users found.
+                </li>
+            {:else}
+                {#each options as item (item.value)}
+                    <li class="c-select--option" {...builder.getOption(item.value)}>
+                        <Avatar seed={item.email} src={item.image ?? undefined} class="w-6" />
+                        {#if builder.isSelected(item.value)}
+                            <IconCheck class="c-select--check" />
+                        {/if}
+                        {item.label}
                     </li>
-                {:else}
-                    {#each options as item (item.value)}
-                        {@const opt = option(item)}
-                        {@const selected = isSelected(item.value)}
-                        <li use:melt={opt} class="c-select--option">
-                            <Avatar seed={item.email} src={item.image ?? undefined} class="w-6" />
-                            {#if selected}
-                                <IconCheck class="c-select--check" />
-                            {/if}
-                            {item.label}
-                        </li>
-                    {/each}
-                {/if}
-            </ul>
-        {:else}
-            <ul class="space-y-1">
-                {#each { length: 3 } as _}
-                    <li class="c-select--option bg-base-4 h-7 w-full animate-pulse"></li>
                 {/each}
-            </ul>
-        {/if}
-    </div>
+            {/if}
+        </ul>
+    {:else}
+        <ul class="space-y-1">
+            {#each { length: 3 } as _}
+                <li class="c-select--option bg-base-4 h-7 w-full animate-pulse"></li>
+            {/each}
+        </ul>
+    {/if}
 </div>

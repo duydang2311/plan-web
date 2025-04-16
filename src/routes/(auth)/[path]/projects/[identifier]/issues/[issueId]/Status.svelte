@@ -1,9 +1,9 @@
 <script lang="ts">
     import { pipe } from '@baetheus/fun/fn';
-    import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { writable } from 'svelte/store';
-    import { addToast, Button, SelectBuilder } from '~/lib/components';
+    import { Select } from 'melt/builders';
+    import { untrack } from 'svelte';
+    import { addToast, Button } from '~/lib/components';
     import {
         IconBacklog,
         IconCanceled,
@@ -26,7 +26,6 @@
     const { workspaceId, issueId }: Props = $props();
     const { api } = useRuntime();
     const queryClient = useQueryClient();
-    const open = writable(false);
     const queryKey = ['workspace-status', { issueId }];
     const query = createQuery<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> | null>({
         queryKey,
@@ -72,12 +71,7 @@
             if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData<WorkspaceStatus>(queryKey, context.oldStatus);
-                    $selected = context.oldStatus
-                        ? {
-                              value: context.oldStatus,
-                              label: context.oldStatus.value
-                          }
-                        : null!;
+                    value = context.oldStatus ? context.oldStatus.id + '' : undefined;
                 }
                 addToast({
                     data: {
@@ -95,14 +89,6 @@
             ]);
         }
     });
-    const selected = writable<SelectOption<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>>>(
-        $query.data
-            ? {
-                  label: $query.data.value,
-                  value: $query.data
-              }
-            : null!
-    );
     const statusIcons = {
         backlog: IconBacklog,
         todo: IconTodo,
@@ -111,48 +97,62 @@
         canceled: IconCanceled,
         duplicated: IconDuplicated
     };
-    const SelectedStatusIcon = $derived(
-        $selected && $selected.value.icon && $selected.value.icon in statusIcons
-            ? statusIcons[$selected.value.icon as keyof typeof statusIcons]
-            : undefined
+    let value = $state.raw<string | undefined>(
+        $query.data == null ? undefined : $query.data.id + ''
     );
+    const builder = new Select({
+        value: () => value,
+        forceVisible: true,
+        floatingConfig: {
+            computePosition: { placement: 'bottom' },
+            sameWidth: true
+        },
+        onValueChange: (next) => {
+            if (next && next !== value) {
+                $mutation.mutate({ statusId: Number(next) });
+            }
+            value = next;
+        }
+    });
+    const selectedStatus = $derived.by(() => {
+        if (!value) {
+            return undefined;
+        }
+        return untrack(() => {
+            const status =
+                $query.data?.id === Number(value)
+                    ? $query.data
+                    : queryClient
+                          .getQueryData<
+                              PaginatedList<WorkspaceStatus>
+                          >(['workspace-statuses', { workspaceId }])
+                          ?.items.find((a) => a.id === Number(value));
+            if (!status) {
+                return undefined;
+            }
+            return {
+                Icon:
+                    status.icon && status.icon in statusIcons
+                        ? statusIcons[status.icon as keyof typeof statusIcons]
+                        : undefined,
+                label: status.value
+            };
+        });
+    });
 </script>
 
-<SelectBuilder
-    options={{
-        selected,
-        open,
-        positioning: { placement: 'bottom', sameWidth: true },
-        forceVisible: true,
-        onSelectedChange: ({ curr, next }) => {
-            if (next && next.value.id !== curr?.value.id) {
-                $mutation.mutate({ statusId: next.value.id });
-            }
-            return next;
-        }
-    }}
->
-    {#snippet children({ trigger, menu, option, helpers })}
-        <Button
-            type="button"
-            variant="base"
-            size="sm"
-            class="flex items-center gap-2"
-            melt={trigger}
-        >
-            {#if $selected == null}
-                No status
-            {:else}
-                {#if SelectedStatusIcon}
-                    <SelectedStatusIcon />
-                {/if}
-                <span>
-                    {$selected.label}
-                </span>
-            {/if}
-        </Button>
-        {#if $open}
-            <StatusOptions {selected} selectProps={{ menu, option, helpers }} {workspaceId} />
+<Button type="button" variant="base" size="sm" class="flex items-center gap-2" {...builder.trigger}>
+    {#if value == null}
+        No status
+    {:else if selectedStatus}
+        {#if selectedStatus.Icon}
+            <selectedStatus.Icon />
         {/if}
-    {/snippet}
-</SelectBuilder>
+        <span>
+            {selectedStatus.label}
+        </span>
+    {/if}
+</Button>
+{#if builder.open}
+    <StatusOptions {builder} {workspaceId} />
+{/if}

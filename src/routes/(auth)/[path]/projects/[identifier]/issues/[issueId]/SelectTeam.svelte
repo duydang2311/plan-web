@@ -1,13 +1,13 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { type SelectOption } from '@melt-ui/svelte';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
-    import { toStore, writable } from 'svelte/store';
-    import { Button, SelectBuilder } from '~/lib/components';
-    import { IconPlus } from '~/lib/components/icons';
+    import { Combobox } from 'melt/builders';
+    import { SvelteSet } from 'svelte/reactivity';
+    import { toStore } from 'svelte/store';
+    import { Input } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { Team } from '~/lib/models/team';
-    import { createEffect } from '~/lib/utils/runes.svelte';
     import SelectTeamOptions from './SelectTeamOptions.svelte';
 
     interface Props {
@@ -19,7 +19,6 @@
 
     const { workspaceId, issueId }: Props = $props();
     const { api, queryClient } = useRuntime();
-    const open = writable(false);
     const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-team' }]);
     const selectedQuery = createQuery(
         toStore(() => ({
@@ -34,13 +33,6 @@
                 return await response.json<{ teams: LocalSelectTeam[] }>().then((a) => a.teams);
             }
         }))
-    );
-    const selected = writable<(SelectOption<string> & { identifier?: string })[]>(
-        $selectedQuery.data?.map((a) => ({
-            label: a.name,
-            value: a.id,
-            identifier: a.identifier
-        })) ?? []
     );
     const addMutation = createMutation({
         mutationFn: (variables: { teamId: string; issueId: string; teamName?: string }) =>
@@ -88,110 +80,92 @@
         }
     });
 
-    createEffect(
-        () => {
-            if ($selectedQuery.data) {
-                $selected = $selectedQuery.data.map((a) => ({
-                    label: a.name,
-                    value: a.id,
-                    identifier: a.identifier
-                }));
+    const value = new SvelteSet<string>($selectedQuery.data?.map((a) => a.id));
+    const builder = new Combobox({
+        multiple: true,
+        forceVisible: true,
+        floatingConfig: {
+            computePosition: {
+                placement: 'bottom'
             }
         },
-        () => $selectedQuery
-    );
+        value: () => value.values(),
+        onValueChange: (next) => {
+            for (const a of next.values()) {
+                if (value.has(a)) {
+                    continue;
+                }
+                value.add(a);
+                const team = queryClient
+                    .getQueryData<
+                        PaginatedList<LocalSelectTeam>
+                    >(['teams', { tag: 'issue-details', workspaceId }])
+                    ?.items.find((b) => b.id === a);
+                if (team) {
+                    $addMutation.mutate({
+                        issueId,
+                        teamName: team.name,
+                        teamId: team.id
+                    });
+                }
+            }
+
+            for (const a of value.values()) {
+                if (next.has(a)) {
+                    continue;
+                }
+                value.delete(a);
+                $deleteMutation.mutate({
+                    issueId,
+                    teamId: a
+                });
+            }
+        }
+    });
 </script>
 
 <div>
     <div class="mb-2 flex items-center gap-2">
         <h2 class="c-label">Teams</h2>
-        {#if $selected.length > 0}
+        {#if value.size > 0}
             <span class="bg-base-3 text-base-fg-3 rounded-full px-2 text-sm font-medium">
-                {$selected.length}
+                {value.size}
             </span>
         {/if}
     </div>
-    {#if $selected.length}
-        <ul class="mb-3 flex flex-wrap gap-1">
-            {#each $selected as option (option.value)}
-                {#if option.identifier}
+    <Input
+        type="text"
+        size="sm"
+        {...builder.input}
+        onfocus={(e) => {
+            builder.open = true;
+            builder.input.onfocus(e);
+        }}
+    />
+    {#if builder.open}
+        <SelectTeamOptions {workspaceId} {builder} />
+    {/if}
+    {#if $selectedQuery.data != null && $selectedQuery.data.length}
+        <ul class="mt-2 flex flex-wrap gap-1">
+            {#each $selectedQuery.data as team (team.id)}
+                {#if team.identifier}
                     <li class="grow">
                         <a
-                            href="/{page.params.path}/teams/{option.identifier}"
+                            href="/{page.params.path}/teams/{team.identifier}"
                             class="bg-base-2 dark:bg-base-3 text-base-fg-2 border-base-border-2 hover:bg-base-4 hover:text-base-fg-1 active:bg-base-active block w-full overflow-hidden text-ellipsis rounded-full border px-2
                             text-center text-sm font-medium"
                         >
-                            {option.label}
+                            {team.name}
                         </a>
                     </li>
                 {:else}
                     <li
                         class="bg-base-2 dark:bg-base-3 text-base-fg-1 border-base-border-2 grow overflow-hidden text-ellipsis rounded-full border px-2 text-center text-sm font-medium"
                     >
-                        {option.label}
+                        {team.name}
                     </li>
                 {/if}
             {/each}
         </ul>
     {/if}
-    <SelectBuilder
-        options={{
-            multiple: true,
-            forceVisible: true,
-            selected,
-            open,
-            positioning: {
-                sameWidth: false,
-                placement: 'left-start'
-            },
-            onSelectedChange: ({ curr, next }) => {
-                const added =
-                    curr == null
-                        ? next
-                        : next?.filter((a) => curr.every((b) => b.value !== a.value));
-                const removed =
-                    next == null
-                        ? curr
-                        : curr?.filter((a) => next.every((b) => b.value !== a.value));
-                if (added) {
-                    for (const a of added) {
-                        $addMutation.mutate({
-                            issueId,
-                            teamName: a.label,
-                            teamId: a.value
-                        });
-                    }
-                }
-                if (removed) {
-                    for (const a of removed) {
-                        $deleteMutation.mutate({
-                            issueId,
-                            teamId: a.value
-                        });
-                    }
-                }
-                return curr;
-            }
-        }}
-    >
-        {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
-            <Button
-                type="button"
-                variant="base"
-                size="sm"
-                melt={trigger}
-                class="flex items-center gap-2"
-            >
-                <IconPlus />
-                Add team
-            </Button>
-            {#if $open}
-                <SelectTeamOptions
-                    {workspaceId}
-                    builders={{ menu, option }}
-                    helpers={{ isSelected }}
-                />
-            {/if}
-        {/snippet}
-    </SelectBuilder>
 </div>

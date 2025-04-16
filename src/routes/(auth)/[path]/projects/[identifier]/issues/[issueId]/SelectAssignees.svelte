@@ -1,14 +1,15 @@
 <script lang="ts">
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { type SelectOption } from '@melt-ui/svelte';
+    import { debounce } from '@mobily/ts-belt/Function';
     import { createMutation, createQuery } from '@tanstack/svelte-query';
-    import { toStore, writable } from 'svelte/store';
-    import { Avatar, Button, SelectBuilder } from '~/lib/components';
-    import { IconPlus } from '~/lib/components/icons';
+    import { Combobox } from 'melt/builders';
+    import { SvelteSet } from 'svelte/reactivity';
+    import { toStore } from 'svelte/store';
+    import { Avatar, Input } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import type { PaginatedList } from '~/lib/models/paginatedList';
     import type { User } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { createEffect } from '~/lib/utils/runes.svelte';
     import SelectAssigneesOptions from './SelectAssigneesOptions.svelte';
 
     interface Props {
@@ -22,7 +23,6 @@
 
     const { workspaceId, issueId }: Props = $props();
     const { api, queryClient, cloudinary } = useRuntime();
-    const open = writable(false);
     const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-assignees' }]);
     const selectedQuery = createQuery(
         toStore(() => ({
@@ -40,7 +40,7 @@
             }
         }))
     );
-    const selected = writable<(SelectOption<string> & { email: string; image?: string })[]>(
+    const assignees = $derived(
         $selectedQuery.data?.map((a) => ({
             label: a.profile?.displayName ?? a.email,
             value: a.id,
@@ -97,108 +97,101 @@
         }
     });
 
-    createEffect(
-        () => {
-            if ($selectedQuery.data) {
-                $selected = $selectedQuery.data.map((a) => ({
-                    label: a.profile?.displayName ?? a.email,
-                    value: a.id,
-                    email: a.email,
-                    image: a.profile
-                        ? imageFromAsset(cloudinary)(a.profile?.image)?.resize(Resize.fill(64)).toURL()
-                        : undefined
-                }));
-            }
+    let value = new SvelteSet<string>($selectedQuery.data?.map((a) => a.id));
+    const builder = new Combobox({
+        multiple: true,
+        forceVisible: true,
+        floatingConfig: {
+            computePosition: {
+                placement: 'bottom'
+            },
+            sameWidth: true
         },
-        () => $selectedQuery
-    );
+        value: () => Array.from(value.values()),
+        onValueChange: (next) => {
+            for (const a of next.values()) {
+                if (value.has(a)) {
+                    continue;
+                }
+                value.add(a);
+                const user = queryClient
+                    .getQueryData<
+                        PaginatedList<LocalUser>
+                    >(['users', { tag: 'select-assignees', workspaceId, search }])
+                    ?.items.find((b) => b.id === a);
+                if (user) {
+                    $addMutation.mutate({
+                        issueId,
+                        userId: user.id,
+                        email: user.email,
+                        image: user.profile
+                            ? imageFromAsset(cloudinary)(user.profile.image)
+                                  ?.resize(Resize.fill(64))
+                                  .toURL()
+                            : undefined
+                    });
+                }
+            }
+
+            for (const a of value.values()) {
+                if (next.has(a)) {
+                    continue;
+                }
+                value.delete(a);
+                $deleteMutation.mutate({
+                    issueId,
+                    userId: a
+                });
+            }
+        }
+    });
+
+    let search = $state.raw<string>('');
+    const updateSearch = debounce((value: string) => {
+        search = value;
+    }, 300);
 </script>
 
 <div>
     <div class="mb-2 flex items-center gap-2">
         <h2 class="c-label">Assignees</h2>
-        {#if $selected.length > 0}
+        {#if value.size > 0}
             <span class="bg-base-3 text-base-fg-3 rounded-full px-2 text-sm font-medium">
-                {$selected.length}
+                {value.size}
             </span>
         {/if}
     </div>
-    {#if $selected.length}
+    <Input
+        type="text"
+        size="sm"
+        class="mb-2"
+        {...builder.input}
+        oninput={(e) => {
+            updateSearch(e.currentTarget.value);
+            builder.input.oninput(e);
+        }}
+        onfocus={() => {
+            builder.open = true;
+        }}
+    />
+    {#if builder.open}
+        <SelectAssigneesOptions {workspaceId} {builder} {search} />
+    {/if}
+    {#if assignees.length}
         <ul class="mb-3 space-y-2">
-            {#each $selected as option (option.value)}
+            {#each assignees as assignee (assignee.value)}
                 <li class="flex items-center gap-2">
                     <Avatar
-                        title={option.label}
-                        seed={option.email}
-                        src={option.image}
-                        class="w-10"
+                        title={assignee.label}
+                        seed={assignee.email}
+                        src={assignee.image}
+                        class="size-avatar-sm"
                     />
                     <div class="overflow-hidden text-ellipsis">
-                        {option.label}
+                        {assignee.label}
                     </div>
                 </li>
             {/each}
         </ul>
     {/if}
-    <SelectBuilder
-        options={{
-            multiple: true,
-            forceVisible: true,
-            selected,
-            open,
-            positioning: {
-                sameWidth: false,
-                placement: 'left-start'
-            },
-            onSelectedChange: ({ curr, next }) => {
-                const added =
-                    curr == null
-                        ? next
-                        : next?.filter((a) => curr.every((b) => b.value !== a.value));
-                const removed =
-                    next == null
-                        ? curr
-                        : curr?.filter((a) => next.every((b) => b.value !== a.value));
-                if (added) {
-                    for (const a of added) {
-                        $addMutation.mutate({
-                            issueId,
-                            userId: a.value,
-                            email: a.email,
-                            image: a.image
-                        });
-                    }
-                }
-                if (removed) {
-                    for (const a of removed) {
-                        $deleteMutation.mutate({
-                            issueId,
-                            userId: a.value
-                        });
-                    }
-                }
-                return curr;
-            }
-        }}
-    >
-        {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
-            <Button
-                type="button"
-                variant="base"
-                size="sm"
-                melt={trigger}
-                class="flex items-center gap-2"
-            >
-                <IconPlus />
-                Add assignee
-            </Button>
-            {#if $open}
-                <SelectAssigneesOptions
-                    {workspaceId}
-                    builders={{ menu, option }}
-                    helpers={{ isSelected }}
-                />
-            {/if}
-        {/snippet}
-    </SelectBuilder>
 </div>

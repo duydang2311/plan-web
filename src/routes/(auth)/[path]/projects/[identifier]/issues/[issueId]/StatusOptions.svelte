@@ -1,9 +1,7 @@
 <script lang="ts">
     import { pipe } from '@baetheus/fun/fn';
-    import type { SelectOption } from '@melt-ui/svelte';
-    import { melt } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
-    import type { Writable } from 'svelte/store';
+    import type { Select } from 'melt/builders';
     import {
         IconBacklog,
         IconCanceled,
@@ -13,12 +11,10 @@
         IconInProgress,
         IconTodo
     } from '~/lib/components/icons';
-    import type { SelectChildrenProps } from '~/lib/components/SelectBuilder.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList, paginatedList } from '~/lib/models/paginatedList';
     import { type WorkspaceStatus } from '~/lib/models/status';
     import { TE } from '~/lib/utils/functional';
-    import { createEffect } from '~/lib/utils/runes.svelte';
     import { select, tsap } from '~/lib/utils/transition';
 
     interface Item {
@@ -27,19 +23,12 @@
     }
 
     const {
-        selected,
         workspaceId,
-        selectProps
+        builder
     }: {
-        selected: Writable<SelectOption<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>>>;
         workspaceId: string;
-        selectProps: Pick<SelectChildrenProps, 'menu' | 'option' | 'helpers'>;
+        builder: Select<string>;
     } = $props();
-    const {
-        menu,
-        option,
-        helpers: { isSelected }
-    } = $derived(selectProps);
     const { api } = useRuntime();
 
     const query = createQuery({
@@ -71,13 +60,6 @@
               })
             : null
     );
-    createEffect(
-        () => {
-            if (!options) return;
-            $selected = options.items.find((a) => a.value.id == $selected?.value.id)!;
-        },
-        () => options
-    );
     const statusIcons = {
         backlog: IconBacklog,
         todo: IconTodo,
@@ -88,19 +70,17 @@
     };
 </script>
 
-<div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
+<div class="c-select--menu" in:tsap={select.in} out:tsap={select.out} {...builder.content}>
     {#if $query.isFetching}
         <li class="c-select--option text-base-fg-ghost">Loading...</li>
     {:else if options && options.items.length > 0}
         {#each options.items as item (item.value.id)}
-            {@const opt = option(item)}
-            {@const selected = isSelected(item.value)}
             {@const StatusIcon =
                 item.value.icon && item.value.icon in statusIcons
                     ? statusIcons[item.value.icon as keyof typeof statusIcons]
                     : undefined}
-            <li use:melt={opt} class="c-select--option">
-                {#if selected}
+            <li class="c-select--option" {...builder.getOption(item.value.id + '')}>
+                {#if builder.isSelected(item.value.id + '')}
                     <IconCheck class="c-select--check" />
                 {/if}
                 {#if StatusIcon}
