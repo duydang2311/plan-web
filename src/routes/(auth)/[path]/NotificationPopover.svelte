@@ -33,6 +33,7 @@
                     selectComment:
                         'Id,Issue.Title,Issue.OrderNumber,Issue.Project.Identifier,Issue.Project.Workspace.Path',
                     selectProjectMemberInvitation: 'Id,Project.Name,Project.Identifier',
+                    selectWorkspaceInvitation: 'Id,Workspace.Name',
                     sort: '-Id'
                 }
             })
@@ -112,6 +113,7 @@
             el.scrollTop = scrollTop;
         });
     });
+    $inspect(ref.value);
 </script>
 
 {#snippet skeleton()}
@@ -232,6 +234,25 @@
                                     You have been invited a project —
                                     <strong class="text-base-fg-1">
                                         {userNotification.notification.data.project.name}
+                                    </strong>.
+                                </p>
+                                <p class="c-label">
+                                    {DateTime.fromISO(userNotification.createdTime)
+                                        .toLocal()
+                                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                                </p>
+                            </a>
+                        {:else if userNotification.notification.type === notificationTypes.workspaceMemberInvited}
+                            <a
+                                href="/workspace-invites/{idHasher.encode([
+                                    userNotification.notification.data.id
+                                ])}"
+                                class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
+                            >
+                                <p class="text-pretty">
+                                    You are invited to join a workspace —
+                                    <strong class="text-base-fg-1">
+                                        {userNotification.notification.data.workspace.name}
                                     </strong>.
                                 </p>
                                 <p class="c-label">

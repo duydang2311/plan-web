@@ -3,7 +3,8 @@ export const notificationTypes = {
     projectCreated: 1,
     issueCreated: 2,
     issueCommentCreated: 3,
-    projectMemberInvited: 4
+    projectMemberInvited: 4,
+    workspaceMemberInvited: 5,
 } as const;
 
 export const notificationTypeNames = {
@@ -11,7 +12,8 @@ export const notificationTypeNames = {
     1: 'ProjectCreated',
     2: 'IssueCreated',
     3: 'IssueCommentCreated',
-    4: 'ProjectMemberInvited'
+    4: 'ProjectMemberInvited',
+    5: 'WorkspaceMemberInvited'
 } as const;
 
 export type NotificationType = (typeof notificationTypes)[keyof typeof notificationTypes];

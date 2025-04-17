@@ -45,5 +45,14 @@ export interface LocalUserNotification {
                       name: string;
                   };
               };
+          }
+        | {
+              type: (typeof notificationTypes)['workspaceMemberInvited'];
+              data: {
+                  id: number;
+                  workspace: {
+                      name: string;
+                  };
+              };
           };
 }
