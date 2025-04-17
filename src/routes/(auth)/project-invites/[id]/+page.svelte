@@ -1,10 +1,11 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
+    import { redirect } from '@sveltejs/kit';
     import { Button, LoadingMonitor, toast } from '~/lib/components';
     import { IconBack, IconCheck, IconXMark } from '~/lib/components/icons';
     import { createLoading } from '~/lib/utils/runes.svelte';
     import type { PageData, SubmitFunction } from './$types';
-    import { redirect } from '@sveltejs/kit';
 
     const { data }: { data: PageData } = $props();
 
@@ -12,7 +13,7 @@
     const declineLoading = createLoading();
     const submitAccept: SubmitFunction = () => {
         submitLoading.set();
-        return ({ result }) => {
+        return async ({ result }) => {
             submitLoading.unset();
             if (result.type === 'redirect') {
                 toast({
@@ -20,18 +21,18 @@
                     body: acceptSuccess,
                     bodyProps: data.invitation.project.name
                 });
-                redirect(result.status, result.location)
-            } else if(result.type === 'failure') {
+                await goto(result.location, { invalidateAll: true });
+            } else if (result.type === 'failure') {
                 toast({
                     type: 'negative',
-                    body: 'The server responded with an error while trying to accept the invitation.',
+                    body: 'The server responded with an error while trying to accept the invitation.'
                 });
             }
         };
     };
     const submitDecline: SubmitFunction = () => {
         declineLoading.set();
-        return ({ result }) => {
+        return async ({ result }) => {
             declineLoading.unset();
             if (result.type === 'redirect') {
                 toast({
@@ -39,11 +40,11 @@
                     body: declineSuccess,
                     bodyProps: data.invitation.project.name
                 });
-                redirect(result.status, result.location)
-            } else if(result.type === 'failure') {
+                await goto(result.location, { invalidateAll: true });
+            } else if (result.type === 'failure') {
                 toast({
                     type: 'negative',
-                    body: 'The server responded with an error while trying to decline the invitation.',
+                    body: 'The server responded with an error while trying to decline the invitation.'
                 });
             }
         };
