@@ -10,7 +10,7 @@ import {
 export const load: PageLoad = async ({ parent, data }) => {
     const { queryClient } = await parent();
 
-    if (data.user) {
+    if (data?.user) {
         const prefetch = prefetchQuery(queryClient);
         prefetch(
             createTeamInvitationListQueryKey(() => ({
