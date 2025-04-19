@@ -8,6 +8,7 @@ import { IdHasher } from './lib/services/id_hasher.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
 import { attempt } from './lib/utils/try';
+import { PermissionService } from './lib/services/permission_service.server';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -84,18 +85,20 @@ export const handle: Handle = async ({
             return resolve(event);
         }
 
+        const ApiClientLive = Layer.sync(
+            ApiClient,
+            () =>
+                new KitBasicHttpApiClient({
+                    httpClient,
+                    cookies
+                })
+        );
         locals.user = { ...jsonAttempt.data.user };
         locals.appLive = Layer.mergeAll(
-            Layer.sync(
-                ApiClient,
-                () =>
-                    new KitBasicHttpApiClient({
-                        httpClient,
-                        cookies
-                    })
-            ),
+            ApiClientLive,
             Cloudinary.Live,
-            IdHasher.Live
+            IdHasher.Live,
+            PermissionService.Live.pipe(Layer.provide(ApiClientLive))
         );
         locals.runtime = {
             runPromise: makeRunPromise(locals.appLive),
@@ -110,16 +113,18 @@ export const handle: Handle = async ({
 };
 
 const initLocals = (locals: App.Locals, httpClient: UniversalHttpClient) => {
+    var ApiClientLive = Layer.sync(
+        ApiClient,
+        () =>
+            new HttpApiClient({
+                httpClient
+            })
+    );
     locals.appLive = Layer.mergeAll(
-        Layer.sync(
-            ApiClient,
-            () =>
-                new HttpApiClient({
-                    httpClient
-                })
-        ),
+        ApiClientLive,
         Cloudinary.Live,
-        IdHasher.Live
+        IdHasher.Live,
+        PermissionService.Live.pipe(Layer.provide(ApiClientLive))
     );
     locals.runtime = {
         runPromise: makeRunPromise(locals.appLive),
