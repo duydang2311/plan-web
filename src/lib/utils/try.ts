@@ -1,4 +1,5 @@
-export type Try<TData, TError> =
+export type Try<TData, TError> = Attempt<TData, TError>;
+export type Attempt<TData, TError> =
     | {
           ok: true;
           data: TData;
@@ -8,10 +9,8 @@ export type Try<TData, TError> =
           error: TError;
       };
 
-export type Attempt<TData, TError> = Try<TData, TError>;
-
 export const tryDo = <TData>(fn: () => TData) => {
-    return <TError>(mapException?: (e: unknown) => TError): Try<TData, TError> => {
+    return <TError>(mapException?: (e: unknown) => TError): Attempt<TData, TError> => {
         try {
             return {
                 ok: true,
@@ -27,7 +26,9 @@ export const tryDo = <TData>(fn: () => TData) => {
 };
 
 export const tryPromise = <TData>(fn: () => Promise<TData>) => {
-    return async <TError>(mapException?: (e: unknown) => TError): Promise<Try<TData, TError>> => {
+    return async <TError>(
+        mapException?: (e: unknown) => TError
+    ): Promise<Attempt<TData, TError>> => {
         try {
             return {
                 ok: true,
