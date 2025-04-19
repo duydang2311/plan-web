@@ -10,8 +10,13 @@
 
     const {
         projectList,
-        loading
-    }: { projectList: PaginatedList<LocalProject> | undefined; loading: Loading } = $props();
+        loading,
+        canDeleteProject
+    }: {
+        projectList: PaginatedList<LocalProject> | undefined;
+        loading: Loading;
+        canDeleteProject: boolean;
+    } = $props();
     const pagination = createPagination({
         syncUrl: () => page.url,
         syncList: () => projectList ?? paginatedList()
@@ -46,7 +51,9 @@
             <ThSort3 name="name">Name</ThSort3>
             <ThSort3 name="createdTime">Created</ThSort3>
             <ThSort3 name="updatedTime">Updated</ThSort3>
-            <Th></Th>
+            {#if canDeleteProject}
+                <Th></Th>
+            {/if}
         </Row>
     </THead>
     <tbody>
@@ -81,11 +88,13 @@
                     <td class="overflow-hidden text-ellipsis whitespace-nowrap">
                         <RelativeTime time={updatedTime} />
                     </td>
-                    <td class="isolate">
-                        <div class="flex items-center">
-                            <DeleteButton project={{ id, name }} {ref} />
-                        </div>
-                    </td>
+                    {#if canDeleteProject}
+                        <td class="isolate">
+                            <div class="flex items-center">
+                                <DeleteButton project={{ id, name }} {ref} />
+                            </div>
+                        </td>
+                    {/if}
                 </Row>
             {/each}
         {/if}

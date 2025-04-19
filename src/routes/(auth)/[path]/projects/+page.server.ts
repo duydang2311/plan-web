@@ -8,6 +8,8 @@ import { Type } from '~/lib/utils/typebox';
 import { paginatedQuery, queryParams } from '~/lib/utils/url';
 import { validator } from '~/lib/utils/validation';
 import type { Actions, PageServerLoad } from './$types';
+import { PermissionService } from '~/lib/services/permission_service.server';
+import { attempt } from '~/lib/utils/try';
 
 export interface LocalProject {
     id: string;
@@ -22,7 +24,7 @@ export const load: PageServerLoad = async ({
     depends,
     url,
     isDataRequest,
-    locals: { runtime }
+    locals: { user, runtime }
 }) => {
     depends('fetch:projects');
     const {
@@ -34,17 +36,31 @@ export const load: PageServerLoad = async ({
         select: 'Id,Name,Identifier,CreatedTime,UpdatedTime',
         workspaceId: id
     };
-    const getProjectList = await Effect.gen(function* () {
-        const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`projects`, { query }));
-        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
-    }).pipe(
-        Effect.orElseSucceed(() => paginatedList<LocalProject>()),
-        runtime.runPromise,
-        (a) => maybeStream(a)(isDataRequest)
-    );
+
+    const [getProjectList, getPermissions] = await Promise.all([
+        Effect.gen(function* () {
+            const response = yield* LoadResponse.HTTP(
+                (yield* ApiClient).get(`projects`, { query })
+            );
+            return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalProject>>());
+        }).pipe(
+            Effect.orElseSucceed(() => paginatedList<LocalProject>()),
+            runtime.runPromise,
+            (a) => maybeStream(a)(isDataRequest)
+        ),
+        Effect.gen(function* () {
+            const list = yield* (yield* PermissionService).getWorkspacePermissions(id, user.id);
+            return attempt.ok(new Set(list.items));
+        }).pipe(
+            Effect.catchAll((e) => Effect.succeed(attempt.fail(e))),
+            runtime.runPromise,
+            (a) => maybeStream(a)(isDataRequest)
+        )
+    ]);
 
     return {
-        projectList: getProjectList()
+        projectList: getProjectList(),
+        getPermissions: getPermissions()
     };
 };
 
