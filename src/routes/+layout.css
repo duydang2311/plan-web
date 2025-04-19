@@ -8,8 +8,6 @@
 @import '~/lib/stylesheets/themes/light.css' layer(theme);
 @import '~/lib/stylesheets/themes/dark.css' layer(base);
 
-@import '~/lib/assets/fonts/Inter/font-face.css' layer(theme);
-@import '~/lib/assets/fonts/RedditSans/font-face.css' layer(theme);
 @import '~/lib/assets/fonts/DMMono/font-face.css' layer(theme);
 @import '~/lib/assets/fonts/NotoSans/font-face.css' layer(theme);
 
@@ -27,7 +25,7 @@
 @import '~/lib/stylesheets/c-dialog.css' layer(components);
 
 @theme {
-    --font-display: InterVariable, var(--font-sans);
+    --font-display: 'Noto Sans', var(--font-sans);
     --font-body: 'Noto Sans', InterVariable, var(--font-sans);
     --font-mono: 'DM Mono', InterVariable, var(--font-sans);
     --text-sm: 0.9028rem;
