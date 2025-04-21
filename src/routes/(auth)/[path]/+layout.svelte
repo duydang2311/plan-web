@@ -23,7 +23,6 @@
     import Logo from '~/lib/components/Logo.svelte';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { pageBlur, tsap } from '~/lib/utils/transition';
     import type { LayoutData } from './$types';
     import DynamicNavigation from './DynamicNavigation.svelte';
     import FriendsButton from './FriendsButton.svelte';
@@ -165,7 +164,7 @@
                 <FriendsButton userId={data.user.id} />
             </div>
         </div>
-        <div class="transition-enforcement overflow-hidden">
+        <!-- <div class="transition-enforcement overflow-hidden">
             {#key data.pathname.includes('chats') ? data.pathname
                       .split('/', 3)
                       .join('') : data.pathname}
@@ -173,6 +172,9 @@
                     {@render children()}
                 </div>
             {/key}
+        </div> -->
+        <div class="overflow-hidden">
+            {@render children()}
         </div>
     </div>
 </div>
