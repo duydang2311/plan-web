@@ -92,7 +92,7 @@
 {/snippet}
 
 <div class="divide-base-border-2 grid h-full grid-cols-[auto_1fr] divide-x">
-    <div class="w-paragraph-sm grid grid-rows-[auto_1fr] overflow-hidden">
+    <div class="w-paragraph-sm grid grid-rows-[auto_1fr] overflow-hidden dark:bg-base-3">
         <div class="border-b-base-border-3 flex gap-2 border-b">
             <div class="relative grow">
                 <Input

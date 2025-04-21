@@ -13,6 +13,7 @@
     import { createEditor } from '../../editor/utils';
     import { IconSend } from '../../icons';
     import { infinitizeChatMessageData, sortChatMessages, type LocalChatMessage } from './utils';
+    import clsx from 'clsx';
 
     const { user, chatId }: { user: UserPreset['basicProfile']; chatId: string } = $props();
     const { api, queryClient } = useRuntime();
@@ -124,9 +125,10 @@
             element: tiptapContainerRef,
             editorProps: {
                 attributes: {
-                    class:
-                        'focus:outline-none prose max-w-full p-4 pr-32 rounded-b-lg ' +
-                        'border-base-border-3 bg-base-4 dark:bg-base-5 hover:border-base-border-2 relative max-h-96 overflow-auto rounded-lg border custom-scrollbar',
+                    class: clsx([
+                        'focus:outline-none prose max-w-full p-4 pr-32',
+                        'border-base-border-2 bg-base-1 dark:bg-base-3 hover:border-base-border-2 relative max-h-96 overflow-auto border-t custom-scrollbar'
+                    ]),
                     style: '--_border: var(--color-base-4);'
                 }
             },
@@ -149,7 +151,7 @@
     });
 </script>
 
-<div class="relative mb-2 px-2">
+<div class="relative">
     <div bind:this={tiptapContainerRef}></div>
     {#if editor}
         <form

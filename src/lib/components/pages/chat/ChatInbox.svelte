@@ -200,7 +200,7 @@
             </p>
             <div
                 class={[
-                    'prose border-base-border-3 bg-base-4 dark:bg-base-5 prose-li:first:mt-0 prose-li:first:prose-p:mt-0 w-fit rounded-xl border px-4 py-2',
+                    'prose border-base-border-3 bg-base-1 dark:bg-base-5 prose-li:first:mt-0 prose-li:first:prose-p:mt-0 w-fit rounded-xl border px-4 py-2',
                     isUser ? 'ml-auto rounded-tr-sm' : 'rounded-tl-sm'
                 ]}
             >
@@ -258,7 +258,7 @@
 {/snippet}
 
 <div class="transition-enforcement h-full w-full">
-    <div class="grid grid-rows-[1fr_auto] gap-1 overflow-hidden">
+    <div class="grid grid-rows-[1fr_auto] gap-1 overflow-hidden bg-base-2">
         {#if $query.isPending}
             <div>
                 {@render skeleton()}
