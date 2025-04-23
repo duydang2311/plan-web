@@ -23,7 +23,7 @@ export class KitBasicHttpApiClient extends HttpApiClient {
             .fetch(path, {
                 ...init,
                 headers: {
-                    Authorization: `Basic ${this._cookies.get('plan_session')}`,
+                    Authorization: `Session ${this._cookies.get('plan_session')}`,
                     ...init?.headers
                 }
             })

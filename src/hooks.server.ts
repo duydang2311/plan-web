@@ -29,7 +29,7 @@ export const handle: Handle = async ({
         if (!request.headers.has('Authorization')) {
             const session = cookies.get('plan_session');
             if (session) {
-                request.headers.set('Authorization', `Basic ${session}`);
+                request.headers.set('Authorization', `Session ${session}`);
             }
         }
         return globalThis.fetch(`${env.API_ORIGIN}${url.pathname}${url.search}`, request);
