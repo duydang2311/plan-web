@@ -193,6 +193,10 @@ export const createRef = Object.assign(
     }
 );
 
+export const createDirty = () => {
+    return new Dirty();
+};
+
 class SvelteLoading {
     status = $state.raw(0);
     timeout: number | undefined = undefined;
@@ -293,5 +297,21 @@ class SvelteAsyncRef<T> implements AsyncRef<T> {
 
     get loading() {
         return this.#loading;
+    }
+}
+
+class Dirty {
+    #dirty = false;
+
+    set() {
+        this.#dirty = true;
+    }
+
+    unset() {
+        this.#dirty = false;
+    }
+
+    get isDirty() {
+        return this.#dirty;
     }
 }
