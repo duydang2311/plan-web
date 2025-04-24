@@ -15,7 +15,8 @@
         content,
         onCreate,
         onTransaction,
-        onDestroy
+        onDestroy,
+        onBlur
     }: {
         class?: string;
         editor?: Editor;
@@ -24,6 +25,7 @@
         onCreate?: (props: EditorEvents['create']) => void;
         onTransaction?: (props: EditorEvents['transaction']) => void;
         onDestroy?: (props: EditorEvents['destroy']) => void;
+        onBlur?: (props: EditorEvents['blur']) => void;
     } = $props();
     let editorNode = $state.raw<HTMLElement>();
     const editorClass =
@@ -34,9 +36,10 @@
         if (attributes && typeof attributes === 'function') {
             const f = attributes;
             attributes = (state) => {
+                const v = f(state);
                 return {
-                    ...f(state),
-                    class: clsx(editorClass, f(state).class)
+                    ...v,
+                    class: clsx(editorClass, v.class)
                 };
             };
         } else if (attributes) {
@@ -60,7 +63,8 @@
                 editor = props.editor;
                 onTransaction?.(props);
             },
-            onDestroy: onDestroy ?? noop
+            onDestroy: onDestroy ?? noop,
+            onBlur: onBlur ?? noop
         });
         editor = e;
         return () => {
@@ -71,7 +75,7 @@
 
 <div
     class={[
-        'border-base-border-2 bg-base-2 dark:bg-base-3 focus-within:border-base-border-focus not-focus-within:hover:border-base-border-hover rounded-lg border',
+        'c-tiptap-editor',
         cls
     ]}
 >

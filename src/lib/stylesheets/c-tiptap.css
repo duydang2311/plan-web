@@ -1,7 +1,7 @@
 .c-tiptap {
     --_border: var(--color-base-border-2);
     --_border-hover: var(--color-base-border-1);
-    --_border-focus: var(--_border-hover);
+    --_border-focus: var(--color-primary-border);
 }
 
 .c-tiptap {
@@ -69,4 +69,47 @@ p.is-editor-empty:first-child::before {
     float: left;
     height: 0;
     pointer-events: none;
+}
+
+.c-tiptap-editor {
+    --_bg: var(--color-base-2);
+    --_border: var(--color-base-border-2);
+    --_border-focus: var(--color-primary-border);
+    --_border-hover: var(--color-base-border-hover);
+
+    @variant dark {
+        --_bg: var(--color-base-3);
+    }
+}
+
+.c-tiptap-editor {
+    background-color: var(--_bg);
+    border: 1px solid var(--_border);
+    border-radius: var(--radius-lg);
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-property: box-shadow, border-color;
+
+    &:where(:hover) {
+        border-color: var(--_border-hover);
+    }
+
+    &:where(:focus-within) {
+        border-color: var(--_border-focus);
+    }
+
+    &:where(&:has(> * > .tiptap[aria-invalid])) {
+        border-color: color-mix(in srgb, var(--color-negative-1) 50%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 5%, transparent);
+
+        &:where(:hover) {
+            border-color: color-mix(in srgb, var(--color-negative-1) 90%, transparent);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 10%, transparent);
+        }
+
+        &:where(focus-visible) {
+            border-color: var(--color-negative-1);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 20%, transparent);
+        }
+    }
 }
