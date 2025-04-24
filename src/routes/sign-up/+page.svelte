@@ -53,7 +53,7 @@
 
 <main class="min-h-screen content-center p-8">
     <div class="mx-auto w-full">
-        <LogoType class="text-primary-1 mx-auto h-16" />
+        <LogoType class="text-primary-1 mx-auto" />
         <div class="transition-enforcement overflow-hidden">
             {#if form?.email}
                 <div
@@ -64,7 +64,10 @@
                 </div>
             {:else}
                 <div out:fly={{ y: '-10%', duration: 800, easing: circInOut }} class="mt-8">
-                    <h1 class="mt-8 mb-4 text-center">Sign up</h1>
+                    <h1 class="mt-8 text-center capitalize">Create account</h1>
+                    <p class="c-label max-w-paragraph-sm mx-auto mb-8 text-pretty text-center">
+                        One step away from streamlining your projects.
+                    </p>
                     <form
                         method="post"
                         class="mx-auto w-full max-w-[40ch] space-y-6"

@@ -50,8 +50,9 @@
 
 <main class="p-8 min-h-screen content-center">
     <div class="mx-auto w-full">
-        <LogoType class="mx-auto h-16 text-primary-1" />
-        <h1 class="mt-8 mb-4 text-center">Sign in</h1>
+        <LogoType class="mx-auto text-primary-1" />
+        <h1 class="mt-8 text-center capitalize">Sign in</h1>
+        <p class="text-center mb-8 mx-auto c-label">Welcome back to coop! Let's get things done.</p>
         <div class="mx-auto max-w-[40ch]">
             <form
                 method="post"
