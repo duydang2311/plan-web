@@ -27,6 +27,8 @@
     background-color: var(--_bg);
     border-radius: var(--radius-xl);
     padding: --spacing(8);
+    max-height: 90vh;
+    overflow-y: auto;
 
     border: 1px solid var(--_border);
     @variant dark {

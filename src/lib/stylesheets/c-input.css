@@ -1,7 +1,7 @@
 .c-input {
     --_border: var(--color-base-border-2);
     --_border-hover: var(--color-base-border-hover);
-    --_border-focus: var(--color-base-border-focus);
+    --_border-focus: var(--color-primary-border);
     --_bg: transparent;
 
     @variant dark {
@@ -14,11 +14,9 @@
     border-radius: var(--radius-md);
     background-color: var(--_bg);
     outline: none;
-    transition:
-        color 150ms var(--cubic-out),
-        background-color 150ms var(--cubic-out),
-        border-color 150ms var(--cubic-out),
-        box-shadow 150ms var(--cubic-out);
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-property: color, background-color, border-color, box-shadow;
 
     &:where(:hover) {
         border-color: var(--_border-hover);
