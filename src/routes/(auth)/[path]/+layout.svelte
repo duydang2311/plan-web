@@ -14,6 +14,8 @@
         IconKeyCommandOutline,
         IconProject,
         IconProjectOutline,
+        IconResources,
+        IconResourcesOutline,
         IconSearch,
         IconSettings,
         IconSettingsOutline,
@@ -51,9 +53,9 @@
     <aside
         class="hidden min-w-60 max-w-60 items-stretch space-y-4 overflow-auto px-4 py-2 lg:flex lg:flex-col"
     >
-        <div class="text-primary-1 flex select-none items-center justify-center gap-2">
-            <Logo class="h-6 w-auto" />
-            <p class="font-display text-title font-black tracking-tight">Keptrack</p>
+        <div class="text-primary-1 flex select-none items-baseline justify-center gap-1">
+            <Logo class="h-4 w-auto" />
+            <p class="font-display text-h2 font-black tracking-tight leading-none">coop</p>
         </div>
         <div class="relative">
             <Input placeholder="Search..." class="py-1 pl-8 pr-12" />
@@ -86,6 +88,12 @@
                             icon: IconUsers,
                             activeIcon: IconUsersSolid,
                             label: 'Teams'
+                        },
+                        {
+                            href: `/${page.params['path']}/resources`,
+                            icon: IconResourcesOutline,
+                            activeIcon: IconResources,
+                            label: 'Resources'
                         },
                         {
                             href: `/${page.params['path']}/settings`,
