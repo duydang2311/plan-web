@@ -216,10 +216,6 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
     };
 
     const validate = () => {
-        if (!capturedNode) {
-            return null;
-        }
-
         if (capturedNode instanceof HTMLInputElement && !capturedNode.checkValidity()) {
             return pickValidityErrors(capturedNode.validity);
         } else if (validator) {
@@ -231,15 +227,16 @@ export const createField = <T extends CreateFieldOptions>(options?: T) => {
     };
 
     const setErrors = (errors?: string[] | null) => {
-        if (!capturedNode) {
-            return;
-        }
         if (errors && errors.length) {
             state.errors = errors;
-            toggleAttribute(capturedNode, 'aria-invalid', true);
+            if (capturedNode) {
+                toggleAttribute(capturedNode, 'aria-invalid', true);
+            }
         } else {
             state.errors = null;
-            toggleAttribute(capturedNode, 'aria-invalid', false);
+            if (capturedNode) {
+                toggleAttribute(capturedNode, 'aria-invalid', false);
+            }
         }
     };
 
