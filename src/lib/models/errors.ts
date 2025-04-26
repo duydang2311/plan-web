@@ -40,3 +40,26 @@ export class InvalidAssetError extends Data.TaggedError('InvalidAssetError') {
 export class NotFoundError extends Data.TaggedError('NotFoundError') {
     public static readonly instance = new NotFoundError();
 }
+
+export const errorCodes = {
+    unknown: 'unknown',
+    aborted: 'aborted_error',
+    timeout: 'timeout_error',
+    network: 'network_error',
+    fetch: (e: unknown) => {
+        if (e instanceof Error) {
+            if (e.name === 'AbortError') {
+                return 'aborted_error';
+            } else if (e.message.includes('Failed to fetch')) {
+                return 'network_error';
+            }
+        }
+        return 'unknown';
+    },
+    json: (e: unknown) => {
+        if (e instanceof SyntaxError) {
+            return 'syntax_error';
+        }
+        return 'parse_error';
+    }
+} as const;

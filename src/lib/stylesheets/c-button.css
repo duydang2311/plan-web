@@ -14,7 +14,7 @@
         --_bg: var(--color-base-2);
         --_bg-hover: var(--color-base-hover);
         --_bg-active: var(--color-base-active);
-        --_bg-disabled: var(--color-base-2);
+        --_bg-disabled: var(--color-base-disabled);
 
         @variant dark {
             --_bg: var(--color-base-3);

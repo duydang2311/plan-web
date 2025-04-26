@@ -59,6 +59,7 @@
         "cacheable": "^1.8.10",
         "cloudinary": "^2.6.0",
         "clsx": "^2.1.1",
+        "decode-formdata": "^0.9.0",
         "define-lazy-prop": "^3.0.0",
         "effect": "^3.14.11",
         "eslint": "^9.25.0",

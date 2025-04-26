@@ -16,6 +16,10 @@ import type { PermissionService } from './lib/services/permission_service.server
 declare global {
     type MaybePromise<T> = T | PromiseLike<T>;
 
+    type OneOf<A, B> =
+        | ({ [key in keyof A]: A[key] } & { [key in keyof B]?: never })
+        | ({ [key in keyof A]?: never } & { [key in keyof B]: B[key] });
+
     interface RouteMeta {
         title: string;
         href: string;

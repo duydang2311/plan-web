@@ -151,7 +151,7 @@ export const createUiStatus = () => {
 };
 
 export const createRef = Object.assign(
-    function <T>(f: T | (() => T)): Ref<NonNullable<T>> {
+    <T>(f: T | (() => T)): Ref<NonNullable<T>> => {
         return new SvelteRef(f) as Ref<NonNullable<T>>;
     },
     {

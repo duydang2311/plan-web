@@ -3,7 +3,7 @@ import { fail, json, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import type { ApiError } from '../models/errors';
 import { flattenProblemDetails, validateProblemDetailsEffect } from './problem_details';
-import type { ValidateOk, ValidationResult } from './validation';
+import { type ValidateOk, type ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
     return invalidate((url) => {
