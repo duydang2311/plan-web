@@ -1,6 +1,6 @@
 import type { Context } from 'effect';
-import type { HttpClientOptions, HttpClientFetchRequestInit, HttpClient } from './http_client';
 import { stringifyQuery } from '../utils/url';
+import type { HttpClient, HttpClientFetchRequestInit, HttpClientOptions } from './http_client';
 
 type RequestRecord = Record<string, unknown>;
 type RequestArray = unknown[];
@@ -15,7 +15,20 @@ export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
     public fetch(path: string, init?: HttpClientFetchRequestInit) {
         if (isRecordOrArray(init?.body)) {
             init.body = isRecordOrArray(init.body) ? JSON.stringify(init.body) : init.body;
-            init.headers = { 'Content-Type': 'application/json', ...init.headers };
+        }
+        if (init?.headers) {
+            let headers = isRecord(init.headers)
+                ? init.headers
+                : Array.isArray(init.headers)
+                  ? Object.fromEntries(init.headers)
+                  : init.headers instanceof Headers
+                    ? Object.fromEntries(init.headers)
+                    : undefined;
+            if (init.body != null) {
+                headers ??= {};
+                headers['Content-Type'] ??= 'application/json';
+            }
+            init.headers = headers;
         }
         return this._options.fetch(this._buildUrl(path, init?.query), init as RequestInit);
     }
@@ -66,5 +79,11 @@ function isRecordOrArray(obj: unknown): obj is RequestRecord | RequestArray {
     if (!obj) return false;
     if (Array.isArray(obj)) return true;
     const prototype = Object.getPrototypeOf(obj) as typeof obj;
-    return prototype === null || prototype.constructor === Object;
+    return prototype == null || prototype.constructor === Object;
+}
+
+function isRecord(obj: unknown): obj is Record<string, string> {
+    if (obj == null) return false;
+    const prototype = Object.getPrototypeOf(obj) as typeof obj;
+    return prototype == null || prototype.constructor === Object;
 }
