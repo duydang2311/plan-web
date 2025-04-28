@@ -66,6 +66,18 @@ export const actions: Actions = {
                 })
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    delete_resource: async ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteResource(decodeDeleteResource(formData))
+            );
+
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`workspace-resources/${validation.data.id}`)
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
 
@@ -92,4 +104,16 @@ const validateCreateResource = validator(
         )
     }),
     { stripLeadingSlash: true, convert: true }
+);
+
+const decodeDeleteResource = (formData: FormData) => {
+    return {
+        id: formData.get('id')
+    };
+};
+
+const validateDeleteResource = validator(
+    Type.Object({
+        id: Type.String()
+    })
 );

@@ -58,7 +58,7 @@
         in:tsap={popoverTransitions.in}
         out:tsap={popoverTransitions.out}
         {...builder.content}
-        class="c-popover w-paragraph-sm overflow-visible p-0"
+        class="c-popover--wrapper w-paragraph-sm p-0"
         style="top: {pos?.y ?? 0}px; left: {pos?.x ?? 0}px;"
     >
         <FriendPopover {userId} />

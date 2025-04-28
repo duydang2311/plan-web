@@ -23,14 +23,14 @@
     --color-base-border-hover: oklch(32.69% 0.003 251.35);
     --color-base-border-focus: oklch(35.69% 0.003 251.35);
 
-    --color-primary-1: oklch(64.36% 0.1886 251.35);
-    --color-primary-2: oklch(60.45% 0.1886 251.35);
-    --color-primary-3: oklch(58.45% 0.1886 251.35);
-    --color-primary-4: oklch(56.45% 0.1886 251.35);
-    --color-primary-5: oklch(54.45% 0.1886 251.35);
-    --color-primary-hover: oklch(74.45% 0.1886 251.35);
-    --color-primary-active: oklch(64.45% 0.1886 251.35);
-    --color-primary-border: oklch(52.45% 0.1886 251.35);
+    --color-primary-1: oklch(68.36% 0.1886 251.35);
+    --color-primary-2: oklch(64.45% 0.1886 251.35);
+    --color-primary-3: oklch(62.45% 0.1886 251.35);
+    --color-primary-4: oklch(60.45% 0.1886 251.35);
+    --color-primary-5: oklch(58.45% 0.1886 251.35);
+    --color-primary-hover: oklch(76.45% 0.1886 251.35);
+    --color-primary-active: oklch(66.45% 0.1886 251.35);
+    --color-primary-border: oklch(56.45% 0.1886 251.35);
     --color-primary-fg-1: oklch(16.08% 0.0054 251.35);
     --color-primary-fg-2: oklch(22.08% 0.0054 251.35);
     --color-primary-fg-3: oklch(24.08% 0.0054 251.35);

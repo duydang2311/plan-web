@@ -72,7 +72,7 @@
                 use:builder.overlay.action
             ></div>
             <div
-                class="c-dialog-wrapper"
+                class="c-dialog--wrapper"
                 {...builder.content}
                 use:builder.content.action
                 in:tsap={dialog.in()}

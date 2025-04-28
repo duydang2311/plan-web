@@ -124,6 +124,17 @@
         font-size: var(--text-h1);
     }
 
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: var(--color-base-fg-1);
+        font-family: var(--font-display);
+        font-weight: 700;
+    }
+
     small {
         font-size: var(--text-sm);
     }
@@ -182,12 +193,6 @@
 
 [popover] {
     color: var(--color-base-fg-2);
-}
-
-:where(h1, h2, h3, h4, h5, h6) {
-    color: var(--color-base-fg-1);
-    font-family: var(--font-display);
-    font-weight: 700;
 }
 
 .mesh-gradient {

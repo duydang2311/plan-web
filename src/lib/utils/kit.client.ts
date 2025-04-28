@@ -9,11 +9,9 @@ export const validateActionFailureData = validator(
 );
 
 export const flattenActionFailureErrors = (errors: Record<string, string[]>) => {
-    return Object.entries(errors).map(([k, v]) => `${k}: ${v.join(', ')}`);
+    return Object.entries(errors).flatMap(([k, a]) => a.flatMap((b) => `${k}:${b}`));
 };
 
 export const stringifyActionFailureErrors = (errors: Record<string, string[]>) => {
-    return Object.entries(errors)
-        .map(([k, v]) => `${k}: ${v.join(', ')}`)
-        .join('; ');
+    return flattenActionFailureErrors(errors).join(', ');
 };

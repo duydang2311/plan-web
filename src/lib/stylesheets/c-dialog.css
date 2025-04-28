@@ -1,4 +1,4 @@
-.c-dialog-wrapper {
+.c-dialog--wrapper {
     padding: --spacing(2);
     max-width: var(--container-paragraph-lg);
     position: fixed;

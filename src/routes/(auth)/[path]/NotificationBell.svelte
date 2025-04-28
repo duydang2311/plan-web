@@ -216,7 +216,7 @@
         {...builder.content}
         in:tsap={popover.in}
         out:tsap={popover.out}
-        class="c-popover w-paragraph-sm max-w-screen p-0"
+        class="c-popover--wrapper w-paragraph-sm max-w-screen"
     >
         <NotificationPopover {userId} {ref} bind:scrollTop />
     </div>

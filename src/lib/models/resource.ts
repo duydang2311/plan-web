@@ -4,7 +4,7 @@ import type { Workspace } from './workspace';
 export interface Resource {
     createdTime: string;
     updatedTime: string;
-    id: number;
+    id: string;
     name: string;
     creatorId: string;
     creator: User;
@@ -25,13 +25,13 @@ export interface ResourceFile {
 export interface WorkspaceResource {
     workspaceId: string;
     workspace: Workspace;
-    resourceId: number;
+    resourceId: string;
     resource: Resource;
 }
 
 export interface ProjectResource {
     projectId: string;
     project: Workspace;
-    resourceId: number;
+    resourceId: string;
     resource: Resource;
 }

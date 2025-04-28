@@ -83,7 +83,7 @@ export const dialog = {
             opacity: 0,
             scale: 0.98,
             duration: 0.15,
-            ease: 'power4.out',
+            ease: 'power2.out',
             force3D: true,
             ...vars
         }),
@@ -92,7 +92,7 @@ export const dialog = {
             opacity: 0,
             scale: 0.98,
             duration: 0.15,
-            ease: 'power4.in',
+            ease: 'power2.in',
             force3D: true,
             ...vars
         })
@@ -103,8 +103,8 @@ export const popover: Record<'in' | 'out', TsapCallback> = {
         gsap.from(node, {
             scaleY: 0.98,
             opacity: 0,
-            y: '-0.2rem',
-            duration: 0.1,
+            y: '-0.25rem',
+            duration: 0.075,
             ease: 'circ.out',
             clearProps: 'opacity,scaleY,y'
         }),
@@ -112,8 +112,8 @@ export const popover: Record<'in' | 'out', TsapCallback> = {
         gsap.to(node, {
             scaleY: 0.98,
             opacity: 0,
-            y: '-0.2rem',
-            duration: 0.1,
+            y: '-0.5rem',
+            duration: 0.075,
             ease: 'circ.in'
         })
 };
@@ -133,6 +133,24 @@ export const pageBlur = {
             opacity: 0,
             duration: 0.1,
             ease: 'sine.out',
+            ...vars
+        })
+} as const;
+
+export const dialogOverlay = {
+    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+        gsap.from(node, {
+            opacity: 0,
+            duration: 0.15,
+            ease: 'circ.out',
+            clearProps: 'opacity',
+            ...vars
+        }),
+    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+        gsap.to(node, {
+            opacity: 0,
+            duration: 0.15,
+            ease: 'circ.in',
             ...vars
         })
 } as const;

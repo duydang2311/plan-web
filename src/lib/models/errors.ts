@@ -46,7 +46,7 @@ export const errorCodes = {
     aborted: 'aborted_error',
     timeout: 'timeout_error',
     network: 'network_error',
-    fetch: (e: unknown) => {
+    fromFetch: (e: unknown) => {
         if (e instanceof Error) {
             if (e.name === 'AbortError') {
                 return 'aborted_error';
@@ -56,7 +56,7 @@ export const errorCodes = {
         }
         return 'unknown';
     },
-    json: (e: unknown) => {
+    fromJson: (e: unknown) => {
         if (e instanceof SyntaxError) {
             return 'syntax_error';
         }

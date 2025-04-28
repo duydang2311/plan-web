@@ -1,20 +1,68 @@
+<script lang="ts" module>
+    declare global {
+        namespace App {
+            interface PageState {
+                deletingWorkspaceResource?: LocalWorkspaceResource;
+            }
+        }
+    }
+</script>
+
 <script lang="ts">
+    import { replaceState } from '$app/navigation';
+    import { page } from '$app/state';
+    import { omit } from '@baetheus/fun/record';
     import { Resize } from '@cloudinary/url-gen/actions';
+    import { toStore } from 'svelte/store';
     import { Avatar, IconButton, Input, Main, OptionalLink, RelativeTime } from '~/lib/components';
     import { IconDownloadOutline, IconSearch } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { createRef } from '~/lib/utils/runes.svelte';
+    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { createRef, watch } from '~/lib/utils/runes.svelte';
     import type { PageData } from './$types';
+    import type { LocalWorkspaceResource } from './+page.server';
     import CreateResourceButton from './CreateResourceButton.svelte';
+    import DeleteResourceDialog from './DeleteResourceDialog.svelte';
+    import MenuPopover from './MenuPopover.svelte';
 
     const { data }: { data: PageData } = $props();
     const { cloudinary } = useRuntime();
     const getResourcesRef = createRef.maybePromise(() => data.getResources);
-    const resourceListRef = createRef(() =>
-        getResourcesRef.value && getResourcesRef.value.ok ? getResourcesRef.value.data : null
+    const resourceListRef = createRef.maybePromise(() =>
+        mapMaybePromise(data.getResources)((a) => (a.ok ? a.data : null))
     );
+    let openDeleteWorkspaceDialog = $state.raw(page.state.deletingWorkspaceResource != null);
+    let deletingWorkspaceResource = $state.raw<LocalWorkspaceResource | null>(
+        page.state.deletingWorkspaceResource ?? null
+    );
+
+    const showDeleteWorkspaceResourceDialog = (wr: LocalWorkspaceResource) => {
+        deletingWorkspaceResource = wr;
+        openDeleteWorkspaceDialog = true;
+        replaceState('', { ...page.state, deletingWorkspaceResource: wr });
+    };
+
+    watch(() => openDeleteWorkspaceDialog)(() => {
+        if (!openDeleteWorkspaceDialog && page.state.deletingWorkspaceResource) {
+            replaceState('', omit('deletingWorkspaceResource')(page.state));
+        }
+    });
 </script>
+
+<DeleteResourceDialog
+    open={toStore(
+        () => openDeleteWorkspaceDialog,
+        (a) => {
+            openDeleteWorkspaceDialog = a;
+        }
+    )}
+    workspaceResource={deletingWorkspaceResource}
+    {resourceListRef}
+    onSubmit={() => {
+        openDeleteWorkspaceDialog = false;
+    }}
+/>
 
 <Main class="p-4">
     <div class="mb-4 sm:flex sm:items-center sm:justify-between sm:gap-x-16 sm:gap-y-4">
@@ -57,7 +105,18 @@
                     <div class="bg-base-2 aspect-video w-full rounded-md"></div>
                     <div class="flex grow flex-col gap-4 p-2">
                         <div>
-                            <p class="text-h6 text-base-fg-1 mb-1 font-bold">{wr.resource.name}</p>
+                            <div class="flex items-center justify-between gap-4">
+                                <p class="text-h6 text-base-fg-1 mb-1 font-bold">
+                                    {wr.resource.name}
+                                </p>
+                                {#if wr.resource.id}
+                                    <MenuPopover
+                                        onDelete={() => {
+                                            showDeleteWorkspaceResourceDialog(wr);
+                                        }}
+                                    />
+                                {/if}
+                            </div>
                             <p class="c-label">
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam
                                 laudantium maxime ratione minus reprehenderit.

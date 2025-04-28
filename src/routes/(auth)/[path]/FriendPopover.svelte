@@ -9,7 +9,7 @@
     let activeView = $state.raw<'all' | 'requests' | 'add-friend'>('all');
 </script>
 
-<div class="min-h-96">
+<div class="min-h-96 c-popover p-0">
     <div class="border-b-base-border-2 flex items-center justify-between gap-4 border-b p-2">
         <ul class="flex gap-2">
             <li>

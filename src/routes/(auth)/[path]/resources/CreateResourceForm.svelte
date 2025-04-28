@@ -116,7 +116,7 @@
                     keys: files.map((a) => a.name)
                 }
             })
-        )(errorCodes.fetch);
+        )(errorCodes.fromFetch);
         if (!getUrlsAttempt.ok || !getUrlsAttempt.data.ok) {
             toast({
                 type: 'negative',
@@ -129,7 +129,7 @@
             getUrlsAttempt.data.json<{
                 results: { url: string; key: string; pendingUploadId: number }[];
             }>()
-        )(errorCodes.json);
+        )(errorCodes.fromJson);
         if (!jsonAttempt.ok) {
             toast({
                 type: 'negative',
@@ -320,7 +320,9 @@
         <h2 class="capitalize">Create resource</h2>
         <IconResourcePlus class="text-base-fg-1 size-10" />
     </div>
-    <p class="c-label mb-4">Create a new resource with docs and files to share within your workspace.</p>
+    <p class="c-label mb-4">
+        Create a new resource with docs and files to share within your workspace.
+    </p>
     <input
         type="hidden"
         name={fields.workspaceId.state.name}

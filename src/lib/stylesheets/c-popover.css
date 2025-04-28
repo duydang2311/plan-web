@@ -1,17 +1,24 @@
-.c-popover {
+.c-popover--wrapper {
     --_bg: var(--color-base-1);
     --_border: var(--color-base-border-1);
+    --_border-top: var(--color-base-border-1);
 
     @variant dark {
         --_bg: var(--color-base-3);
         --_border: var(--color-base-border-3);
         --_border-top: var(--color-base-border-1);
     }
+
+    overflow: visible;
+
+    &:where(:focus) {
+        outline: none;
+    }
 }
 
 .c-popover {
     background-color: var(--_bg);
-    padding: --spacing(4);
+    padding: --spacing(2);
     border: 1px solid var(--_border);
     border-radius: var(--radius-md);
 
@@ -34,10 +41,11 @@
 }
 
 .c-popover--arrow {
-    --_border: var(--color-base-border-1);
     --_size: 0.7rem;
-    border-top: 1px solid var(--_border);
-    border-left: 1px solid var(--_border);
+    border-top: 1px solid var(--_border-top);
+    border-left: 1px solid var(--_border-top);
     width: var(--_size);
     height: var(--_size);
+    background-color: var(--_bg) !important;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 1px, 1px 100%, 0% 100%);
 }

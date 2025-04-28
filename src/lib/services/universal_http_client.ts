@@ -13,10 +13,8 @@ export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
     ) {}
 
     public fetch(path: string, init?: HttpClientFetchRequestInit) {
-        if (isRecordOrArray(init?.body)) {
+        if (init?.body && isRecordOrArray(init.body)) {
             init.body = isRecordOrArray(init.body) ? JSON.stringify(init.body) : init.body;
-        }
-        if (init?.headers) {
             let headers = isRecord(init.headers)
                 ? init.headers
                 : Array.isArray(init.headers)
@@ -28,7 +26,9 @@ export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
                 headers ??= {};
                 headers['Content-Type'] ??= 'application/json';
             }
-            init.headers = headers;
+            if (headers) {
+                init.headers = headers;
+            }
         }
         return this._options.fetch(this._buildUrl(path, init?.query), init as RequestInit);
     }

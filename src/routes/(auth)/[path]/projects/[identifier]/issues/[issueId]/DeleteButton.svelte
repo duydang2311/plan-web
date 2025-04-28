@@ -40,7 +40,7 @@
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="c-dialog-wrapper"
+            class="c-dialog--wrapper"
         >
             <div class="c-dialog space-y-2">
                 <h4 use:melt={title}>Delete issue?</h4>

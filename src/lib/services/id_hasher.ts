@@ -1,3 +1,3 @@
 import Sqids from 'sqids';
 
-export const createIdHasher = () => new Sqids({ minLength: 8 });
+export const createIdHasher = (alphabet: string) => new Sqids({ minLength: 8, alphabet });

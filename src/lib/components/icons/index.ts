@@ -41,6 +41,7 @@ export { default as IconUserPlus } from '~icons/heroicons/user-plus-16-solid';
 export { default as IconXMark } from '~icons/heroicons/x-mark-16-solid';
 export { default as IconBold } from '~icons/lucide/bold';
 export { default as IconColumns } from '~icons/lucide/columns-3';
+export { default as IconMenu } from '~icons/lucide/ellipsis-vertical';
 export { default as IconDraggable } from '~icons/lucide/grip-vertical';
 export { default as IconH1 } from '~icons/lucide/heading-1';
 export { default as IconH2 } from '~icons/lucide/heading-2';
