@@ -3,6 +3,7 @@
     import { SvelteMap } from 'svelte/reactivity';
     import { Field, IconButton, Label } from '~/lib/components';
     import { IconUploadOutline, IconXMark } from '~/lib/components/icons';
+    import { formatFileSize } from '~/lib/utils/commons';
 
     const {
         files,
@@ -47,14 +48,9 @@
     <p class="c-label ml-auto mt-4">
         {#if files.size > 0}
             <strong>{files.size}</strong> files selected ·
-            <strong
-                >{Math.round(
-                    (Array.from(files.values()).reduce((acc, cur) => acc + cur.size, 0) /
-                        1024 /
-                        1024) *
-                        100
-                ) / 100} MB</strong
-            >
+            <strong>
+                {formatFileSize(Array.from(files.values()).reduce((acc, cur) => acc + cur.size, 0))}
+            </strong>
         {/if}
     </p>
     {#if files.size > 0}
@@ -84,9 +80,7 @@
                         {/if}
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="c-label text-nowrap"
-                            >{Math.round((file.size * 100) / 1024 / 1024) / 100} MB</span
-                        >
+                        <span class="c-label text-nowrap">{formatFileSize(file.size)}</span>
                         <IconButton
                             type="button"
                             variant="negative"

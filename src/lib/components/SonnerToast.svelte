@@ -1,51 +1,113 @@
 <script lang="ts" module>
-    const borderClass = {
-        positive: 'border-b-positive-border/40 dark:border-b-positive-border/60',
-        negative: 'border-b-negative-border/40 dark:border-b-negative-border/40'
+    const progressClass = {
+        base: 'bg-base-fg-1',
+        positive: 'bg-positive-1',
+        negative: 'bg-negative-1'
     };
 </script>
 
 <script lang="ts">
-    import { IconFailure, IconSuccess, IconXMark } from './icons';
-    import type { ToastProps } from './Sonner.svelte';
+    import { onMount } from 'svelte';
 
-    const { type, body, bodyProps, onDismiss }: ToastProps<unknown> = $props();
+    import { IconXMark } from './icons';
+    import { add, remove, type ToastProps } from './Sonner.svelte';
+
+    const {
+        type,
+        header,
+        headerProps,
+        body,
+        bodyProps,
+        footer,
+        footerProps,
+        onDismiss,
+        durationMs = 5000
+    }: ToastProps<unknown, unknown, unknown> = $props();
+    let progress = $state.raw(0);
+
+    onMount(() => {
+        const id = add({
+            get progress() {
+                return progress;
+            },
+            set progress(value) {
+                progress = value;
+            },
+            now: performance.now(),
+            durationMs
+        });
+        return () => {
+            remove(id);
+        };
+    });
 </script>
 
+{#snippet headerSnippet()}
+    {#if header}
+        <div>
+            {#if typeof header === 'function'}
+                {@render header(headerProps)}
+            {:else}
+                <h2 class="text-h6">
+                    {header}
+                </h2>
+            {/if}
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet bodySnippet()}
-    <div>
-        {#if typeof body === 'function'}
-            {@render body(bodyProps)}
-        {:else}
-            {body}
-        {/if}
-    </div>
+    {#if body}
+        <div class="text-sm">
+            {#if typeof body === 'function'}
+                {@render body(bodyProps)}
+            {:else}
+                <span>
+                    {body}
+                </span>
+            {/if}
+        </div>
+    {/if}
+{/snippet}
+
+{#snippet footerSnippet()}
+    {#if footer}
+        <div class="text-sm">
+            {#if typeof footer === 'function'}
+                {@render footer(footerProps)}
+            {:else}
+                <span class="c-label">
+                    {footer}
+                </span>
+            {/if}
+        </div>
+    {/if}
 {/snippet}
 
 <div
     class={[
-        'bg-base-1 dark:bg-base-2 w-(--width) border-base-border-3 relative rounded-lg border p-4 shadow-sm',
-        type ? borderClass[type] : undefined
+        'bg-base-1 dark:bg-base-2 w-(--width) border-base-border-3 shadow-xs relative overflow-hidden rounded-xl border p-4 focus:outline-none'
     ]}
 >
-    <div class="flex items-center gap-4">
-        {#if type === 'positive'}
-            <IconSuccess class="text-positive-1 size-6 shrink-0" />
-        {:else if type === 'negative'}
-            <IconFailure class="text-negative-1 size-6 shrink-0" />
-        {/if}
-        {@render bodySnippet()}
+    <div class="flex items-start gap-4">
+        <div class="grow space-y-2 text-pretty">
+            {@render headerSnippet()}
+            {@render bodySnippet()}
+            {@render footerSnippet()}
+        </div>
+        <button
+            type="button"
+            onclick={onDismiss}
+            class={[
+                'text-base-fg-ghost hover:text-base-fg-1 active:text-base-fg-3 transition',
+                'group-[[data-expanded=false][data-front=false]]:hidden'
+            ]}
+        >
+            <IconXMark />
+        </button>
     </div>
-    <button
-        type="button"
-        onclick={onDismiss}
-        class={[
-            `text-base-fg-1 bg-base-1 dark:bg-base-2 border-base-border-3
-            hover:bg-negative-1 hover:text-negative-fg-1 hover:border-negative-border
-            absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 rounded-full border transition
-            group-[[data-expanded=false][data-front=false]]:hidden`
-        ]}
-    >
-        <IconXMark />
-    </button>
+    <div
+        class={['absolute inset-x-0 bottom-0 h-[2px]', progressClass[type ?? 'base']]}
+        style="transform: translateX(calc({progress * 100 - 100}%));"
+    ></div>
 </div>

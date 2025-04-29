@@ -18,6 +18,7 @@ export interface Ref<T> {
 
 export interface AsyncRef<T> extends Ref<T> {
     readonly loading: Loading;
+    readonly isInitialLoading: boolean;
 }
 
 export const createEffect: ((fn: () => void | (() => void), depsFn?: () => unknown) => void) & {
@@ -162,7 +163,7 @@ export const createRef = Object.assign(
             const initialValue = f();
             if (!isPromiseLike(initialValue)) {
                 const ref = new SvelteAsyncRef(initialValue);
-                $effect(() => {
+                $effect.pre(() => {
                     unwrapMaybePromise(f())((b) => {
                         untrack(() => {
                             ref.value = b;
@@ -178,7 +179,7 @@ export const createRef = Object.assign(
                 ref.value = a;
                 ref.loading.unset();
             });
-            $effect(() => {
+            $effect.pre(() => {
                 const a = f();
                 untrack(() => {
                     ref.loading.set();
@@ -260,43 +261,16 @@ class SvelteAsyncRef<T> implements AsyncRef<T> {
     value = $state.raw<T>();
     #loading = createLoading();
 
-    constructor2(f: () => MaybePromise<T>) {
-        const initialValue = f();
-        const loading = createLoading();
-        if (!isPromiseLike(initialValue)) {
-            this.value = initialValue;
-            $effect(() => {
-                unwrapMaybePromise(f())((b) => {
-                    untrack(() => {
-                        this.value = b;
-                    });
-                });
-            });
-        }
-
-        loading.set();
-        unwrapMaybePromise(initialValue)((a) => {
-            this.value = a;
-            loading.unset();
-        });
-        $effect(() => {
-            const a = f();
-            untrack(() => {
-                loading.set();
-                unwrapMaybePromise(a)((b) => {
-                    this.value = b;
-                    loading.unset();
-                });
-            });
-        });
-    }
-
     constructor(initialValue?: T) {
         this.value = initialValue;
     }
 
     get loading() {
         return this.#loading;
+    }
+
+    get isInitialLoading() {
+        return this.value == null && this.#loading.immediate;
     }
 }
 

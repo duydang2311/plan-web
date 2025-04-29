@@ -3,7 +3,7 @@
     import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import DOMPurify from 'isomorphic-dompurify';
-    import { InlineEdit, Input, TiptapEditor, toast } from '~/lib/components';
+    import { InlineEdit, TiptapEditor, toast } from '~/lib/components';
     import Button from '~/lib/components/Button.svelte';
     import { IconCheck, IconXMark } from '~/lib/components/icons';
     import type { Ref } from '~/lib/utils/runes.svelte';
@@ -18,84 +18,46 @@
 
     let { editing = $bindable(), ref = $bindable() }: Props = $props();
     let editor = $state.raw<Editor>();
-    let titleEditing = $state.raw(false);
     let descFormEl = $state.raw<HTMLFormElement>();
 </script>
 
 {#if ref.value}
-    <InlineEdit bind:editing={titleEditing}>
-        {#snippet children({ editing, suppressNextKeyUp })}
-            {#if editing}
-                <form
-                    class="w-full"
-                    method="post"
-                    action="?/edit_title"
-                    use:enhance={(e) => {
-                        const title = e.formData.get('title') as string;
-                        const old = ref.value;
-                        if (old) {
-                            ref.value = {
-                                ...old,
-                                title
-                            };
-                        }
-                        suppressNextKeyUp();
-                        titleEditing = false;
-                        return async ({ result }) => {
-                            if (result.type === 'failure') {
-                                ref.value = old;
-                            }
-                            await invalidateAll();
-                        };
-                    }}
-                    title="Press Escape to cancel"
-                >
-                    <input type="hidden" name="issueId" value={ref.value!.id} />
-                    <Input
-                        type="text"
-                        value={ref.value!.title}
-                        name="title"
-                        onkeydown={(e) => {
-                            if (e.key === 'Escape') {
-                                e.preventDefault();
-                            } else if (e.key === 'Enter') {
-                                e.stopPropagation();
-                            }
-                        }}
-                        onkeyup={(e) => {
-                            if (e.key === 'Escape') {
-                                titleEditing = false;
-                            }
-                        }}
-                        onblur={(e) => {
-                            if (!titleEditing) {
-                                return;
-                            }
-                            if (e.currentTarget.value !== ref.value!.title) {
-                                e.currentTarget.form?.requestSubmit();
-                            }
-                            titleEditing = false;
-                        }}
-                        action={(node) => {
-                            node.focus();
-                        }}
-                        class="text-h1 text-base-fg-1 h-full w-full px-4 font-bold"
-                    />
-                </form>
-            {:else}
-                <div
-                    class="hover:bg-base-hover flex items-center gap-4 rounded-md px-2 transition"
-                    title="Double click to edit"
-                >
-                    <h1>
-                        {ref.value!.title}
-                    </h1>
-                    <span class="text-base-fg-ghost text-h1 font-light">
-                        #{ref.value!.orderNumber}
-                    </span>
-                </div>
-            {/if}
-        {/snippet}
+    <InlineEdit
+        name="title"
+        value={ref.value.title}
+        action="?/edit_title"
+        inputProps={{
+            class: 'text-h1 text-base-fg-1 font-bold'
+        }}
+        onSubmit={(e) => {
+            if (!ref.value) {
+                e.cancel();
+                return;
+            }
+
+            e.formData.set('issueId', ref.value.id);
+            const title = e.formData.get('title') as string;
+            const old = ref.value;
+            if (old) {
+                ref.value = {
+                    ...old,
+                    title
+                };
+            }
+            return async ({ result }) => {
+                if (result.type === 'failure') {
+                    ref.value = old;
+                }
+                await invalidateAll();
+            };
+        }}
+    >
+        <h1>
+            {ref.value!.title}
+            <span class="text-base-fg-ghost text-h1 font-light">
+                #{ref.value!.orderNumber}
+            </span>
+        </h1>
     </InlineEdit>
     <div class="transition-enforcement mt-6 max-w-full">
         {#if editing}

@@ -84,7 +84,7 @@ export const actions: Actions = {
 const decodeCreateResource = (formData: FormData) => {
     return decode(formData, {
         arrays: ['files'],
-        numbers: ['files.$.pendingUploadId']
+        numbers: ['files.$.pendingUploadId', 'files.$.size']
     });
 };
 
@@ -98,6 +98,8 @@ const validateCreateResource = validator(
                 Type.Object({
                     key: Type.String(),
                     originalName: Type.String(),
+                    size: Type.Number(),
+                    mimeType: Type.String(),
                     pendingUploadId: Type.Optional(Type.Number())
                 })
             )

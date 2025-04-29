@@ -2,25 +2,21 @@ export type Try<TData, TError> = Attempt<TData, TError>;
 export type Attempt<TData, TError> =
     | {
           ok: true;
+          failed: false;
           data: TData;
       }
     | {
           ok: false;
+          failed: true;
           error: TError;
       };
 
 export const tryDo = <TData>(fn: () => TData) => {
     return <TError>(mapException?: (e: unknown) => TError): Attempt<TData, TError> => {
         try {
-            return {
-                ok: true,
-                data: fn()
-            };
+            return attempt.ok(fn());
         } catch (e) {
-            return {
-                ok: false,
-                error: mapException ? mapException(e) : (e as TError)
-            };
+            return attempt.fail(mapException ? mapException(e) : (e as TError));
         }
     };
 };
@@ -30,15 +26,9 @@ export const tryPromise = <TData>(fn: () => Promise<TData>) => {
         mapException?: (e: unknown) => TError
     ): Promise<Attempt<TData, TError>> => {
         try {
-            return {
-                ok: true,
-                data: await fn()
-            };
+            return attempt.ok(await fn());
         } catch (e) {
-            return {
-                ok: false,
-                error: mapException ? mapException(e) : (e as TError)
-            };
+            return attempt.fail(mapException ? mapException(e) : (e as TError));
         }
     };
 };
@@ -47,10 +37,12 @@ export const attempt = Object.assign(tryDo, {
     promise: tryPromise,
     ok: <T>(data: T): Try<T, never> => ({
         ok: true,
+        failed: false,
         data
     }),
     fail: <T>(error: T): Try<never, T> => ({
         ok: false,
+        failed: true,
         error
     })
 });

@@ -28,6 +28,7 @@
     import { attempt, type Attempt } from '~/lib/utils/try';
     import type { LocalWorkspaceResource } from './+page.server';
     import CreateResourceFileUpload from './CreateResourceFileUpload.svelte';
+    import { createUploads } from './utils';
 
     const {
         workspaceId,
@@ -109,98 +110,53 @@
     });
 
     const uploadFiles = async (workspaceId: string, files: File[]) => {
-        const getUrlsAttempt = await attempt.promise(() =>
-            api.post('workspace-resources/batch-upload-urls', {
-                body: {
-                    workspaceId,
-                    keys: files.map((a) => a.name)
-                }
-            })
-        )(errorCodes.fromFetch);
-        if (!getUrlsAttempt.ok || !getUrlsAttempt.data.ok) {
+        const createUploadsAttempt = await createUploads(api)(workspaceId, files);
+        if (!createUploadsAttempt.ok) {
             toast({
                 type: 'negative',
-                body: `An error occurred while trying to upload files (code: ${!getUrlsAttempt.ok ? getUrlsAttempt.error : getUrlsAttempt.data.status}).`
+                body: `An error occurred while trying to upload files (code: ${createUploadsAttempt.error}).`
             });
             return;
         }
-
-        const jsonAttempt = await attempt.promise(() =>
-            getUrlsAttempt.data.json<{
-                results: { url: string; key: string; pendingUploadId: number }[];
-            }>()
-        )(errorCodes.fromJson);
-        if (!jsonAttempt.ok) {
-            toast({
-                type: 'negative',
-                body: `An error occurred while trying to upload files (code: ${jsonAttempt.error}).`
-            });
-            return;
-        }
-
-        const enrichedResults = jsonAttempt.data.results.map((result, i) => ({
-            ...result,
-            file: files[i]
-        }));
 
         const size = 8;
         const partitions = Array.from(
-            { length: Math.ceil(enrichedResults.length / size) },
-            (_, i) => enrichedResults.slice(i * size, i * size + size)
+            { length: Math.ceil(createUploadsAttempt.data.length / size) },
+            (_, i) => createUploadsAttempt.data.slice(i * size, i * size + size)
         );
 
         const uploadResults: {
-            fileName: string;
+            file: File;
             key: string;
             pendingUploadId: number;
             attempt: Attempt<void, string>;
         }[] = [];
+
         for (const partition of partitions) {
             const results = await Promise.all(
                 partition.map(async (a) => {
-                    const uploadAttempt = await new Promise<Attempt<void, string>>((resolve) => {
-                        const xhr = new XMLHttpRequest();
-                        uploads.set(a.file.name, {
-                            progress: 0,
-                            abort: () => {
-                                xhr.abort();
-                            }
-                        });
-                        xhr.upload.onprogress = (e) => {
-                            if (e.lengthComputable) {
-                                const value = uploads.get(a.file.name);
-                                if (!value) {
-                                    return;
-                                }
-                                uploads.set(a.file.name, {
-                                    ...value,
-                                    progress: (e.loaded / e.total) * 100
-                                });
-                            }
-                        };
-                        xhr.timeout = 2 * 1000 * 60;
-                        xhr.open('PUT', a.url, true);
-                        xhr.onload = () => {
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                resolve(attempt.ok<void>(undefined));
-                            } else {
-                                resolve(attempt.fail(xhr.status + ''));
-                            }
-                            resolve(attempt.ok<void>(void 0));
-                        };
-                        xhr.ontimeout = () => {
-                            resolve(attempt.fail(errorCodes.timeout));
-                        };
-                        xhr.onerror = () => {
-                            resolve(attempt.fail(errorCodes.network));
-                        };
-                        xhr.onabort = () => {
-                            resolve(attempt.fail(errorCodes.aborted));
-                        };
-                        xhr.send(a.file);
+                    uploads.set(a.file.name, {
+                        progress: 0,
+                        abort: () => {
+                            a.xhr.abort();
+                        }
                     });
+                    a.xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const value = uploads.get(a.file.name);
+                            if (!value) {
+                                return;
+                            }
+                            uploads.set(a.file.name, {
+                                ...value,
+                                progress: (e.loaded / e.total) * 100
+                            });
+                        }
+                    };
+                    a.xhr.send(a.file);
+                    const uploadAttempt = await a.promise;
                     return {
-                        fileName: a.file.name,
+                        file: a.file,
                         key: a.key,
                         pendingUploadId: a.pendingUploadId,
                         attempt: uploadAttempt
@@ -214,7 +170,7 @@
             if (!result.attempt.ok) {
                 toast({
                     type: 'negative',
-                    body: `An error occurred while trying to upload file ${result.fileName} (code: ${result.attempt.error}).`
+                    body: `An error occurred while trying to upload file ${result.file.name} (code: ${result.attempt.error}).`
                 });
                 return;
             }
@@ -237,7 +193,7 @@
 
         let uploadResults:
             | {
-                  fileName: string;
+                  file: File;
                   key: string;
                   pendingUploadId: number;
                   attempt: Attempt<void, string>;
@@ -251,8 +207,10 @@
                 let i = 0;
                 for (const result of uploadResults.filter((a) => a.attempt.ok)) {
                     e.formData.set(`files.${i}.key`, result.key);
-                    e.formData.set(`files.${i}.originalName`, result.fileName);
+                    e.formData.set(`files.${i}.originalName`, result.file.name);
                     e.formData.set(`files.${i}.pendingUploadId`, result.pendingUploadId + '');
+                    e.formData.set(`files.${i}.size`, result.file.size + '');
+                    e.formData.set(`files.${i}.mimeType`, result.file.type);
                     ++i;
                 }
             }
@@ -276,8 +234,11 @@
                             document: content ? { content } : undefined,
                             files: uploadResults
                                 ? uploadResults.map((a) => ({
+                                      id: '',
                                       key: a.key,
-                                      originalName: a.fileName
+                                      originalName: a.file.name,
+                                      size: a.file.size,
+                                      mimeType: a.file.type
                                   }))
                                 : undefined,
                             rank: '',

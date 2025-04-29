@@ -18,8 +18,13 @@ export interface ResourceDocument {
 }
 
 export interface ResourceFile {
+    createdTime: string;
+    updatedTime: string;
+    id: string;
     key: string;
     originalName: string;
+    size: number;
+    mimeType: string;
 }
 
 export interface WorkspaceResource {

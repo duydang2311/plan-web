@@ -14,8 +14,15 @@
     import { omit } from '@baetheus/fun/record';
     import { Resize } from '@cloudinary/url-gen/actions';
     import { toStore } from 'svelte/store';
-    import { Avatar, IconButton, Input, Main, OptionalLink, RelativeTime } from '~/lib/components';
-    import { IconDownloadOutline, IconSearch } from '~/lib/components/icons';
+    import {
+        Avatar,
+        Input,
+        Link,
+        Main,
+        OptionalLink,
+        RelativeTime
+    } from '~/lib/components';
+    import { IconSearch } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { mapMaybePromise } from '~/lib/utils/promise';
@@ -102,13 +109,18 @@
                 <div
                     class="border-base-border-3 shadow-xs dark:bg-base-3 dark:border-t-base-border-1 flex flex-col overflow-hidden rounded-lg border"
                 >
-                    <div class="bg-base-2 aspect-video w-full rounded-md"></div>
+                    <Link href="/{page.params.path}/resources/{wr.resource.id}">
+                        <div class="bg-base-2 aspect-video w-full rounded-md"></div>
+                    </Link>
                     <div class="flex grow flex-col gap-4 p-2">
                         <div>
                             <div class="flex items-center justify-between gap-4">
-                                <p class="text-h6 text-base-fg-1 mb-1 font-bold">
+                                <Link
+                                    href="/{page.params.path}/resources/{wr.resource.id}"
+                                    class="text-h6 text-base-fg-1 mb-1 font-bold"
+                                >
                                     {wr.resource.name}
-                                </p>
+                                </Link>
                                 {#if wr.resource.id}
                                     <MenuPopover
                                         onDelete={() => {
@@ -123,22 +135,17 @@
                             </p>
                         </div>
                         {#if wr.resource.files && wr.resource.files.length > 0}
-                            <div class="flex items-start justify-between gap-4">
-                                <ul class="flex flex-wrap gap-2">
-                                    {#each new Set(wr.resource.files.map((a) => a.key
-                                                .split('.')
-                                                .pop())).values() as ext (ext)}
-                                        <li
-                                            class="border-base-border-3 rounded-full border px-2.5 py-0.5 text-xs font-bold"
-                                        >
-                                            {ext}
-                                        </li>
-                                    {/each}
-                                </ul>
-                                <IconButton variant="base" title="Download files">
-                                    <IconDownloadOutline />
-                                </IconButton>
-                            </div>
+                            <ul class="flex flex-wrap gap-2">
+                                {#each new Set(wr.resource.files.map((a) => a.key
+                                            .split('.')
+                                            .pop())).values() as ext (ext)}
+                                    <li
+                                        class="border-base-border-3 rounded-full border px-2.5 py-0.5 text-xs font-bold"
+                                    >
+                                        {ext}
+                                    </li>
+                                {/each}
+                            </ul>
                         {/if}
                         <div class="mt-auto flex items-center justify-between">
                             <OptionalLink

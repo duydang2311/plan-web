@@ -1,0 +1,269 @@
+<script lang="ts" module>
+    import type { ResourceFile } from '~/lib/models/resource';
+
+    declare global {
+        namespace App {
+            interface PageState {
+                deletingResourceFile?: ResourceFile;
+            }
+        }
+    }
+</script>
+
+<script lang="ts">
+    import { replaceState } from '$app/navigation';
+    import { page } from '$app/state';
+    import { omit } from '@baetheus/fun/record';
+    import DOMPurify from 'isomorphic-dompurify';
+    import { DateTime } from 'luxon';
+    import { toStore } from 'svelte/store';
+    import { InlineEdit, Main, RelativeTime, toast } from '~/lib/components';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { errorCodes } from '~/lib/models/errors';
+    import { formatFileSize } from '~/lib/utils/commons';
+    import {
+        stringifyActionFailureErrors,
+        validateActionFailureData
+    } from '~/lib/utils/kit.client';
+    import { mapMaybePromise } from '~/lib/utils/promise';
+    import { createRef, watch } from '~/lib/utils/runes.svelte';
+    import { attempt } from '~/lib/utils/try';
+    import type { PageData } from './$types';
+    import type { LocalResourceFile } from './+page.server';
+    import DeleteFileDialog from './DeleteFileDialog.svelte';
+    import FileUpload from './FileUpload.svelte';
+    import MenuPopover from './MenuPopover.svelte';
+
+    const { data }: { data: PageData } = $props();
+
+    const { api } = useRuntime();
+    const getWorkspaceResourceRef = createRef.maybePromise(() => data.getWorkspaceResource);
+    const resourceRef = createRef.maybePromise(() =>
+        mapMaybePromise(data.getWorkspaceResource)((a) => (a.ok ? a.data.resource : null))
+    );
+    const fileListRef = createRef.maybePromise(() =>
+        mapMaybePromise(data.getResourceFileList)((a) => (a.ok ? a.data : null))
+    );
+    let openDeleteFileDialog = $state.raw(false);
+
+    const downloadFile = async (resourceFile: LocalResourceFile) => {
+        const exchangeTokenAttempt = await attempt.promise(() =>
+            api.post('workspace-resources/token', {
+                body: { workspaceId: data.workspace.id, resourceFileId: resourceFile.id }
+            })
+        )(errorCodes.fromFetch);
+        if (exchangeTokenAttempt.failed) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while trying to download the file.',
+                footer: exchangeTokenAttempt.error
+            });
+            return;
+        }
+
+        const jsonAttempt = await attempt.promise(() =>
+            exchangeTokenAttempt.data.json<{ accessToken: string }>()
+        )(errorCodes.fromJson);
+        if (jsonAttempt.failed) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while trying to download the file.',
+                footer: jsonAttempt.error
+            });
+            return;
+        }
+
+        const fetchAttempt = await attempt.promise(() =>
+            fetch(`https://coop-worker.duyda.tech/${resourceFile.key}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${jsonAttempt.data.accessToken}`
+                }
+            })
+        )(errorCodes.fromFetch);
+        if (fetchAttempt.failed || !fetchAttempt.data.ok) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while trying to download the file.',
+                footer: fetchAttempt.failed ? fetchAttempt.error : fetchAttempt.data.status + ''
+            });
+            return;
+        }
+
+        const blobAttempt = await attempt.promise(() => fetchAttempt.data.blob())(() => 'blob');
+        if (blobAttempt.failed) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while trying to download the file.',
+                footer: blobAttempt.error
+            });
+            return;
+        }
+
+        const blobUrl = URL.createObjectURL(blobAttempt.data);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = resourceFile.originalName;
+
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+            document.body.removeChild(link);
+        }, 100);
+    };
+
+    watch(() => page.state.deletingResourceFile)(() => {
+        if (page.state.deletingResourceFile) {
+            openDeleteFileDialog = true;
+        }
+    });
+</script>
+
+{#snippet successToast(name: string)}
+    Resource name updated to <strong>'{name}'</strong>.
+{/snippet}
+
+<DeleteFileDialog
+    open={toStore(
+        () => openDeleteFileDialog,
+        (a) => {
+            openDeleteFileDialog = a;
+            if (!a) {
+                replaceState('', omit('deletingResourceFile')(page.state));
+            }
+        }
+    )}
+    resourceFile={page.state.deletingResourceFile ?? null}
+    {fileListRef}
+    onSubmit={() => {
+        openDeleteFileDialog = false;
+        replaceState('', omit('deletingResourceFile')(page.state));
+    }}
+/>
+
+<Main>
+    <div class="max-w-paragraph-lg mx-auto">
+        {#if getWorkspaceResourceRef.isInitialLoading}
+            <p class="c-label">Loading...</p>
+        {:else if resourceRef.value == null || getWorkspaceResourceRef.value == null || !getWorkspaceResourceRef.value.ok}
+            <p class="c-label">An error occurred while loading the resource.</p>
+            {#if getWorkspaceResourceRef.value != null && !getWorkspaceResourceRef.value.ok}
+                <pre>{JSON.stringify(getWorkspaceResourceRef.value.error)}</pre>
+            {/if}
+        {:else}
+            {@const name = resourceRef.value.name}
+            <section>
+                <InlineEdit
+                    name="name"
+                    value={name}
+                    action="?/update_resource_name"
+                    inputProps={{
+                        class: 'text-h1 font-bold text-base-fg-1'
+                    }}
+                    onSubmit={async (e) => {
+                        const old = resourceRef.value;
+                        if (!old) {
+                            e.cancel();
+                            return;
+                        }
+
+                        const name = (e.formData.get('name') as string | null) ?? '';
+                        if (name == null || name.trim() === old.name) {
+                            e.cancel();
+                            return;
+                        }
+
+                        e.formData.set('resourceId', old.id);
+                        resourceRef.value = {
+                            ...old,
+                            name
+                        };
+                        return async ({ result, update }) => {
+                            if (result.type === 'success') {
+                                toast({
+                                    type: 'positive',
+                                    // @ts-ignore
+                                    body: successToast,
+                                    bodyProps: name
+                                });
+                            } else if (result.type === 'failure') {
+                                const data = validateActionFailureData(result.data);
+                                toast({
+                                    type: 'negative',
+                                    body: 'An error occurred while updating the resource name.',
+                                    footer: stringifyActionFailureErrors(
+                                        data.ok ? data.data.errors : data.errors
+                                    )
+                                });
+                                resourceRef.value = old;
+                            } else {
+                                await update();
+                            }
+                        };
+                    }}
+                >
+                    <h1>{name}</h1>
+                </InlineEdit>
+                <p class="c-label">
+                    Created on {DateTime.fromISO(resourceRef.value.createdTime).toLocaleString()} • Last
+                    modified <RelativeTime time={resourceRef.value.updatedTime} />.
+                </p>
+            </section>
+            {#if resourceRef.value.document}
+                <section class="mt-8">
+                    <h2>Documentation</h2>
+                    <div
+                        class="prose wrap-anywhere border-base-border-3 dark:bg-base-3 max-w-full rounded-lg border p-4"
+                    >
+                        {@html DOMPurify.sanitize(resourceRef.value.document.content, {
+                            USE_PROFILES: { html: true }
+                        })}
+                    </div>
+                </section>
+            {/if}
+            <section class="mt-8">
+                <h2 class="mb-2">Files</h2>
+                <FileUpload
+                    workspaceId={data.workspace.id}
+                    {fileListRef}
+                    resourceId={resourceRef.value.id}
+                />
+                {#if fileListRef.value && fileListRef.value.items.length > 0}
+                    <ul
+                        class="file-item grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4"
+                    >
+                        {#each fileListRef.value.items as file (file.key)}
+                            <li>
+                                <div
+                                    class="border-base-border-3 dark:bg-base-3 flex h-full items-start justify-between gap-x-4 gap-y-2 rounded-lg border p-2"
+                                >
+                                    <div class="flex h-full flex-col justify-between">
+                                        <p class="text-h6">
+                                            {file.originalName}
+                                        </p>
+                                        <p class="c-label">
+                                            {file.mimeType} - {formatFileSize(file.size)}
+                                        </p>
+                                    </div>
+                                    <MenuPopover
+                                        onDownload={() => {
+                                            downloadFile(file);
+                                        }}
+                                        onDelete={() => {
+                                            replaceState('', {
+                                                ...page.state,
+                                                deletingResourceFile: file
+                                            });
+                                        }}
+                                    />
+                                </div>
+                            </li>
+                        {/each}
+                    </ul>
+                {/if}
+            </section>
+        {/if}
+    </div>
+</Main>

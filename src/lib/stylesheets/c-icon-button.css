@@ -23,6 +23,7 @@
 
     &:where(:focus-visible) {
         outline: none;
+        @apply ring-1;
     }
 }
 
@@ -36,7 +37,21 @@
     @apply ring-base-fg-2/20;
 
     &:where(:focus-visible) {
-        @apply ring-base-border-2 ring-offset-base-1 ring-offset-1;
+        @apply ring-base-fg-2;
+    }
+}
+
+.c-icon-button--primary {
+    --_text: var(--color-primary-1);
+    --_text-hover: var(--color-primary-2);
+    --_text-active: var(--color-primary-3);
+    --_bg: transparent;
+    --_bg-hover: color-mix(in oklch, var(--color-primary-1) 20%, transparent);
+    --_bg-active: color-mix(in oklch, var(--color-primary-1) 5%, transparent);
+    @apply ring-primary-1/20;
+
+    &:where(:focus-visible) {
+        @apply ring-primary-3;
     }
 }
 
@@ -50,7 +65,7 @@
     @apply ring-positive-1/20;
 
     &:where(:focus-visible) {
-        @apply ring-positive-3 ring-offset-base-1 ring-offset-1;
+        @apply ring-positive-3;
     }
 }
 
@@ -64,7 +79,7 @@
     @apply ring-negative-1/20;
 
     &:where(:focus-visible) {
-        @apply ring-negative-3 ring-offset-base-1 ring-offset-1;
+        @apply ring-negative-3;
     }
 }
 
@@ -78,7 +93,7 @@
     @apply ring-info-1/20;
 
     &:where(:focus-visible) {
-        @apply ring-info-3 ring-offset-base-1 ring-offset-1;
+        @apply ring-info-3;
     }
 }
 
