@@ -14,16 +14,10 @@
     import { omit } from '@baetheus/fun/record';
     import { Resize } from '@cloudinary/url-gen/actions';
     import { toStore } from 'svelte/store';
-    import {
-        Avatar,
-        Input,
-        Link,
-        Main,
-        OptionalLink,
-        RelativeTime
-    } from '~/lib/components';
+    import { Avatar, Input, Link, Main, OptionalLink, RelativeTime } from '~/lib/components';
     import { IconSearch } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { permissions } from '~/lib/models/permission';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import { mapMaybePromise } from '~/lib/utils/promise';
     import { createRef, watch } from '~/lib/utils/runes.svelte';
@@ -39,6 +33,7 @@
     const resourceListRef = createRef.maybePromise(() =>
         mapMaybePromise(data.getResources)((a) => (a.ok ? a.data : null))
     );
+    const permissionListRef = createRef.maybePromise(() => data.permissionList);
     let openDeleteWorkspaceDialog = $state.raw(page.state.deletingWorkspaceResource != null);
     let deletingWorkspaceResource = $state.raw<LocalWorkspaceResource | null>(
         page.state.deletingWorkspaceResource ?? null
@@ -49,6 +44,15 @@
         openDeleteWorkspaceDialog = true;
         replaceState('', { ...page.state, deletingWorkspaceResource: wr });
     };
+
+    const can = $derived({
+        create:
+            permissionListRef.value != null &&
+            permissionListRef.value.items.includes(permissions.createWorkspaceResource),
+        delete:
+            permissionListRef.value != null &&
+            permissionListRef.value.items.includes(permissions.deleteWorkspaceResource)
+    });
 
     watch(() => openDeleteWorkspaceDialog)(() => {
         if (!openDeleteWorkspaceDialog && page.state.deletingWorkspaceResource) {
@@ -85,11 +89,13 @@
                 <Input type="text" placeholder="Search resources..." class="pl-8" />
                 <IconSearch class="text-base-fg-5 absolute left-2 top-1/2 -translate-y-1/2" />
             </div>
-            <CreateResourceButton
-                workspaceId={data.workspace.id}
-                {resourceListRef}
-                user={data.user}
-            />
+            {#if can.create}
+                <CreateResourceButton
+                    workspaceId={data.workspace.id}
+                    {resourceListRef}
+                    user={data.user}
+                />
+            {/if}
         </div>
     </div>
     {#if getResourcesRef.value == null}
@@ -121,7 +127,7 @@
                                 >
                                     {wr.resource.name}
                                 </Link>
-                                {#if wr.resource.id}
+                                {#if wr.resource.id && (data.user.id === wr.resource.creator.id || can.delete)}
                                     <MenuPopover
                                         onDelete={() => {
                                             showDeleteWorkspaceResourceDialog(wr);
@@ -129,24 +135,30 @@
                                     />
                                 {/if}
                             </div>
-                            <p class="c-label">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam
-                                laudantium maxime ratione minus reprehenderit.
-                            </p>
+                            {#if wr.resource.document?.previewContent}
+                                <p class="c-label">
+                                    {wr.resource.document.previewContent}
+                                </p>
+                            {/if}
                         </div>
-                        {#if wr.resource.files && wr.resource.files.length > 0}
-                            <ul class="flex flex-wrap gap-2">
-                                {#each new Set(wr.resource.files.map((a) => a.key
-                                            .split('.')
-                                            .pop())).values() as ext (ext)}
-                                    <li
-                                        class="border-base-border-3 rounded-full border px-2.5 py-0.5 text-xs font-bold"
-                                    >
-                                        {ext}
-                                    </li>
-                                {/each}
-                            </ul>
-                        {/if}
+                        <div class="flex items-center gap-2">
+                            {#if wr.resource.previewFileCount > 0}
+                                <p class="c-label text-base-fg-5">
+                                    {wr.resource.previewFileCount} files
+                                </p>
+                            {/if}
+                            {#if wr.resource.previewFileMimeTypes && wr.resource.previewFileMimeTypes.length > 0}
+                                <ul class="flex flex-wrap gap-2">
+                                    {#each wr.resource.previewFileMimeTypes as mimeType (mimeType)}
+                                        <li
+                                            class="border-base-border-3 rounded-full border px-2.5 py-0.5 text-xs font-bold"
+                                        >
+                                            {mimeType}
+                                        </li>
+                                    {/each}
+                                </ul>
+                            {/if}
+                        </div>
                         <div class="mt-auto flex items-center justify-between">
                             <OptionalLink
                                 href={wr.resource.creator.profile

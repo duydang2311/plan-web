@@ -4,7 +4,11 @@
     import { IconDownloadOutline, IconMenu, IconTrash } from '~/lib/components/icons';
     import { popover, tsap } from '~/lib/utils/transition';
 
-    const { onDelete, onDownload }: { onDelete: () => void; onDownload: () => void } = $props();
+    const {
+        canDelete,
+        onDelete,
+        onDownload
+    }: { canDelete: boolean; onDelete: () => void; onDownload: () => void } = $props();
 
     const builder = new Popover({
         forceVisible: true
@@ -37,18 +41,20 @@
                         <span>Download</span>
                     </Button>
                 </li>
-                <li>
-                    <Button
-                        filled={false}
-                        variant="negative"
-                        size="sm"
-                        class="flex w-full items-center gap-4"
-                        onclick={onDelete}
-                    >
-                        <IconTrash />
-                        <span>Delete</span>
-                    </Button>
-                </li>
+                {#if canDelete}
+                    <li>
+                        <Button
+                            filled={false}
+                            variant="negative"
+                            size="sm"
+                            class="flex w-full items-center gap-4"
+                            onclick={onDelete}
+                        >
+                            <IconTrash />
+                            <span>Delete</span>
+                        </Button>
+                    </li>
+                {/if}
             </ul>
         </div>
     </div>

@@ -11,10 +11,14 @@ export interface Resource {
     rank: string;
     document?: ResourceDocument;
     files?: ResourceFile[];
+
+    previewFileCount: number;
+    previewFileMimeTypes: string[];
 }
 
 export interface ResourceDocument {
     content: string;
+    previewContent?: string;
 }
 
 export interface ResourceFile {

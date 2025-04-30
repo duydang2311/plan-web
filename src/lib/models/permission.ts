@@ -43,5 +43,15 @@ export const permissions = {
 
     readProjectMemberInvitation: 'project-member-invitation:read',
     deleteProjectMemberInvitation: 'project-member-invitation:delete',
-    createProjectMemberInvitation: 'project-member-invitation:create'
+    createProjectMemberInvitation: 'project-member-invitation:create',
+
+    createWorkspaceResource: 'workspace-resource:create',
+    readWorkspaceResource: 'workspace-resource:read',
+    updateWorkspaceResource: 'workspace-resource:update',
+    deleteWorkspaceResource: 'workspace-resource:delete',
+
+    createWorkspaceResourceFile: 'workspace-resource-file:create',
+    readWorkspaceResourceFile: 'workspace-resource-file:read',
+    updateWorkspaceResourceFile: 'workspace-resource-file:update',
+    deleteWorkspaceResourceFile: 'workspace-resource-file:delete'
 } as const;

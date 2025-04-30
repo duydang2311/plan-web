@@ -1,9 +1,10 @@
 import { decode } from 'decode-formdata';
 import { Effect } from 'effect';
-import type { PaginatedList } from '~/lib/models/paginatedList';
-import type { Resource } from '~/lib/models/resource';
+import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import type { Resource, ResourceDocument } from '~/lib/models/resource';
 import type { UserPreset } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
+import { PermissionService } from '~/lib/services/permission_service.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import { attempt } from '~/lib/utils/try';
@@ -13,37 +14,55 @@ import type { Actions, PageServerLoad } from './$types';
 
 export type LocalWorkspaceResource = {
     resource: OneOf<Pick<Resource, 'id'>, { optimisticId: number }> &
-        Pick<Resource, 'createdTime' | 'name' | 'rank' | 'document' | 'files'> & {
+        Pick<
+            Resource,
+            'createdTime' | 'name' | 'rank' | 'previewFileCount' | 'previewFileMimeTypes'
+        > & {
             creator: UserPreset['basicProfile'];
+            document: Pick<ResourceDocument, 'previewContent'>;
         };
 };
 
-export const load: PageServerLoad = async ({ parent, locals: { runtime }, isDataRequest }) => {
+export const load: PageServerLoad = async ({
+    parent,
+    locals: { user, runtime },
+    isDataRequest
+}) => {
     const {
         workspace: { id }
     } = await parent();
-    const getResources = await Effect.gen(function* () {
-        const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(`workspaces/${id}/resources`, {
-                query: {
-                    workspaceId: id,
-                    select: 'Resource.Id,Resource.CreatedTime,Resource.Name,Resource.Document,Resource.Files,Resource.Rank,Resource.Creator.Id,Resource.Creator.Email,Resource.Creator.Profile.Name,Resource.Creator.Profile.DisplayName,Resource.Creator.Profile.Image'
-                }
-            })
-        );
+    const [getResources, permissionList] = await Promise.all([
+        Effect.gen(function* () {
+            const response = yield* LoadResponse.HTTP(
+                (yield* ApiClient).get(`workspaces/${id}/resources`, {
+                    query: {
+                        workspaceId: id,
+                        select: 'Resource.Id,Resource.CreatedTime,Resource.Name,Resource.Document.PreviewContent,Resource.PreviewFileCount,Resource.PreviewFileMimeTypes,Resource.Rank,Resource.Creator.Id,Resource.Creator.Email,Resource.Creator.Profile.Name,Resource.Creator.Profile.DisplayName,Resource.Creator.Profile.Image'
+                    }
+                })
+            );
 
-        const json = yield* LoadResponse.JSON(() =>
-            response.json<PaginatedList<LocalWorkspaceResource>>()
-        );
-        return attempt.ok(json);
-    }).pipe(
-        Effect.catchAll((e) => Effect.succeed(attempt.fail(e))),
-        runtime.runPromise,
-        (a) => maybeStream(a)(isDataRequest)
-    );
+            const json = yield* LoadResponse.JSON(() =>
+                response.json<PaginatedList<LocalWorkspaceResource>>()
+            );
+            return attempt.ok(json);
+        }).pipe(
+            Effect.catchAll((e) => Effect.succeed(attempt.fail(e))),
+            runtime.runPromise,
+            (a) => maybeStream(a)(isDataRequest)
+        ),
+        Effect.gen(function* () {
+            return yield* (yield* PermissionService).getWorkspacePermissions(id, user.id);
+        }).pipe(
+            Effect.orElseSucceed(() => paginatedList<string>()),
+            runtime.runPromise,
+            (a) => maybeStream(a)(isDataRequest)
+        )
+    ]);
 
     return {
-        getResources: getResources()
+        getResources: getResources(),
+        permissionList: permissionList()
     };
 };
 

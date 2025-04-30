@@ -33,6 +33,7 @@
     import DeleteFileDialog from './DeleteFileDialog.svelte';
     import FileUpload from './FileUpload.svelte';
     import MenuPopover from './MenuPopover.svelte';
+    import { permissions } from '~/lib/models/permission';
 
     const { data }: { data: PageData } = $props();
 
@@ -44,6 +45,13 @@
     const fileListRef = createRef.maybePromise(() =>
         mapMaybePromise(data.getResourceFileList)((a) => (a.ok ? a.data : null))
     );
+    const permissionListRef = createRef.maybePromise(() => data.permissionList);
+    const can = $derived({
+        delete:
+            (data.user.id === resourceRef.value?.creator.id ||
+                permissionListRef.value?.items.includes(permissions.deleteWorkspaceResourceFile)) ??
+            false
+    });
     let openDeleteFileDialog = $state.raw(false);
 
     const downloadFile = async (resourceFile: LocalResourceFile) => {
@@ -248,6 +256,7 @@
                                         </p>
                                     </div>
                                     <MenuPopover
+                                        canDelete={can.delete}
                                         onDownload={() => {
                                             downloadFile(file);
                                         }}

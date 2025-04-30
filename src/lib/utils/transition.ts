@@ -84,6 +84,7 @@ export const dialog = {
             scale: 0.98,
             duration: 0.15,
             ease: 'power2.out',
+            clearProps: 'opacity,scale',
             force3D: true,
             ...vars
         }),
