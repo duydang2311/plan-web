@@ -240,12 +240,12 @@
                 />
                 {#if fileListRef.value && fileListRef.value.items.length > 0}
                     <ul
-                        class="file-item grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4"
+                        class="grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4"
                     >
                         {#each fileListRef.value.items as file (file.key)}
                             <li>
                                 <div
-                                    class="border-base-border-3 dark:bg-base-3 flex h-full items-start justify-between gap-x-4 gap-y-2 rounded-lg border p-2"
+                                    class="border-base-border-3 dark:bg-base-3 wrap-anywhere flex h-full items-start justify-between gap-x-4 gap-y-2 rounded-lg border p-2"
                                 >
                                     <div class="flex h-full flex-col justify-between">
                                         <p class="text-h6">
