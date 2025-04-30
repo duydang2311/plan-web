@@ -217,6 +217,7 @@
         }
 
         const content = toggle.value && editor ? editor.getHTML() : null;
+        const previewContent = toggle.value && editor ? editor.getText().substring(0, 256) : null;
         if (content) {
             e.formData.set('content', content);
         }
@@ -231,16 +232,9 @@
                             optimisticId: Date.now(),
                             name: fields.name.state.value,
                             createdTime: DateTime.now().toISO(),
-                            document: content ? { content } : undefined,
-                            files: uploadResults
-                                ? uploadResults.map((a) => ({
-                                      id: '',
-                                      key: a.key,
-                                      originalName: a.file.name,
-                                      size: a.file.size,
-                                      mimeType: a.file.type
-                                  }))
-                                : undefined,
+                            document: previewContent ? { previewContent } : undefined,
+                            previewFileCount: uploadResults?.length ?? 0,
+                            previewFileMimeTypes: uploadResults?.map((a) => a.file.type) ?? [],
                             rank: '',
                             creator: user
                         }

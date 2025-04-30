@@ -19,7 +19,7 @@ export type LocalWorkspaceResource = {
             'createdTime' | 'name' | 'rank' | 'previewFileCount' | 'previewFileMimeTypes'
         > & {
             creator: UserPreset['basicProfile'];
-            document: Pick<ResourceDocument, 'previewContent'>;
+            document?: Pick<ResourceDocument, 'previewContent'>;
         };
 };
 
