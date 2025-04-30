@@ -16,7 +16,6 @@
     } from '~/lib/components';
     import { IconPlus, IconResourcePlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { errorCodes } from '~/lib/models/errors';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { UserPreset } from '~/lib/models/user';
     import { createForm } from '~/lib/utils/form.svelte';
@@ -25,7 +24,7 @@
         validateActionFailureData
     } from '~/lib/utils/kit.client';
     import { createDirty, createLoading, watch, type Ref } from '~/lib/utils/runes.svelte';
-    import { attempt, type Attempt } from '~/lib/utils/try';
+    import { type Attempt } from '~/lib/utils/try';
     import type { LocalWorkspaceResource } from './+page.server';
     import CreateResourceFileUpload from './CreateResourceFileUpload.svelte';
     import { createUploads } from './utils';
