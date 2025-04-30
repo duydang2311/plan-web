@@ -18,6 +18,7 @@ import Strike from '@tiptap/extension-strike';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
+import { Markdown } from 'tiptap-markdown';
 
 export const createEditor = (
     options?: Partial<EditorOptions> | ((options: Partial<EditorOptions>) => Partial<EditorOptions>)
@@ -48,6 +49,10 @@ export const createEditor = (
             HorizontalRule,
             History,
             BulletList,
+            Markdown.configure({
+                transformPastedText: true,
+                linkify: true
+            }),
             Extension.create({
                 addKeyboardShortcuts: () => {
                     return {
