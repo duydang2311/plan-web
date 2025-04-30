@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FileUpload } from 'melt/builders';
     import { SvelteMap } from 'svelte/reactivity';
-    import { Field, IconButton, Label, toast } from '~/lib/components';
+    import { Field, IconButton, toast } from '~/lib/components';
     import { IconUploadOutline, IconXMark } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { errorCodes } from '~/lib/models/errors';
@@ -27,6 +27,7 @@
         multiple: true,
         onSelectedChange: (selected) => {
             uploadFiles(Array.from(selected.values()));
+            selected.clear();
         }
     });
     const uploads = new SvelteMap<number, { file: File; progress: number; abort: () => void }>();
@@ -171,7 +172,6 @@
 </script>
 
 <Field>
-    <Label for={fileUpload.input.id}>Files</Label>
     <input {...fileUpload.input} />
     <div
         {...fileUpload.dropzone}
