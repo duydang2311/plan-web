@@ -14,6 +14,8 @@ import {
     validateInviteMember,
     workspaceMembersParams
 } from './utils';
+import { PermissionService } from '~/lib/services/permission_service.server';
+import { maybeStream } from '~/lib/utils/promise';
 
 export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'updatedTime' | 'id'> & {
     user: Pick<User, 'email'>;
@@ -91,7 +93,7 @@ const loadPendingMembersView = async ({
     parent,
     url,
     isDataRequest,
-    locals: { runtime }
+    locals: { user, runtime }
 }: PageServerLoadEvent) => {
     const {
         workspace: { id }

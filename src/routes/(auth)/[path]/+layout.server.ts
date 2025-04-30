@@ -2,10 +2,17 @@ import { error } from '@sveltejs/kit';
 import { Effect, Exit } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
 import type { LayoutServerLoad } from './$types';
+import { PermissionService } from '~/lib/services/permission_service.server';
+import { maybeStream } from '~/lib/utils/promise';
 
 const pathIdMap = new Map<string, string>();
 
-export const load: LayoutServerLoad = async ({ params, locals: { user, runtime }, url }) => {
+export const load: LayoutServerLoad = async ({
+    params,
+    locals: { user, runtime },
+    url,
+    isDataRequest
+}) => {
     const exit = await runtime.runPromiseExit(
         Effect.gen(function* () {
             const apiClient = yield* ApiClient;
@@ -34,10 +41,23 @@ export const load: LayoutServerLoad = async ({ params, locals: { user, runtime }
     if (Exit.isFailure(exit)) {
         return error(404, { message: 'Workspace does not exist', code: 'workspace_not_found' });
     }
+
+    const workspacePermissions = await Effect.gen(function* () {
+        const list = yield* (yield* PermissionService).getWorkspacePermissions(
+            exit.value.id,
+            user.id
+        );
+        return new Set(list.items);
+    }).pipe(
+        Effect.orElseSucceed(() => new Set<string>()),
+        runtime.runPromise,
+        (a) => maybeStream(a)(isDataRequest)
+    );
+
     return {
         user,
         workspace: exit.value,
-        pathname: url.pathname
+        pathname: url.pathname,
+        workspacePermissions: workspacePermissions()
     };
 };
-

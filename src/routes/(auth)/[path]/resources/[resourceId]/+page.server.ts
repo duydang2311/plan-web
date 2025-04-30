@@ -1,9 +1,8 @@
 import { Effect } from 'effect';
-import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import { type PaginatedList } from '~/lib/models/paginatedList';
 import type { Resource, ResourceFile } from '~/lib/models/resource';
 import type { UserPreset } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { PermissionService } from '~/lib/services/permission_service.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import { attempt } from '~/lib/utils/try';
@@ -23,16 +22,12 @@ export type LocalResourceFile = Pick<
 >;
 
 export const load: PageServerLoad = async ({
-    parent,
     params,
-    locals: { user, runtime },
+    locals: { runtime },
     isDataRequest
 }) => {
-    const {
-        workspace: { id }
-    } = await parent();
     const resourceId = params.resourceId;
-    const [getWorkspaceResource, getResourceFileList, permissionList] = await Promise.all([
+    const [getWorkspaceResource, getResourceFileList] = await Promise.all([
         Effect.gen(function* () {
             const response = yield* LoadResponse.HTTP(
                 (yield* ApiClient).get(`workspace-resources/${resourceId}`, {
@@ -66,20 +61,12 @@ export const load: PageServerLoad = async ({
             Effect.catchAll((e) => Effect.succeed(attempt.fail(e))),
             runtime.runPromise,
             (a) => maybeStream(a)(isDataRequest)
-        ),
-        Effect.gen(function* () {
-            return yield* (yield* PermissionService).getWorkspacePermissions(id, user.id);
-        }).pipe(
-            Effect.orElseSucceed(() => paginatedList<string>()),
-            runtime.runPromise,
-            (a) => maybeStream(a)(isDataRequest)
         )
     ]);
 
     return {
         getWorkspaceResource: getWorkspaceResource(),
-        getResourceFileList: getResourceFileList(),
-        permissionList: permissionList()
+        getResourceFileList: getResourceFileList()
     };
 };
 

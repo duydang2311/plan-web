@@ -8,6 +8,8 @@
     import InviteMemberDialog from './InviteMemberDialog.svelte';
     import PendingMembers from './PendingMembers.svelte';
     import SelectView from './SelectView.svelte';
+    import { createRef } from '~/lib/utils/runes.svelte';
+    import { permissions } from '~/lib/models/permission';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const showInviteMember = writable(false);
@@ -26,6 +28,10 @@
             ? viewOptions.find((a) => a.value === view)
             : viewOptions.find((a) => a.default === true)
     );
+    const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
+    const can = {
+        invite: workspacePermissionsRef.value?.has(permissions.createWorkspaceInvitation) ?? false
+    };
 </script>
 
 <InviteMemberDialog
@@ -41,25 +47,27 @@
             <IconSearch class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2" />
             <Input
                 type="text"
-                class="h-full border-none py-0 pl-8 focus:shadow-none bg-transparent"
+                class="h-full border-none bg-transparent py-0 pl-8 focus:shadow-none"
                 placeholder="Search member"
             />
         </div>
-        <div>
-            <Button
-                variant="base"
-                size="sm"
-                filled={false}
-                class="flex h-full w-fit items-center gap-2 rounded-none py-2 pr-8"
-                flat
-                onclick={() => {
-                    $showInviteMember = true;
-                }}
-            >
-                <IconPlus />
-                Invite member
-            </Button>
-        </div>
+        {#if can.invite}
+            <div>
+                <Button
+                    variant="base"
+                    size="sm"
+                    filled={false}
+                    class="flex h-full w-fit items-center gap-2 rounded-none py-2 pr-8"
+                    flat
+                    onclick={() => {
+                        $showInviteMember = true;
+                    }}
+                >
+                    <IconPlus />
+                    Invite member
+                </Button>
+            </div>
+        {/if}
     </div>
     {#if $selectedView.value === 'pending'}
         <PendingMembers {data} />

@@ -53,5 +53,10 @@ export const permissions = {
     createWorkspaceResourceFile: 'workspace-resource-file:create',
     readWorkspaceResourceFile: 'workspace-resource-file:read',
     updateWorkspaceResourceFile: 'workspace-resource-file:update',
-    deleteWorkspaceResourceFile: 'workspace-resource-file:delete'
+    deleteWorkspaceResourceFile: 'workspace-resource-file:delete',
+
+    createWorkspaceInvitation: 'workspace-invitation:create',
+    readWorkspaceInvitation: 'workspace-invitation:read',
+    updateWorkspaceInvitation: 'workspace-invitation:update',
+    deleteWorkspaceInvitation: 'workspace-invitation:delete'
 } as const;

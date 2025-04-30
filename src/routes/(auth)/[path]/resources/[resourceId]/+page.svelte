@@ -45,11 +45,11 @@
     const fileListRef = createRef.maybePromise(() =>
         mapMaybePromise(data.getResourceFileList)((a) => (a.ok ? a.data : null))
     );
-    const permissionListRef = createRef.maybePromise(() => data.permissionList);
+    const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({
         delete:
             (data.user.id === resourceRef.value?.creator.id ||
-                permissionListRef.value?.items.includes(permissions.deleteWorkspaceResourceFile)) ??
+                workspacePermissionsRef.value?.has(permissions.deleteWorkspaceResourceFile)) ??
             false
     });
     let openDeleteFileDialog = $state.raw(false);

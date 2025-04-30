@@ -33,26 +33,22 @@
     const resourceListRef = createRef.maybePromise(() =>
         mapMaybePromise(data.getResources)((a) => (a.ok ? a.data : null))
     );
-    const permissionListRef = createRef.maybePromise(() => data.permissionList);
+    const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
+
     let openDeleteWorkspaceDialog = $state.raw(page.state.deletingWorkspaceResource != null);
     let deletingWorkspaceResource = $state.raw<LocalWorkspaceResource | null>(
         page.state.deletingWorkspaceResource ?? null
     );
+    const can = $derived({
+        create: workspacePermissionsRef.value?.has(permissions.createWorkspaceResource) ?? false,
+        delete: workspacePermissionsRef.value?.has(permissions.deleteWorkspaceResource) ?? false
+    });
 
     const showDeleteWorkspaceResourceDialog = (wr: LocalWorkspaceResource) => {
         deletingWorkspaceResource = wr;
         openDeleteWorkspaceDialog = true;
         replaceState('', { ...page.state, deletingWorkspaceResource: wr });
     };
-
-    const can = $derived({
-        create:
-            permissionListRef.value != null &&
-            permissionListRef.value.items.includes(permissions.createWorkspaceResource),
-        delete:
-            permissionListRef.value != null &&
-            permissionListRef.value.items.includes(permissions.deleteWorkspaceResource)
-    });
 
     watch(() => openDeleteWorkspaceDialog)(() => {
         if (!openDeleteWorkspaceDialog && page.state.deletingWorkspaceResource) {

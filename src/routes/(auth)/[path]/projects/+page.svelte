@@ -8,14 +8,10 @@
     import { permissions } from '~/lib/models/permission';
 
     const { data }: { data: PageData } = $props();
-    const getPermissionsRef = createRef.maybePromise(() => data.getPermissions);
+    const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({
-        createProject:
-            getPermissionsRef.value?.ok === true &&
-            getPermissionsRef.value.data.has(permissions.createProject),
-        deleteProject:
-            getPermissionsRef.value?.ok === true &&
-            getPermissionsRef.value.data.has(permissions.deleteProject)
+        create: workspacePermissionsRef.value?.has(permissions.createProject) ?? false,
+        delete: workspacePermissionsRef.value?.has(permissions.deleteProject) ?? false
     });
 </script>
 
@@ -32,7 +28,7 @@
             />
             <IconSearch class="text-base-fg-ghost absolute left-8 top-1/2 -translate-y-1/2" />
         </div>
-        {#if can.createProject}
+        {#if can.create}
             <Button
                 as="link"
                 href="/{page.params['path']}/projects/new"
@@ -49,7 +45,7 @@
     </div>
     <Await resolve={data.projectList}>
         {#snippet children({ value, loading })}
-            <ProjectTable projectList={value} {loading} canDeleteProject={can.deleteProject} />
+            <ProjectTable projectList={value} {loading} canDeleteProject={can.delete} />
         {/snippet}
     </Await>
 </main>
