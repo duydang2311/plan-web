@@ -2,18 +2,16 @@ import type { Cloudinary } from '@cloudinary/url-gen';
 import { type QueryClient } from '@tanstack/svelte-query';
 import defineLazyProperty from 'define-lazy-prop';
 import type { Context } from 'effect';
-import type Sqids from 'sqids';
 import { getContext, setContext } from 'svelte';
 import type { HttpClient } from '../services/http_client';
-import { type Realtime } from '../services/realtime.client';
 import type { Hub } from '../services/hub.client';
+import { type Realtime } from '../services/realtime.client';
 
 interface Runtime {
     readonly api: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
     readonly cloudinary: Cloudinary;
     readonly queryClient: QueryClient;
-    readonly idHasher: Sqids;
     readonly hub: Hub;
 }
 

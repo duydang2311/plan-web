@@ -135,12 +135,12 @@
                     }
 
                     return async (e) => {
-                        await e.update({ invalidateAll: false, reset: false });
                         if (e.result.type === 'success') {
                             $selected = undefined!;
                             search = '';
                             $open = false;
                         }
+                        await e.update();
                     };
                 }}
             >

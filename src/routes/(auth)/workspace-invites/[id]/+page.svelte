@@ -5,6 +5,10 @@
     import { IconBack, IconCheck, IconXMark } from '~/lib/components/icons';
     import { createLoading, createRef } from '~/lib/utils/runes.svelte';
     import type { PageData, SubmitFunction } from './$types';
+    import {
+        stringifyActionFailureErrors,
+        validateActionFailureData
+    } from '~/lib/utils/kit.client';
 
     const { data }: { data: PageData } = $props();
 
@@ -18,7 +22,7 @@
 
         const data = getInvitationRef.value.data;
         submitLoading.set();
-        return async ({ result }) => {
+        return async ({ result, update }) => {
             submitLoading.unset();
             if (result.type === 'redirect') {
                 toast({
@@ -26,11 +30,15 @@
                     body: acceptSuccess,
                     bodyProps: data.workspace.name
                 });
-                await goto(result.location, { invalidateAll: true });
+                await update();
             } else if (result.type === 'failure') {
+                const validation = validateActionFailureData(result.data);
                 toast({
                     type: 'negative',
-                    body: 'The server responded with an error while trying to accept the invitation.'
+                    body: 'Something went wrong while trying to accept the invitation.',
+                    footer: stringifyActionFailureErrors(
+                        validation.ok ? validation.data.errors : validation.errors
+                    )
                 });
             }
         };
@@ -43,7 +51,7 @@
 
         const data = getInvitationRef.value.data;
         declineLoading.set();
-        return async ({ result }) => {
+        return async ({ result, update }) => {
             declineLoading.unset();
             if (result.type === 'redirect') {
                 toast({
@@ -51,11 +59,15 @@
                     body: declineSuccess,
                     bodyProps: data.workspace.name
                 });
-                await goto(result.location, { invalidateAll: true });
+                await update();
             } else if (result.type === 'failure') {
+                const validation = validateActionFailureData(result.data);
                 toast({
                     type: 'negative',
-                    body: 'The server responded with an error while trying to decline the invitation.'
+                    body: 'Something went wrong while trying to decline the invitation.',
+                    footer: stringifyActionFailureErrors(
+                        validation.ok ? validation.data.errors : validation.errors
+                    )
                 });
             }
         };

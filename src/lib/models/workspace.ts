@@ -26,7 +26,7 @@ export interface WorkspaceMember {
 
 export interface WorkspaceInvitation {
     createdTime: string;
-    id: number;
+    id: string;
     workspaceId: string;
     workspace: Workspace;
     userId: string;

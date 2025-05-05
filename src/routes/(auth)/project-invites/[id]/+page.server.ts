@@ -1,13 +1,12 @@
 import { error, redirect } from '@sveltejs/kit';
-import { Cause, Effect, Exit } from 'effect';
+import { Effect, Exit } from 'effect';
 import type { Project, ProjectMemberInvitation } from '~/lib/models/project';
-import { ApiClient } from '~/lib/services/api_client.server';
-import { IdHasher } from '~/lib/services/id_hasher.server';
-import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
-import type { Actions, PageServerLoad } from './$types';
 import type { Role } from '~/lib/models/role';
+import { ApiClient } from '~/lib/services/api_client.server';
+import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { Type } from '~/lib/utils/typebox';
 import { validator } from '~/lib/utils/validation';
+import type { Actions, PageServerLoad } from './$types';
 
 export type LocalProjectMemberInvitation = Pick<ProjectMemberInvitation, 'id'> & {
     project: Pick<Project, 'id' | 'name'>;
@@ -16,18 +15,8 @@ export type LocalProjectMemberInvitation = Pick<ProjectMemberInvitation, 'id'> &
 
 export const load: PageServerLoad = async ({ params, locals: { runtime } }) => {
     const getInvitation = await Effect.gen(function* () {
-        const [decodedId] = (yield* IdHasher).decode(params.id);
-        if (decodedId == null) {
-            yield* Effect.fail({
-                _tag: 'InvalidIdError',
-                status: 400,
-                code: 'invalid_id',
-                message: 'Invalid invitation ID'
-            } as const);
-        }
-
         const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(`project-member-invitations/${decodedId}`, {
+            (yield* ApiClient).get(`project-member-invitations/${params.id}`, {
                 query: { select: 'Id,Project.Id,Project.Name,Role.Name' }
             })
         );
@@ -93,9 +82,9 @@ const decodeAccept = (formData: FormData) => {
 
 const validateAccept = validator(
     Type.Object({
-        projectMemberInvitationId: Type.Number()
+        projectMemberInvitationId: Type.String()
     }),
-    { convert: true, stripLeadingSlash: true }
+    { stripLeadingSlash: true }
 );
 
 const decodeDecline = (formData: FormData) => {
@@ -106,7 +95,7 @@ const decodeDecline = (formData: FormData) => {
 
 const validateDecline = validator(
     Type.Object({
-        projectMemberInvitationId: Type.Number()
+        projectMemberInvitationId: Type.String()
     }),
-    { convert: true, stripLeadingSlash: true }
+    { stripLeadingSlash: true }
 );

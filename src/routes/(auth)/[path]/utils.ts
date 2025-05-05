@@ -49,7 +49,7 @@ export interface LocalUserNotification {
         | {
               type: (typeof notificationTypes)['workspaceMemberInvited'];
               data: {
-                  id: number;
+                  id: string;
                   workspace: {
                       name: string;
                   };

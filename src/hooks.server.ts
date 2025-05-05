@@ -4,18 +4,14 @@ import { Effect, Exit, Layer } from 'effect';
 import type { Asset } from './lib/models/asset';
 import { ApiClient, HttpApiClient } from './lib/services/api_client.server';
 import { Cloudinary } from './lib/services/cloudinary.server';
-import { IdHasher } from './lib/services/id_hasher.server';
 import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client';
 import { UniversalHttpClient } from './lib/services/universal_http_client';
 import { attempt } from './lib/utils/try';
 import { PermissionService } from './lib/services/permission_service.server';
-import { createIdHasher } from './lib/services/id_hasher';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
 if (!env.API_VERSION) throw new ReferenceError('API_VERSION must be provided');
-
-const IdHasherLive = Layer.sync(IdHasher, () => createIdHasher(env.SQIDS_ALPHABET));
 
 export const handle: Handle = async ({
     event,
@@ -100,7 +96,6 @@ export const handle: Handle = async ({
         locals.appLive = Layer.mergeAll(
             ApiClientLive,
             Cloudinary.Live,
-            IdHasherLive,
             PermissionService.Live.pipe(Layer.provide(ApiClientLive))
         );
         locals.runtime = {
@@ -126,7 +121,6 @@ const initLocals = (locals: App.Locals, httpClient: UniversalHttpClient) => {
     locals.appLive = Layer.mergeAll(
         ApiClientLive,
         Cloudinary.Live,
-        IdHasherLive,
         PermissionService.Live.pipe(Layer.provide(ApiClientLive))
     );
     locals.runtime = {

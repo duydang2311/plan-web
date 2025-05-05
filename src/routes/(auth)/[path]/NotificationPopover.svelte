@@ -18,7 +18,7 @@
         ref: AsyncRef<PaginatedList<LocalUserNotification>>;
         scrollTop?: number;
     } = $props();
-    const { api, idHasher } = useRuntime();
+    const { api } = useRuntime();
     const loading = createLoading();
     const loadMore = async () => {
         loading.set();
@@ -227,9 +227,7 @@
                                 </a>
                             {:else if userNotification.notification.type === notificationTypes.projectMemberInvited}
                                 <a
-                                    href="/project-invites/{idHasher.encode([
-                                        userNotification.notification.data.id
-                                    ])}"
+                                    href="/project-invites/{userNotification.notification.data.id}"
                                     class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                 >
                                     <p class="text-pretty">
@@ -246,9 +244,8 @@
                                 </a>
                             {:else if userNotification.notification.type === notificationTypes.workspaceMemberInvited}
                                 <a
-                                    href="/workspace-invites/{idHasher.encode([
-                                        userNotification.notification.data.id
-                                    ])}"
+                                    href="/workspace-invites/{userNotification.notification.data
+                                        .id}"
                                     class="bg-base-1 dark:bg-base-3 hover:bg-base-hover text-base-fg-2 block gap-2 rounded-md px-4 py-2 transition"
                                 >
                                     <p class="text-pretty">

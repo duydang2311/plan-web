@@ -9,7 +9,6 @@ import type { Asset } from './lib/models/asset';
 import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
 import type { HttpClient } from './lib/services/http_client';
-import type { IdHasher } from './lib/services/id_hasher.server';
 import type { PermissionService } from './lib/services/permission_service.server';
 
 // for information about these interfaces
@@ -52,7 +51,7 @@ declare global {
                     options?: { readonly signal?: AbortSignal } | undefined
                 ): Promise<Exit.Exit<A, E>>;
             };
-            appLive: Layer<ApiClient | Cloudinary | IdHasher | PermissionService>;
+            appLive: Layer<ApiClient | Cloudinary | PermissionService>;
             user: {
                 id: string;
                 email: string;

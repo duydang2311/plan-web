@@ -2,7 +2,6 @@ import { redirect } from '@sveltejs/kit';
 import { Effect, Exit } from 'effect';
 import type { Workspace, WorkspaceInvitation } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { IdHasher } from '~/lib/services/id_hasher.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import { attempt } from '~/lib/utils/try';
@@ -16,18 +15,8 @@ export type LocalWorkspaceInvitation = Pick<WorkspaceInvitation, 'id'> & {
 
 export const load: PageServerLoad = async ({ params, locals: { runtime }, isDataRequest }) => {
     const getInvitation = await Effect.gen(function* () {
-        const [decodedId] = (yield* IdHasher).decode(params.id);
-        if (decodedId == null) {
-            yield* Effect.fail({
-                _tag: 'InvalidIdError',
-                status: 400,
-                code: 'invalid_id',
-                message: 'Invalid invitation ID'
-            } as const);
-        }
-
         const response = yield* LoadResponse.HTTP(
-            (yield* ApiClient).get(`workspace-invitations/${decodedId}`, {
+            (yield* ApiClient).get(`workspace-invitations/${params.id}`, {
                 query: { select: 'Id,Workspace.Path,Workspace.Name' }
             })
         );
@@ -93,9 +82,9 @@ const decodeAccept = (formData: FormData) => {
 
 const validateAccept = validator(
     Type.Object({
-        workspaceInvitationId: Type.Number()
+        workspaceInvitationId: Type.String()
     }),
-    { convert: true, stripLeadingSlash: true }
+    { stripLeadingSlash: true }
 );
 
 const decodeDecline = (formData: FormData) => {
@@ -106,7 +95,7 @@ const decodeDecline = (formData: FormData) => {
 
 const validateDecline = validator(
     Type.Object({
-        workspaceInvitationId: Type.Number()
+        workspaceInvitationId: Type.String()
     }),
-    { convert: true, stripLeadingSlash: true }
+    { stripLeadingSlash: true }
 );

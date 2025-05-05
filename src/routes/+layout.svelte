@@ -7,7 +7,6 @@
     import { Sonner, Toaster } from '~/lib/components';
     import { setRuntime } from '~/lib/contexts/runtime.client';
     import { createSignalRHub } from '~/lib/services/hub.client';
-    import { createIdHasher } from '~/lib/services/id_hasher';
     import { NATSRealtime } from '~/lib/services/realtime.client';
     import { UniversalHttpClient } from '~/lib/services/universal_http_client';
     import type { LayoutData } from './$types';
@@ -36,7 +35,6 @@
                 url: { secure: true }
             }),
         queryClient: () => data.queryClient,
-        idHasher: createIdHasher,
         hub: () =>
             createSignalRHub(env.PUBLIC_SIGNALR_ORIGIN + '/hub', async () => {
                 const api = getApi();
