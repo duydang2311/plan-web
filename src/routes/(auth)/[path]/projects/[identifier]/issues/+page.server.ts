@@ -1,5 +1,5 @@
 import { D } from '@mobily/ts-belt';
-import { Effect, Exit, pipe } from 'effect';
+import { Console, Effect, Exit, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
@@ -8,6 +8,7 @@ import { LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
+import type { UserPreset } from '~/lib/models/user';
 
 export type LocalIssue = Pick<
     Issue,
@@ -19,10 +20,17 @@ export type LocalIssue = Pick<
 
 export type LocalBoardIssue = Pick<
     Issue,
-    'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'statusId' | 'statusRank'
->;
+    | 'createdTime'
+    | 'updatedTime'
+    | 'id'
+    | 'orderNumber'
+    | 'title'
+    | 'statusId'
+    | 'statusRank'
+    | 'priority'
+> & { author: UserPreset['email'] & UserPreset['profile'] };
 
-export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color'>;
+export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color' | 'category'>;
 
 export interface PageBoardData {
     statuses: PaginatedList<LocalWorkspaceStatus>;
@@ -31,7 +39,7 @@ export interface PageBoardData {
 }
 
 export const load: PageServerLoad = (e) => {
-    return e.url.searchParams.get('layout') === 'board' ? loadBoardLayout(e) : loadTableLayout(e);
+    return e.url.searchParams.get('view') === 'board' ? loadBoardLayout(e) : loadTableLayout(e);
 };
 
 const loadTableLayout = async ({
@@ -165,7 +173,7 @@ const getWorkspaceStatusList = (workspaceId: string) =>
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
             api.get(`workspaces/${workspaceId}/statuses`, {
-                query: { select: 'Id,Value,Color,Rank', order: 'Rank' }
+                query: { select: 'Id,Value,Color,Rank,Category', order: 'Rank' }
             })
         );
 

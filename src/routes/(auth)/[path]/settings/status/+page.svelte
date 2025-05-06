@@ -1,49 +1,59 @@
 <script lang="ts">
-    import { Button, Input } from '~/lib/components';
-    import { IconPlus, IconSearch } from '~/lib/components/icons';
+    import { page } from '$app/state';
+    import { Button, Main, Pagination3 } from '~/lib/components';
+    import { IconPlus } from '~/lib/components/icons';
+    import { paginatedList } from '~/lib/models/paginatedList';
     import { permissions } from '~/lib/models/permission';
+    import { mapMaybePromise } from '~/lib/utils/promise';
     import { createRef } from '~/lib/utils/runes.svelte';
+    import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
     import AddStatusDialog from './AddStatusDialog.svelte';
     import TableStatus from './TableStatus.svelte';
+    import { toStore } from 'svelte/store';
 
     const { data }: { data: PageData } = $props();
-    let showAddStatusDialog = $state(false);
+    let showAddStatusDialog = $state.raw(false);
+    const errorRef = createRef.maybePromise(() =>
+        mapMaybePromise(data.getStatusList)((a) => (a.failed ? a.error : null))
+    );
+    const statusListRef = createRef.maybePromise(() =>
+        mapMaybePromise(data.getStatusList)((a) => (a.ok ? a.data : null))
+    );
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({
-        create: workspacePermissionsRef.value?.has(permissions.createWorkspaceStatus) ?? false
+        create: workspacePermissionsRef.value?.has(permissions.createWorkspaceStatus) ?? false,
+        update: workspacePermissionsRef.value?.has(permissions.updateWorkspaceStatus) ?? false,
+        delete: workspacePermissionsRef.value?.has(permissions.deleteWorkspaceStatus) ?? false
+    });
+    const pagination = createPagination({
+        syncList: () => statusListRef.value ?? paginatedList(),
+        syncUrl: () => page.url
     });
 </script>
 
-{#if showAddStatusDialog}
-    <AddStatusDialog
-        workspaceId={data.workspace.id}
-        onClose={() => {
-            showAddStatusDialog = false;
-        }}
-    />
-{/if}
-<main class="grid h-full w-full grid-rows-[auto_1fr]">
-    <div class="border-b-base-border-2 border-b">
-        <div class="flex justify-between gap-4 pl-4">
-            <div class="relative grow">
-                <Input
-                    id="search"
-                    type="text"
-                    class="w-full rounded-none border-none bg-transparent pl-8 shadow-none"
-                    placeholder="Search by name"
-                />
-                <IconSearch
-                    class="text-base-fg-ghost absolute left-0 top-1/2 -translate-y-1/2 translate-x-1/2"
-                />
+<AddStatusDialog
+    {statusListRef}
+    workspaceId={data.workspace.id}
+    open={toStore(
+        () => showAddStatusDialog,
+        (a) => (showAddStatusDialog = a)
+    )}
+/>
+
+<Main>
+    <div
+        class="max-w-desktop relative mx-auto grid h-full grid-rows-[auto_minmax(24rem,1fr)_auto] gap-4"
+    >
+        <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+            <div>
+                <h1 class="capitalize">Workspace status</h1>
+                <p class="c-label">Manage issue statuses across your workspace.</p>
             </div>
             {#if can.create}
                 <Button
-                    variant="base"
-                    filled={false}
-                    class="border-l-base-border-2 flex w-fit min-w-max items-center gap-2 border-l pr-4"
-                    size="sm"
-                    flat
+                    variant="primary"
+                    class="flex w-full items-center gap-2 max-sm:justify-center sm:w-fit"
                     onclick={() => {
                         showAddStatusDialog = true;
                     }}
@@ -53,6 +63,21 @@
                 </Button>
             {/if}
         </div>
+        {#if errorRef.value}
+            <div class="row-span-3">
+                <p>Something went wrong while retrieving workspace statuses.</p>
+                <pre>{JSON.stringify(errorRef.value, null, 4)}</pre>
+            </div>
+        {:else}
+            <TableStatus {statusListRef} canDelete={can.delete} canUpdate={can.update} />
+            {#if statusListRef.value != null && statusListRef.value.items.length > 0}
+                <Pagination3 {pagination}>
+                    {#snippet label({ from, to, totalCount })}
+                        Showing <strong>{from}</strong> - <strong>{to}</strong> of
+                        <strong>{totalCount}</strong> workspace statuses.
+                    {/snippet}
+                </Pagination3>
+            {/if}
+        {/if}
     </div>
-    <TableStatus {data} />
-</main>
+</Main>

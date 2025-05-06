@@ -1,0 +1,10 @@
+.c-pagination {
+    --_bg: color-mix(in oklch, var(--color-base-1) 20%, transparent);
+    --_border: var(--color-base-border-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom-left-radius: var(--radius-xl);
+    border-bottom-right-radius: var(--radius-xl);
+    background-color: var(--_bg);
+}

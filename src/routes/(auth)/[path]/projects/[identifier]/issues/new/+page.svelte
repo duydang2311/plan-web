@@ -78,9 +78,9 @@
 </script>
 
 <main class="mx-auto max-h-full max-w-screen-lg overflow-auto p-8">
-    <div class="border-b-base-border-3 mb-8 border-b pb-1">
-        <h2>Create issue</h2>
-        <p>Fill in the form below to create a new issue.</p>
+    <div class="mb-8">
+        <h1 class="capitalize">Create issue</h1>
+        <p class="c-label">Turn your tasks into trackable issues and keep work flowing smoothly.</p>
     </div>
     <form
         method="post"

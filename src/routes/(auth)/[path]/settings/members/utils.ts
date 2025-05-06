@@ -23,7 +23,7 @@ export const workspaceMembersParams = ({ url, order }: { url: URL; order?: strin
             })
         ),
         order: order === undefined ? url.searchParams.get('order') : order,
-        select: 'CreatedTime,UpdatedTime,Id,UserId,User.Email,Role.Name'
+        select: 'CreatedTime,Id,UserId,User.Email,Role.Name,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
     }) as const;
 
 export const pendingMembersParams = ({
@@ -44,7 +44,7 @@ export const pendingMembersParams = ({
         ),
         workspaceId,
         order: order === undefined ? url.searchParams.get('order') : order,
-        select: 'CreatedTime,Id,User.Id,User.Email,User.Profile.DisplayName,User.Profile.Image'
+        select: 'CreatedTime,Id,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
     }) as const;
 
 export const validateDeleteMemberActionFailure = validator(

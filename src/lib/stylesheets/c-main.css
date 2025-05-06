@@ -1,5 +1,5 @@
 .c-main {
     overflow: auto;
     height: 100%;
-    padding: --spacing(4);
+    padding: --spacing(2) --spacing(4);
 }

@@ -1,11 +1,11 @@
 import { fail } from '@sveltejs/kit';
 import { Effect } from 'effect';
-import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+import { type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { PermissionService } from '~/lib/services/permission_service.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
+import { attempt } from '~/lib/utils/try';
 import type { Actions, PageServerLoad } from './$types';
 import {
     decodeAddStatus,
@@ -19,32 +19,25 @@ export type LocalWorkspaceStatus = Pick<
     'id' | 'rank' | 'value' | 'color' | 'isDefault' | 'description'
 >;
 
-export const load: PageServerLoad = async ({
-    parent,
-    depends,
-    isDataRequest,
-    locals: { runtime }
-}) => {
-    depends('fetch:workspace-statuses');
+export const load: PageServerLoad = async ({ parent, isDataRequest, locals: { runtime } }) => {
     const data = await parent();
-    const promise = Effect.gen(function* () {
+    const getStatusList = await Effect.gen(function* () {
         const api = yield* ApiClient;
         const response = yield* LoadResponse.HTTP(
             api.get(`workspaces/${data.workspace.id}/statuses`, {
                 query: { select: 'Id,Rank,Value,Color,IsDefault,Description', order: 'Rank' }
             })
         );
-        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>());
+        return attempt.ok(
+            yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>())
+        );
     }).pipe(
-        Effect.orElseSucceed(() => paginatedList<LocalWorkspaceStatus>()),
-        runtime.runPromise
+        Effect.catchAll((a) => Effect.succeed(attempt.fail(a))),
+        runtime.runPromise,
+        (a) => maybeStream(a)(isDataRequest)
     );
 
-    if (!isDataRequest) {
-        return { statusList: await promise };
-    }
-
-    return { statusList: promise };
+    return { getStatusList: getStatusList() };
 };
 
 export const actions: Actions = {
@@ -68,7 +61,7 @@ export const actions: Actions = {
             runtime.runPromise
         );
     },
-    'delete-status': ({ request, locals: { runtime } }) => {
+    delete_status: ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
             const validation = yield* ActionResponse.Validation(
@@ -77,10 +70,6 @@ export const actions: Actions = {
             yield* ActionResponse.HTTP(
                 (yield* ApiClient).delete(`workspace-statuses/${validation.data.statusId}`)
             );
-            return { deleteStatus: { success: true } };
-        }).pipe(
-            Effect.catchAll((a) => Effect.succeed(fail(a.status, { deleteStatus: a.data }))),
-            runtime.runPromise
-        );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };

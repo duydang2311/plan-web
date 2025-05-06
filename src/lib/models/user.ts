@@ -14,9 +14,20 @@ export interface UserProfile {
 }
 
 export interface UserPreset {
+    id: { id: string };
     basicProfile: {
         id: string;
         email: string;
+        profile?: {
+            name: string;
+            displayName: string;
+            image?: Partial<Asset>;
+        };
+    };
+    email: {
+        email: string;
+    };
+    profile: {
         profile?: {
             name: string;
             displayName: string;

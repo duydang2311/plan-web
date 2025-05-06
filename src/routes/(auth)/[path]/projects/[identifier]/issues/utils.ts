@@ -21,7 +21,7 @@ export const createBoardQueryParams = (url: URL) => {
                 size: 20
             })
         ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image',
         order: 'StatusRank,OrderNumber'
     };
 };

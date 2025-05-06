@@ -1,105 +1,93 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import { page } from '$app/state';
-    import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
+    import { Resize } from '@cloudinary/url-gen/actions';
     import { DateTime } from 'luxon';
-    import { toStore } from 'svelte/store';
-    import { Pagination, Row, Table, Th, THead } from '~/lib/components';
-    import ThSort2 from '~/lib/components/ThSort2.svelte';
+    import { Avatar, Pagination3, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { createSort, sortHelper } from '~/lib/utils/table.svelte';
+    import { paginatedList } from '~/lib/models/paginatedList';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import { createRef } from '~/lib/utils/runes.svelte';
+    import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
-    import type { LocalWorkspaceMember } from './+page.server';
     import DeleteMemberButton from './DeleteMemberButton.svelte';
-    import { workspaceMembersParams } from './utils';
 
-    const { data }: { data: PageData } = $props();
-    const { api } = useRuntime();
-    const sort = createSort({
-        fields: page.url.searchParams.get('order') ?? undefined,
-        onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
+    const { data, canDelete }: { data: PageData; canDelete: boolean } = $props();
+    const { cloudinary } = useRuntime();
+    const listRef = createRef.maybePromise(() => data.memberList);
+    const pagination = createPagination({
+        syncList: () => listRef.value ?? paginatedList(),
+        syncUrl: () => page.url
     });
-    const params = $derived(
-        workspaceMembersParams({
-            url: page.url,
-            order: sort.string
-        })
-    );
-    const queryKey = $derived([
-        'workspace-members',
-        { tag: 'active', workspaceId: data.workspace.id, params }
-    ]);
-    const query = createQuery(
-        toStore(() => ({
-            queryKey,
-            queryFn: async () => {
-                const response = await api.get(`workspaces/${data.workspace.id}/members`, {
-                    query: params
-                });
-                return await response.json<PaginatedList<LocalWorkspaceMember>>();
-            },
-            placeholderData: keepPreviousData
-        }))
-    );
 </script>
 
-<div class="grid grid-rows-[1fr_auto]">
-    <Table class="grid-cols-[1fr_1fr_auto_auto_auto]">
-        <THead>
-            <Row class="py-2 items-center">
-                <Th>Email address</Th>
-                <Th>Role</Th>
-                <ThSort2 field={sort.field('createdTime')}>Created time</ThSort2>
-                <ThSort2 field={sort.field('updatedTime')}>Updated time</ThSort2>
-                <Th>Actions</Th>
-            </Row>
-        </THead>
-        <tbody>
-            {#if !$query.data || $query.data.items.length === 0}
-                <Row>
-                    <td class="col-span-full">No members yet.</td>
+<div class="grid h-full grid-rows-[1fr_auto] gap-2">
+    <div class="c-table--wrapper custom-scrollbar relative overflow-auto">
+        <Table class="w-full grid-cols-[auto_1fr_1fr_auto_auto_auto]">
+            <THead>
+                <Row class="items-center py-2">
+                    <Th class="col-span-2 capitalize">User</Th>
+                    <Th class="capitalize">Role</Th>
+                    <ThSort3 name="createdTime" class="capitalize">Joined</ThSort3>
+                    {#if canDelete}
+                        <Th>Actions</Th>
+                    {/if}
                 </Row>
-            {:else}
-                {#each $query.data.items as { id, user, role, createdTime, updatedTime } (id)}
+            </THead>
+            <tbody>
+                {#if listRef.isInitialLoading}
                     <Row>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={user.email}
-                        >
-                            {user.email}
-                        </td>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={role.name}
-                        >
-                            {role.name}
-                        </td>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={DateTime.fromISO(createdTime).toRelative()}
-                        >
-                            {DateTime.fromISO(createdTime).toRelative()}
-                        </td>
-                        <td
-                            class="whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={DateTime.fromISO(updatedTime).toRelative()}
-                        >
-                            {DateTime.fromISO(updatedTime).toRelative()}
-                        </td>
-                        <td>
-                            <DeleteMemberButton {id} {queryKey} />
-                        </td>
+                        <td class="col-span-full">Loading...</td>
                     </Row>
-                {/each}
-            {/if}
-        </tbody>
-    </Table>
-    {#if $query.data}
-        <Pagination query={params} list={$query.data}>
+                {:else if listRef.value == null || listRef.value.items.length === 0}
+                    <Row>
+                        <td class="col-span-full">No members found.</td>
+                    </Row>
+                {:else}
+                    {#each listRef.value.items as { id, user, role, createdTime } (id)}
+                        <Row>
+                            <td class="ellipsis">
+                                <Avatar
+                                    seed={user.profile?.name ?? user.email}
+                                    src={imageFromAsset(cloudinary)(user.profile?.image)
+                                        ?.resize(Resize.fill(64))
+                                        .toURL()}
+                                    class="size-avatar-md"
+                                />
+                            </td>
+                            <td class="overflow-hidden" title={user.email}>
+                                <p class="ellipsis">Duy Dang</p>
+                                {#if user.profile}
+                                    <p class="ellipsis">
+                                        {user.profile.displayName}
+                                    </p>
+                                {/if}
+                                <p class="c-label ellipsis mt-0">
+                                    {user.email}
+                                </p>
+                            </td>
+                            <td class="ellipsis" title={role.name}>
+                                {role.name}
+                            </td>
+                            <td class="ellipsis" title={DateTime.fromISO(createdTime).toRelative()}>
+                                {DateTime.fromISO(createdTime).toRelative()}
+                            </td>
+                            {#if canDelete}
+                                <td class="flex items-center justify-end">
+                                    <DeleteMemberButton {id} />
+                                </td>
+                            {/if}
+                        </Row>
+                    {/each}
+                {/if}
+            </tbody>
+        </Table>
+    </div>
+    {#if listRef.value != null && listRef.value.items.length > 0}
+        <Pagination3 {pagination} class="mt-2">
             {#snippet label({ from, to, totalCount })}
-                Displaying {from} - {to} out of {totalCount} members.
+                Showing <strong>{from}</strong> - <strong>{to}</strong> of
+                <strong>{totalCount}</strong> members.
             {/snippet}
-        </Pagination>
+        </Pagination3>
     {/if}
 </div>

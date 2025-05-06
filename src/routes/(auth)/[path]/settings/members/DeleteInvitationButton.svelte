@@ -6,7 +6,7 @@
     import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
     import { validateDeleteMemberActionFailure } from './utils';
 
-    const { id }: { id: number } = $props();
+    const { id }: { id: string } = $props();
 
     let open = $state.raw(false);
     const builder = new Popover.Builder({
@@ -22,7 +22,7 @@
 <IconButton
     type="submit"
     variant="negative"
-    title="Remove member"
+    title="Delete invitation"
     class="w-fit"
     {...builder.trigger}
 >
@@ -31,11 +31,11 @@
 {#if builder.open}
     <Popover.Wrapper {...builder.content} class="max-w-paragraph-sm">
         <Popover.Content class="p-4">
-            <h2>Delete member?</h2>
-            <p class="mt-1">This will remove the member from the workspace and cannot be undone.</p>
+            <h2>Delete invitation?</h2>
+            <p class="mt-1">This will revoke the invitation for this user and cannot be undone.</p>
             <form
                 method="post"
-                action="?/delete-member"
+                action="?/delete_invitation"
                 class="mt-4 flex items-center justify-end gap-2"
                 use:enhance={() => {
                     return async ({ result, update }) => {
@@ -43,7 +43,7 @@
                             const validation = validateDeleteMemberActionFailure(result.data);
                             toast({
                                 type: 'negative',
-                                body: 'Something went wrong while deleting the member.',
+                                body: 'Something went wrong while deleting the invitation.',
                                 footer: stringifyActionFailureErrors(
                                     validation.ok ? validation.data.errors : validation.errors
                                 )
@@ -51,7 +51,7 @@
                         } else if (result.type === 'success') {
                             toast({
                                 type: 'positive',
-                                body: 'Member deleted successfully.'
+                                body: 'Invitation deleted successfully.'
                             });
                         }
                         await update();

@@ -23,6 +23,8 @@
 @import '~/lib/stylesheets/c-select.css' layer(components);
 @import '~/lib/stylesheets/c-main.css' layer(components);
 @import '~/lib/stylesheets/c-dialog.css' layer(components);
+@import '~/lib/stylesheets/c-pagination.css' layer(components);
+@import '~/lib/stylesheets/c-tab.css' layer(components);
 
 @theme {
     --font-display: InterVariable, var(--font-sans);
@@ -49,6 +51,7 @@
     --text-title: var(--text-h5);
     --container-paragraph-sm: var(--container-sm);
     --container-paragraph-lg: var(--container-2xl);
+    --container-desktop: var(--container-7xl);
     --size-avatar-lg: calc(var(--spacing) * 12);
     --size-avatar-md: calc(var(--spacing) * 10);
     --size-avatar-sm: calc(var(--spacing) * 6);
@@ -154,7 +157,15 @@
 
     .custom-scrollbar {
         --_border: var(--color-base-3);
+        --_track: transparent;
+        --_radius: 0px;
         --_bg: color-mix(in oklch, var(--color-base-fg-2) 30%, var(--color-base-1));
+        &::-webkit-scrollbar {
+            border-radius: var(--_radius);
+        }
+        &::-webkit-scrollbar-track {
+            background-color: var(--_track);
+        }
         &::-webkit-scrollbar-thumb {
             border: --spacing(0.5) solid var(--_border);
             background-color: var(--_bg);
@@ -185,6 +196,14 @@
             --tw-prose-pre-bg: var(--color-base-5);
         }
     }
+}
+
+@utility ellipsis {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+@utility min-h-screen-sm {
+    min-height: 40rem;
 }
 
 [data-sonner-toaster] {

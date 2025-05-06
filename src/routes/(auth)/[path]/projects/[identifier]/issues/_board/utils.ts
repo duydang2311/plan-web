@@ -43,7 +43,7 @@ export const createStatusListQuery = (depsFn: () => { workspaceId: string }) => 
                 queryKey: createStatusListQueryKey(depsFn),
                 queryFn: async () => {
                     const response = await api.get(`workspaces/${deps.workspaceId}/statuses`, {
-                        query: { select: 'Id,Value,Color' }
+                        query: { select: 'Id,Value,Color,Category' }
                     });
                     if (!response.ok) {
                         return null;

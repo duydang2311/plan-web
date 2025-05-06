@@ -28,13 +28,21 @@
     import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
     import { Row } from '~/lib/components';
     import { IconDraggable } from '~/lib/components/icons';
-    import { createEffect } from '~/lib/utils/runes.svelte';
+    import { watch } from '~/lib/utils/runes.svelte';
     import DropIndicator from '../../projects/[identifier]/issues/_board/DropIndicator.svelte';
     import type { LocalWorkspaceStatus } from './+page.server';
     import DeleteStatus from './DeleteStatus.svelte';
     import { toDraggleStatusData, validateDraggleStatusData } from './utils';
 
-    const { status, queryKey }: { status: LocalWorkspaceStatus; queryKey: unknown[] } = $props();
+    const {
+        status,
+        canUpdate,
+        canDelete
+    }: {
+        status: LocalWorkspaceStatus;
+        canUpdate: boolean;
+        canDelete: boolean;
+    } = $props();
 
     let edge = $state<Edge | null>(null);
     let preview = $state<{ container: HTMLElement; rect: DOMRect } | null>(null);
@@ -107,25 +115,28 @@
         );
     }
 
-    createEffect(
-        () => {
-            if (!ref) {
-                return;
-            }
-            return atlas(ref, status);
-        },
-        () => [ref, status]
-    );
+    watch(() => [ref, canUpdate])(() => {
+        if (!ref || !canUpdate) {
+            return;
+        }
+        return atlas(ref, status);
+    });
 </script>
 
 <Row bind:ref class="relative transition">
-    <td class="text-base-fg-ghost cursor-grab content-center pr-0">
-        <IconDraggable />
-        {#if edge != null && (edge === 'top' || edge === 'bottom')}
-            <DropIndicator {edge} gap={0} />
-        {/if}
-    </td>
-    <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={status.value}>
+    {#if canUpdate}
+        <td class="text-base-fg-ghost cursor-grab content-center pr-0">
+            <IconDraggable />
+            {#if edge != null && (edge === 'top' || edge === 'bottom')}
+                <DropIndicator {edge} gap={0} />
+            {/if}
+        </td>
+    {/if}
+    <td
+        class="overflow-hidden text-ellipsis whitespace-nowrap"
+        class:col-span-2={!canUpdate}
+        title={status.value}
+    >
         {status.value}
     </td>
     <td class="overflow-hidden text-ellipsis whitespace-nowrap" title={status.description}>
@@ -133,9 +144,11 @@
             {status.description}
         {/if}
     </td>
-    <td class="flex flex-wrap gap-2">
-        <DeleteStatus {queryKey} {status} />
-    </td>
+    {#if canDelete}
+        <td class="flex flex-wrap items-center justify-end gap-2">
+            <DeleteStatus {status} />
+        </td>
+    {/if}
 </Row>
 
 {#if preview}

@@ -105,149 +105,148 @@
     }}
 >
     {#snippet children({ overlay, content, title, close })}
-        <div
-            transition:fade={{ duration: 200 }}
-            use:melt={overlay}
-            class="fixed inset-0 bg-black/20"
-        ></div>
+        <div transition:fade={{ duration: 200 }} use:melt={overlay} class="c-dialog--overlay"></div>
         <div
             in:tsap={dialog.in()}
             out:tsap={dialog.out()}
             use:melt={content}
-            class="bg-base-1 max-w-paragraph-sm lg:max-w-paragraph-lg border-base-border-2 fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 space-y-4 rounded-md border p-8"
+            class="c-dialog--wrapper"
         >
-            <div>
-                <div class="flex items-center justify-between gap-4">
-                    <h2 use:melt={title}>Invite member</h2>
-                    <IconUserPlus class="text-base-fg-1 size-10" />
+            <div class="c-dialog space-y-4">
+                <div>
+                    <div class="flex items-center justify-between gap-4">
+                        <h2 use:melt={title}>Invite member</h2>
+                        <IconUserPlus class="text-base-fg-1 size-10" />
+                    </div>
+                    <p>Add a user to your workspace by their email address or name.</p>
                 </div>
-                <p>Add a user to your workspace by their email address or name.</p>
-            </div>
-            <form
-                method="post"
-                action="?/invite-member"
-                class="space-y-4"
-                use:enhance={({ cancel }) => {
-                    if (!$selected) {
-                        errors = { search: ['required'] };
-                        cancel();
-                        return;
-                    }
+                <form
+                    method="post"
+                    action="?/invite-member"
+                    class="space-y-4"
+                    use:enhance={({ cancel }) => {
+                        if (!$selected) {
+                            errors = { search: ['required'] };
+                            cancel();
+                            return;
+                        }
 
-                    return async (e) => {
-                        if (e.result.type === 'success') {
-                            $selected = undefined!;
-                            search = '';
-                            $open = false;
-                        }
-                        await e.update();
-                    };
-                }}
-            >
-                <input type="hidden" name="workspaceId" value={workspaceId} />
-                <Combobox
-                    options={{
-                        open: comboboxOpen,
-                        selected,
-                        forceVisible: true,
-                        onSelectedChange: ({ next }) => {
-                            if ($selected?.value.id === next?.value.id) {
+                        return async (e) => {
+                            if (e.result.type === 'success') {
                                 $selected = undefined!;
-                                return undefined;
+                                search = '';
+                                $open = false;
                             }
-                            return next;
-                        }
+                            await e.update();
+                        };
                     }}
                 >
-                    {#snippet children({ input, label, menu, option, helpers: { isSelected } })}
-                        <input type="hidden" name="userId" value={$selected?.value.id ?? ''} />
-                        <Field>
-                            <Label for="search" melt={label}>
-                                Search by username, or email address
-                            </Label>
-                            <div class="relative">
-                                <Input
-                                    type="text"
-                                    id="search"
-                                    placeholder="Find people"
-                                    class="pl-8"
-                                    autofocus
-                                    melt={input}
-                                    bind:value={search}
-                                    onblur={() => {
-                                        if ($selected) {
-                                            search = $selected.value!.email;
-                                        }
-                                    }}
-                                    aria-invalid={errors?.search == null ? undefined : true}
-                                />
-                                <IconSearch
-                                    class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2"
-                                />
-                            </div>
-                            <Errors errors={errors?.search} errorMap={errorMap.search} />
-                        </Field>
-                        {#if $comboboxOpen}
-                            <div
-                                use:melt={menu}
-                                in:tsap={select.in}
-                                out:tsap={select.out}
-                                class="c-select--menu"
-                            >
-                                <ol class="space-y-1">
-                                    {#if $query.data == null || $query.data.items.length === 0}
-                                        <li class="text-base-fg-ghost p-2">
-                                            No relevant users found.
-                                        </li>
-                                    {:else}
-                                        {#each $query.data.items as item (item.id)}
-                                            {@const opt = option({
-                                                value: item,
-                                                label: item.email
-                                            })}
-                                            <li class="c-select--option" use:melt={opt}>
-                                                {#if item.profile}
-                                                    <Avatar
-                                                        seed={item.profile.name}
-                                                        src={imageFromAsset(cloudinary)(
-                                                            item.profile.image
-                                                        )
-                                                            ?.resize(Resize.fill(64))
-                                                            .toURL()}
-                                                        class="size-8"
-                                                    />
-                                                {/if}
-                                                {#if isSelected(item)}
-                                                    <IconCheck class="c-select--check" />
-                                                {/if}
-                                                <span>
-                                                    {#if item.profile}
-                                                        {item.profile.displayName} ({item.email})
-                                                    {:else}
-                                                        {item.email}
-                                                    {/if}
-                                                </span>
-                                            </li>
-                                        {/each}
-                                    {/if}
-                                </ol>
-                            </div>
-                        {/if}
-                    {/snippet}
-                </Combobox>
-                <div class="ml-auto flex w-fit gap-4">
-                    <Button type="button" variant="base" class="w-fit" outline melt={close}
-                        >Cancel</Button
+                    <input type="hidden" name="workspaceId" value={workspaceId} />
+                    <Combobox
+                        options={{
+                            open: comboboxOpen,
+                            selected,
+                            forceVisible: true,
+                            onSelectedChange: ({ next }) => {
+                                if ($selected?.value.id === next?.value.id) {
+                                    $selected = undefined!;
+                                    return undefined;
+                                }
+                                return next;
+                            }
+                        }}
                     >
-                    <Button type="submit" variant="primary" outline class="w-fit">Invite</Button>
-                </div>
+                        {#snippet children({ input, label, menu, option, helpers: { isSelected } })}
+                            <input type="hidden" name="userId" value={$selected?.value.id ?? ''} />
+                            <Field>
+                                <Label for="search" melt={label}>
+                                    Search by username, or email address
+                                </Label>
+                                <div class="relative">
+                                    <Input
+                                        type="text"
+                                        id="search"
+                                        placeholder="Find people"
+                                        class="pl-8"
+                                        autofocus
+                                        melt={input}
+                                        bind:value={search}
+                                        onblur={() => {
+                                            if ($selected) {
+                                                search = $selected.value!.email;
+                                            }
+                                        }}
+                                        aria-invalid={errors?.search == null ? undefined : true}
+                                    />
+                                    <IconSearch
+                                        class="text-base-fg-ghost absolute left-2 top-1/2 -translate-y-1/2"
+                                    />
+                                </div>
+                                <Errors errors={errors?.search} errorMap={errorMap.search} />
+                            </Field>
+                            {#if $comboboxOpen}
+                                <div
+                                    use:melt={menu}
+                                    in:tsap={select.in}
+                                    out:tsap={select.out}
+                                    class="c-select--menu"
+                                >
+                                    <ol class="space-y-1">
+                                        {#if $query.data == null || $query.data.items.length === 0}
+                                            <li class="text-base-fg-ghost p-2">
+                                                No relevant users found.
+                                            </li>
+                                        {:else}
+                                            {#each $query.data.items as item (item.id)}
+                                                {@const opt = option({
+                                                    value: item,
+                                                    label: item.email
+                                                })}
+                                                <li class="c-select--option" use:melt={opt}>
+                                                    {#if item.profile}
+                                                        <Avatar
+                                                            seed={item.profile.name}
+                                                            src={imageFromAsset(cloudinary)(
+                                                                item.profile.image
+                                                            )
+                                                                ?.resize(Resize.fill(64))
+                                                                .toURL()}
+                                                            class="size-8"
+                                                        />
+                                                    {/if}
+                                                    {#if isSelected(item)}
+                                                        <IconCheck class="c-select--check" />
+                                                    {/if}
+                                                    <span>
+                                                        {#if item.profile}
+                                                            {item.profile.displayName} ({item.email})
+                                                        {:else}
+                                                            {item.email}
+                                                        {/if}
+                                                    </span>
+                                                </li>
+                                            {/each}
+                                        {/if}
+                                    </ol>
+                                </div>
+                            {/if}
+                        {/snippet}
+                    </Combobox>
+                    <div class="ml-auto flex w-fit gap-4">
+                        <Button type="button" variant="base" class="w-fit" outline melt={close}
+                            >Cancel</Button
+                        >
+                        <Button type="submit" variant="primary" outline class="w-fit">Invite</Button
+                        >
+                    </div>
 
-                {#if errors}
-                    {#each Object.entries(errors).filter(([k]) => k !== 'search') as [, v]}
-                        <Errors errors={v} />
-                    {/each}
-                {/if}
-            </form>
+                    {#if errors}
+                        {#each Object.entries(errors).filter(([k]) => k !== 'search') as [, v]}
+                            <Errors errors={v} />
+                        {/each}
+                    {/if}
+                </form>
+            </div>
         </div>
     {/snippet}
 </DialogBuilder>

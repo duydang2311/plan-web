@@ -1,12 +1,12 @@
 import { error, fail, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import { HttpError } from '~/lib/models/errors';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { Role } from '~/lib/models/role';
-import type { User, UserProfile } from '~/lib/models/user';
+import type { User, UserPreset } from '~/lib/models/user';
 import type { WorkspaceInvitation, WorkspaceMember } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
+import { validator } from '~/lib/utils/validation';
 import type { Actions, PageServerLoad, PageServerLoadEvent } from './$types';
 import {
     decodeInviteMember,
@@ -14,14 +14,15 @@ import {
     validateInviteMember,
     workspaceMembersParams
 } from './utils';
+import { Type } from '~/lib/utils/typebox';
 
 export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'updatedTime' | 'id'> & {
-    user: Pick<User, 'email'>;
+    user: UserPreset['basicProfile'];
     role: Pick<Role, 'name'>;
 };
 
 export type LocalWorkspaceInvitation = Pick<WorkspaceInvitation, 'createdTime' | 'id'> & {
-    user: Pick<User, 'id' | 'email'> & { profile?: Pick<UserProfile, 'displayName' | 'image'> };
+    user: UserPreset['basicProfile'] & Pick<User, 'id'>;
 };
 
 export const load: PageServerLoad = (e) => {
@@ -43,30 +44,15 @@ const loadActiveMembersView = async ({
         workspace: { id }
     } = await parent();
     const params = workspaceMembersParams({ url });
-    const exitPromise = runtime.runPromiseExit(
-        pipe(
-            Effect.gen(function* () {
-                const api = yield* ApiClient;
-                const response = yield* api.get(`workspaces/${id}/members`, {
-                    query: params
-                });
-                if (!response.ok) {
-                    return yield* Effect.fail(HttpError.from(response));
-                }
-
-                return yield* Effect.tryPromise(() =>
-                    response.json<PaginatedList<LocalWorkspaceMember>>()
-                );
-            }),
-            Effect.catchTags({
-                ApiError: (e) => Effect.fail({ status: 500, code: e.code, message: e.message }),
-                HttpError: (e) =>
-                    Effect.fail({ status: e.status, code: e.status + '', message: e.message }),
-                UnknownException: (e) =>
-                    Effect.fail({ status: 500, code: 'unknown', message: e.message })
+    const exitPromise = Effect.gen(function* () {
+        const api = yield* ApiClient;
+        const response = yield* LoadResponse.HTTP(
+            api.get(`workspaces/${id}/members`, {
+                query: params
             })
-        )
-    );
+        );
+        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceMember>>());
+    }).pipe(runtime.runPromiseExit);
 
     if (isDataRequest) {
         return {
@@ -116,7 +102,7 @@ const loadPendingMembersView = async ({
     if (isDataRequest) {
         return {
             invitationList: exitPromise.then((a) =>
-                Exit.isFailure(a) ? paginatedList<LocalWorkspaceMember>() : a.value
+                Exit.isFailure(a) ? paginatedList<LocalWorkspaceInvitation>() : a.value
             )
         };
     }
@@ -159,9 +145,28 @@ export const actions: Actions = {
             yield* ActionResponse.HTTP(
                 (yield* ApiClient).delete(`workspace-members/${formData.get('id')}`)
             );
-        }).pipe(
-            Effect.catchAll((a) => Effect.succeed(fail(a.status, { deleteMember: a.data }))),
-            runtime.runPromise
-        );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    delete_invitation: ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateDeleteInvitation(decodeDeleteInvitation(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).delete(`workspace-invitations/${validation.data.id}`)
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };
+
+const decodeDeleteInvitation = (formData: FormData) => ({
+    id: formData.get('id')
+});
+
+const validateDeleteInvitation = validator(
+    Type.Object({
+        id: Type.String()
+    }),
+    { stripLeadingSlash: true }
+);

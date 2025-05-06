@@ -1,42 +1,39 @@
 <script lang="ts">
     import { type PaginatedList } from '~/lib/models/paginatedList';
+    import type { AsyncRef } from '~/lib/utils/runes.svelte';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
     import BoardLayoutDefault from './BoardLayoutDefault.svelte';
     import BoardLayoutSkeleton from './BoardLayoutSkeleton.svelte';
-    import { Await } from '~/lib/components';
+    import { StatusCategory } from '~/lib/models/status';
 
     const {
-        statusList,
-        issueLists,
+        statusListRef,
+        issueListsRef,
         projectId,
         projectIdentifier
     }: {
-        statusList: MaybePromise<PaginatedList<LocalWorkspaceStatus>>;
-        issueLists: MaybePromise<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
+        statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus>>;
+        issueListsRef: AsyncRef<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
         projectId: string;
         projectIdentifier: string;
     } = $props();
 </script>
 
-<Await resolve={statusList}>
-    {#snippet children({ value, loading })}
-        {#if value == null}
-            {#if loading.immediate}
-                <BoardLayoutSkeleton />
-            {:else}
-                <p class="c-label">No status found.</p>
-            {/if}
-        {:else}
-            <BoardLayoutDefault
-                statusList={{
-                    items: [{ id: -1, value: 'No status', color: '' }, ...value.items],
-                    totalCount: value.totalCount + 1
-                }}
-                {issueLists}
-                {loading}
-                {projectId}
-                {projectIdentifier}
-            />
-        {/if}
-    {/snippet}
-</Await>
+{#if statusListRef.isInitialLoading}
+    <BoardLayoutSkeleton />
+{:else if statusListRef.value == null || statusListRef.value.items.length === 0}
+    <p class="c-label">No status found.</p>
+{:else}
+    <BoardLayoutDefault
+        statusList={{
+            items: [
+                { id: -1, value: 'No status', color: '', category: StatusCategory.Pending },
+                ...statusListRef.value.items
+            ],
+            totalCount: statusListRef.value.totalCount + 1
+        }}
+        {issueListsRef}
+        {projectId}
+        {projectIdentifier}
+    />
+{/if}

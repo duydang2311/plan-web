@@ -78,4 +78,15 @@
     --color-info-fg-3: oklch(88% 0.0054 255.17);
     --color-info-fg-4: oklch(83% 0.0054 255.17);
     --color-info-fg-5: oklch(78% 0.0054 255.17);
+
+    --color-status-pending: oklch(49.99% 0.082 250.46);
+
+    --color-status-ongoing: oklch(50.39% 0.16 255.19);
+    --color-status-ongoing-border: oklch(41.27% 0.1498 255.17);
+
+    --color-status-completed: oklch(48.51% 0.16 142.04);
+    --color-status-completed-border: oklch(38.42% 0.1461 142.04);
+
+    --color-status-canceled: oklch(52.44% 0.16 22.18);
+    --color-status-canceled-border: oklch(43.07% 0.1897 22.17);
 }

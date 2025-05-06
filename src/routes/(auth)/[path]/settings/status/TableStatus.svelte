@@ -1,28 +1,23 @@
 <script lang="ts">
-    import { invalidate } from '$app/navigation';
+    import { invalidateAll } from '$app/navigation';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-    import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+    import { createMutation } from '@tanstack/svelte-query';
     import { onMount } from 'svelte';
     import invariant from 'tiny-invariant';
     import { Row, Table, Th, THead } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { type PaginatedList } from '~/lib/models/paginatedList';
-    import type { PageData } from './$types';
-    import { type LocalWorkspaceStatus } from './+page.server';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { type AsyncRef } from '~/lib/utils/runes.svelte';
+    import type { LocalWorkspaceStatus } from './+page.server';
     import StatusRow from './StatusRow.svelte';
     import { validateDraggleStatusData } from './utils';
 
-    const { data }: { data: PageData } = $props();
-    const queryKey = ['workspace-statuses', { workspaceId: data.workspace.id }];
-    const query = createQuery({
-        queryKey,
-        queryFn: async () => {
-            await invalidate('fetch:workspace-statuses');
-            return data.statusList;
-        }
-    });
-    const queryClient = useQueryClient();
+    const {
+        statusListRef,
+        canDelete,
+        canUpdate
+    }: { statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus>>; canDelete: boolean; canUpdate: boolean } = $props();
     const { api } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ statusId, rank }: { statusId: number; rank: number }) => {
@@ -31,26 +26,24 @@
             });
         },
         onMutate: async ({ statusId, rank }) => {
-            await queryClient.cancelQueries({ queryKey });
-            const previousData =
-                queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(queryKey);
-            if (previousData) {
-                queryClient.setQueryData(queryKey, {
-                    ...previousData,
-                    items: previousData.items
+            const old = statusListRef.value;
+            if (old) {
+                statusListRef.value = paginatedList({
+                    items: old.items
                         .map((a) => (a.id === statusId ? { ...a, rank } : a))
-                        .toSorted((a, b) => a.rank - b.rank)
+                        .toSorted((a, b) => a.rank - b.rank),
+                    totalCount: old.totalCount
                 });
             }
-            return { previousData };
+            return { old };
         },
         onSettled: async (data, error, _variables, context) => {
             if (error || !data?.ok) {
                 if (context) {
-                    queryClient.setQueryData(queryKey, context.previousData);
+                    statusListRef.value = context.old;
                 }
             }
-            await queryClient.invalidateQueries({ queryKey });
+            await invalidateAll();
         }
     });
 
@@ -69,8 +62,7 @@
                 invariant(typeof target.data['id'] === 'number', 'target id must be number');
                 invariant(typeof target.data['rank'] === 'number', 'target rank must be number');
 
-                const previousData =
-                    queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(queryKey);
+                const previousData = statusListRef.value;
                 if (previousData) {
                     const idx = previousData.items.findIndex((a) => a.id === target.data['id']);
                     let idx2: number | null = edge === 'top' ? idx - 1 : idx + 1;
@@ -99,28 +91,32 @@
     });
 </script>
 
-<Table class="grid-cols-[auto_1fr_1fr_auto] h-full overflow-auto">
-    <THead>
-        <Row class="py-2">
-            <Th></Th>
-            <Th>Name</Th>
-            <Th>Description</Th>
-            <Th></Th>
-        </Row>
-    </THead>
-    <tbody>
-        {#if !$query.data}
-            <Row>
-                <td class="text-base-fg-ghost col-span-full">Loading data...</td>
+<div class="c-table--wrapper custom-scrollbar relative z-0 overflow-auto">
+    <Table class="grid-cols-[auto_1fr_1fr_auto]">
+        <THead class="z-10">
+            <Row class="py-2">
+                {#if canUpdate}
+                    <Th></Th>
+                {/if}
+                <Th class={!canUpdate ? 'col-span-2' : undefined}>Name</Th>
+                <Th>Description</Th>
+                <Th>Actions</Th>
             </Row>
-        {:else if $query.data.items.length === 0}
-            <Row>
-                <td class="text-base-fg-ghost col-span-full"> No data to be displayed. </td>
-            </Row>
-        {:else}
-            {#each $query.data.items as status (status.id)}
-                <StatusRow {status} {queryKey} />
-            {/each}
-        {/if}
-    </tbody>
-</Table>
+        </THead>
+        <tbody>
+            {#if statusListRef.isInitialLoading}
+                <Row>
+                    <td class="text-base-fg-ghost col-span-full">Loading...</td>
+                </Row>
+            {:else if statusListRef.value == null || statusListRef.value.items.length === 0}
+                <Row>
+                    <td class="text-base-fg-ghost col-span-full">No statuses found.</td>
+                </Row>
+            {:else}
+                {#each statusListRef.value.items as status (status.id)}
+                    <StatusRow {status} {canDelete} {canUpdate} />
+                {/each}
+            {/if}
+        </tbody>
+    </Table>
+</div>

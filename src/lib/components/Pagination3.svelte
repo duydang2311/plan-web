@@ -5,16 +5,17 @@
     import gsap from 'gsap';
     import Flip from 'gsap/dist/Flip';
     import { tick, untrack, type Snippet } from 'svelte';
+    import type { HTMLAttributes } from 'svelte/elements';
     import type { PaginationHandler } from '../utils/table.svelte';
     import { fluentSearchParams } from '../utils/url';
     import { IconChevronLeft, IconChevronRight } from './icons';
 
-    interface Props {
+    interface Props extends HTMLAttributes<HTMLDivElement> {
         pagination: PaginationHandler;
         label?: Snippet<[{ from: number; to: number; totalCount: number }]>;
     }
 
-    const { pagination, label }: Props = $props();
+    const { pagination, label, class: cls, ...props }: Props = $props();
     const offset = $derived((pagination.page - 1) * pagination.rowsPerPage);
     const totalPages = $derived(Math.ceil(pagination.totalCount / pagination.rowsPerPage));
     const pages = $derived.by(() => {
@@ -93,9 +94,7 @@
     </li>
 {/snippet}
 
-<div
-    class="bg-base-1/20 border-t-base-border-3 sticky inset-x-0 bottom-0 flex items-center justify-between rounded-b-xl border-t px-8 py-4 backdrop-blur"
->
+<div {...props} class={['c-pagination', cls]}>
     <span class="text-base-fg-4 text-sm font-medium">
         {#if pagination.totalCount === 0}
             No entries found.
@@ -120,10 +119,10 @@
             <a
                 href="{page.url.pathname}{getSearchParams(pagination.page - 1).toString()}"
                 class={clsx(
-                    'block h-full content-center rounded-full px-4 transition duration-100',
+                    'mr-2 block h-full content-center rounded-full transition duration-100',
                     pagination.page === 1
                         ? 'text-base-fg-3/40 pointer-events-none'
-                        : 'hover:bg-base-hover'
+                        : 'hover:text-base-fg-1'
                 )}
                 data-sveltekit-replacestate
             >
@@ -137,10 +136,10 @@
             <a
                 href="{page.url.pathname}{getSearchParams(pagination.page + 1).toString()}"
                 class={clsx(
-                    'block h-full content-center rounded-full px-4 transition duration-100',
-                    pagination.page === totalPages
+                    'ml-2 block h-full content-center rounded-full transition duration-100',
+                    pagination.page >= totalPages
                         ? 'text-base-fg-3/40 pointer-events-none'
-                        : 'hover:bg-base-hover'
+                        : 'hover:text-base-fg-1'
                 )}
                 data-sveltekit-replacestate
             >

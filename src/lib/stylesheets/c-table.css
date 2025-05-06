@@ -1,7 +1,16 @@
+.c-table--wrapper {
+    border: 1px solid var(--color-base-border-3);
+    border-radius: var(--radius-lg);
+}
+
 .c-table {
-    --_bg: transparent;
+    --_bg: var(--color-base-1);
     --_hover: var(--color-base-3);
     --_border: var(--color-base-border-3);
+
+    @variant dark {
+        --_bg: var(--color-base-2);
+    }
 }
 
 .c-table {

@@ -1,101 +1,94 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import { page } from '$app/state';
-    import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
+    import { Resize } from '@cloudinary/url-gen/actions';
     import { DateTime } from 'luxon';
-    import { toStore } from 'svelte/store';
-    import { IconButton, Pagination, Row, Table, Th, THead } from '~/lib/components';
-    import { IconTrash } from '~/lib/components/icons';
-    import ThSort2 from '~/lib/components/ThSort2.svelte';
+    import { Avatar, Pagination3, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { createSort, sortHelper } from '~/lib/utils/table.svelte';
+    import { paginatedList } from '~/lib/models/paginatedList';
+    import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import { createRef } from '~/lib/utils/runes.svelte';
+    import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
-    import type { LocalWorkspaceInvitation } from './+page.server';
-    import { pendingMembersParams } from './utils';
+    import DeleteInvitationButton from './DeleteInvitationButton.svelte';
 
-    const { data }: { data: PageData } = $props();
-    const { api } = useRuntime();
-    const sort = createSort({
-        fields: page.url.searchParams.get('order') ?? undefined,
-        onDirectionChange: browser ? sortHelper.replaceState(page.url) : undefined
+    const { data, canDelete }: { data: PageData; canDelete: boolean } = $props();
+    const listRef = createRef.maybePromise(() => data.invitationList);
+    const { cloudinary } = useRuntime();
+    const pagination = createPagination({
+        syncList: () => listRef.value ?? paginatedList(),
+        syncUrl: () => page.url
     });
-    const params = $derived(
-        pendingMembersParams({
-            url: page.url,
-            workspaceId: data.workspace.id,
-            order: sort.string
-        })
-    );
-    const query = createQuery(
-        toStore(() => ({
-            queryKey: ['workspace-invitations', { tag: 'pending', params }],
-            queryFn: async () => {
-                const response = await api.get(`workspace-invitations`, {
-                    query: params
-                });
-                return await response.json<PaginatedList<LocalWorkspaceInvitation>>();
-            },
-            placeholderData: keepPreviousData
-        }))
-    );
 </script>
 
-<div class="grid grid-rows-[1fr_auto]">
-    <Table class="grid-cols-[1fr_auto_auto]">
-        <THead>
-            <Row class="items-center py-2">
-                <Th>User</Th>
-                <ThSort2 field={sort.field('createdTime')}>Created time</ThSort2>
-                <Th>Actions</Th>
-            </Row>
-        </THead>
-        <tbody>
-            {#if !$query.data}
-                <Row>
-                    <td class="text-base-fg-ghost col-span-full">Loading...</td>
+<div class="grid h-full grid-rows-[1fr_auto]">
+    <div class="c-table--wrapper custom-scrollbar relative overflow-auto">
+        <Table class="grid-cols-[auto_1fr_auto_auto]">
+            <THead>
+                <Row class="items-center py-2">
+                    <Th class="col-span-2">User</Th>
+                    <ThSort3 name="createdTime">Sent</ThSort3>
+                    {#if canDelete}
+                        <Th>Actions</Th>
+                    {/if}
                 </Row>
-            {:else if $query.data.items.length === 0}
-                <Row>
-                    <td class="text-base-fg-ghost col-span-full">No invitations available.</td>
-                </Row>
-            {:else}
-                {#each $query.data.items as { id, user, createdTime } (id)}
+            </THead>
+            <tbody>
+                {#if listRef.isInitialLoading}
                     <Row>
-                        <td
-                            class="overflow-hidden text-ellipsis whitespace-nowrap"
-                            title={user.email}
-                        >
-                            {user.email}
-                        </td>
-                        <td
-                            class="overflow-hidden text-ellipsis whitespace-nowrap"
-                            title={DateTime.fromISO(createdTime).toRelative()}
-                        >
-                            {DateTime.fromISO(createdTime).toRelative()}
-                        </td>
-                        <td>
-                            <div class="flex flex-wrap gap-2">
-                                <IconButton
-                                    type="button"
-                                    variant="negative"
-                                    title="Remove member"
-                                    class="w-fit"
-                                >
-                                    <IconTrash />
-                                </IconButton>
-                            </div>
-                        </td>
+                        <td class="text-base-fg-ghost col-span-full">Loading...</td>
                     </Row>
-                {/each}
-            {/if}
-        </tbody>
-    </Table>
-    {#if $query.data}
-        <Pagination query={params} list={$query.data}>
+                {:else if listRef.value == null || listRef.value.items.length === 0}
+                    <Row>
+                        <td class="text-base-fg-ghost col-span-full">No invitations found.</td>
+                    </Row>
+                {:else}
+                    {#each listRef.value.items as { id, user, createdTime } (id)}
+                        <Row>
+                            <td class="overflow-hidden text-ellipsis whitespace-nowrap">
+                                <Avatar
+                                    seed={user.profile?.name ?? user.email}
+                                    src={imageFromAsset(cloudinary)(user.profile?.image)
+                                        ?.resize(Resize.fill(64))
+                                        .toURL()}
+                                    class="size-avatar-md"
+                                />
+                            </td>
+                            <td
+                                class="overflow-hidden text-ellipsis whitespace-nowrap"
+                                title={user.email}
+                            >
+                                {#if user.profile}
+                                    <p>
+                                        {user.profile.displayName}
+                                    </p>
+                                {/if}
+                                <p class="c-label">
+                                    {user.email}
+                                </p>
+                            </td>
+                            <td
+                                class="overflow-hidden text-ellipsis whitespace-nowrap"
+                                title={DateTime.fromISO(createdTime).toRelative()}
+                            >
+                                {DateTime.fromISO(createdTime).toRelative()}
+                            </td>
+                            {#if canDelete}
+                                <td class="flex items-center justify-end">
+                                    <DeleteInvitationButton {id} />
+                                </td>
+                            {/if}
+                        </Row>
+                    {/each}
+                {/if}
+            </tbody>
+        </Table>
+    </div>
+    {#if listRef.value != null && listRef.value.items.length > 0}
+        <Pagination3 {pagination} class="mt-2">
             {#snippet label({ from, to, totalCount })}
-                Displaying {from} - {to} out of {totalCount} invitations.
+                Showing <strong>{from}</strong> - <strong>{to}</strong> of
+                <strong>{totalCount}</strong> invitations.
             {/snippet}
-        </Pagination>
+        </Pagination3>
     {/if}
 </div>

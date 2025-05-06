@@ -3,19 +3,31 @@
     import { page } from '$app/state';
     import { isRecord } from '@baetheus/fun/refinement';
     import { melt } from '@melt-ui/svelte';
-    import { useQueryClient } from '@tanstack/svelte-query';
     import { fade } from 'svelte/transition';
     import invariant from 'tiny-invariant';
-    import { Button, DialogBuilder, Errors, Field, Input, Label } from '~/lib/components';
+    import { Button, DialogBuilder, Errors, Field, Input, Label, toast } from '~/lib/components';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
+    import {
+        stringifyActionFailureErrors,
+        validateActionFailureData
+    } from '~/lib/utils/kit.client';
+    import type { Ref } from '~/lib/utils/runes.svelte';
     import { dialog, tsap } from '~/lib/utils/transition';
     import type { LocalWorkspaceStatus } from './+page.server';
     import { validateAddStatus } from './utils';
+    import { IconPlus } from '~/lib/components/icons';
+    import type { Writable } from 'svelte/store';
 
-    const { workspaceId, onClose }: { workspaceId: string; onClose: () => void } = $props();
-    const queryKey = ['workspace-statuses', { workspaceId: workspaceId }];
-    const queryClient = useQueryClient();
+    const {
+        statusListRef,
+        workspaceId,
+        open
+    }: {
+        statusListRef: Ref<PaginatedList<LocalWorkspaceStatus>>;
+        workspaceId: string;
+        open: Writable<boolean>;
+    } = $props();
     const form = createForm({
         validator: formValidator(validateAddStatus)
     });
@@ -37,32 +49,25 @@
 
 <DialogBuilder
     options={{
-        defaultOpen: true,
-        onOpenChange: ({ next }) => {
-            if (next === false) {
-                onClose();
-            }
-            return next;
-        }
+        open
     }}
 >
     {#snippet children({ overlay, content, title, description, close })}
+        <div transition:fade={{ duration: 150 }} use:melt={overlay} class="c-dialog--overlay"></div>
         <div
-            transition:fade|global={{ duration: 150 }}
-            use:melt={overlay}
-            class="fixed inset-0 bg-black/20"
-        ></div>
-        <div class="fixed inset-8 z-50">
-            <div
-                in:tsap|global={dialog.in()}
-                out:tsap|global={dialog.out()}
-                use:melt={content}
-                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-base-1 p-8 rounded-md w-full max-w-paragraph-lg space-y-4 border border-base-border-2 outline-none"
-            >
+            class="c-dialog--wrapper"
+            in:tsap={dialog.in()}
+            out:tsap={dialog.out()}
+            use:melt={content}
+        >
+            <div class="c-dialog space-y-4">
                 <div>
-                    <h2 use:melt={title} class="font-medium">Add a new status</h2>
+                    <div class="flex items-center justify-between gap-4">
+                        <h2 use:melt={title} class="capitalize">Create status</h2>
+                        <IconPlus class="text-base-fg-1 size-8" />
+                    </div>
                     <p use:melt={description} class="text-pretty">
-                        Fill in the form below to create a new status for your entire workspace.
+                        Fill in the form below to create a new status in your workspace.
                     </p>
                 </div>
                 <form
@@ -78,36 +83,46 @@
                         }
 
                         status = 'submit';
-                        await queryClient.cancelQueries({ queryKey });
-                        const old =
-                            queryClient.getQueryData<PaginatedList<LocalWorkspaceStatus>>(queryKey);
+                        const old = statusListRef.value;
                         if (old) {
-                            queryClient.setQueryData(
-                                queryKey,
-                                paginatedList<LocalWorkspaceStatus>({
-                                    items: [
-                                        ...old.items,
-                                        {
-                                            id: Number.MAX_SAFE_INTEGER,
-                                            rank: Number.MAX_SAFE_INTEGER,
-                                            value: fields.value.state.value,
-                                            description: fields.description.state.value,
-                                            color: '',
-                                            isDefault: false
-                                        }
-                                    ],
-                                    totalCount: old.totalCount + 1
-                                })
-                            );
+                            statusListRef.value = paginatedList<LocalWorkspaceStatus>({
+                                items: [
+                                    ...old.items,
+                                    {
+                                        id: Number.MAX_SAFE_INTEGER,
+                                        rank: Number.MAX_SAFE_INTEGER,
+                                        value: fields.value.state.value,
+                                        description: fields.description.state.value,
+                                        color: '',
+                                        isDefault: false
+                                    }
+                                ],
+                                totalCount: old.totalCount + 1
+                            });
                         }
-                        return async ({ result, formElement }) => {
+                        return async ({ result, update }) => {
                             status = null;
-                            if (result.type !== 'success') {
-                                queryClient.setQueryData(queryKey, old);
+                            switch (result.type) {
+                                case 'failure':
+                                    statusListRef.value = old;
+                                    const validation = validateActionFailureData(result.data);
+                                    toast({
+                                        type: 'negative',
+                                        body: 'Something went wrong while creating the status.',
+                                        footer: stringifyActionFailureErrors(
+                                            validation.ok
+                                                ? validation.data.errors
+                                                : validation.errors
+                                        )
+                                    });
+                                    break;
+                                case 'success':
+                                    toast({
+                                        type: 'positive',
+                                        body: 'Status created successfully.'
+                                    });
                             }
-
-                            formElement.reset();
-                            await queryClient.invalidateQueries({ queryKey });
+                            await update();
                         };
                     }}
                 >
@@ -141,7 +156,7 @@
                         />
                         <Errors errors={fields.description.state.errors} />
                     </Field>
-                    <div class="flex justify-end gap-4 !mt-8">
+                    <div class="!mt-8 flex justify-end gap-4">
                         <Button variant="base" outline class="w-fit" melt={close}>Cancel</Button>
                         <Button outline class="w-fit" disabled={status === 'submit'}>Create</Button>
                     </div>

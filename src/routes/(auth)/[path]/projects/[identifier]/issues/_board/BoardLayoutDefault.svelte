@@ -12,7 +12,7 @@
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
     import { compareRank, getRank } from '~/lib/utils/ranking';
-    import { createRef, type Loading } from '~/lib/utils/runes.svelte';
+    import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
     import Board from './Board.svelte';
     import BoardSkeleton from './BoardSkeleton.svelte';
@@ -20,18 +20,15 @@
 
     const {
         statusList,
-        issueLists,
-        loading,
+        issueListsRef,
         projectId,
         projectIdentifier
     }: {
         statusList: PaginatedList<LocalWorkspaceStatus>;
-        issueLists: MaybePromise<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
-        loading: Loading;
+        issueListsRef: AsyncRef<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
         projectId: string;
         projectIdentifier: string;
     } = $props();
-    const issueListsRef = createRef.maybePromise(() => issueLists);
     const { api } = useRuntime();
     let preview = $state.raw<{
         container: HTMLElement;
@@ -144,7 +141,7 @@
                             statusId: a === -1 ? null : a,
                             nullStatusId: a === -1,
                             size,
-                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank',
+                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image',
                             order: 'StatusRank,OrderNumber'
                         }
                     });
@@ -278,31 +275,31 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-<div class="overflow-x-auto overflow-y-hidden">
-<ol
-    class="grid grid-flow-col h-max"
-    class:animate-pulse={loading.immediate}
->
-    {#each statusList.items as status (status.id)}
-        {@const list = issueListsRef.value?.[status.id]}
-        {#if status.id !== -1 || (list != null && list.totalCount > 0)}
-            <li class="h-full min-h-128 group">
-                <ol class="flex h-full w-fit py-4 pr-4 group-first:pl-4">
-                    {#if list == null}
-                        <BoardSkeleton />
-                    {:else}
-                        <Board
-                            issueList={list}
-                            identifier={projectIdentifier}
-                            {projectId}
-                            {status}
-                        />
-                    {/if}
-                </ol>
-            </li>
-        {/if}
-    {/each}
-</ol>
+<div class="flex h-full overflow-x-auto px-4 overflow-y-hidden pb-1">
+    <ol
+        class="grid auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
+        class:animate-pulse={issueListsRef.loading.immediate}
+    >
+        {#each statusList.items as status (status.id)}
+            {@const list = issueListsRef.value?.[status.id]}
+            {#if status.id !== -1 || (list != null && list.totalCount > 0)}
+                <li class="min-h-0">
+                    <ol class="flex h-full">
+                        {#if list == null}
+                            <BoardSkeleton />
+                        {:else}
+                            <Board
+                                issueList={list}
+                                identifier={projectIdentifier}
+                                {projectId}
+                                {status}
+                            />
+                        {/if}
+                    </ol>
+                </li>
+            {/if}
+        {/each}
+    </ol>
 </div>
 {#if preview}
     <div

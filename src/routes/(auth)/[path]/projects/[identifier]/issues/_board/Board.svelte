@@ -1,6 +1,20 @@
 <script lang="ts" module>
-    const dragStatusClasses = {
-        dragover: 'bg-base-4 border-primary-border/20'
+    import { StatusCategory } from '~/lib/models/status';
+    const categoryClasses = {
+        [StatusCategory.Pending]:
+            'bg-status-pending/10 border-status-pending/10 data-[dragover]:bg-status-pending/20',
+        [StatusCategory.Ongoing]:
+            'bg-status-ongoing/10 border-status-ongoing/10 data-[dragover]:bg-status-ongoing/20',
+        [StatusCategory.Completed]:
+            'bg-status-completed/10 border-status-completed/10 data-[dragover]:bg-status-completed/20',
+        [StatusCategory.Canceled]:
+            'bg-status-canceled/10 border-status-canceled/10 data-[dragover]:bg-status-canceled/20'
+    };
+    const categoryTextClasses = {
+        [StatusCategory.Pending]: 'text-status-pending',
+        [StatusCategory.Ongoing]: 'text-status-ongoing',
+        [StatusCategory.Completed]: 'text-status-completed',
+        [StatusCategory.Canceled]: 'text-status-canceled'
     };
 </script>
 
@@ -13,7 +27,7 @@
     } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import clsx from 'clsx';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import type { Status } from '~/lib/models/status';
+    import type { Status, WorkspaceStatus } from '~/lib/models/status';
     import { tsap } from '~/lib/utils/transition';
     import type { LocalBoardIssue } from '../+page.server';
     import BoardIssue from './BoardIssue.svelte';
@@ -27,7 +41,7 @@
         issueList: PaginatedList<LocalBoardIssue>;
         identifier: string;
         projectId: string;
-        status: Pick<Status, 'id' | 'value' | 'color'>;
+        status: Pick<WorkspaceStatus, 'id' | 'value' | 'category'>;
     } = $props();
     let dragStatus = $state<'dragover' | null>(null);
     let draggingIssueId = $state.raw<string | null>(null);
@@ -79,20 +93,24 @@
 </script>
 
 <li
+    data-dragover={dragStatus != null ? true : undefined}
     class={clsx(
-        'bg-base-2 flex w-80 flex-col rounded-lg py-4 transition duration-75',
-        dragStatus != null && dragStatusClasses[dragStatus]
+        'flex w-full flex-col gap-2 rounded-lg border bg-red-500 py-4 transition',
+        categoryClasses[status.category]
     )}
     use:atlas={{ id: status.id }}
 >
     <h2
-        class="text-p text-base-fg-2 px-4 font-medium tracking-tight"
+        class={[
+            'text-p text-base-fg-2 px-4 font-medium tracking-tight',
+            categoryTextClasses[status.category]
+        ]}
         class:opacity-40={status.id === -1}
     >
         {status.value}
     </h2>
-    <div class="scrollbar-3 grow overflow-y-auto overflow-x-hidden pt-2">
-        <ol class="h-full px-2">
+    <div class="flex-1 overflow-hidden">
+        <ol class="custom-scrollbar h-full overflow-auto px-2">
             {#each issueList.items.filter((a) => a.id !== draggingIssueId) as issue (issue.id)}
                 <li
                     in:tsap={(node, gsap) =>
