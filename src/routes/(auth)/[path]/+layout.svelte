@@ -68,7 +68,7 @@
             </div>
         </div>
         <div class="flex grow flex-col gap-4">
-            <ul class="group text-sm font-medium">
+            <ul class="group font-medium">
                 <Navigation
                     items={[
                         {
@@ -123,7 +123,7 @@
             <DynamicNavigation />
         </div>
         <div>
-            <ul class="group mb-2 text-sm font-medium">
+            <ul class="group mb-2 font-medium">
                 <Navigation
                     items={[
                         {
@@ -149,7 +149,7 @@
                     seed={data.user.profile?.name ?? data.user.email}
                     class="size-10"
                 />
-                <div class="grid grid-rows-2 text-start">
+                <div class="flex flex-col text-start overflow-hidden">
                     <span class="text-base-fg-1 overflow-hidden text-ellipsis whitespace-nowrap">
                         {data.user.profile?.displayName ?? data.user.email}
                     </span>

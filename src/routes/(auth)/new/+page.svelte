@@ -54,6 +54,7 @@
                 <Input
                     type="text"
                     name="name"
+                    id="name"
                     bind:value={name}
                     oninput={({ currentTarget }) => {
                         if (path.dirty || !(currentTarget instanceof HTMLInputElement)) return;
@@ -68,6 +69,7 @@
                     <Input
                         type="text"
                         name="path"
+                        id="path"
                         style="padding-inline-start: calc({spanWidth}px + 7px);"
                         bind:value={path.value}
                         oninput={({ currentTarget }) => {

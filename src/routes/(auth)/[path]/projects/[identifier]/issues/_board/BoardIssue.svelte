@@ -106,10 +106,8 @@
 <div class="py-1" use:atlas={issue}>
     <div
         class={clsx(
-            'relative w-full cursor-grab rounded-md shadow-xs p-4 transition duration-75',
-            dragStatus != null
-                ? dragStatusClasses[dragStatus]
-                : 'bg-base-1 dark:bg-base-2'
+            'shadow-xs relative w-full cursor-grab rounded-md p-4 transition duration-75',
+            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 dark:bg-base-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
@@ -121,18 +119,20 @@
             </p>
             <IconDraggable class="ml-auto h-4" />
         </div>
-        <p class="leading-none font-semibold">
+        <p class="font-semibold leading-none">
             <Link
                 href="/{page.params.path}/projects/{page.params
                     .identifier}/issues/{issue.orderNumber}"
-                    class="text-base-fg-1"
+                class="text-base-fg-1"
             >
                 {issue.title}
             </Link>
         </p>
-        <p class="c-label mt-4 text-pretty">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-        </p>
+        {#if issue.previewDescription != null && issue.previewDescription.length > 0}
+            <p class="c-label mt-4 line-clamp-3 text-pretty">
+                {issue.previewDescription}
+            </p>
+        {/if}
         <div class="mt-4 flex items-center justify-between gap-4 text-sm">
             <div
                 class="bg-negative-1 text-negative-fg-1 border-negative-border rounded-full border px-2"
@@ -152,7 +152,6 @@
                 class="size-avatar-md"
             />
             <div>
-                <p class="c-label">Duy Dang</p>
                 {#if issue.author.profile}
                     <p>{issue.author.profile.displayName}</p>
                 {/if}

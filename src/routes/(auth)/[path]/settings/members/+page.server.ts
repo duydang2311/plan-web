@@ -18,7 +18,7 @@ import { Type } from '~/lib/utils/typebox';
 
 export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'updatedTime' | 'id'> & {
     user: UserPreset['basicProfile'];
-    role: Pick<Role, 'name'>;
+    role: Pick<Role, 'id' | 'name'>;
 };
 
 export type LocalWorkspaceInvitation = Pick<WorkspaceInvitation, 'createdTime' | 'id'> & {

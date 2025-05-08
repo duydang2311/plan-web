@@ -29,8 +29,10 @@ export const permissions = {
     deleteWorkspaceStatus: 'workspace-status:delete',
     updateWorkspaceStatus: 'workspace-status:update',
 
+    createWorkspaceMember: 'workspace-member:create',
     readWorkspaceMember: 'workspace-member:read',
     deleteWorkspaceMember: 'workspace-member:delete',
+    updateWorkspaceMember: 'workspace-member:update',
 
     readIssueAudit: 'issue-audit:read',
     deleteIssueAudit: 'issue-audit:delete',
@@ -58,5 +60,15 @@ export const permissions = {
     createWorkspaceInvitation: 'workspace-invitation:create',
     readWorkspaceInvitation: 'workspace-invitation:read',
     updateWorkspaceInvitation: 'workspace-invitation:update',
-    deleteWorkspaceInvitation: 'workspace-invitation:delete'
+    deleteWorkspaceInvitation: 'workspace-invitation:delete',
+
+    createIssueAssignee: 'issue-assignee:create',
+    readIssueAssignee: 'issue-assignee:read',
+    updateIssueAssignee: 'issue-assignee:update',
+    deleteIssueAssignee: 'issue-assignee:delete',
+
+    createTeamIssue: 'team-issue:create',
+    readTeamIssue: 'team-issue:read',
+    updateTeamIssue: 'team-issue:update',
+    deleteTeamIssue: 'team-issue:delete',
 } as const;

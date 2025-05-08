@@ -16,7 +16,8 @@ export function toDraggableIssueData(issue: LocalBoardIssue) {
         statusId: issue.statusId ?? -1,
         statusRank: issue.statusRank,
         title: issue.title,
-        orderNumber: issue.orderNumber
+        orderNumber: issue.orderNumber,
+        previewDescription: issue.previewDescription
     };
 }
 

@@ -49,12 +49,12 @@
 
 <Main>
     <div
-        class="max-w-desktop relative mx-auto grid max-h-full grid-rows-[auto_auto_minmax(24rem,1fr)] gap-4"
+        class="max-w-desktop relative mx-auto grid h-full grid-rows-[auto_auto_minmax(24rem,1fr)] gap-4"
     >
         <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
             <div>
                 <h1 class="capitalize">Workspace members</h1>
-                <p class="c-label">Invite people and manage teammates easily.</p>
+                <p class="c-text-secondary">Invite people and manage teammates easily.</p>
             </div>
             {#if can.invite}
                 <Button
@@ -70,7 +70,7 @@
                 </Button>
             {/if}
         </div>
-        <Tabs {...tabsBuilder.triggerList} class="text-sm max-sm:-mt-2 sm:w-fit">
+        <Tabs {...tabsBuilder.triggerList} class="max-sm:-mt-2 sm:w-fit">
             <a
                 {...tabsBuilder.getTrigger('active')}
                 data-sveltekit-replacestate

@@ -13,11 +13,12 @@
     interface Props {
         workspaceId: string;
         issueId: string;
+        canAssign: boolean;
     }
 
     type LocalSelectTeam = Pick<Team, 'id' | 'name' | 'identifier'>;
 
-    const { workspaceId, issueId }: Props = $props();
+    const { workspaceId, issueId, canAssign }: Props = $props();
     const { api, queryClient } = useRuntime();
     const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-team' }]);
     const selectedQuery = createQuery(
@@ -133,6 +134,7 @@
             </span>
         {/if}
     </div>
+    {#if canAssign}
     <Input
         type="text"
         size="sm"
@@ -142,6 +144,7 @@
             builder.input.onfocus(e);
         }}
     />
+    {/if}
     {#if builder.open}
         <SelectTeamOptions {workspaceId} {builder} />
     {/if}

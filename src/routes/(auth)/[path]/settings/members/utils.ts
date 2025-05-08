@@ -23,7 +23,7 @@ export const workspaceMembersParams = ({ url, order }: { url: URL; order?: strin
             })
         ),
         order: order === undefined ? url.searchParams.get('order') : order,
-        select: 'CreatedTime,Id,UserId,User.Email,Role.Name,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
+        select: 'CreatedTime,Id,UserId,User.Email,Role.Id,Role.Name,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
     }) as const;
 
 export const pendingMembersParams = ({

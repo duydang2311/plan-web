@@ -126,60 +126,47 @@
         dirtyScroll = false;
     });
 
-    hub.on(
-        'new_chat_message',
-        async (data: { ChatMessageId: number; OptimisticId?: string }) => {
-            invariant(
-                typeof data.ChatMessageId === 'number',
-                'data.ChatMessageId must be a number'
-            );
+    hub.on('new_chat_message', async (data: { ChatMessageId: number; OptimisticId?: string }) => {
+        invariant(typeof data.ChatMessageId === 'number', 'data.ChatMessageId must be a number');
 
-            const queryData =
-                queryClient.getQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey);
-            const all = queryData?.pages.flatMap((a) => a.items) ?? [];
+        const queryData =
+            queryClient.getQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey);
+        const all = queryData?.pages.flatMap((a) => a.items) ?? [];
 
-            if (all.some((a) => a.id === data.ChatMessageId)) {
-                return;
-            }
-
-            if (data.OptimisticId) {
-                const index = all.findIndex((b) => b.optimisticId === data.OptimisticId);
-                if (index !== -1) {
-                    all[index] = {
-                        ...all[index],
-                        id: data.ChatMessageId,
-                        optimisticId: undefined
-                    };
-                    queryClient.setQueryData(
-                        queryKey,
-                        infinitizeChatMessageData(all, queryData?.pages[0]?.totalCount ?? 0)
-                    );
-                    return;
-                }
-            }
-
-            const getChatMessageAttempt = await getChatMessage(api)(data.ChatMessageId);
-            if (!getChatMessageAttempt.ok) {
-                return;
-            }
-
-            queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(
-                queryKey,
-                (a) => {
-                    if (!a) {
-                        return a;
-                    }
-
-                    return infinitizeChatMessageData(
-                        [getChatMessageAttempt.data, ...a.pages.flatMap((a) => a.items)].toSorted(
-                            sortChatMessages
-                        ),
-                        (a.pages[0]?.totalCount ?? 0) + 1
-                    );
-                }
-            );
+        if (all.some((a) => a.id === data.ChatMessageId)) {
+            return;
         }
-    );
+
+        if (data.OptimisticId) {
+            const index = all.findIndex((b) => b.optimisticId === data.OptimisticId);
+            if (index !== -1) {
+                all[index] = {
+                    ...all[index],
+                    id: data.ChatMessageId,
+                    optimisticId: undefined
+                };
+                queryClient.setQueryData(
+                    queryKey,
+                    infinitizeChatMessageData(all, queryData?.pages[0]?.totalCount ?? 0)
+                );
+                return;
+            }
+        }
+
+        const getChatMessageAttempt = await getChatMessage(api)(data.ChatMessageId);
+        if (!getChatMessageAttempt.ok) {
+            return;
+        }
+
+        queryClient.setQueryData<InfiniteData<PaginatedList<LocalChatMessage>>>(queryKey, (a) =>
+            infinitizeChatMessageData(
+                [getChatMessageAttempt.data, ...(a?.pages.flatMap((a) => a.items) ?? [])].toSorted(
+                    sortChatMessages
+                ),
+                (a?.pages[0]?.totalCount ?? 0) + 1
+            )
+        );
+    });
 </script>
 
 {#snippet messageSnippet(message: LocalChatMessage)}
@@ -258,7 +245,7 @@
 {/snippet}
 
 <div class="transition-enforcement h-full w-full">
-    <div class="grid grid-rows-[1fr_auto] gap-1 overflow-hidden bg-base-2">
+    <div class="bg-base-2 grid grid-rows-[1fr_auto] gap-1 overflow-hidden">
         {#if $query.isPending}
             <div>
                 {@render skeleton()}

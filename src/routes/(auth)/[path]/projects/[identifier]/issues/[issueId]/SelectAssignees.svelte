@@ -15,13 +15,14 @@
     interface Props {
         workspaceId: string;
         issueId: string;
+        canAssign: boolean;
     }
 
     type LocalUser = Pick<User, 'id' | 'email'> & {
         profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;
     };
 
-    const { workspaceId, issueId }: Props = $props();
+    const { workspaceId, issueId, canAssign }: Props = $props();
     const { api, queryClient, cloudinary } = useRuntime();
     const selectedQueryKey = $derived(['issues', { issueId, tag: 'select-assignees' }]);
     const selectedQuery = createQuery(
@@ -101,11 +102,11 @@
     const builder = new Combobox({
         multiple: true,
         forceVisible: true,
+        sameWidth: false,
         floatingConfig: {
             computePosition: {
-                placement: 'bottom'
+                placement: 'bottom',
             },
-            sameWidth: true
         },
         value: () => Array.from(value.values()),
         onValueChange: (next) => {
@@ -161,19 +162,21 @@
             </span>
         {/if}
     </div>
-    <Input
-        type="text"
-        size="sm"
-        class="mb-2"
-        {...builder.input}
-        oninput={(e) => {
-            updateSearch(e.currentTarget.value);
-            builder.input.oninput(e);
-        }}
-        onfocus={() => {
-            builder.open = true;
-        }}
-    />
+    {#if canAssign}
+        <Input
+            type="text"
+            size="sm"
+            class="mb-2"
+            {...builder.input}
+            oninput={(e) => {
+                updateSearch(e.currentTarget.value);
+                builder.input.oninput(e);
+            }}
+            onfocus={() => {
+                builder.open = true;
+            }}
+        />
+    {/if}
     {#if builder.open}
         <SelectAssigneesOptions {workspaceId} {builder} {search} />
     {/if}

@@ -3,8 +3,15 @@ import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import type { LayoutServerLoad } from './$types';
+import { maybeStream } from '~/lib/utils/promise';
+import { PermissionService } from '~/lib/services/permission_service.server';
 
-export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime } }) => {
+export const load: LayoutServerLoad = async ({
+    parent,
+    params,
+    locals: { runtime },
+    isDataRequest
+}) => {
     const data = await parent();
     const exit = await runtime.runPromiseExit(
         pipe(
@@ -30,7 +37,20 @@ export const load: LayoutServerLoad = async ({ parent, params, locals: { runtime
         return error(status, body);
     }
 
+    const getProjectPermissions = await Effect.gen(function* () {
+        const list = yield* (yield* PermissionService).getProjectPermissions(
+            exit.value.id,
+            data.user.id
+        );
+        return new Set(list.items);
+    }).pipe(
+        Effect.orElseSucceed(() => new Set<string>()),
+        runtime.runPromise,
+        (a) => maybeStream(a)(isDataRequest)
+    );
+
     return {
-        project: exit.value
+        project: exit.value,
+        getProjectPermissions: getProjectPermissions()
     };
 };

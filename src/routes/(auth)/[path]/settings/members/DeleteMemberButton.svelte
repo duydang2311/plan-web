@@ -30,7 +30,7 @@
 </IconButton>
 {#if builder.open}
     <Popover.Wrapper {...builder.content} class="max-w-paragraph-sm">
-        <Popover.Content class="p-4">
+        <Popover class="p-4">
             <h2>Delete member?</h2>
             <p class="mt-1">This will remove the member from the workspace and cannot be undone.</p>
             <form
@@ -70,6 +70,6 @@
                 </Button>
                 <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
             </form>
-        </Popover.Content>
+        </Popover>
     </Popover.Wrapper>
 {/if}

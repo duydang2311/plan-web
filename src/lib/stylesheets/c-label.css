@@ -2,6 +2,9 @@
     display: block;
     color: var(--color-base-fg-4);
     font-weight: 500;
-    font-size: var(--text-sm);
     max-width: max-content;
+}
+
+.c-text-secondary {
+    color: var(--color-base-fg-4);
 }

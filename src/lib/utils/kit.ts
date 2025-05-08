@@ -1,8 +1,13 @@
 import { invalidate } from '$app/navigation';
 import { fail, json, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
-import type { ApiError } from '../models/errors';
-import { flattenProblemDetails, validateProblemDetailsEffect } from './problem_details';
+import { errorCodes, type ApiError } from '../models/errors';
+import {
+    flattenProblemDetails,
+    validateProblemDetails,
+    validateProblemDetailsEffect
+} from './problem_details';
+import { attempt, type Attempt } from './try';
 import { type ValidateOk, type ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
@@ -201,4 +206,50 @@ export const EndpointResponse = {
             catch: () => json({ errors: { root: ['json'] } }, { status: 400 })
         }),
     Die: () => json({ errors: { root: ['die'] } }, { status: 500 })
+} as const;
+
+const actionErrors = {
+    fromHttp: (a: unknown) => actionError(500, { root: [errorCodes.fromFetch(a)] }),
+    fromJson: (a: unknown) => actionError(500, { root: [errorCodes.fromJson(a)] })
+} as const;
+
+interface ActionError<TStatus extends number = number> {
+    status: TStatus;
+    errors?: Record<string, string[]>;
+}
+
+const actionError = <TStatus extends number>(
+    status: TStatus,
+    errors?: Record<string, string[]>
+): ActionError<TStatus> => ({
+    status,
+    errors
+});
+
+export const ActionAttempt = {
+    HTTP: async (f: () => Promise<Response>): Promise<Attempt<Response, ActionError>> => {
+        const tryFetch = await attempt.promise(() => f())(actionErrors.fromHttp);
+        if (tryFetch.failed) {
+            return tryFetch;
+        }
+        if (!tryFetch.data.ok) {
+            const json = await ActionAttempt.JSON(() => tryFetch.data.json());
+            const problemDetails = validateProblemDetails(json);
+            return attempt.fail(
+                actionError(
+                    tryFetch.data.status,
+                    problemDetails.ok ? flattenProblemDetails(problemDetails.data) : undefined
+                )
+            );
+        }
+        return tryFetch;
+    },
+    JSON: async <T>(f: () => Promise<T>) => attempt.promise(() => f())(actionErrors.fromJson),
+    Response: <A, E extends ActionError>(attempt: Attempt<A, E>) => {
+        if (attempt.ok) {
+            return attempt.data;
+        }
+        const { status, ...data } = attempt.error;
+        return fail(status, data);
+    }
 } as const;

@@ -1,15 +1,17 @@
+export interface Success<TData> {
+    ok: true;
+    failed?: never;
+    data: TData;
+}
+
+export interface Failure<TError> {
+    ok?: never;
+    failed: true;
+    error: TError;
+}
+
 export type Try<TData, TError> = Attempt<TData, TError>;
-export type Attempt<TData, TError> =
-    | {
-          ok: true;
-          failed: false;
-          data: TData;
-      }
-    | {
-          ok: false;
-          failed: true;
-          error: TError;
-      };
+export type Attempt<TData, TError> = Success<TData> | Failure<TError>;
 
 export const tryDo = <TData>(fn: () => TData) => {
     return <TError>(mapException?: (e: unknown) => TError): Attempt<TData, TError> => {
@@ -37,11 +39,9 @@ export const attempt = Object.assign(tryDo, {
     promise: tryPromise,
     ok: <T>(data: T): Try<T, never> => ({
         ok: true,
-        failed: false,
         data
     }),
     fail: <T>(error: T): Try<never, T> => ({
-        ok: false,
         failed: true,
         error
     })

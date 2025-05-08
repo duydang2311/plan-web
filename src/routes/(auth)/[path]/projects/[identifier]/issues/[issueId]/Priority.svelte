@@ -17,9 +17,10 @@
 
     interface Props {
         issueId: string;
+        canUpdate: boolean;
     }
 
-    const { issueId }: Props = $props();
+    const { issueId, canUpdate }: Props = $props();
     const queryClient = useQueryClient();
     const items = pipe(
         IssuePriorities,
@@ -88,7 +89,7 @@
     });
 </script>
 
-<Button type="button" variant="base" size="sm" class="flex items-center gap-2" {...builder.trigger}>
+<Button type="button" variant="base" size="sm" class="flex items-center gap-2" disabled={!canUpdate} {...builder.trigger}>
     <IconPriority />
     <span>
         {getPriorityLabel($selected.value)}

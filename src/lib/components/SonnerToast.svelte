@@ -58,7 +58,7 @@
 
 {#snippet bodySnippet()}
     {#if body}
-        <div class="text-sm">
+        <div>
             {#if typeof body === 'function'}
                 {@render body(bodyProps)}
             {:else}
@@ -72,11 +72,11 @@
 
 {#snippet footerSnippet()}
     {#if footer}
-        <div class="text-sm">
+        <div class="c-text-secondary text-sm">
             {#if typeof footer === 'function'}
                 {@render footer(footerProps)}
             {:else}
-                <span class="c-label">
+                <span>
                     {footer}
                 </span>
             {/if}

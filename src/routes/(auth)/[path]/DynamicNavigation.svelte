@@ -18,12 +18,12 @@
             gsap.to(node, { opacity: 0, y: '0.5rem', duration: 0.2, ease: 'power2.in' })}
     >
         <h2
-            class="text-sm text-base-fg-5 text-ellipsis whitespace-nowrap overflow-hidden"
+            class="text-sm text-base-fg-4 ellipsis font-medium"
             title={navigation.label}
         >
             {navigation.label}
         </h2>
-        <ul class="mt-1 font-medium group text-sm">
+        <ul class="mt-1 font-medium group">
             {#each navigation.entries as { label, href, icon, activeIcon } (href)}
                 <li>
                     <NavigationItem {href} {icon} {activeIcon} {label} />

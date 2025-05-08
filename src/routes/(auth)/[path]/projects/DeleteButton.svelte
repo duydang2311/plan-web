@@ -1,16 +1,9 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { invalidate } from '$app/navigation';
-    import { writable } from 'svelte/store';
-    import {
-        Button,
-        IconButton,
-        Popover,
-        PopoverArrow,
-        PopoverBuilder,
-        toast
-    } from '~/lib/components';
+    import { Button, IconButton, toast } from '~/lib/components';
     import { IconTrash } from '~/lib/components/icons';
+    import Popover from '~/lib/components/popover';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type Project } from '~/lib/models/project';
     import { validateActionFailureData } from '~/lib/utils/kit.client';
@@ -24,7 +17,15 @@
         ref: Ref<PaginatedList<LocalProject> | undefined>;
         project: Pick<Project, 'id' | 'name'>;
     } = $props();
-    const open = writable(false);
+    const builder = new Popover.Builder({
+        forceVisible: true,
+        floatingConfig: {
+            flip: {
+                mainAxis: true,
+                crossAxis: true
+            }
+        }
+    });
 </script>
 
 {#snippet success()}
@@ -44,87 +45,77 @@
     You need sufficient privileges to perform this action.
 {/snippet}
 
-<PopoverBuilder
-    options={{
-        open,
-        forceVisible: true,
-        positioning: {
-            placement: 'bottom',
-            fitViewport: true
-        }
-    }}
+<IconButton
+    type="button"
+    variant="negative"
+    title="Remove member"
+    class="w-fit"
+    {...builder.trigger}
 >
-    {#snippet children({ trigger, content, arrow, close })}
-        <IconButton
-            type="button"
-            variant="negative"
-            title="Remove member"
-            class="w-fit"
-            melt={trigger}
-        >
-            <IconTrash />
-        </IconButton>
-        {#if $open}
-            <Popover melt={content} class="w-96 text-pretty">
-                <PopoverArrow melt={arrow} />
-                <h2 class="mb-2">Delete project?</h2>
-                <p>Would you like to delete the project? This action cannot be undone.</p>
-                <form
-                    method="post"
-                    action="?/delete_project"
-                    class="mt-4 flex flex-wrap justify-end gap-2"
-                    use:enhance={async () => {
-                        const old = ref.value;
-                        if (old) {
-                            ref.value = paginatedList({
-                                items: old.items.filter((a) => a.id !== project.id),
-                                totalCount: old.totalCount - 1
+    <IconTrash />
+</IconButton>
+{#if builder.open}
+    <Popover.Wrapper {...builder.content}>
+        <Popover class="w-96 text-pretty p-4">
+            <h2 class="mb-2">Delete project?</h2>
+            <p class="text-pretty">Would you like to delete the project? This action cannot be undone.</p>
+            <form
+                method="post"
+                action="?/delete_project"
+                class="mt-4 flex flex-wrap justify-end gap-2"
+                use:enhance={async () => {
+                    const old = ref.value;
+                    if (old) {
+                        ref.value = paginatedList({
+                            items: old.items.filter((a) => a.id !== project.id),
+                            totalCount: old.totalCount - 1
+                        });
+                    }
+                    return async ({ result }) => {
+                        if (result.type === 'success') {
+                            toast({
+                                type: 'positive',
+                                body: success
                             });
-                        }
-                        return async ({ result }) => {
-                            if (result.type === 'success') {
+                        } else if (result.type === 'failure') {
+                            const validation = validateActionFailureData(
+                                result.data?.deleteProject
+                            );
+                            if (!validation.ok) {
                                 toast({
-                                    type: 'positive',
-                                    body: success
+                                    type: 'negative',
+                                    body: genericFailure,
+                                    bodyProps: 'unknown'
                                 });
-                            } else if (result.type === 'failure') {
-                                const validation = validateActionFailureData(
-                                    result.data?.deleteProject
-                                );
-                                if (!validation.ok) {
-                                    toast({
-                                        type: 'negative',
-                                        body: genericFailure,
-                                        bodyProps: 'unknown'
-                                    });
-                                    return;
-                                }
-
-                                if (validation.data.errors.root.includes('403')) {
-                                    toast({
-                                        type: 'negative',
-                                        body: forbiddenFailure
-                                    });
-                                } else {
-                                    toast({
-                                        type: 'negative',
-                                        body: genericFailure,
-                                        bodyProps: validation.data.errors.root[0] ?? 'unknown'
-                                    });
-                                }
-                                ref.value = old;
+                                return;
                             }
-                            await invalidate('fetch:projects');
-                        };
-                    }}
-                >
-                    <input type="hidden" name="projectId" value={project.id} />
-                    <Button type="button" variant="base" outline melt={close} class="w-fit">
-                        Cancel
-                    </Button>
-                    <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
-                </form>
-            </Popover>
-        {/if}
-    {/snippet}
-</PopoverBuilder>
+
+                            if (validation.data.errors.root.includes('403')) {
+                                toast({
+                                    type: 'negative',
+                                    body: forbiddenFailure
+                                });
+                            } else {
+                                toast({
+                                    type: 'negative',
+                                    body: genericFailure,
+                                    bodyProps: validation.data.errors.root[0] ?? 'unknown'
+                                });
+                            }
+                            ref.value = old;
+                        }
+                        await invalidate('fetch:projects');
+                    };
+                }}
+            >
+                <input type="hidden" name="projectId" value={project.id} />
+                <Button type="button" variant="base" outline class="w-fit" onclick={() => {
+                    builder.open = false;
+                }}>
+                    Cancel
+                </Button>
+                <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
+            </form>
+        </Popover>
+    </Popover.Wrapper>
+{/if}

@@ -19,6 +19,8 @@ declare global {
         | ({ [key in keyof A]: A[key] } & { [key in keyof B]?: never })
         | ({ [key in keyof A]?: never } & { [key in keyof B]: B[key] });
 
+    type SvelteIconComponent = typeof import('~icons/*').default;
+
     interface RouteMeta {
         title: string;
         href: string;
@@ -27,13 +29,11 @@ declare global {
             entries: {
                 label: string;
                 href: string;
-                icon: typeof SvelteComponent;
-                activeIcon: typeof SvelteComponent;
+                icon: SvelteIconComponent;
+                activeIcon: SvelteIconComponent;
             }[];
         };
     }
-
-    type SvelteIconComponent = typeof import('~icons/*').default;
 
     namespace App {
         interface Error {

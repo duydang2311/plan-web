@@ -75,7 +75,12 @@
                                 </div>
                             </td>
                             <td id="issue-{row.orderNumber}">
-                                {row.title}
+                                <p>
+                                    {row.title}
+                                </p>
+                                <p class="c-label line-clamp-1">
+                                    {row.previewDescription}
+                                </p>
                             </td>
                             <td>
                                 {#if row.status?.value}

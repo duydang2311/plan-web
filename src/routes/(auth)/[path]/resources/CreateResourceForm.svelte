@@ -222,29 +222,27 @@
         }
 
         const old = resourceListRef.value;
-        if (old) {
-            resourceListRef.value = paginatedList({
-                items: [
-                    {
+        resourceListRef.value = paginatedList({
+            items: [
+                {
+                    optimisticId: Date.now(),
+                    resource: {
                         optimisticId: Date.now(),
-                        resource: {
-                            optimisticId: Date.now(),
-                            name: fields.name.state.value,
-                            createdTime: DateTime.now().toISO(),
-                            document: previewContent ? { previewContent } : undefined,
-                            previewFileCount: uploadResults?.length ?? 0,
-                            previewFileMimeTypes: uploadResults?.map((a) => a.file.type) ?? [],
-                            rank: '',
-                            creator: user
-                        }
-                    },
-                    ...old.items
-                ],
-                totalCount: old.totalCount + 1
-            });
-        }
+                        name: fields.name.state.value,
+                        createdTime: DateTime.now().toISO(),
+                        document: previewContent ? { previewContent } : undefined,
+                        previewFileCount: uploadResults?.length ?? 0,
+                        previewFileMimeTypes: uploadResults?.map((a) => a.file.type) ?? [],
+                        rank: '',
+                        creator: user
+                    }
+                },
+                ...(old?.items ?? [])
+            ],
+            totalCount: (old?.totalCount ?? 0) + 1
+        });
         loading.set();
-        return ({ result }) => {
+        return async ({ result, update }) => {
             loading.unset();
             if (result.type === 'success') {
                 toast({
@@ -266,7 +264,9 @@
                     type: 'negative',
                     body: `An error occurred while trying to create the resource (code: ${stringifyActionFailureErrors(validation.data.errors)}).`
                 });
+                resourceListRef.value = old;
             }
+            await update();
         };
     }}
 >

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { invalidateAll } from '$app/navigation';
     import { Resize } from '@cloudinary/url-gen/actions';
     import { debounce } from '@mobily/ts-belt/Function';
     import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
@@ -98,6 +99,7 @@
             } else if (result.type === 'success') {
                 toast({ type: 'positive', body: 'Chat created successfully.' });
             }
+            await invalidateAll();
             await queryClient.invalidateQueries({ queryKey: ['chats'] });
         };
     }}
@@ -106,7 +108,7 @@
         <input type="hidden" name="memberIds[]" value={user.id} />
     {/each}
     <div class="flex items-center justify-between">
-        <h2>Create chat</h2>
+        <h2 class="capitalize">Create chat</h2>
         <div class="relative">
             <IconChat class="text-base-fg-1 size-8" />
         </div>

@@ -44,7 +44,7 @@
 </IconButton>
 {#if builder.open}
     <Popover.Wrapper {...builder.content}>
-        <Popover.Content class="w-96 text-pretty p-4">
+        <Popover class="w-96 text-pretty p-4">
             <h2 class="mb-1">Delete the status?</h2>
             <p>
                 The status <strong>{status.value}</strong> will be deleted from your workspace.
@@ -90,6 +90,6 @@
                 </Button>
                 <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
             </form>
-        </Popover.Content>
+        </Popover>
     </Popover.Wrapper>
 {/if}

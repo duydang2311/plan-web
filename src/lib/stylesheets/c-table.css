@@ -5,11 +5,12 @@
 
 .c-table {
     --_bg: var(--color-base-1);
-    --_hover: var(--color-base-3);
+    --_hover: color-mix(in oklch, var(--color-base-1) 50%, var(--color-base-2));
     --_border: var(--color-base-border-3);
 
     @variant dark {
         --_bg: var(--color-base-2);
+        --_hover: var(--color-base-3);
     }
 }
 
@@ -55,7 +56,6 @@
 
     :where(& > .c-table--th) {
         font-weight: 500;
-        font-size: var(--text-sm);
     }
 }
 

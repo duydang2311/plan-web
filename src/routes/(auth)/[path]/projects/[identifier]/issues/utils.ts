@@ -21,7 +21,7 @@ export const createBoardQueryParams = (url: URL) => {
                 size: 20
             })
         ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image',
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription',
         order: 'StatusRank,OrderNumber'
     };
 };
@@ -39,7 +39,7 @@ export const createQueryKey =
                     offset: 0,
                     limit: 10,
                     order: 'OrderNumber',
-                    select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+                    select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority,PreviewDescription'
                 }
             }
         ] as const;
@@ -55,6 +55,6 @@ export const createIssueListQueryParams = ({
         page: rest.page ?? Number(url?.searchParams.get('page') ?? '1'),
         size: rest.size ?? Number(url?.searchParams.get('size') ?? '20'),
         order: rest.order ?? url?.searchParams.get('order') ?? 'OrderNumber',
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority'
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority,PreviewDescription'
     };
 };

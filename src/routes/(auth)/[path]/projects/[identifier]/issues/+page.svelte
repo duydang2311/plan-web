@@ -7,6 +7,7 @@
     import type { PageData } from './$types';
     import TableLayout from './TableLayout.svelte';
     import BoardLayout from './_board/BoardLayout.svelte';
+    import { permissions } from '~/lib/models/permission';
 
     const { data }: { data: PageData } = $props();
     const createIssueHref = $derived(page.url.pathname + '/new');
@@ -22,18 +23,22 @@
     const tabsBuilder = new Tabs.Builder({
         value: page.url.searchParams.get('view') === 'board' ? 'board' : 'table'
     });
+    const getProjectPermissionsRef = createRef.maybePromise(() => data.getProjectPermissions);
+    const can = $derived({
+        create: getProjectPermissionsRef.value?.has(permissions.createIssue) ?? false
+    });
 </script>
 
 <Main>
     <div class="min-h-screen-sm grid h-full grid-rows-[auto_auto_1fr] gap-4">
         <div>
             <h1>Issues</h1>
-            <p class="c-label text-pretty">
+            <p class="c-text-secondary text-pretty">
                 Create, track, and resolve tasks—keep your project aligned, focused and fast-moving.
             </p>
         </div>
         <div class="flex justify-between gap-x-2 gap-y-2">
-            <Tabs {...tabsBuilder.triggerList} class="text-sm *:px-4 sm:w-fit">
+            <Tabs {...tabsBuilder.triggerList} class="*:px-4 sm:w-fit">
                 <a
                     {...tabsBuilder.getTrigger('table')}
                     href="{page.url.pathname}{fluentSearchParams(page.url).delete('view')}"
@@ -53,15 +58,17 @@
                     Board
                 </a>
             </Tabs>
-            <Button
-                as="link"
-                href={createIssueHref}
-                variant="primary"
-                class="flex w-fit items-center gap-2 capitalize max-sm:justify-center"
-            >
-                <IconPlus />
-                Create issue
-            </Button>
+            {#if can.create}
+                <Button
+                    as="link"
+                    href={createIssueHref}
+                    variant="primary"
+                    class="flex w-fit items-center gap-2 capitalize max-sm:justify-center"
+                >
+                    <IconPlus />
+                    Create issue
+                </Button>
+            {/if}
         </div>
         <div class="-mx-4 overflow-hidden">
             <div {...tabsBuilder.getContent('table')} class="h-full px-4">

@@ -28,6 +28,10 @@
         .c-select--option[aria-selected='true'] {
         background-color: var(--color-base-5);
     }
+
+    &:where(:focus) {
+        outline: none;
+    }
 }
 
 .c-select--option {
@@ -41,8 +45,8 @@
     align-items: center;
     gap: --spacing(2);
     transition:
-        color 50ms var(--cubic-out),
-        background-color 50ms var(--cubic-out);
+        color var(--default-transition-duration) var(--default-timing-function),
+        background-color var(--default-transition-duration) var(--default-timing-function);
 
     &:where([data-melt-select-option]),
     &:where([data-melt-combobox-option]) {
@@ -60,9 +64,70 @@
 }
 
 .c-select--check {
+    width: --spacing(5);
+    height: --spacing(5);
     position: absolute;
     right: 0;
     top: 50%;
     transform: translate3d(-50%, -50%, 0);
     color: var(--text-base-fg-1);
+}
+
+.c-next-select {
+    --_bg: var(--color-base-1);
+    --_border: var(--color-base-border-2);
+
+    @variant dark {
+        --_bg: var(--color-base-3);
+        --_border: var(--color-base-border-3);
+        --_border-top: var(--color-base-border-1);
+    }
+
+    padding: --spacing(1);
+    background-color: var(--_bg);
+    border-radius: var(--radius-md);
+    min-width: --spacing(40);
+    cursor: default;
+    @apply shadow-sm;
+
+    border: 1px solid var(--_border);
+    @variant dark {
+        border-top-color: var(--_border-top);
+    }
+
+    &[data-melt-select-multiple] .c-select--option[aria-selected='true'] {
+        background-color: var(--color-base-5);
+    }
+
+    &:where(:focus) {
+        outline: none;
+    }
+}
+
+.c-next-select--option {
+    position: relative;
+    padding-inline: --spacing(2) --spacing(10);
+    padding-block: --spacing(1);
+    color: var(--color-base-fg-3);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: --spacing(2);
+    transition:
+        color var(--default-transition-duration) var(--default-timing-function),
+        background-color var(--default-transition-duration) var(--default-timing-function);
+
+    &:where([data-melt-select-option]),
+    &:where([data-melt-combobox-option]) {
+        &[data-highlighted] {
+            color: var(--color-base-fg-1);
+            background-color: var(--color-base-4);
+        }
+
+        &[aria-selected='true'] {
+            color: var(--color-base-fg-1);
+            font-weight: 500;
+        }
+    }
 }

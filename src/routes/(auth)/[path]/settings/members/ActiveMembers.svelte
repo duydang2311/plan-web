@@ -10,6 +10,8 @@
     import { createPagination } from '~/lib/utils/table.svelte';
     import type { PageData } from './$types';
     import DeleteMemberButton from './DeleteMemberButton.svelte';
+    import MemberRole from './MemberRole.svelte';
+    import { permissions } from '~/lib/models/permission';
 
     const { data, canDelete }: { data: PageData; canDelete: boolean } = $props();
     const { cloudinary } = useRuntime();
@@ -17,6 +19,10 @@
     const pagination = createPagination({
         syncList: () => listRef.value ?? paginatedList(),
         syncUrl: () => page.url
+    });
+    const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
+    const can = $derived({
+        update: workspacePermissionsRef.value?.has(permissions.updateWorkspaceMember) ?? false
     });
 </script>
 
@@ -55,7 +61,6 @@
                                 />
                             </td>
                             <td class="overflow-hidden" title={user.email}>
-                                <p class="ellipsis">Duy Dang</p>
                                 {#if user.profile}
                                     <p class="ellipsis">
                                         {user.profile.displayName}
@@ -65,8 +70,8 @@
                                     {user.email}
                                 </p>
                             </td>
-                            <td class="ellipsis" title={role.name}>
-                                {role.name}
+                            <td class="ellipsis">
+                                <MemberRole workspaceMemberId={id} {role} canUpdate={can.update} />
                             </td>
                             <td class="ellipsis" title={DateTime.fromISO(createdTime).toRelative()}>
                                 {DateTime.fromISO(createdTime).toRelative()}

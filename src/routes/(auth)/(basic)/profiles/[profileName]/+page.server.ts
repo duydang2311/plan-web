@@ -74,7 +74,6 @@ export const actions: Actions = {
                     body
                 })
             );
-            return { createProfile: { success: true } };
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     }
 };

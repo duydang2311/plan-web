@@ -16,6 +16,7 @@ export interface Issue {
     orderNumber: number;
     title: string;
     description?: string;
+    previewDescription?: string;
     statusId?: number;
     status?: WorkspaceStatus;
     statusRank: string;

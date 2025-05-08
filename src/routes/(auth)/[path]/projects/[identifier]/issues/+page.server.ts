@@ -12,7 +12,7 @@ import type { UserPreset } from '~/lib/models/user';
 
 export type LocalIssue = Pick<
     Issue,
-    'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'priority'
+    'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'priority' | 'previewDescription'
 > & {
     project: { identifier: string };
     status?: { value: string; rank: string };
@@ -28,6 +28,7 @@ export type LocalBoardIssue = Pick<
     | 'statusId'
     | 'statusRank'
     | 'priority'
+    | 'previewDescription'
 > & { author: UserPreset['email'] & UserPreset['profile'] };
 
 export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color' | 'category'>;

@@ -21,9 +21,10 @@
     interface Props {
         workspaceId: string;
         issueId: string;
+        canUpdate: boolean;
     }
 
-    const { workspaceId, issueId }: Props = $props();
+    const { workspaceId, issueId, canUpdate }: Props = $props();
     const { api } = useRuntime();
     const queryClient = useQueryClient();
     const queryKey = ['workspace-status', { issueId }];
@@ -141,7 +142,14 @@
     });
 </script>
 
-<Button type="button" variant="base" size="sm" class="flex items-center gap-2" {...builder.trigger}>
+<Button
+    type="button"
+    variant="base"
+    size="sm"
+    class="flex items-center gap-2"
+    disabled={!canUpdate}
+    {...builder.trigger}
+>
     {#if value == null}
         No status
     {:else if selectedStatus}

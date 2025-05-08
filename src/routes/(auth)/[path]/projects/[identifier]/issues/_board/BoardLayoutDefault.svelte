@@ -141,7 +141,7 @@
                             statusId: a === -1 ? null : a,
                             nullStatusId: a === -1,
                             size,
-                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image',
+                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription',
                             order: 'StatusRank,OrderNumber'
                         }
                     });
@@ -304,11 +304,10 @@
 {#if preview}
     <div
         use:portal={preview}
-        style="width: {preview.rect.width}px; height: calc({preview.rect
-            .height}px - 1rem);{navigator.userAgent.includes('Windows')
+        style="width: {preview.rect.width}px; {navigator.userAgent.includes('Windows')
             ? ' max-width: 280px; max-height: 280px;'
             : ''}"
-        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border px-4 opacity-100"
+        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border px-4 opacity-100 p-4"
     >
         <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
             <p class="text-sm leading-none">
@@ -319,5 +318,6 @@
         <p class="font-medium leading-none">
             {preview.data.title}
         </p>
+        <p class="line-clamp-3 mt-4">{preview.data.previewDescription}</p>
     </div>
 {/if}
