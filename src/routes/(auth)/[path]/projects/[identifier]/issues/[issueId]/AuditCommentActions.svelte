@@ -22,25 +22,25 @@
     });
 </script>
 
-        <IconButton
-            title="Manage comment"
-            class="text-base-fg-4 hover:text-(--_text_hover) active:text-(--_text_active)"
-            {...builder.trigger}
-        >
-            <IconOptionsOutline />
-        </IconButton>
-        {#if builder.open}
-            <Popover.Wrapper {...builder.content}>
-            <Popover>
-                <AuditCommentActionsPopover
-                    {auditId}
-                    {editing}
-                    {ref}
-                    onEdit={() => {
-                        editing = true;
-                        builder.open = false;
-                    }}
-                />
-            </Popover>
-            </Popover.Wrapper>
-        {/if}
+<IconButton
+    title="Manage comment"
+    class="text-base-fg-4 hover:text-(--_text_hover) active:text-(--_text_active)"
+    {...builder.trigger}
+>
+    <IconOptionsOutline />
+</IconButton>
+{#if builder.open}
+    <Popover.Wrapper {...builder.content}>
+        <Popover>
+            <AuditCommentActionsPopover
+                {auditId}
+                {editing}
+                {ref}
+                onEdit={() => {
+                    editing = true;
+                    builder.open = false;
+                }}
+            />
+        </Popover>
+    </Popover.Wrapper>
+{/if}
