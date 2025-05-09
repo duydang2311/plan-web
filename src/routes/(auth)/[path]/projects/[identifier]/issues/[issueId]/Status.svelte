@@ -145,7 +145,6 @@
 <Button
     type="button"
     variant="base"
-    size="sm"
     class="flex items-center gap-2"
     disabled={!canUpdate}
     {...builder.trigger}

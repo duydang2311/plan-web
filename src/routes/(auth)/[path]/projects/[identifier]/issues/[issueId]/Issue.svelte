@@ -98,10 +98,9 @@
                     <TiptapEditor
                         bind:editor
                         content={ref.value.description}
-                        class="max-w-paragraph-lg"
                         editorProps={{
                             attributes: {
-                                class: 'h-128 overflow-auto'
+                                class: 'min-h-92 max-h-160 overflow-auto'
                             }
                         }}
                         onCreate={(e) => {
@@ -137,7 +136,7 @@
                 </form>
             </div>
         {:else}
-            <div class="prose max-w-paragraph-lg wrap-anywhere">
+            <div class="prose max-w-full wrap-anywhere">
                 {#if ref.value.description && ref.value.description !== '<p></p>'}
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                     {@html DOMPurify.sanitize(ref.value.description, {

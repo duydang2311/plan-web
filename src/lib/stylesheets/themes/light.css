@@ -1,15 +1,15 @@
 @theme {
     --color-bg: oklch(100% 0 0);
 
-    --color-base-1: oklch(98.38% 0.003 267.08);
-    --color-base-2: oklch(96.38% 0.003 267.08);
-    --color-base-3: oklch(94.88% 0.003 267.08);
-    --color-base-4: oklch(93.88% 0.003 267.08);
-    --color-base-5: oklch(92.88% 0.003 267.08);
-    --color-base-hover: oklch(90.38% 0.003 267.08);
-    --color-base-active: oklch(92.88% 0.003 267.08);
-    --color-base-disabled: oklch(94.38% 0.003 267.08);
-    --color-base-selected: oklch(92.88% 0.003 267.08);
+    --color-base-1: #ffffff;
+    --color-base-2: oklch(98.38% 0.003 267.08);
+    --color-base-3: oklch(96.88% 0.003 267.08);
+    --color-base-4: oklch(95.88% 0.003 267.08);
+    --color-base-5: oklch(94.88% 0.003 267.08);
+    --color-base-hover: oklch(92.38% 0.003 267.08);
+    --color-base-active: oklch(94.88% 0.003 267.08);
+    --color-base-disabled: oklch(96.38% 0.003 267.08);
+    --color-base-selected: oklch(94.88% 0.003 267.08);
     --color-base-fg-1: oklch(16% 0.003 267.08);
     --color-base-fg-2: oklch(32% 0.003 267.08);
     --color-base-fg-3: oklch(45% 0.003 267.08);

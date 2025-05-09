@@ -19,7 +19,6 @@
 
 <Button
     variant="negative"
-    size="sm"
     class="flex items-center gap-2"
     onclick={() => {
         $open = true;

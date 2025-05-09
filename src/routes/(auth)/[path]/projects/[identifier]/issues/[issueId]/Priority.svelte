@@ -89,7 +89,7 @@
     });
 </script>
 
-<Button type="button" variant="base" size="sm" class="flex items-center gap-2" disabled={!canUpdate} {...builder.trigger}>
+<Button type="button" variant="base" class="flex items-center gap-2" disabled={!canUpdate} {...builder.trigger}>
     <IconPriority />
     <span>
         {getPriorityLabel($selected.value)}

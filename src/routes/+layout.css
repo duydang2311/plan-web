@@ -31,15 +31,15 @@
     --font-display: InterVariable, var(--font-sans);
     --font-body: InterVariable, var(--font-sans);
     --font-mono: 'DM Mono', InterVariable, var(--font-sans);
-    --text-xs: 0.79rem;
-    --text-sm: 0.889rem;
+    --text-xs: 0.878rem;
+    --text-sm: 0.937rem;
     --text-p: 1rem;
     --text-h6: 1.125rem;
     --text-h5: 1.266rem;
     --text-h4: 1.424rem;
     --text-h3: 1.602rem;
     --text-h2: 1.802rem;
-    --text-h1: 2.488rem;
+    --text-h1: 2.027rem;
     --radius-full: calc(infinity * 1px);
 
     --cubic-out: cubic-bezier(0.33, 1, 0.68, 1);

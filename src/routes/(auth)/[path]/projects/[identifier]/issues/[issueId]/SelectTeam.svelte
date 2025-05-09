@@ -127,7 +127,7 @@
 
 <div>
     <div class="mb-2 flex items-center gap-2">
-        <h2 class="c-label">Teams</h2>
+        <h2 class="text-p mb-2 font-medium">Teams</h2>
         {#if value.size > 0}
             <span class="bg-base-3 text-base-fg-3 rounded-full px-2 text-sm font-medium">
                 {value.size}

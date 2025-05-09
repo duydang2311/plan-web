@@ -14,3 +14,13 @@ export const formatRelativeDateUi = (
     }
     return dateTime.toLocaleString(absoluteFormatOpts ?? DateTime.DATE_FULL);
 };
+
+export const formatTimeUi = (dateTime: string | DateTime) => {
+    if (typeof dateTime === 'string') {
+        dateTime = DateTime.fromISO(dateTime);
+    }
+    if (dateTime.diffNow('days').days > -1) {
+        return dateTime.toLocaleString(DateTime.TIME_SIMPLE);
+    }
+    return dateTime.toLocaleString(DateTime.DATETIME_MED);
+};

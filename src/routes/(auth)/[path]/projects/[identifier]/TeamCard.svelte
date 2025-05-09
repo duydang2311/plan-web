@@ -11,7 +11,7 @@
 
 <div class="border-base-border-3 dark:bg-base-3 shadow-xs flex-1 rounded-md border p-4">
     <div class="flex items-center justify-between gap-4">
-        <h2 class="text-p text-base-fg-2">Teams</h2>
+        <p class="font-medium">Teams</p>
         <IconButton
             as="link"
             href="/{page.params.path}/projects/{page.params.identifier}/issues"
