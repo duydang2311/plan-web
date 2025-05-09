@@ -3,10 +3,16 @@
     import { Button, IconButton, toast } from '~/lib/components';
     import { IconTrash } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
+    import type { Ref } from '~/lib/utils/runes.svelte';
+    import type { LocalWorkspaceMember } from './+page.server';
     import { validateDeleteMemberActionFailure } from './utils';
 
-    const { id }: { id: number } = $props();
+    const {
+        id,
+        memberListRef
+    }: { id: number; memberListRef: Ref<PaginatedList<LocalWorkspaceMember>> } = $props();
 
     let open = $state.raw(false);
     const builder = new Popover.Builder({
@@ -38,8 +44,16 @@
                 action="?/delete-member"
                 class="mt-4 flex items-center justify-end gap-2"
                 use:enhance={() => {
+                    const old = memberListRef.value;
+                    if (old) {
+                        memberListRef.value = paginatedList({
+                            items: old.items.filter((item) => item.id !== id),
+                            totalCount: old.totalCount - 1
+                        });
+                    }
                     return async ({ result, update }) => {
                         if (result.type === 'failure') {
+                            memberListRef.value = old;
                             const validation = validateDeleteMemberActionFailure(result.data);
                             toast({
                                 type: 'negative',

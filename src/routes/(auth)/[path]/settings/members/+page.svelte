@@ -12,7 +12,7 @@
     import { fluentSearchParams } from '~/lib/utils/url';
     import { goto } from '$app/navigation';
 
-    const { data, form }: { data: PageData; form: ActionData } = $props();
+    const { data }: { data: PageData } = $props();
     const showInviteMember = writable(false);
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({
@@ -22,6 +22,7 @@
         deleteInvitation:
             workspacePermissionsRef.value?.has(permissions.deleteWorkspaceInvitation) ?? false
     });
+    const invitationListRef = createRef.maybePromise(() => data.invitationList);
 
     const tabsBuilder = new Tabs.Builder({
         value: () => (page.url.searchParams.get('view') === 'pending' ? 'pending' : 'active'),
@@ -41,11 +42,7 @@
     });
 </script>
 
-<InviteMemberDialog
-    workspaceId={data.workspace.id}
-    open={showInviteMember}
-    form={form?.inviteMember}
-/>
+<InviteMemberDialog workspaceId={data.workspace.id} open={showInviteMember} {invitationListRef} />
 
 <Main>
     <div
@@ -95,7 +92,7 @@
                 <ActiveMembers {data} canDelete={can.deleteMember} />
             </div>
             <div {...tabsBuilder.getContent('pending')} class="h-full">
-                <PendingMembers {data} canDelete={can.deleteInvitation} />
+                <PendingMembers {invitationListRef} canDelete={can.deleteInvitation} />
             </div>
         </div>
     </div>

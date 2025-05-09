@@ -5,8 +5,14 @@
     import Popover from '~/lib/components/popover';
     import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
     import { validateDeleteMemberActionFailure } from './utils';
+    import type { Ref } from '~/lib/utils/runes.svelte';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import type { LocalWorkspaceInvitation } from './+page.server';
 
-    const { id }: { id: string } = $props();
+    const {
+        id,
+        invitationListRef
+    }: { id: string; invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation>> } = $props();
 
     let open = $state.raw(false);
     const builder = new Popover.Builder({
@@ -38,8 +44,16 @@
                 action="?/delete_invitation"
                 class="mt-4 flex items-center justify-end gap-2"
                 use:enhance={() => {
+                    const old = invitationListRef.value;
+                    if (old) {
+                        invitationListRef.value = paginatedList({
+                            items: old.items.filter((i) => i.id !== id),
+                            totalCount: old.totalCount - 1
+                        });
+                    }
                     return async ({ result, update }) => {
                         if (result.type === 'failure') {
+                            invitationListRef.value = old;
                             const validation = validateDeleteMemberActionFailure(result.data);
                             toast({
                                 type: 'negative',

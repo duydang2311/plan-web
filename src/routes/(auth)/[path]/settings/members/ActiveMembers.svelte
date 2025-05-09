@@ -15,9 +15,9 @@
 
     const { data, canDelete }: { data: PageData; canDelete: boolean } = $props();
     const { cloudinary } = useRuntime();
-    const listRef = createRef.maybePromise(() => data.memberList);
+    const memberListRef = createRef.maybePromise(() => data.memberList);
     const pagination = createPagination({
-        syncList: () => listRef.value ?? paginatedList(),
+        syncList: () => memberListRef.value ?? paginatedList(),
         syncUrl: () => page.url
     });
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
@@ -40,16 +40,16 @@
                 </Row>
             </THead>
             <tbody>
-                {#if listRef.isInitialLoading}
+                {#if memberListRef.isInitialLoading}
                     <Row>
                         <td class="col-span-full">Loading...</td>
                     </Row>
-                {:else if listRef.value == null || listRef.value.items.length === 0}
+                {:else if memberListRef.value == null || memberListRef.value.items.length === 0}
                     <Row>
                         <td class="col-span-full">No members found.</td>
                     </Row>
                 {:else}
-                    {#each listRef.value.items as { id, user, role, createdTime } (id)}
+                    {#each memberListRef.value.items as { id, user, role, createdTime } (id)}
                         <Row>
                             <td class="ellipsis">
                                 <Avatar
@@ -78,7 +78,7 @@
                             </td>
                             {#if canDelete}
                                 <td class="flex items-center justify-end">
-                                    <DeleteMemberButton {id} />
+                                    <DeleteMemberButton {id} {memberListRef} />
                                 </td>
                             {/if}
                         </Row>
@@ -87,7 +87,7 @@
             </tbody>
         </Table>
     </div>
-    {#if listRef.value != null && listRef.value.items.length > 0}
+    {#if memberListRef.value != null && memberListRef.value.items.length > 0}
         <Pagination3 {pagination} class="mt-2">
             {#snippet label({ from, to, totalCount })}
                 Showing <strong>{from}</strong> - <strong>{to}</strong> of

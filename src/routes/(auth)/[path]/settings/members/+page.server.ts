@@ -21,9 +21,13 @@ export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'update
     role: Pick<Role, 'id' | 'name'>;
 };
 
-export type LocalWorkspaceInvitation = Pick<WorkspaceInvitation, 'createdTime' | 'id'> & {
-    user: UserPreset['basicProfile'] & Pick<User, 'id'>;
-};
+export type LocalWorkspaceInvitation = OneOf<
+    { id: WorkspaceInvitation['id'] },
+    { optimisticId: string }
+> &
+    Pick<WorkspaceInvitation, 'createdTime'> & {
+        user: UserPreset['basicProfile'] & Pick<User, 'id'>;
+    };
 
 export const load: PageServerLoad = (e) => {
     switch (e.url.searchParams.get('view')) {
@@ -119,7 +123,7 @@ const loadPendingMembersView = async ({
 };
 
 export const actions: Actions = {
-    'invite-member': ({
+    invite_member: ({
         request,
         locals: { runtime }
     }): Promise<ActionFailure<{ inviteMember: { errors: Record<string, string[]> } }> | null> => {
@@ -134,10 +138,7 @@ export const actions: Actions = {
                 })
             );
             return null;
-        }).pipe(
-            Effect.catchAll((a) => Effect.succeed(fail(a.status, { inviteMember: a.data }))),
-            runtime.runPromise
-        );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     },
     'delete-member': ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {

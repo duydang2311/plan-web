@@ -48,7 +48,10 @@
         <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
             <div>
                 <h1 class="capitalize">Workspace status</h1>
-                <p class="c-label">Manage issue statuses across your workspace.</p>
+                <p class="c-text-secondary text-balance">
+                    Create and manage task statuses to keep everyone aligned
+                    from planning to production.
+                </p>
             </div>
             {#if can.create}
                 <Button

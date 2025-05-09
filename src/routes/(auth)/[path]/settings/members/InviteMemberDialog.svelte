@@ -15,16 +15,21 @@
         Errors,
         Field,
         Input,
-        Label
+        Label,
+        toast
     } from '~/lib/components';
     import { IconCheck, IconSearch, IconUserPlus } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import type { PaginatedList } from '~/lib/models/paginatedList';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import type { User } from '~/lib/models/user';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { watch } from '~/lib/utils/runes.svelte';
+    import {
+        stringifyActionFailureErrors,
+        validateActionFailureData
+    } from '~/lib/utils/kit.client';
+    import { watch, type Ref } from '~/lib/utils/runes.svelte';
     import { dialog, select, tsap } from '~/lib/utils/transition';
-    import type { ActionData } from './$types';
+    import type { LocalWorkspaceInvitation } from './+page.server';
 
     type LocalUser = Pick<User, 'id' | 'email'> & {
         profile?: Pick<NonNullable<User['profile']>, 'name' | 'displayName' | 'image'>;
@@ -33,11 +38,11 @@
     const {
         workspaceId,
         open,
-        form
+        invitationListRef
     }: {
         workspaceId: string;
         open: Writable<boolean>;
-        form: NonNullable<ActionData>['inviteMember'] | null | undefined;
+        invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation>>;
     } = $props();
     const { api, cloudinary } = useRuntime();
     const comboboxOpen = writable(false);
@@ -80,13 +85,6 @@
         updateSearch(search);
     });
 
-    watch(() => form)(() => {
-        if (form) {
-            const { userId, ...rest } = form.errors;
-            errors = { search: userId, ...rest };
-        }
-    });
-
     const onSelectedChange = watch(() => $selected);
     onSelectedChange(() => {
         search = $selected?.value.email ?? '';
@@ -122,7 +120,7 @@
                 </div>
                 <form
                     method="post"
-                    action="?/invite-member"
+                    action="?/invite_member"
                     class="space-y-4"
                     use:enhance={({ cancel }) => {
                         if (!$selected) {
@@ -131,11 +129,36 @@
                             return;
                         }
 
+                        const old = invitationListRef.value;
+                        invitationListRef.value = paginatedList({
+                            items: [
+                                ...(invitationListRef.value?.items ?? []),
+                                {
+                                    createdTime: new Date().toISOString(),
+                                    optimisticId: crypto.randomUUID(),
+                                    user: {
+                                        id: $selected.value.id,
+                                        email: $selected.value.email,
+                                        profile: $selected.value.profile
+                                    }
+                                }
+                            ],
+                            totalCount: (invitationListRef.value?.totalCount ?? 0) + 1
+                        });
                         return async (e) => {
                             if (e.result.type === 'success') {
                                 $selected = undefined!;
                                 search = '';
                                 $open = false;
+                            } else if (e.result.type === 'failure') {
+                                const validation = validateActionFailureData(e.result.data);
+                                errors = validation.ok ? validation.data.errors : validation.errors;
+                                toast({
+                                    type: 'negative',
+                                    body: 'Something went wrong while inviting member.',
+                                    footer: `Error code: ${stringifyActionFailureErrors(validation.ok ? validation.data.errors : validation.errors)}.`
+                                });
+                                invitationListRef.value = old;
                             }
                             await e.update();
                         };

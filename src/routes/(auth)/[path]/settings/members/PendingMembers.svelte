@@ -1,21 +1,34 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { DateTime } from 'luxon';
-    import { Avatar, Pagination3, Row, Table, Th, THead, ThSort3 } from '~/lib/components';
+    import {
+        Avatar,
+        Pagination3,
+        RelativeTime,
+        Row,
+        Table,
+        Th,
+        THead,
+        ThSort3
+    } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { paginatedList } from '~/lib/models/paginatedList';
+    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import { createRef } from '~/lib/utils/runes.svelte';
+    import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
-    import type { PageData } from './$types';
+    import type { LocalWorkspaceInvitation } from './+page.server';
     import DeleteInvitationButton from './DeleteInvitationButton.svelte';
 
-    const { data, canDelete }: { data: PageData; canDelete: boolean } = $props();
-    const listRef = createRef.maybePromise(() => data.invitationList);
+    const {
+        invitationListRef,
+        canDelete
+    }: {
+        invitationListRef: AsyncRef<PaginatedList<LocalWorkspaceInvitation>>;
+        canDelete: boolean;
+    } = $props();
     const { cloudinary } = useRuntime();
     const pagination = createPagination({
-        syncList: () => listRef.value ?? paginatedList(),
+        syncList: () => invitationListRef.value ?? paginatedList(),
         syncUrl: () => page.url
     });
 </script>
@@ -33,16 +46,16 @@
                 </Row>
             </THead>
             <tbody>
-                {#if listRef.isInitialLoading}
+                {#if invitationListRef.isInitialLoading}
                     <Row>
                         <td class="text-base-fg-ghost col-span-full">Loading...</td>
                     </Row>
-                {:else if listRef.value == null || listRef.value.items.length === 0}
+                {:else if invitationListRef.value == null || invitationListRef.value.items.length === 0}
                     <Row>
                         <td class="text-base-fg-ghost col-span-full">No invitations found.</td>
                     </Row>
                 {:else}
-                    {#each listRef.value.items as { id, user, createdTime } (id)}
+                    {#each invitationListRef.value.items as { id, optimisticId, user, createdTime } (id ?? optimisticId)}
                         <Row>
                             <td class="overflow-hidden text-ellipsis whitespace-nowrap">
                                 <Avatar
@@ -66,15 +79,12 @@
                                     {user.email}
                                 </p>
                             </td>
-                            <td
-                                class="overflow-hidden text-ellipsis whitespace-nowrap"
-                                title={DateTime.fromISO(createdTime).toRelative()}
-                            >
-                                {DateTime.fromISO(createdTime).toRelative()}
+                            <td class="overflow-hidden text-ellipsis whitespace-nowrap">
+                                <RelativeTime time={createdTime} />
                             </td>
-                            {#if canDelete}
+                            {#if id && canDelete}
                                 <td class="flex items-center justify-end">
-                                    <DeleteInvitationButton {id} />
+                                    <DeleteInvitationButton {id} {invitationListRef} />
                                 </td>
                             {/if}
                         </Row>
@@ -83,7 +93,7 @@
             </tbody>
         </Table>
     </div>
-    {#if listRef.value != null && listRef.value.items.length > 0}
+    {#if invitationListRef.value != null && invitationListRef.value.items.length > 0}
         <Pagination3 {pagination} class="mt-2">
             {#snippet label({ from, to, totalCount })}
                 Showing <strong>{from}</strong> - <strong>{to}</strong> of
