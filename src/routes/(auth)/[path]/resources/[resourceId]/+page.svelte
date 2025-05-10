@@ -152,7 +152,7 @@
 />
 
 <Main>
-    <div class="max-w-paragraph-lg mx-auto">
+    <div class="max-w-desktop mx-auto">
         {#if getWorkspaceResourceRef.isInitialLoading}
             <p class="c-label">Loading...</p>
         {:else if resourceRef.value == null || getWorkspaceResourceRef.value == null || !getWorkspaceResourceRef.value.ok}

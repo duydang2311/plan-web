@@ -1,5 +1,5 @@
 import { invalidate } from '$app/navigation';
-import { fail, json, type ActionFailure } from '@sveltejs/kit';
+import { error, fail, json, type ActionFailure } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { errorCodes, type ApiError } from '../models/errors';
 import {
@@ -7,7 +7,7 @@ import {
     validateProblemDetails,
     validateProblemDetailsEffect
 } from './problem_details';
-import { attempt, type Attempt } from './try';
+import { attempt, type Attempt, type Failure, type Success } from './try';
 import { type ValidateOk, type ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
@@ -251,5 +251,64 @@ export const ActionAttempt = {
         }
         const { status, ...data } = attempt.error;
         return fail(status, data);
+    }
+} as const;
+
+const loadErrorCodes = {
+    fromHttp: (a: unknown) => loadError(500, errorCodes.fromFetch(a)),
+    fromJson: (a: unknown) => loadError(500, errorCodes.fromJson(a))
+} as const;
+
+interface LoadError<TStatus extends number = number, TCode extends string = string> {
+    status: TStatus;
+    code: TCode;
+    message?: string;
+}
+
+const loadError = <TStatus extends number, TCode extends string = string>(
+    status: TStatus,
+    code: TCode,
+    message?: string
+): LoadError<TStatus, TCode> => ({
+    status,
+    code,
+    message
+});
+
+interface LoadAttemptHelpers {
+    HTTP: (
+        f: () => Promise<Response>
+    ) => Promise<
+        Attempt<
+            Response,
+            ReturnType<(typeof loadErrorCodes)['fromHttp']> | LoadError<number, 'http_error'>
+        >
+    >;
+    JSON: <T>(f: () => Promise<T>) => Promise<Attempt<T, LoadError>>;
+    Assert: <A, E extends LoadError>(attempt: Attempt<A, E>) => asserts attempt is Success<A>;
+}
+
+export const LoadAttempt: LoadAttemptHelpers = {
+    HTTP: async (f: () => Promise<Response>) => {
+        const tryFetch = await attempt.promise(() => f())(loadErrorCodes.fromHttp);
+        if (tryFetch.failed) {
+            return tryFetch;
+        }
+        if (!tryFetch.data.ok) {
+            return attempt.fail(
+                loadError(tryFetch.data.status, 'http_error', tryFetch.data.statusText)
+            );
+        }
+        return tryFetch;
+    },
+    JSON: async <T>(f: () => Promise<T>) => attempt.promise(() => f())(loadErrorCodes.fromJson),
+    Assert(attempt) {
+        if (attempt.failed) {
+            const { status, ...data } = attempt.error;
+            error(status, {
+                code: data.code,
+                message: data.message ?? 'Something went wrong while processing your request.'
+            });
+        }
     }
 } as const;
