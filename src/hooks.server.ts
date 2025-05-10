@@ -8,6 +8,7 @@ import { KitBasicHttpApiClient } from './lib/services/kit_basic_http_api_client'
 import { UniversalHttpClient } from './lib/services/universal_http_client';
 import { attempt } from './lib/utils/try';
 import { PermissionService } from './lib/services/permission_service.server';
+import { SessionHttpClient } from './lib/services/session_http_client.server';
 
 if (!env.VERIFICATION_URL) throw new ReferenceError('VERIFICATION_URL must be provided');
 if (!env.API_BASE_URL) throw new ReferenceError('API_BASE_URL must be provided');
@@ -102,6 +103,12 @@ export const handle: Handle = async ({
             runPromise: makeRunPromise(locals.appLive),
             runPromiseExit: makeRunPromiseExit(locals.appLive)
         };
+        locals.api = new SessionHttpClient({
+            baseUrl: env.API_BASE_URL,
+            version: env.API_VERSION,
+            fetch,
+            cookies
+        });
 
         return resolve(event);
     }
@@ -118,6 +125,7 @@ const initLocals = (locals: App.Locals, httpClient: UniversalHttpClient) => {
                 httpClient
             })
     );
+    locals.api = httpClient;
     locals.appLive = Layer.mergeAll(
         ApiClientLive,
         Cloudinary.Live,

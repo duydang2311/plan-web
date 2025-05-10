@@ -7,7 +7,7 @@ type RequestArray = unknown[];
 
 export class UniversalHttpClient implements Context.Tag.Service<HttpClient> {
     public constructor(
-        private readonly _options: HttpClientOptions & {
+        protected readonly _options: HttpClientOptions & {
             fetch: typeof fetch;
         }
     ) {}
