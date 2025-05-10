@@ -1,3 +1,4 @@
+import { StatusCategory } from '~/lib/models/status';
 import { validator } from '~/lib/utils/validation';
 
 const invalidStatusValueRegExp = /[^a-zA-Z0-9\s]/;
@@ -5,6 +6,7 @@ const invalidStatusValueRegExp = /[^a-zA-Z0-9\s]/;
 export const validateAddStatus = validator<{
     workspaceId: string;
     value: string;
+    category: number;
     description?: string;
 }>((input, { error }) => {
     if (!input || typeof input !== 'object') {
@@ -24,6 +26,16 @@ export const validateAddStatus = validator<{
         return error('value', 'string');
     }
 
+    if (!('category' in input) || !input.category) {
+        return error('category', 'required');
+    }
+
+    const categoryNumber = Number(input.category);
+    if (isNaN(categoryNumber) || !StatusCategory[categoryNumber]) {
+        return error('category', 'invalid');
+    }
+    input.category = categoryNumber;
+
     if (invalidStatusValueRegExp.test(input.value)) {
         return error('value', 'invalid');
     }
@@ -40,6 +52,7 @@ export const validateAddStatus = validator<{
 export const decodeAddStatus = (formData: FormData) => ({
     workspaceId: formData.get('workspaceId'),
     value: formData.get('value'),
+    category: formData.get('category'),
     description: formData.get('description')
 });
 

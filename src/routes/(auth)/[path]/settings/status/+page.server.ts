@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ parent, isDataRequest, locals: { ru
 };
 
 export const actions: Actions = {
-    'add-status': ({ request, locals: { runtime } }) => {
+    add_status: ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
             const validation = yield* ActionResponse.Validation(
@@ -51,15 +51,12 @@ export const actions: Actions = {
                 (yield* ApiClient).post(`workspaces/${validation.data.workspaceId}/statuses`, {
                     body: {
                         value: validation.data.value,
+                        category: validation.data.category,
                         description: validation.data.description
                     }
                 })
             );
-            return { addStatus: { success: true } };
-        }).pipe(
-            Effect.catchAll((a) => Effect.succeed(fail(a.status, { addStatus: a.data }))),
-            runtime.runPromise
-        );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
     },
     delete_status: ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {

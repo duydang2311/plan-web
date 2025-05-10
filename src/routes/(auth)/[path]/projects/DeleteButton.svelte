@@ -20,9 +20,8 @@
     const builder = new Popover.Builder({
         forceVisible: true,
         floatingConfig: {
-            flip: {
-                mainAxis: true,
-                crossAxis: true
+            shift: {
+                padding: 32
             }
         }
     });
@@ -50,6 +49,7 @@
     variant="negative"
     title="Remove member"
     class="w-fit"
+    data-custom-state={builder.open ? 'open' : undefined}
     {...builder.trigger}
 >
     <IconTrash />
@@ -58,7 +58,9 @@
     <Popover.Wrapper {...builder.content}>
         <Popover class="w-96 text-pretty p-4">
             <h2 class="mb-2">Delete project?</h2>
-            <p class="text-pretty">Would you like to delete the project? This action cannot be undone.</p>
+            <p class="text-pretty">
+                Would you like to delete the project? This action cannot be undone.
+            </p>
             <form
                 method="post"
                 action="?/delete_project"
@@ -109,9 +111,15 @@
                 }}
             >
                 <input type="hidden" name="projectId" value={project.id} />
-                <Button type="button" variant="base" outline class="w-fit" onclick={() => {
-                    builder.open = false;
-                }}>
+                <Button
+                    type="button"
+                    variant="base"
+                    outline
+                    class="w-fit"
+                    onclick={() => {
+                        builder.open = false;
+                    }}
+                >
                     Cancel
                 </Button>
                 <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>

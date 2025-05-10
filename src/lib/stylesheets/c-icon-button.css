@@ -44,12 +44,14 @@
 }
 
 .c-icon-button--primary {
-    --_text: var(--color-primary-1);
-    --_text-hover: var(--color-primary-2);
-    --_text-active: var(--color-primary-3);
+    --_text: var(--color-primary-2);
+    --_text-hover: var(--color-primary-1);
+    --_text-active: var(--color-primary-1);
+    --_text-selected: var(--color-primary-1);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-primary-1) 20%, transparent);
     --_bg-active: color-mix(in oklch, var(--color-primary-1) 5%, transparent);
+    --_bg-selected: color-mix(in oklch, var(--color-primary-1) 15%, transparent);
     @apply ring-primary-1/20;
 
     &:where(:focus-visible) {
@@ -58,12 +60,14 @@
 }
 
 .c-icon-button--positive {
-    --_text: var(--color-positive-1);
-    --_text-hover: var(--color-positive-2);
-    --_text-active: var(--color-positive-3);
+    --_text: var(--color-positive-2);
+    --_text-hover: var(--color-positive-1);
+    --_text-active: var(--color-positive-1);
+    --_text-selected: var(--color-positive-1);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-positive-1) 20%, transparent);
     --_bg-active: color-mix(in oklch, var(--color-positive-1) 5%, transparent);
+    --_bg-selected: color-mix(in oklch, var(--color-positive-1) 15%, transparent);
     @apply ring-positive-1/20;
 
     &:where(:focus-visible) {
@@ -72,12 +76,14 @@
 }
 
 .c-icon-button--negative {
-    --_text: var(--color-negative-1);
-    --_text-hover: var(--color-negative-2);
-    --_text-active: var(--color-negative-3);
+    --_text: var(--color-negative-2);
+    --_text-hover: var(--color-negative-1);
+    --_text-active: var(--color-negative-1);
+    --_text-selected: var(--color-negative-1);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-negative-1) 20%, transparent);
     --_bg-active: color-mix(in oklch, var(--color-negative-1) 5%, transparent);
+    --_bg-selected: color-mix(in oklch, var(--color-negative-1) 15%, transparent);
     @apply ring-negative-1/20;
 
     &:where(:focus-visible) {

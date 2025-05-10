@@ -26,7 +26,8 @@
         <Button
             type="button"
             variant="base"
-            class="relative flex items-center gap-2 pr-10 text-base"
+            outline
+            class="relative flex items-center gap-2 pr-10 text-base not-active:not-hover:bg-base-1"
             melt={trigger}
             autofocus
         >

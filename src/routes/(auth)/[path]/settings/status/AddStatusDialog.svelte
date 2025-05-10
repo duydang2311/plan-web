@@ -18,6 +18,8 @@
     import { validateAddStatus } from './utils';
     import { IconPlus } from '~/lib/components/icons';
     import type { Writable } from 'svelte/store';
+    import Select from '~/lib/components/select';
+    import { StatusCategory } from '~/lib/models/status';
 
     const {
         statusListRef,
@@ -37,6 +39,16 @@
         description: form.createField({ name: 'description' })
     };
     let status = $state<'submit' | null>(null);
+    let category = $state.raw(StatusCategory.Pending + '');
+    const categorySelect = new Select.Builder({
+        value: () => category,
+        onValueChange: (a) => {
+            if (a) {
+                category = a;
+            }
+        },
+        forceVisible: true
+    });
 
     $effect(() => {
         const errors = page.form?.['addStatus']?.errors as Record<string, string[]> | undefined;
@@ -66,14 +78,14 @@
                         <h2 use:melt={title} class="capitalize">Create status</h2>
                         <IconPlus class="text-base-fg-1 size-8" />
                     </div>
-                    <p use:melt={description} class="text-pretty">
+                    <p use:melt={description} class="c-text-secondary text-pretty">
                         Fill in the form below to create a new status in your workspace.
                     </p>
                 </div>
                 <form
                     class="space-y-4"
                     method="post"
-                    action="?/add-status"
+                    action="?/add_status"
                     use:form
                     use:enhance={async (e) => {
                         form.validate();
@@ -132,19 +144,48 @@
                         name={fields.workspaceId.state.name}
                         value={fields.workspaceId.state.value}
                     />
-                    <Field>
-                        <Label for="value">Name</Label>
-                        <Input
-                            useField={fields.value}
-                            id="value"
-                            type="text"
-                            name={fields.value.state.name}
-                            required
-                            pattern="[a-zA-Z0-9\s]+"
-                            bind:value={fields.value.state.value}
-                        />
-                        <Errors errors={fields.value.state.errors} />
-                    </Field>
+                    <input type="hidden" name="category" value={categorySelect.value} />
+                    <div class="flex items-start gap-4 *:flex-1">
+                        <Field>
+                            <Label for="value">Name</Label>
+                            <Input
+                                useField={fields.value}
+                                id="value"
+                                type="text"
+                                name={fields.value.state.name}
+                                required
+                                pattern="[a-zA-Z0-9\s]+"
+                                bind:value={fields.value.state.value}
+                            />
+                            <Errors errors={fields.value.state.errors} />
+                        </Field>
+                        <Field>
+                            <Label for={categorySelect.trigger.id}>Category</Label>
+                            <Button
+                                {...categorySelect.trigger}
+                                type="button"
+                                variant="base"
+                                outline
+                                class="relative w-full pr-10 text-left"
+                            >
+                                {StatusCategory[Number(categorySelect.value)]}
+                                <Select.Icon class="absolute right-2 top-1/2 -translate-y-1/2" />
+                            </Button>
+                        </Field>
+                        {#if categorySelect.open}
+                            <Select {...categorySelect.content}>
+                                {#each Object.values(StatusCategory).filter((a) => typeof a === 'number') as category (category)}
+                                    {@const value = category + ''}
+                                    <Select.Option {...categorySelect.getOption(value)}>
+                                        {#if categorySelect.isSelected(value)}
+                                            <Select.Check />
+                                        {/if}
+                                        {StatusCategory[Number(category)]}
+                                    </Select.Option>
+                                {/each}
+                            </Select>
+                        {/if}
+                    </div>
                     <Field>
                         <Label for="desc">Description (optional)</Label>
                         <Input
