@@ -3,9 +3,8 @@
     import { melt } from '@melt-ui/svelte';
     import { writable } from 'svelte/store';
     import { fade } from 'svelte/transition';
-    import { Button, DialogBuilder } from '~/lib/components';
+    import { Button, DialogBuilder, toast } from '~/lib/components';
     import { IconTrash } from '~/lib/components/icons';
-    import { addToast } from '~/lib/components/Toaster.svelte';
     import type { Issue } from '~/lib/models/issue';
     import { dialog, tsap } from '~/lib/utils/transition';
 
@@ -19,6 +18,7 @@
 
 <Button
     variant="negative"
+    size="sm"
     class="flex items-center gap-2"
     onclick={() => {
         $open = true;
@@ -42,9 +42,13 @@
             class="c-dialog--wrapper"
         >
             <div class="c-dialog space-y-2">
-                <h4 use:melt={title}>Delete issue?</h4>
-                <p>
-                    Proceed to delete <span class="font-medium">"{issue.title}"</span>?
+                <div class="flex items-center justify-between">
+                    <h2 use:melt={title}>Delete issue?</h2>
+                    <IconTrash class="text-base-fg-1 size-8" />
+                </div>
+                <p class="text-pretty">
+                    You're about to delete the issue <strong>'{issue.title}'</strong>.
+                    <br />This action cannot be undone.
                 </p>
                 <div class="ml-auto flex w-fit gap-4">
                     <Button variant="base" class="w-fit" outline melt={close}>Cancel</Button>
@@ -54,11 +58,10 @@
                         use:enhance={() => {
                             return async ({ result, update }) => {
                                 if (result.type === 'redirect') {
-                                    addToast({
-                                        data: {
-                                            title: 'Issue deleted',
-                                            description
-                                        }
+                                    toast({
+                                        type: 'positive',
+                                        body: successToast,
+                                        bodyProps: issue.title
                                     });
                                 }
                                 await update();
@@ -74,6 +77,6 @@
     {/snippet}
 </DialogBuilder>
 
-{#snippet description()}
-    "<span class="font-medium">{issue.title}</span>" has been deleted.
+{#snippet successToast(title: string)}
+    Issue '<span class="font-medium">{title}</span>' has been deleted.
 {/snippet}

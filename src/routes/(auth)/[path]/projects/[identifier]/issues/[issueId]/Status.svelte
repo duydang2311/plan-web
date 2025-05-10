@@ -3,7 +3,7 @@
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { Select } from 'melt/builders';
     import { untrack } from 'svelte';
-    import { addToast, Button } from '~/lib/components';
+    import { addToast, Button, Field, Label } from '~/lib/components';
     import {
         IconBacklog,
         IconCanceled,
@@ -142,24 +142,28 @@
     });
 </script>
 
-<Button
-    type="button"
-    variant="base"
-    class="flex items-center gap-2"
-    disabled={!canUpdate}
-    {...builder.trigger}
->
-    {#if value == null}
-        No status
-    {:else if selectedStatus}
-        {#if selectedStatus.Icon}
-            <selectedStatus.Icon />
+<Field>
+    <Label for={builder.trigger.id}>Status</Label>
+    <Button
+        type="button"
+        variant="base"
+        class="flex items-center gap-2"
+        size="sm"
+        disabled={!canUpdate}
+        {...builder.trigger}
+    >
+        {#if value == null}
+            No status
+        {:else if selectedStatus}
+            {#if selectedStatus.Icon}
+                <selectedStatus.Icon />
+            {/if}
+            <span>
+                {selectedStatus.label}
+            </span>
         {/if}
-        <span>
-            {selectedStatus.label}
-        </span>
+    </Button>
+    {#if builder.open}
+        <StatusOptions {builder} {workspaceId} />
     {/if}
-</Button>
-{#if builder.open}
-    <StatusOptions {builder} {workspaceId} />
-{/if}
+</Field>

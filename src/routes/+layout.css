@@ -31,8 +31,8 @@
     --font-display: InterVariable, var(--font-sans);
     --font-body: InterVariable, var(--font-sans);
     --font-mono: 'DM Mono', InterVariable, var(--font-sans);
-    --text-xs: 0.878rem;
-    --text-sm: 0.937rem;
+    --text-xs: 11px;
+    --text-sm: 12px;
     --text-p: 1rem;
     --text-h6: 1.125rem;
     --text-h5: 1.266rem;

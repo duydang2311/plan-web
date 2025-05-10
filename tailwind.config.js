@@ -33,7 +33,7 @@ export default {
                         '--tw-prose-hr': 'var(--color-base-border-2)',
                         '--tw-prose-code': 'var(--color-base-fg-1)',
                         '--tw-prose-pre-code': 'var(--color-base-fg-1)',
-                        '--tw-prose-pre-bg': 'var(--color-base-3)',
+                        '--tw-prose-pre-bg': 'var(--color-base-5)',
                         '--tw-prose-quotes': 'var(--color-base-fg-4)',
                         '--tw-prose-quote-borders': 'var(--color-base-5)'
                     }

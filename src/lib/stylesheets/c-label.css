@@ -3,10 +3,10 @@
     color: var(--color-base-fg-4);
     font-weight: 500;
     max-width: max-content;
-    font-size: var(--text-p);
+    font-size: var(--text-sm);
 }
 
 .c-text-secondary {
     color: var(--color-base-fg-4);
-    font-size: var(--text-p);
+    font-size: var(--text-sm);
 }

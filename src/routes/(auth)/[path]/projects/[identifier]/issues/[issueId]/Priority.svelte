@@ -4,7 +4,7 @@
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { Select } from 'melt/builders';
     import { writable } from 'svelte/store';
-    import { addToast, Button } from '~/lib/components';
+    import { addToast, Button, Field, Label } from '~/lib/components';
     import { IconCheck } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import {
@@ -89,23 +89,33 @@
     });
 </script>
 
-<Button type="button" variant="base" class="flex items-center gap-2" disabled={!canUpdate} {...builder.trigger}>
-    <IconPriority />
-    <span>
-        {getPriorityLabel($selected.value)}
-    </span>
-</Button>
-{#if builder.open}
-    <ol class="c-select--menu" in:tsap={select.in} out:tsap={select.out} {...builder.content}>
-        {#each items as item (item.value)}
-            {@const IconPriority = priorityIcons[item.value]}
-            <li class="c-select--option" {...builder.getOption(item.value + '')}>
-                <IconPriority />
-                {#if builder.isSelected(item.value + '')}
-                    <IconCheck class="c-select--check" />
-                {/if}
-                {item.label}
-            </li>
-        {/each}
-    </ol>
-{/if}
+<Field>
+    <Label for={builder.trigger.id}>Priority</Label>
+    <Button
+        type="button"
+        variant="base"
+        class="flex items-center gap-2"
+        disabled={!canUpdate}
+        size="sm"
+        {...builder.trigger}
+    >
+        <IconPriority />
+        <span>
+            {getPriorityLabel($selected.value)}
+        </span>
+    </Button>
+    {#if builder.open}
+        <ol class="c-select--menu" in:tsap={select.in} out:tsap={select.out} {...builder.content}>
+            {#each items as item (item.value)}
+                {@const IconPriority = priorityIcons[item.value]}
+                <li class="c-select--option" {...builder.getOption(item.value + '')}>
+                    <IconPriority />
+                    {#if builder.isSelected(item.value + '')}
+                        <IconCheck class="c-select--check" />
+                    {/if}
+                    {item.label}
+                </li>
+            {/each}
+        </ol>
+    {/if}
+</Field>

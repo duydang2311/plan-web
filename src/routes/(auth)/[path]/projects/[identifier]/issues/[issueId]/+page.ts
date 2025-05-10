@@ -10,14 +10,6 @@ export const load: PageLoad = async ({ parent, data }) => {
         () => data.page.issue.status ?? null
     );
     prefetch(['priority', { issueId: data.page.issue.id }], () => data.page.issue.priority);
-    prefetch(
-        ['issues', { issueId: data.page.issue.id, tag: 'select-team' }],
-        () => data.page.issue.teams
-    );
-    prefetch(
-        ['issues', { issueId: data.page.issue.id, tag: 'select-assignees' }],
-        () => data.page.issue.assignees
-    );
 
     return data;
 };

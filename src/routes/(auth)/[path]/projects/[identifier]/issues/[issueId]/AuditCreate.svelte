@@ -4,6 +4,7 @@
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import type { LocalIssueAudit } from './+page.server';
+    import { formatTimeUi } from '~/lib/utils/time';
 
     interface Props {
         audit: LocalIssueAudit;
@@ -12,7 +13,7 @@
     const { cloudinary } = useRuntime();
 </script>
 
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-4">
     <OptionalLink href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}>
         <Avatar
             seed={audit.user.profile?.name ?? audit.user.email}
@@ -22,7 +23,7 @@
             class="size-10"
         />
     </OptionalLink>
-    <div class="text-sm">
+    <div>
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
         >
@@ -30,9 +31,9 @@
                 {audit.user.profile?.displayName ?? audit.user.email}
             </span>
         </OptionalLink>
-        created the issue
-        <span class="text-base-fg-4">
-            · <RelativeTime time={audit.createdTime} />
+        created the task
+        <span class="text-base-fg-4 c-text-secondary text-sm">
+            {formatTimeUi(audit.createdTime)}
         </span>
     </div>
 </div>

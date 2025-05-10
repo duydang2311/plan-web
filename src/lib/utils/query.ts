@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/svelte-query';
+import { HttpError } from '../models/plain_errors';
 
 export const prefetchQuery =
     (queryClient: QueryClient) =>
@@ -29,7 +30,10 @@ export const QueryResponse = {
     },
     HTTPError: (response: Response) => {
         if (!response.ok) {
-            throw new Error(`${response.statusText} (code: ${response.status})`);
+            throw new HttpError({
+                status: response.status,
+                message: `${response.statusText} (code: ${response.status})`
+            });
         }
         return response;
     },

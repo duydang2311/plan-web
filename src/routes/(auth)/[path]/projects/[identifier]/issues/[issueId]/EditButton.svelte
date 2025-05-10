@@ -12,6 +12,7 @@
 
 <Button
     variant="base"
+    size="sm"
     disabled={editing}
     class="flex items-center gap-2"
     onclick={onClick}

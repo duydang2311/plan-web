@@ -42,10 +42,6 @@ export type LocalIssue = Pick<
     | 'statusId'
 > & {
     author: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
-    teams: Pick<Team, 'id' | 'name' | 'identifier'>[];
-    assignees: Pick<User, 'id' | 'email'> & {
-        profile?: Pick<NonNullable<User['profile']>, 'displayName' | 'image'>;
-    };
     status?: Pick<WorkspaceStatus, 'value'>;
 };
 

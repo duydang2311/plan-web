@@ -31,9 +31,11 @@
     --_text: var(--color-base-fg-2);
     --_text-hover: var(--color-base-fg-1);
     --_text-active: var(--color-base-fg-3);
+    --_text-selected: var(--color-base-fg-1);
     --_bg: transparent;
     --_bg-hover: color-mix(in oklch, var(--color-base-fg-2) 20%, transparent);
     --_bg-active: color-mix(in oklch, var(--color-base-fg-2) 5%, transparent);
+    --_bg-selected: var(--color-base-selected);
     @apply ring-base-fg-2/20;
 
     &:where(:focus-visible) {
@@ -101,15 +103,15 @@
     background-color: var(--_bg);
     color: var(--_text);
 
+    &:where(:not([data-melt-popover-trigger])[data-state='open']),
+    &:where([data-melt-popover-trigger][data-custom-state='open']) {
+        color: var(--_text-selected);
+        background-color: var(--_bg-selected);
+    }
+
     &:where(:hover) {
         background-color: var(--_bg-hover);
         color: var(--_text-hover);
-    }
-
-    &:where(:not([data-melt-popover-trigger])[data-state='open']),
-    &:where([data-melt-popover-trigger][data-custom-state='open']) {
-        color: var(--_text-hover);
-        background-color: var(--_bg-hover);
     }
 
     &:where(:active) {

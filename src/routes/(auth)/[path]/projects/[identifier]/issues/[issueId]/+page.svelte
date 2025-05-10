@@ -2,11 +2,7 @@
     import { Pane, PaneGroup, PaneResizer, type PaneAPI } from 'paneforge';
     import { onMount } from 'svelte';
     import { IconButton } from '~/lib/components';
-    import {
-        IconChevronRight,
-        IconPanelRightClose,
-        IconPanelRightOpen
-    } from '~/lib/components/icons';
+    import { IconPanelRightClose, IconPanelRightOpen } from '~/lib/components/icons';
     import { permissions } from '~/lib/models/permission';
     import { createRef } from '~/lib/utils/runes.svelte';
     import type { ActionData, PageData } from './$types';
@@ -167,30 +163,23 @@
                 </div>
             </div>
         </Pane>
-        <PaneResizer class="h-full px-1">
+        <PaneResizer class="h-full min-h-screen px-1">
             <div class="bg-base-border-2 h-full w-px"></div>
         </PaneResizer>
         <Pane
             defaultSize={(1 / 4) * 100}
             collapsible
-            collapsedSize={0}
             bind:pane={rightPane}
             onCollapse={() => (collapsed = true)}
             onExpand={() => (collapsed = false)}
-            onResize={(size) => {
-                if (Math.abs(size) <= Number.EPSILON) {
-                    collapsed = true;
-                } else {
-                    collapsed = false;
-                }
-            }}
-            class="min-w-max"
+            class="min-w-8 text-sm"
         >
             {#if collapsed}
                 <div class="p-2 pl-1">
                     <IconButton
                         type="button"
                         variant="base"
+                        class="text-base"
                         onclick={() => {
                             if (!rightPane) {
                                 return;
@@ -210,6 +199,7 @@
                     <IconButton
                         type="button"
                         variant="base"
+                        class="text-base"
                         onclick={() => {
                             if (!rightPane) {
                                 return;
@@ -223,16 +213,13 @@
                     >
                         <IconPanelRightClose />
                     </IconButton>
-                    <div class="-mt-6">
-                        <h2 class="text-p mb-2 font-medium">Properties</h2>
-                        <div class="space-y-2">
-                            <Status
-                                workspaceId={data.workspace.id}
-                                issueId={data.page.issue.id}
-                                canUpdate={can.update}
-                            />
-                            <Priority issueId={data.page.issue.id} canUpdate={can.update} />
-                        </div>
+                    <div class="-mt-6 space-y-4">
+                        <Status
+                            workspaceId={data.workspace.id}
+                            issueId={data.page.issue.id}
+                            canUpdate={can.update}
+                        />
+                        <Priority issueId={data.page.issue.id} canUpdate={can.update} />
                     </div>
                     <SelectAssignees
                         workspaceId={data.workspace.id}

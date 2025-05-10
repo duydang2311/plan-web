@@ -29,7 +29,7 @@
     const isAuthor = $derived(audit.user.id === currentUserId);
 </script>
 
-<div class="bg-base-2 dark:bg-base-3 -mx-4 rounded-lg p-4">
+<div class="bg-base-3 -mx-4 rounded-xl p-4">
     <div class="flex gap-4">
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
@@ -42,7 +42,7 @@
                 class="size-10"
             />
         </OptionalLink>
-        <div class="grow">
+        <div class="grow overflow-hidden">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
@@ -54,10 +54,10 @@
                             <span class="font-bold">
                                 {audit.user.profile?.displayName ?? audit.user.email}
                             </span>
+                            <span class="c-text-secondary text-sm">
+                                {formatTimeUi(audit.createdTime)}
+                            </span>
                         </OptionalLink>
-                        <span class="c-text-secondary text-sm">
-                            {formatTimeUi(audit.createdTime)}
-                        </span>
                         {#if isAuthor}
                             <span
                                 class="bg-base-1 dark:bg-base-5 border-base-border-3 c-text-secondary rounded-full border px-1 text-sm"
