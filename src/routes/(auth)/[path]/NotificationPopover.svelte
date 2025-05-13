@@ -113,7 +113,6 @@
             el.scrollTop = scrollTop;
         });
     });
-    $inspect(ref.value);
 </script>
 
 {#snippet skeleton()}

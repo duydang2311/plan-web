@@ -29,7 +29,7 @@
     const isAuthor = $derived(audit.user.id === currentUserId);
 </script>
 
-<div class="bg-base-3 -mx-4 rounded-xl p-4">
+<div class="bg-base-2 dark:bg-base-3 -mx-4 rounded-xl p-4">
     <div class="flex gap-4">
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}

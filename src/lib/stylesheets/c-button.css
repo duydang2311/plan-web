@@ -92,12 +92,14 @@
         &:where(.c-button--outline) {
             border: 1px solid var(--_border);
         }
-        &:where(:hover), &:where(:focus-visible) {
+        &:where(:hover),
+        &:where(:focus-visible) {
             color: var(--_fg-hover);
             background-color: var(--_bg-hover);
         }
         &:where(:not([data-melt-popover-trigger])[data-state='open']),
-        &:where([data-melt-popover-trigger][data-custom-state='open']) {
+        &:where([data-melt-popover-trigger][data-custom-state='open']),
+        &:where([data-melt-select-trigger][aria-expanded='true']) {
             color: var(--_fg-hover);
             background-color: var(--_bg-active);
         }
@@ -123,7 +125,7 @@
 .c-button--sm {
     font-size: theme('fontSize[sm]');
     &:where(:not(.c-button--flat)) {
-        padding: --spacing(1) --spacing(3);
+        padding: --spacing(1) --spacing(2);
         border-radius: var(--radius-sm);
     }
 }

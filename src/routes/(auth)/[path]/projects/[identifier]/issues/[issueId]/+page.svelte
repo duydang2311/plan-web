@@ -15,6 +15,7 @@
     import SelectAssignees from './SelectAssignees.svelte';
     import SelectTeam from './SelectTeam.svelte';
     import Status from './Status.svelte';
+    import Timeline from './Timeline.svelte';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     let editing = $state.raw(false);
@@ -174,83 +175,93 @@
             onExpand={() => (collapsed = false)}
             class="min-w-8 text-sm"
         >
-            {#if collapsed}
-                <div class="p-2 pl-1">
-                    <IconButton
-                        type="button"
-                        variant="base"
-                        class="text-base"
-                        onclick={() => {
-                            if (!rightPane) {
-                                return;
-                            }
-                            if (collapsed) {
-                                rightPane.expand();
-                            } else {
-                                rightPane.collapse();
-                            }
-                        }}
-                    >
-                        <IconPanelRightOpen />
-                    </IconButton>
-                </div>
-            {:else}
-                <div class="min-w-max space-y-8 p-4">
-                    <IconButton
-                        type="button"
-                        variant="base"
-                        class="text-base"
-                        onclick={() => {
-                            if (!rightPane) {
-                                return;
-                            }
-                            if (collapsed) {
-                                rightPane.expand();
-                            } else {
-                                rightPane.collapse();
-                            }
-                        }}
-                    >
-                        <IconPanelRightClose />
-                    </IconButton>
-                    <div class="-mt-6 space-y-4">
-                        <Status
+            <div class="custom-scrollbar h-full max-w-full overflow-auto">
+                {#if collapsed}
+                    <div class="p-2 pl-1">
+                        <IconButton
+                            type="button"
+                            variant="base"
+                            class="text-base"
+                            onclick={() => {
+                                if (!rightPane) {
+                                    return;
+                                }
+                                if (collapsed) {
+                                    rightPane.expand();
+                                } else {
+                                    rightPane.collapse();
+                                }
+                            }}
+                        >
+                            <IconPanelRightOpen />
+                        </IconButton>
+                    </div>
+                {:else}
+                    <div class="min-w-72 space-y-8 p-4">
+                        <IconButton
+                            type="button"
+                            variant="base"
+                            class="text-base"
+                            onclick={() => {
+                                if (!rightPane) {
+                                    return;
+                                }
+                                if (collapsed) {
+                                    rightPane.expand();
+                                } else {
+                                    rightPane.collapse();
+                                }
+                            }}
+                        >
+                            <IconPanelRightClose />
+                        </IconButton>
+                        <div class="-mt-6 space-y-4">
+                            <div class="flex flex-wrap gap-x-2 gap-y-4 *:grow *:basis-60">
+                                <Status
+                                    workspaceId={data.workspace.id}
+                                    issueId={data.page.issue.id}
+                                    canUpdate={can.update}
+                                />
+                                <Priority issueId={data.page.issue.id} canUpdate={can.update} />
+                            </div>
+                            <Timeline
+                                issueId={data.page.issue.id}
+                                defaultStartTime={data.page.issue.startTime}
+                                defaultEndTime={data.page.issue.endTime}
+                                zone={data.page.issue.timelineZone}
+                            />
+                        </div>
+                        <SelectAssignees
                             workspaceId={data.workspace.id}
                             issueId={data.page.issue.id}
-                            canUpdate={can.update}
+                            canAssign={can.assignUser}
                         />
-                        <Priority issueId={data.page.issue.id} canUpdate={can.update} />
-                    </div>
-                    <SelectAssignees
-                        workspaceId={data.workspace.id}
-                        issueId={data.page.issue.id}
-                        canAssign={can.assignUser}
-                    />
-                    <SelectTeam
-                        workspaceId={data.workspace.id}
-                        issueId={data.page.issue.id}
-                        canAssign={can.assignTeam}
-                    />
-                    {#if can.update || can.delete}
-                        <div>
-                            <h2 class="text-p mb-2 font-medium">Actions</h2>
-                            <div class="items-center gap-2 space-y-2">
-                                {#if can.update}
-                                    <EditButton
-                                        {editing}
-                                        onClick={() => {
-                                            editing = !editing;
-                                        }}
-                                    />
-                                {/if}
-                                {#if can.delete}
-                                    <DeleteButton issue={data.page.issue} />
-                                {/if}
+                        <SelectTeam
+                            workspaceId={data.workspace.id}
+                            issueId={data.page.issue.id}
+                            canAssign={can.assignTeam}
+                        />
+                        {#if can.update || can.delete}
+                            <div>
+                                <h2 class="text-p mb-2 font-medium">Actions</h2>
+                                <div class="items-center gap-2 space-y-2">
+                                    {#if can.update}
+                                        <EditButton
+                                            {editing}
+                                            onClick={() => {
+                                                editing = !editing;
+                                            }}
+                                        />
+                                    {/if}
+                                    {#if can.delete}
+                                        <DeleteButton issue={data.page.issue} />
+                                    {/if}
+                                </div>
                             </div>
-                        </div>
-                    {/if}
-                </div>
-            {/if}
+                        {/if}
+                    </div>
+                {/if}
+            </div>
         </Pane>
     </PaneGroup>
 </main>

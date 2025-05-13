@@ -96,7 +96,6 @@
         variant="base"
         class="flex items-center gap-2"
         disabled={!canUpdate}
-        size="sm"
         {...builder.trigger}
     >
         <IconPriority />

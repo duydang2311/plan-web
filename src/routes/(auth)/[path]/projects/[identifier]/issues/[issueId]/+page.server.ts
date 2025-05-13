@@ -40,6 +40,9 @@ export type LocalIssue = Pick<
     | 'orderNumber'
     | 'priority'
     | 'statusId'
+    | 'startTime'
+    | 'endTime'
+    | 'timelineZone'
 > & {
     author: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
     status?: Pick<WorkspaceStatus, 'value'>;

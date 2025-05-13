@@ -18,6 +18,9 @@ export interface Issue {
     description?: string;
     previewDescription?: string;
     statusId?: number;
+    startTime?: string;
+    endTime?: string;
+    timelineZone?: string;
     status?: WorkspaceStatus;
     statusRank: string;
     priority: IssuePriority;
