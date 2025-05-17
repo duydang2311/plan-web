@@ -34,7 +34,7 @@
                     as="link"
                     href="/{page.params['path']}/projects/new"
                     variant="primary"
-                    class="flex items-center gap-2 pr-8 max-sm:justify-center sm:w-fit"
+                    class="flex items-center gap-2 max-sm:justify-center sm:w-fit"
                 >
                     <IconPlus />
                     Create Project

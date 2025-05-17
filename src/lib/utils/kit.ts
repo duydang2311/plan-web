@@ -8,7 +8,7 @@ import {
     validateProblemDetailsEffect
 } from './problem_details';
 import { attempt, type Attempt, type Failure, type Success } from './try';
-import { type ValidateOk, type ValidationResult } from './validation';
+import { type ValidateFail, type ValidateOk, type ValidationResult } from './validation';
 
 export function invalidateSome(...hrefs: string[]) {
     return invalidate((url) => {
@@ -210,7 +210,19 @@ export const EndpointResponse = {
 
 const actionErrors = {
     fromHttp: (a: unknown) => actionError(500, { root: [errorCodes.fromFetch(a)] }),
-    fromJson: (a: unknown) => actionError(500, { root: [errorCodes.fromJson(a)] })
+    fromJson: (a: unknown) => actionError(500, { root: [errorCodes.fromJson(a)] }),
+    fromFormData: (a: unknown) => {
+        if (a instanceof TypeError) {
+            if (a.message.includes('already been consumed')) {
+                return actionError(500, { root: ['formdata_body_used'] });
+            } else if (a.message.includes('Invalid form data')) {
+                return actionError(500, { root: ['formdata_invalid'] });
+            } else {
+                return actionError(500, { root: ['formdata_type_error'] });
+            }
+        }
+        return actionError(500, { root: ['formdata_unknown'] });
+    }
 } as const;
 
 interface ActionError<TStatus extends number = number> {
@@ -233,8 +245,13 @@ export const ActionAttempt = {
             return tryFetch;
         }
         if (!tryFetch.data.ok) {
-            const json = await ActionAttempt.JSON(() => tryFetch.data.json());
-            const problemDetails = validateProblemDetails(json);
+            const jsonAttempt = await ActionAttempt.JSON(() => tryFetch.data.json());
+            if (jsonAttempt.failed) {
+                return attempt.fail(
+                    actionError(tryFetch.data.status, { root: [tryFetch.data.status + ''] })
+                );
+            }
+            const problemDetails = validateProblemDetails(jsonAttempt.data);
             return attempt.fail(
                 actionError(
                     tryFetch.data.status,
@@ -244,11 +261,13 @@ export const ActionAttempt = {
         }
         return tryFetch;
     },
+    FormData: async <T>(f: () => Promise<T>) =>
+        attempt.promise(() => f())(actionErrors.fromFormData),
+    Validation: (validation: ValidateFail) => {
+        return fail(400, { errors: validation.errors });
+    },
     JSON: async <T>(f: () => Promise<T>) => attempt.promise(() => f())(actionErrors.fromJson),
-    Response: <A, E extends ActionError>(attempt: Attempt<A, E>) => {
-        if (attempt.ok) {
-            return attempt.data;
-        }
+    Failure: <E extends ActionError>(attempt: Failure<E>) => {
         const { status, ...data } = attempt.error;
         return fail(status, data);
     }

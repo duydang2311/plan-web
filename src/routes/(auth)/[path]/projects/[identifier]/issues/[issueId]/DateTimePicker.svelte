@@ -83,7 +83,9 @@
     const patchTime = async (dateTime: DateTime) => {
         const patchAttempt = await attempt.promise(() =>
             api.patch(`issues/${issueId}`, {
-                body: { patch: { [name]: dateTime.toUTC().toISO(), timelineZone: dateTime.zone.name } }
+                body: {
+                    patch: { [name]: dateTime.toUTC().toISO(), timelineZone: dateTime.zone.name }
+                }
             })
         )(errorCodes.fromFetch);
 
@@ -105,7 +107,7 @@
 
 <Field>
     <Label for={popover.trigger.id} class="capitalize">{label}</Label>
-    <Button {...popover.trigger} type="button" variant="base">
+    <Button {...popover.trigger} data-custom-state={popover.open ? 'open' : undefined} type="button" variant="base" filled={false} class="px-2">
         <span class="flex items-center gap-2">
             <IconCalendarRange />
             {dateTime ? dateTime.toLocaleString(DateTime.DATETIME_MED) : 'Select date and time'}
@@ -113,89 +115,85 @@
     </Button>
 </Field>
 {#if popover.open}
-    <Popover.Wrapper {...popover.content}>
-        <Popover class="p-2">
-            <div use:melt={$calendar} class="w-full">
-                <header class="mb-4 flex items-center justify-between">
-                    <IconButton melt={$prevButton}>
-                        <IconChevronLeft />
-                    </IconButton>
-                    <div use:melt={$heading}>
-                        {$headingValue}
-                    </div>
-                    <IconButton melt={$nextButton}>
-                        <IconChevronRight />
-                    </IconButton>
-                </header>
-                {#each $months as month}
-                    <table use:melt={$grid} class="w-full text-center">
-                        <thead aria-hidden="true">
+    <Popover {...popover.content} class="p-2">
+        <div use:melt={$calendar} class="w-full">
+            <header class="mb-4 flex items-center justify-between">
+                <IconButton melt={$prevButton}>
+                    <IconChevronLeft />
+                </IconButton>
+                <div use:melt={$heading}>
+                    {$headingValue}
+                </div>
+                <IconButton melt={$nextButton}>
+                    <IconChevronRight />
+                </IconButton>
+            </header>
+            {#each $months as month}
+                <table use:melt={$grid} class="w-full text-center">
+                    <thead aria-hidden="true">
+                        <tr>
+                            {#each $weekdays as day}
+                                <th>
+                                    {day}
+                                </th>
+                            {/each}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each month.weeks as days}
                             <tr>
-                                {#each $weekdays as day}
-                                    <th>
-                                        {day}
-                                    </th>
+                                {#each days as date}
+                                    {@const isHighlighted =
+                                        highlightDate &&
+                                        date.day === highlightDate.day &&
+                                        date.month === highlightDate.month &&
+                                        date.year === highlightDate.year}
+                                    <td
+                                        role="gridcell"
+                                        aria-disabled={$isDateDisabled(date) ||
+                                        $isDateUnavailable(date)
+                                            ? true
+                                            : undefined}
+                                        class="aria-disabled:text-base-fg-ghost group rounded-lg py-px"
+                                    >
+                                        <div
+                                            use:melt={$cell(date, month.value)}
+                                            data-custom-highlight={isHighlighted ? true : undefined}
+                                            class={[
+                                                'relative flex h-8 select-none items-center justify-center rounded-md transition',
+                                                'data-[selected]:bg-primary-1/10 data-[selected]:text-primary-1 group-[:not([aria-disabled])]:hover:bg-base-hover',
+                                                'data-[custom-highlight]:not-[[data-selected]]:bg-base-selected data-[custom-highlight]:not-[[data-selected]]:text-base-fg-1'
+                                            ]}
+                                        >
+                                            {date.day}
+                                        </div>
+                                    </td>
                                 {/each}
                             </tr>
-                        </thead>
-                        <tbody>
-                            {#each month.weeks as days}
-                                <tr>
-                                    {#each days as date}
-                                        {@const isHighlighted =
-                                            highlightDate &&
-                                            date.day === highlightDate.day &&
-                                            date.month === highlightDate.month &&
-                                            date.year === highlightDate.year}
-                                        <td
-                                            role="gridcell"
-                                            aria-disabled={$isDateDisabled(date) ||
-                                            $isDateUnavailable(date)
-                                                ? true
-                                                : undefined}
-                                            class="aria-disabled:text-base-fg-ghost group rounded-lg py-px"
-                                        >
-                                            <div
-                                                use:melt={$cell(date, month.value)}
-                                                data-custom-highlight={isHighlighted
-                                                    ? true
-                                                    : undefined}
-                                                class={[
-                                                    'relative flex h-8 select-none items-center justify-center rounded-md transition',
-                                                    'data-[selected]:bg-primary-1/10 data-[selected]:text-primary-1 group-[:not([aria-disabled])]:hover:bg-base-hover',
-                                                    'data-[custom-highlight]:not-[[data-selected]]:bg-base-selected data-[custom-highlight]:not-[[data-selected]]:text-base-fg-1'
-                                                ]}
-                                            >
-                                                {date.day}
-                                            </div>
-                                        </td>
-                                    {/each}
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                {/each}
-            </div>
-            <div class="mt-2">
-                <SelectTime
-                    value={time}
-                    onValueChange={(a) => {
-                        console.log('onValueChange', a);
-                        if (a == null || dateTime == null) {
-                            return;
-                        }
+                        {/each}
+                    </tbody>
+                </table>
+            {/each}
+        </div>
+        <div class="mt-2">
+            <SelectTime
+                value={time}
+                onValueChange={(a) => {
+                    console.log('onValueChange', a);
+                    if (a == null || dateTime == null) {
+                        return;
+                    }
 
-                        time = a;
-                        const d = DateTime.fromFormat(a, 'hh:mm a');
-                        dateTime = dateTime.set({
-                            hour: d.hour,
-                            minute: d.minute
-                        });
-                        patchTime(dateTime);
-                    }}
-                    disabled={$value == null}
-                />
-            </div>
-        </Popover>
-    </Popover.Wrapper>
+                    time = a;
+                    const d = DateTime.fromFormat(a, 'hh:mm a');
+                    dateTime = dateTime.set({
+                        hour: d.hour,
+                        minute: d.minute
+                    });
+                    patchTime(dateTime);
+                }}
+                disabled={$value == null}
+            />
+        </div>
+    </Popover>
 {/if}

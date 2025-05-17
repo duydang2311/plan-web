@@ -4,7 +4,7 @@
     import type { Action } from 'svelte/action';
     import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-    type Props = (
+    export type IconButtonProps = (
         | ({ as: 'link' } & HTMLAnchorAttributes)
         | ({ as?: never } & HTMLButtonAttributes)
     ) & {
@@ -19,7 +19,7 @@
         children,
         action = () => {},
         ...props
-    }: Props = $props();
+    }: IconButtonProps = $props();
     const meltAction = $derived(useMelt ? (node: HTMLElement) => useMelt.action(node) : () => {});
 </script>
 

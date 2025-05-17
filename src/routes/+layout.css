@@ -31,14 +31,14 @@
     --font-display: InterVariable, var(--font-sans);
     --font-body: InterVariable, var(--font-sans);
     --font-mono: 'DM Mono', InterVariable, var(--font-sans);
-    --text-xs: 12px;
-    --text-sm: 14px;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
     --text-p: 1rem;
-    --text-h6: 1.125rem;
-    --text-h5: 1.266rem;
-    --text-h4: 1.424rem;
-    --text-h3: 1.602rem;
-    --text-h2: 1.802rem;
+    --text-h6: 1rem;
+    --text-h5: 1rem;
+    --text-h4: 1.15rem;
+    --text-h3: 1.25rem;
+    --text-h2: 1.5rem;
     --text-h1: 2.027rem;
     --radius-full: calc(infinity * 1px);
 
@@ -48,7 +48,8 @@
 }
 
 @theme inline {
-    --default-transition-timing-function: var(--cubic-out);
+    --default-transition-timing-function: var(--cubic-in-out);
+    --default-transition-duration: 75ms;
     --text-title: var(--text-h5);
     --container-paragraph-sm: var(--container-sm);
     --container-paragraph-lg: var(--container-2xl);
@@ -61,7 +62,7 @@
 @layer base {
     :root {
         color-scheme: light dark;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 400;
         line-height: 1.5;
         font-synthesis: none;
@@ -136,7 +137,6 @@
     h6 {
         color: var(--color-base-fg-1);
         font-family: var(--font-display);
-        font-weight: 700;
     }
 
     small {

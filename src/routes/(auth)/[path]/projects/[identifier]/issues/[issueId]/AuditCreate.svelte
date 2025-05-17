@@ -13,7 +13,7 @@
     const { cloudinary } = useRuntime();
 </script>
 
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-4 text-sm">
     <OptionalLink href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}>
         <Avatar
             seed={audit.user.profile?.name ?? audit.user.email}
@@ -27,7 +27,7 @@
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
         >
-            <span class="font-bold">
+            <span class="font-medium">
                 {audit.user.profile?.displayName ?? audit.user.email}
             </span>
         </OptionalLink>

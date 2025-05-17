@@ -86,7 +86,7 @@
 
 <div
     class={[
-        'bg-base-1 dark:bg-base-2 w-(--width) border-base-border-3 shadow-xs relative overflow-hidden rounded-xl border p-4 focus:outline-none'
+        'bg-base-1 dark:bg-base-2 w-(--width) border-base-border-3 shadow-xs relative overflow-hidden rounded-lg border p-4 focus:outline-none'
     ]}
 >
     <div class="flex items-start gap-4">

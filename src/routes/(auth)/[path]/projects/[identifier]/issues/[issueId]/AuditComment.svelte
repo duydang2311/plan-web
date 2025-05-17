@@ -51,7 +51,7 @@
                                 ? `/profiles/${audit.user.profile.name}`
                                 : undefined}
                         >
-                            <span class="font-bold">
+                            <span class="font-medium">
                                 {audit.user.profile?.displayName ?? audit.user.email}
                             </span>
                             <span class="c-text-secondary text-sm">

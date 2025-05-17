@@ -33,17 +33,20 @@
             </span>
         {/if}
         {#if canAssign}
-            <IconButton {...popover.trigger} data-custom-state={popover.open ? 'open' : undefined} variant="base" class="ml-auto">
+            <IconButton
+                {...popover.trigger}
+                data-custom-state={popover.open ? 'open' : undefined}
+                variant="base"
+                class="ml-auto"
+            >
                 <IconSettingsOutline />
             </IconButton>
         {/if}
     </div>
     {#if popover.open}
-        <Popover.Wrapper {...popover.content}>
-            <Popover class="w-80 min-w-fit">
-                <SelectTeamOptions {workspaceId} {issueId} />
-            </Popover>
-        </Popover.Wrapper>
+        <Popover {...popover.content} class="w-80 min-w-fit">
+            <SelectTeamOptions {workspaceId} {issueId} />
+        </Popover>
     {/if}
     {#if $assignedTeamListQuery.isPending}
         <span class="c-text-secondary">Loading...</span>

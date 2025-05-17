@@ -23,9 +23,7 @@
     <IconPlus />
 </Button>
 {#if builder.open}
-    <Popover.Wrapper {...builder.content}>
-        <Popover class="max-w-paragraph-sm p-4">
-            <CreateChatForm {userId} />
-        </Popover>
-    </Popover.Wrapper>
+    <Popover {...builder.content} class="max-w-paragraph-sm p-4">
+        <CreateChatForm {userId} />
+    </Popover>
 {/if}

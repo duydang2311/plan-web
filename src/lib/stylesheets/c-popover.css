@@ -4,7 +4,7 @@
     --_border-top: var(--color-base-border-1);
 
     @variant dark {
-        --_bg: var(--color-base-3);
+        --_bg: var(--color-base-25);
         --_border: var(--color-base-border-3);
         --_border-top: var(--color-base-border-1);
     }
@@ -18,12 +18,21 @@
 }
 
 .c-popover {
+    --_bg: var(--color-base-1);
+    --_border: var(--color-base-border-1);
+    --_border-top: var(--color-base-border-1);
+
+    @variant dark {
+        --_bg: var(--color-base-25);
+        --_border: var(--color-base-border-3);
+        --_border-top: var(--color-base-border-1);
+    }
+
     background-color: var(--_bg);
     padding: --spacing(1);
     border: 1px solid var(--_border);
     border-radius: var(--radius-lg);
 
-    border: 1px solid var(--_border);
     @variant dark {
         border-top-color: var(--_border-top);
     }

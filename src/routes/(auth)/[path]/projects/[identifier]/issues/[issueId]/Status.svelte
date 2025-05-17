@@ -1,7 +1,6 @@
 <script lang="ts">
     import { pipe } from '@baetheus/fun/fn';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { Select } from 'melt/builders';
     import { untrack } from 'svelte';
     import { addToast, Button, Field, Label } from '~/lib/components';
     import {
@@ -12,6 +11,7 @@
         IconInProgress,
         IconTodo
     } from '~/lib/components/icons';
+    import Select from '~/lib/components/select';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { type PaginatedList } from '~/lib/models/paginatedList';
     import type { WorkspaceStatus } from '~/lib/models/status';
@@ -101,7 +101,7 @@
     let value = $state.raw<string | undefined>(
         $query.data == null ? undefined : $query.data.id + ''
     );
-    const builder = new Select({
+    const select = new Select.Builder({
         value: () => value,
         forceVisible: true,
         floatingConfig: {
@@ -143,13 +143,14 @@
 </script>
 
 <Field>
-    <Label for={builder.trigger.id}>Status</Label>
+    <Label for={select.trigger.id}>Status</Label>
     <Button
         type="button"
         variant="base"
-        class="flex items-center gap-2"
+        class="flex items-center gap-2 px-2"
+        filled={false}
         disabled={!canUpdate}
-        {...builder.trigger}
+        {...select.trigger}
     >
         {#if value == null}
             No status
@@ -162,7 +163,9 @@
             </span>
         {/if}
     </Button>
-    {#if builder.open}
-        <StatusOptions {builder} {workspaceId} />
-    {/if}
 </Field>
+{#if select.open}
+    <Select {...select.content}>
+        <StatusOptions {workspaceId} builder={select} />
+    </Select>
+{/if}

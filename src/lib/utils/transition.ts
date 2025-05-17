@@ -19,7 +19,7 @@ interface FlyAndScaleOptions {
     easing?: EasingFunction;
 }
 
-export const flyAndScale = (node: HTMLElement, options: FlyAndScaleOptions): TransitionConfig => {
+export const flyAndScale = (node: Element, options: FlyAndScaleOptions): TransitionConfig => {
     const style = getComputedStyle(node);
     const transform = style.transform === 'none' ? '' : style.transform;
 
@@ -36,7 +36,7 @@ export const flyAndScale = (node: HTMLElement, options: FlyAndScaleOptions): Tra
     };
 };
 
-export function none(_node: HTMLElement, { delay = 0, duration = 400 } = {}) {
+export function none(_node: Element, { delay = 0, duration = 400 } = {}) {
     return {
         delay,
         css: () => {
@@ -47,8 +47,8 @@ export function none(_node: HTMLElement, { delay = 0, duration = 400 } = {}) {
     };
 }
 
-type TsapCallback = (node: HTMLElement, gsap: typeof __gsap) => gsap.core.Animation;
-export function tsap(node: HTMLElement, callback: TsapCallback) {
+type TsapCallback = (node: Element, gsap: typeof __gsap) => gsap.core.Animation;
+export function tsap(node: Element, callback: TsapCallback) {
     const animation = callback(node, __gsap);
     return {
         duration: animation.totalDuration() * 1000,
@@ -78,17 +78,17 @@ export const select: Record<'in' | 'out', TsapCallback> = {
 };
 
 export const dialog = {
-    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    in: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,
             scale: 0.98,
             duration: 0.15,
             ease: 'power2.out',
-            clearProps: 'opacity,scale',
+            clearProps: 'opacity,scale,transform',
             force3D: true,
             ...vars
         }),
-    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    out: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.to(node, {
             opacity: 0,
             scale: 0.98,
@@ -107,6 +107,7 @@ export const popover: Record<'in' | 'out', TsapCallback> = {
             y: '-0.25rem',
             duration: 0.075,
             ease: 'circ.out',
+            force3D: true,
             clearProps: 'opacity,scaleY,y'
         }),
     out: (node, gsap) =>
@@ -115,12 +116,13 @@ export const popover: Record<'in' | 'out', TsapCallback> = {
             opacity: 0,
             y: '-0.5rem',
             duration: 0.075,
+            force3D: true,
             ease: 'circ.in'
         })
 };
 
 export const pageBlur = {
-    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    in: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,
             filter: 'blur(2px)',
@@ -129,7 +131,7 @@ export const pageBlur = {
             clearProps: 'opacity,filter',
             ...vars
         }),
-    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    out: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.to(node, {
             opacity: 0,
             duration: 0.1,
@@ -139,7 +141,7 @@ export const pageBlur = {
 } as const;
 
 export const dialogOverlay = {
-    in: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    in: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,
             duration: 0.15,
@@ -147,7 +149,7 @@ export const dialogOverlay = {
             clearProps: 'opacity',
             ...vars
         }),
-    out: (vars?: gsap.TweenVars) => (node: HTMLElement, gsap: typeof __gsap) =>
+    out: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.to(node, {
             opacity: 0,
             duration: 0.15,

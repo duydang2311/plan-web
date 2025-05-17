@@ -30,17 +30,15 @@
     <IconOptionsOutline />
 </IconButton>
 {#if builder.open}
-    <Popover.Wrapper {...builder.content}>
-        <Popover>
-            <AuditCommentActionsPopover
-                {auditId}
-                {editing}
-                {ref}
-                onEdit={() => {
-                    editing = true;
-                    builder.open = false;
-                }}
-            />
-        </Popover>
-    </Popover.Wrapper>
+    <Popover {...builder.content}>
+        <AuditCommentActionsPopover
+            {auditId}
+            {editing}
+            {ref}
+            onEdit={() => {
+                editing = true;
+                builder.open = false;
+            }}
+        />
+    </Popover>
 {/if}

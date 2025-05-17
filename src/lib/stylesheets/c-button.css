@@ -70,7 +70,7 @@
     width: 100%;
     text-align: center;
     font-family: var(--font-display);
-    padding: --spacing(2) --spacing(5);
+    padding: --spacing(2) --spacing(4);
     font-weight: 600;
     color: var(--_fg);
     box-shadow: var(--_shadow);

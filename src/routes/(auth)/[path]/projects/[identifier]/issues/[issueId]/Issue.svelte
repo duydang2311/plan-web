@@ -52,7 +52,7 @@
             };
         }}
     >
-        <h1>
+        <h1 class="font-bold">
             {ref.value!.title}
             <span class="text-base-fg-ghost text-h1 font-light">
                 #{ref.value!.orderNumber}

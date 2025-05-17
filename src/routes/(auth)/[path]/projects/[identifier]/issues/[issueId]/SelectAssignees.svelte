@@ -60,11 +60,9 @@
         {/if}
     </div>
     {#if popover.open}
-        <Popover.Wrapper {...popover.content}>
-            <Popover class="w-80 min-w-fit">
-                <SelectAssigneesOptions {workspaceId} {issueId} />
-            </Popover>
-        </Popover.Wrapper>
+        <Popover {...popover.content} class="w-80 min-w-fit">
+            <SelectAssigneesOptions {workspaceId} {issueId} />
+        </Popover>
     {/if}
     {#if $assigneeListQuery.isPending}
         <span class="c-text-secondary">Loading...</span>

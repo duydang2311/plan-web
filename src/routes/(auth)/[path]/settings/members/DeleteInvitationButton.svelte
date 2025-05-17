@@ -35,55 +35,53 @@
     <IconTrash />
 </IconButton>
 {#if builder.open}
-    <Popover.Wrapper {...builder.content} class="max-w-paragraph-sm">
-        <Popover class="p-4">
-            <h2>Delete invitation?</h2>
-            <p class="mt-1">This will revoke the invitation for this user and cannot be undone.</p>
-            <form
-                method="post"
-                action="?/delete_invitation"
-                class="mt-4 flex items-center justify-end gap-2"
-                use:enhance={() => {
-                    const old = invitationListRef.value;
-                    if (old) {
-                        invitationListRef.value = paginatedList({
-                            items: old.items.filter((i) => i.id !== id),
-                            totalCount: old.totalCount - 1
+    <Popover {...builder.content} class="max-w-paragraph-sm p-4">
+        <h2>Delete invitation?</h2>
+        <p class="mt-1">This will revoke the invitation for this user and cannot be undone.</p>
+        <form
+            method="post"
+            action="?/delete_invitation"
+            class="mt-4 flex items-center justify-end gap-2"
+            use:enhance={() => {
+                const old = invitationListRef.value;
+                if (old) {
+                    invitationListRef.value = paginatedList({
+                        items: old.items.filter((i) => i.id !== id),
+                        totalCount: old.totalCount - 1
+                    });
+                }
+                return async ({ result, update }) => {
+                    if (result.type === 'failure') {
+                        invitationListRef.value = old;
+                        const validation = validateDeleteMemberActionFailure(result.data);
+                        toast({
+                            type: 'negative',
+                            body: 'Something went wrong while deleting the invitation.',
+                            footer: stringifyActionFailureErrors(
+                                validation.ok ? validation.data.errors : validation.errors
+                            )
+                        });
+                    } else if (result.type === 'success') {
+                        toast({
+                            type: 'positive',
+                            body: 'Invitation deleted successfully.'
                         });
                     }
-                    return async ({ result, update }) => {
-                        if (result.type === 'failure') {
-                            invitationListRef.value = old;
-                            const validation = validateDeleteMemberActionFailure(result.data);
-                            toast({
-                                type: 'negative',
-                                body: 'Something went wrong while deleting the invitation.',
-                                footer: stringifyActionFailureErrors(
-                                    validation.ok ? validation.data.errors : validation.errors
-                                )
-                            });
-                        } else if (result.type === 'success') {
-                            toast({
-                                type: 'positive',
-                                body: 'Invitation deleted successfully.'
-                            });
-                        }
-                        await update();
-                    };
-                }}
+                    await update();
+                };
+            }}
+        >
+            <input type="hidden" name="id" value={id} />
+            <Button
+                type="button"
+                variant="base"
+                outline
+                class="w-fit"
+                onclick={() => (open = false)}
             >
-                <input type="hidden" name="id" value={id} />
-                <Button
-                    type="button"
-                    variant="base"
-                    outline
-                    class="w-fit"
-                    onclick={() => (open = false)}
-                >
-                    Cancel
-                </Button>
-                <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
-            </form>
-        </Popover>
-    </Popover.Wrapper>
+                Cancel
+            </Button>
+            <Button type="submit" variant="negative" outline class="w-fit">Delete</Button>
+        </form>
+    </Popover>
 {/if}

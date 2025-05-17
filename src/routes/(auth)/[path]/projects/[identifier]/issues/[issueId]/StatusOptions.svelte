@@ -70,26 +70,24 @@
     };
 </script>
 
-<div class="c-select--menu" in:tsap={select.in} out:tsap={select.out} {...builder.content}>
-    {#if $query.isFetching}
-        <li class="c-select--option text-base-fg-ghost">Loading...</li>
-    {:else if options && options.items.length > 0}
-        {#each options.items as item (item.value.id)}
-            {@const StatusIcon =
-                item.value.icon && item.value.icon in statusIcons
-                    ? statusIcons[item.value.icon as keyof typeof statusIcons]
-                    : undefined}
-            <li class="c-select--option" {...builder.getOption(item.value.id + '')}>
-                {#if builder.isSelected(item.value.id + '')}
-                    <IconCheck class="c-select--check" />
-                {/if}
-                {#if StatusIcon}
-                    <StatusIcon />
-                {/if}
-                {item.label}
-            </li>
-        {/each}
-    {:else}
-        <li class="c-select--option text-base-fg-ghost">No statuses yet.</li>
-    {/if}
-</div>
+{#if $query.isFetching}
+    <li class="c-select--option text-base-fg-ghost">Loading...</li>
+{:else if options && options.items.length > 0}
+    {#each options.items as item (item.value.id)}
+        {@const StatusIcon =
+            item.value.icon && item.value.icon in statusIcons
+                ? statusIcons[item.value.icon as keyof typeof statusIcons]
+                : undefined}
+        <li class="c-select--option" {...builder.getOption(item.value.id + '')}>
+            {#if builder.isSelected(item.value.id + '')}
+                <IconCheck class="c-select--check" />
+            {/if}
+            {#if StatusIcon}
+                <StatusIcon />
+            {/if}
+            {item.label}
+        </li>
+    {/each}
+{:else}
+    <li class="c-select--option text-base-fg-ghost">No statuses yet.</li>
+{/if}

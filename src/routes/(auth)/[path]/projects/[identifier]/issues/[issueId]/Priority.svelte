@@ -2,10 +2,9 @@
     import { type SelectOption } from '@melt-ui/svelte';
     import { A, D, pipe } from '@mobily/ts-belt';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-    import { Select } from 'melt/builders';
     import { writable } from 'svelte/store';
     import { addToast, Button, Field, Label } from '~/lib/components';
-    import { IconCheck } from '~/lib/components/icons';
+    import Select from '~/lib/components/select';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import {
         getPriorityLabel,
@@ -13,7 +12,6 @@
         priorityIcons,
         type IssuePriority
     } from '~/lib/models/issue';
-    import { select, tsap } from '~/lib/utils/transition';
 
     interface Props {
         issueId: string;
@@ -76,7 +74,7 @@
     let value = $state.raw<string>(
         (items.find((a) => a.value === priority)?.value ?? items[0].value) + ''
     );
-    const builder = new Select({
+    const builder = new Select.Builder({
         value: () => value,
         onValueChange: (next) => {
             if (next) {
@@ -94,7 +92,8 @@
     <Button
         type="button"
         variant="base"
-        class="flex items-center gap-2"
+        class="flex items-center gap-2 px-2"
+        filled={false}
         disabled={!canUpdate}
         {...builder.trigger}
     >
@@ -103,18 +102,18 @@
             {getPriorityLabel($selected.value)}
         </span>
     </Button>
-    {#if builder.open}
-        <ol class="c-select--menu" in:tsap={select.in} out:tsap={select.out} {...builder.content}>
-            {#each items as item (item.value)}
-                {@const IconPriority = priorityIcons[item.value]}
-                <li class="c-select--option" {...builder.getOption(item.value + '')}>
-                    <IconPriority />
-                    {#if builder.isSelected(item.value + '')}
-                        <IconCheck class="c-select--check" />
-                    {/if}
-                    {item.label}
-                </li>
-            {/each}
-        </ol>
-    {/if}
 </Field>
+{#if builder.open}
+    <Select {...builder.content}>
+        {#each items as item (item.value)}
+            {@const IconPriority = priorityIcons[item.value]}
+            <Select.Option {...builder.getOption(item.value + '')}>
+                <IconPriority />
+                {#if builder.isSelected(item.value + '')}
+                    <Select.Check />
+                {/if}
+                {item.label}
+            </Select.Option>
+        {/each}
+    </Select>
+{/if}
