@@ -1,4 +1,3 @@
-import { fail } from '@sveltejs/kit';
 import { Effect } from 'effect';
 import { type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';

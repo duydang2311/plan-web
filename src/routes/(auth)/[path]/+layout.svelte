@@ -7,7 +7,6 @@
     import {
         IconChat,
         IconChatOutline,
-        IconChevronRight,
         IconCircleDashed,
         IconCircleDashedOutline,
         IconHome,

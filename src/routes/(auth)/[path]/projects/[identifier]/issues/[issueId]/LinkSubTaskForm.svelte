@@ -5,11 +5,11 @@
     import { Button, Field, Input, Label } from '~/lib/components';
     import { IconLink } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { ChecklistItemKind } from '~/lib/models/checklist';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { mapMaybePromise } from '~/lib/utils/promise';
     import { QueryResponse } from '~/lib/utils/query';
     import type { LocalSearchIssue } from './types';
-    import { ChecklistItemKind } from '~/lib/models/checklist';
-    import { mapMaybePromise, unwrapMaybePromise } from '~/lib/utils/promise';
 
     const {
         projectId,

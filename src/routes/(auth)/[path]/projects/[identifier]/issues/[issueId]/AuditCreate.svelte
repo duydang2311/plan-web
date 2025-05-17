@@ -1,10 +1,10 @@
 <script lang="ts">
     import { Resize } from '@cloudinary/url-gen/actions';
-    import { Avatar, OptionalLink, RelativeTime } from '~/lib/components';
+    import { Avatar, OptionalLink } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
-    import type { LocalIssueAudit } from './+page.server';
     import { formatTimeUi } from '~/lib/utils/time';
+    import type { LocalIssueAudit } from './+page.server';
 
     interface Props {
         audit: LocalIssueAudit;

@@ -1,26 +1,26 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import { SvelteSet } from 'svelte/reactivity';
+    import { toStore } from 'svelte/store';
     import { Button, toast } from '~/lib/components';
     import { IconLink, IconPlus } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { ChecklistItemKind } from '~/lib/models/checklist';
+    import { errorCodes } from '~/lib/models/errors';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import {
         stringifyActionFailureErrors,
         validateActionFailureData
     } from '~/lib/utils/kit.client';
     import type { AsyncRef } from '~/lib/utils/runes.svelte';
-    import type { ActionData, SubmitFunction } from './$types';
+    import { attempt } from '~/lib/utils/try';
+    import type { SubmitFunction } from './$types';
     import type { LocalChecklistItem } from './+page.server';
     import AddToDo from './AddToDo.svelte';
     import ChecklistItem from './ChecklistItem.svelte';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { errorCodes } from '~/lib/models/errors';
-    import { attempt } from '~/lib/utils/try';
-    import { invalidateAll } from '$app/navigation';
     import LinkSubTaskDialog from './LinkSubTaskDialog.svelte';
-    import { toStore } from 'svelte/store';
     import type { LocalSearchIssue } from './types';
-    import { ChecklistItemKind } from '~/lib/models/checklist';
 
     const {
         checklistRef,
@@ -284,7 +284,7 @@
         <div class="c-text-secondary px-4 py-2">Loading...</div>
     {:else if checklistRef.value == null || checklistRef.value.items.length == 0}
         {#if !addTodo}
-        <div class="c-text-secondary px-4 py-2">
+            <div class="c-text-secondary px-4 py-2">
                 No checklist items found. Start by adding a new one.
             </div>
         {/if}

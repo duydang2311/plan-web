@@ -1,10 +1,10 @@
-import { LoadResponse } from '~/lib/utils/kit';
-import type { PageServerLoad } from './$types';
-import { ApiClient } from '~/lib/services/api_client.server';
 import { Effect } from 'effect';
+import type { LocalChatMessage } from '~/lib/components/pages/chat/utils';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
-import type { LocalChatMessage } from '~/lib/components/pages/chat/ChatInbox.svelte';
+import { ApiClient } from '~/lib/services/api_client.server';
+import { LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals: { runtime }, isDataRequest }) => {
     const chatId = params.chatId;

@@ -1,9 +1,8 @@
 <script lang="ts">
     import { createCheckbox, type CreateCheckboxProps } from '@melt-ui/svelte';
     import { mergeActions } from '~/lib/utils/actions.client';
-    import IconButton, { type IconButtonProps } from '../IconButton.svelte';
-    import { watch } from '~/lib/utils/runes.svelte';
     import { tsap } from '~/lib/utils/transition';
+    import IconButton, { type IconButtonProps } from '../IconButton.svelte';
 
     const { options, action, ...props }: { options?: CreateCheckboxProps } & IconButtonProps =
         $props();
@@ -12,14 +11,6 @@
         elements: { root },
         helpers: { isChecked, isIndeterminate }
     } = createCheckbox(options);
-    let checkRef = $state.raw<SVGPathElement>();
-
-    watch(() => [$isChecked, checkRef])(() => {
-        if (!$isChecked || !checkRef) {
-            return;
-        }
-        gsap.to();
-    });
 </script>
 
 <IconButton

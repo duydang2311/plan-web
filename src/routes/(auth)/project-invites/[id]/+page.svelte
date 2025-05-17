@@ -1,7 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
-    import { redirect } from '@sveltejs/kit';
     import { Button, LoadingMonitor, toast } from '~/lib/components';
     import { IconBack, IconCheck, IconXMark } from '~/lib/components/icons';
     import { createLoading } from '~/lib/utils/runes.svelte';

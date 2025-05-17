@@ -3,7 +3,6 @@
     import { Button, IconButton } from '~/lib/components';
     import { IconEditOutline, IconMenu } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
-    import type { LocalChecklistItem } from './+page.server';
     import ChecklistItemActionDelete from './ChecklistItemActionDelete.svelte';
 
     const {

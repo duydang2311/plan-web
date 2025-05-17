@@ -1,14 +1,14 @@
 import { D } from '@mobily/ts-belt';
-import { Console, Effect, Exit, pipe } from 'effect';
+import { Effect, Exit, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
+import type { UserPreset } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
-import type { UserPreset } from '~/lib/models/user';
 
 export type LocalIssue = Pick<
     Issue,

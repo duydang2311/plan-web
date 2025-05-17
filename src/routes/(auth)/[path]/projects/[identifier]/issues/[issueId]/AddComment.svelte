@@ -1,16 +1,15 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { invalidateAll } from '$app/navigation';
     import { Editor } from '@tiptap/core';
     import { DateTime } from 'luxon';
     import { Button, TiptapEditor } from '~/lib/components';
     import { IconArrowUp } from '~/lib/components/icons';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import type { UserPreset } from '~/lib/models/user';
     import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import type { ValidationResult } from '~/lib/utils/validation';
     import type { LocalIssueAudit } from './+page.server';
     import { clientValidate } from './utils.client';
-    import type { UserPreset } from '~/lib/models/user';
 
     const {
         user,

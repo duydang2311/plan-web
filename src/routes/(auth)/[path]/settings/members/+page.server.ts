@@ -1,4 +1,4 @@
-import { error, fail, type ActionFailure } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { Cause, Effect, Exit, Option, pipe } from 'effect';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { Role } from '~/lib/models/role';
@@ -6,6 +6,7 @@ import type { User, UserPreset } from '~/lib/models/user';
 import type { WorkspaceInvitation, WorkspaceMember } from '~/lib/models/workspace';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
+import { Type } from '~/lib/utils/typebox';
 import { validator } from '~/lib/utils/validation';
 import type { Actions, PageServerLoad, PageServerLoadEvent } from './$types';
 import {
@@ -14,7 +15,6 @@ import {
     validateInviteMember,
     workspaceMembersParams
 } from './utils';
-import { Type } from '~/lib/utils/typebox';
 
 export type LocalWorkspaceMember = Pick<WorkspaceMember, 'createdTime' | 'updatedTime' | 'id'> & {
     user: UserPreset['basicProfile'];
@@ -126,7 +126,7 @@ export const actions: Actions = {
     invite_member: ({
         request,
         locals: { runtime }
-    }): Promise<ActionFailure<{ inviteMember: { errors: Record<string, string[]> } }> | null> => {
+    }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
             const validation = yield* ActionResponse.Validation(

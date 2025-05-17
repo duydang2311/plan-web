@@ -1,14 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { goto } from '$app/navigation';
     import { Button, LoadingMonitor, toast } from '~/lib/components';
     import { IconBack, IconCheck, IconXMark } from '~/lib/components/icons';
-    import { createLoading, createRef } from '~/lib/utils/runes.svelte';
-    import type { PageData, SubmitFunction } from './$types';
     import {
         stringifyActionFailureErrors,
         validateActionFailureData
     } from '~/lib/utils/kit.client';
+    import { createLoading, createRef } from '~/lib/utils/runes.svelte';
+    import type { PageData, SubmitFunction } from './$types';
 
     const { data }: { data: PageData } = $props();
 

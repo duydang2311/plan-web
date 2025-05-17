@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
     import { Button } from '~/lib/components';
     import { IconPlus } from '~/lib/components/icons';
     import Popover from '../../popover';
