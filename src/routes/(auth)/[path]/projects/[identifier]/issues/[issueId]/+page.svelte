@@ -77,6 +77,7 @@
                     </div>
                     <div>
                         <Checklist
+                            issue={data.page.issue}
                             {checklistRef}
                             projectId={data.project.id}
                             issueId={data.page.issue.id}
@@ -164,7 +165,11 @@
                                     issueId={data.page.issue.id}
                                     canUpdate={can.update}
                                 />
-                                <Priority ref={issueRef} issueId={data.page.issue.id} canUpdate={can.update} />
+                                <Priority
+                                    ref={issueRef}
+                                    issueId={data.page.issue.id}
+                                    canUpdate={can.update}
+                                />
                             </div>
                             <Timeline
                                 issueId={data.page.issue.id}

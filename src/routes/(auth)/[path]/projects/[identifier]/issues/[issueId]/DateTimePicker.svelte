@@ -179,7 +179,6 @@
             <SelectTime
                 value={time}
                 onValueChange={(a) => {
-                    console.log('onValueChange', a);
                     if (a == null || dateTime == null) {
                         return;
                     }

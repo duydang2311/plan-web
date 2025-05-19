@@ -436,6 +436,31 @@ export const actions: Actions = {
         if (patchAttempt.failed) {
             return ActionAttempt.Failure(patchAttempt);
         }
+    },
+    create_checklist_item_todo_batch: async ({ request, locals }) => {
+        const formDataAttempt = await ActionAttempt.FormData(() => request.formData());
+        if (formDataAttempt.failed) {
+            return ActionAttempt.Failure(formDataAttempt);
+        }
+
+        const validation = validateAddChecklistItemTodoBatch(
+            decodeAddChecklistItemTodoBatch(formDataAttempt.data)
+        );
+        if (!validation.ok) {
+            return ActionAttempt.Validation(validation);
+        }
+
+        const createAttempt = await ActionAttempt.HTTP(() =>
+            locals.api.post(`checklist-items/batch`, {
+                body: {
+                    parentIssueId: validation.data.parentIssueId,
+                    contents: validation.data.contents
+                }
+            })
+        );
+        if (createAttempt.failed) {
+            return ActionAttempt.Failure(createAttempt);
+        }
     }
 };
 
@@ -520,4 +545,22 @@ const validatePatchChecklistItem = validator(
         { additionalProperties: false }
     ),
     { stripLeadingSlash: true, convert: true }
+);
+
+const decodeAddChecklistItemTodoBatch = (formData: FormData) => {
+    return {
+        parentIssueId: formData.get('parentIssueId'),
+        contents: formData.getAll('contents').filter((a) => typeof a === 'string' && a.length > 0)
+    };
+};
+
+const validateAddChecklistItemTodoBatch = validator(
+    Type.Object(
+        {
+            parentIssueId: Type.String(),
+            contents: Type.Array(Type.String(), { minItems: 1 })
+        },
+        { additionalProperties: false }
+    ),
+    { stripLeadingSlash: true }
 );

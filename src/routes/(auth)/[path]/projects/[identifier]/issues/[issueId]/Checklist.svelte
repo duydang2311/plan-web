@@ -1,33 +1,48 @@
+<script lang="ts" module>
+    declare global {
+        namespace App {
+            interface PageState {
+                importChecklistTodos?: string[];
+            }
+        }
+    }
+</script>
+
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
+    import { invalidateAll, replaceState } from '$app/navigation';
+    import { page } from '$app/state';
     import { SvelteSet } from 'svelte/reactivity';
     import { toStore } from 'svelte/store';
-    import { Button, CircularProgressBar, toast } from '~/lib/components';
-    import { IconLink, IconPlus } from '~/lib/components/icons';
+    import invariant from 'tiny-invariant';
+    import { Button, CircularProgressBar, LoadingMonitor, toast } from '~/lib/components';
+    import { IconLink, IconPlus, IconSparkles } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { ChecklistItemKind } from '~/lib/models/checklist';
     import { errorCodes } from '~/lib/models/errors';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { StatusCategory } from '~/lib/models/status';
     import {
         stringifyActionFailureErrors,
         validateActionFailureData
     } from '~/lib/utils/kit.client';
-    import type { AsyncRef } from '~/lib/utils/runes.svelte';
+    import { createLoading, type AsyncRef } from '~/lib/utils/runes.svelte';
     import { attempt } from '~/lib/utils/try';
     import type { SubmitFunction } from './$types';
-    import type { LocalChecklistItem } from './+page.server';
+    import type { LocalChecklistItem, LocalIssue } from './+page.server';
     import AddToDo from './AddToDo.svelte';
     import ChecklistItem from './ChecklistItem.svelte';
+    import ImportChecklistTodosDialog from './ImportChecklistTodosDialog.svelte';
     import LinkSubTaskDialog from './LinkSubTaskDialog.svelte';
     import type { LocalSearchIssue } from './types';
-    import { StatusCategory } from '~/lib/models/status';
 
     const {
+        issue,
         checklistRef,
         projectId,
         issueId
     }: {
+        issue: LocalIssue;
         checklistRef: AsyncRef<PaginatedList<LocalChecklistItem>>;
         projectId: string;
         issueId: string;
@@ -213,6 +228,62 @@
             await e.update();
         };
     };
+
+    const generateLoading = createLoading();
+    const generateChecklist = async () => {
+        generateLoading.set();
+        const postAttempt = await attempt
+            .promise(() =>
+                api.post('internal/generate-checklist-todos', {
+                    body: {
+                        title: issue.title,
+                        description: issue.description,
+                    }
+                })
+            )(errorCodes.fromFetch)
+            .finally(() => {
+                generateLoading.unset();
+            });
+
+        if (postAttempt.failed || !postAttempt.data.ok) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while generating the checklist.',
+                footer: `Error code: ${postAttempt.failed ? postAttempt.error : postAttempt.data.status}.`
+            });
+            return;
+        }
+
+        const jsonAttempt = await attempt.promise(() => postAttempt.data.json())(
+            errorCodes.fromJson
+        );
+        if (jsonAttempt.failed) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong parsing checklist generation response.',
+                footer: `Error code: ${jsonAttempt.error}.`
+            });
+            return;
+        }
+
+        const parseAttempt = attempt(() => {
+            const data = JSON.parse(
+                (jsonAttempt.data as any).candidates[0].content.parts[0].text
+            ) as string[];
+            invariant(Array.isArray(data), 'data must be an array');
+            return data;
+        })(() => 'invalid_json_content');
+        if (parseAttempt.failed) {
+            toast({
+                type: 'negative',
+                body: 'Something went wrong while parsing checklist generation response.',
+                footer: `Error code: ${parseAttempt.error}.`
+            });
+            return;
+        }
+
+        replaceState('', { ...page.state, importChecklistTodos: parseAttempt.data });
+    };
 </script>
 
 <LinkSubTaskDialog
@@ -224,6 +295,8 @@
     {issueId}
     {onLinkSubmit}
 />
+
+<ImportChecklistTodosDialog {issueId} />
 
 <div class="border-base-border-3 rounded-xl border">
     <div
@@ -304,6 +377,25 @@
 {#if popover.open}
     <Popover {...popover.content}>
         <ul class="space-y-1">
+            <li>
+                <Button
+                    type="button"
+                    variant="base"
+                    class="flex items-center gap-4 px-2 text-sm capitalize"
+                    filled={false}
+                    onclick={async () => {
+                        await generateChecklist().finally(() => {
+                            popover.open = false;
+                        });
+                    }}
+                    disabled={generateLoading.immediate}
+                >
+                    <LoadingMonitor loading={generateLoading} class="size-5">
+                        <IconSparkles />
+                    </LoadingMonitor>
+                    Generate checklist
+                </Button>
+            </li>
             <li>
                 <Button
                     type="button"

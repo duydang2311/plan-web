@@ -60,6 +60,7 @@ export { default as IconPanelRightOpen } from '~icons/lucide/panel-right-open';
 export { default as IconEditOutline } from '~icons/lucide/pencil';
 export { default as IconQuotes } from '~icons/lucide/quote';
 export { default as IconRows } from '~icons/lucide/rows-3';
+export { default as IconSparkles } from '~icons/lucide/sparkles';
 export { default as IconStrikeThrough } from '~icons/lucide/strikethrough';
 export { default as IconTrash } from '~icons/lucide/trash';
 export { default as IconUnderline } from '~icons/lucide/underline';
