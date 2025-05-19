@@ -2,7 +2,7 @@
     import { invalidateAll } from '$app/navigation';
     import { SvelteSet } from 'svelte/reactivity';
     import { toStore } from 'svelte/store';
-    import { Button, toast } from '~/lib/components';
+    import { Button, CircularProgressBar, toast } from '~/lib/components';
     import { IconLink, IconPlus } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
     import { useRuntime } from '~/lib/contexts/runtime.client';
@@ -21,6 +21,7 @@
     import ChecklistItem from './ChecklistItem.svelte';
     import LinkSubTaskDialog from './LinkSubTaskDialog.svelte';
     import type { LocalSearchIssue } from './types';
+    import { StatusCategory } from '~/lib/models/status';
 
     const {
         checklistRef,
@@ -224,60 +225,28 @@
     {onLinkSubmit}
 />
 
-<div class="border-base-border-3 border-b">
-    <div class="border-b-base-border-3 flex items-end justify-between gap-4 border-b pb-2">
-        <div class="flex items-center gap-2">
-            <h2 class="text-h6 font-medium">Checklist</h2>
-            {#if checklistRef.value != null && checklistRef.value.items.length > 0}
+<div class="border-base-border-3 rounded-xl border">
+    <div
+        class="border-b-base-border-3 dark:bg-base-3 flex items-center justify-between gap-4 border-b px-4 py-2"
+    >
+        <h2 class="text-h4 font-medium">Checklist</h2>
+        {#if checklistRef.value != null && checklistRef.value.items.length > 0}
+            {@const completedCount = checklistRef.value.items.filter((i) =>
+                i.kind === ChecklistItemKind.Todo
+                    ? i.completed
+                    : i.subIssue?.status?.category === StatusCategory.Completed
+            ).length}
+            {@const total = checklistRef.value.items.length}
+            <div class="flex items-center gap-4">
                 <span class="text-base-text-2 c-text-secondary">
-                    <strong>{checklistRef.value.items.filter((i) => i.completed).length}</strong> of
-                    <strong>{checklistRef.value.items.length}</strong> completed
+                    <strong>{completedCount}</strong> of
+                    <strong>{total}</strong> completed
                 </span>
-            {/if}
-        </div>
-        <Button
-            {...popover.trigger}
-            type="button"
-            variant="base"
-            class="flex w-fit items-center gap-4 text-sm capitalize"
-        >
-            <IconPlus />
-            Add subtask
-        </Button>
-        {#if popover.open}
-            <Popover {...popover.content}>
-                <ul class="space-y-1">
-                    <li>
-                        <Button
-                            type="button"
-                            variant="base"
-                            class="flex items-center gap-4 px-2 text-sm capitalize"
-                            filled={false}
-                            onclick={() => {
-                                addTodo = true;
-                                popover.open = false;
-                            }}
-                        >
-                            <IconPlus />
-                            Add simple to-do
-                        </Button>
-                    </li>
-                    <li>
-                        <Button
-                            type="button"
-                            variant="base"
-                            filled={false}
-                            class="flex items-center gap-4 px-2 text-sm capitalize"
-                            onclick={() => {
-                                openLinkSubTaskDialog = true;
-                            }}
-                        >
-                            <IconLink />
-                            Link existing task
-                        </Button>
-                    </li>
-                </ul>
-            </Popover>
+                <CircularProgressBar
+                    value={completedCount / total}
+                    class="text-positive-1 size-5"
+                />
+            </div>
         {/if}
     </div>
     {#if checklistRef.isInitialLoading}
@@ -290,7 +259,9 @@
         {/if}
     {:else}
         <div>
-            <ul class="grid grid-cols-[auto_1fr_auto]">
+            <ul
+                class="bg-base-1 grid max-h-96 grid-cols-[auto_1fr_auto] overflow-auto rounded-b-xl"
+            >
                 {#each checklistRef.value.items as item (item.id ?? item.optimisticId)}
                     <ChecklistItem
                         {item}
@@ -320,3 +291,48 @@
         </div>
     {/if}
 </div>
+<Button
+    {...popover.trigger}
+    type="button"
+    variant="base"
+    filled={false}
+    class="ml-auto mt-2 flex w-fit items-center gap-4 text-sm capitalize"
+>
+    <IconPlus />
+    Add subtask
+</Button>
+{#if popover.open}
+    <Popover {...popover.content}>
+        <ul class="space-y-1">
+            <li>
+                <Button
+                    type="button"
+                    variant="base"
+                    class="flex items-center gap-4 px-2 text-sm capitalize"
+                    filled={false}
+                    onclick={() => {
+                        addTodo = true;
+                        popover.open = false;
+                    }}
+                >
+                    <IconPlus />
+                    Add simple to-do
+                </Button>
+            </li>
+            <li>
+                <Button
+                    type="button"
+                    variant="base"
+                    filled={false}
+                    class="flex items-center gap-4 px-2 text-sm capitalize"
+                    onclick={() => {
+                        openLinkSubTaskDialog = true;
+                    }}
+                >
+                    <IconLink />
+                    Link existing task
+                </Button>
+            </li>
+        </ul>
+    </Popover>
+{/if}

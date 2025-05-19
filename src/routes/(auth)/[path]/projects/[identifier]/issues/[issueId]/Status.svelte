@@ -2,6 +2,7 @@
     import { pipe } from '@baetheus/fun/fn';
     import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
     import { untrack } from 'svelte';
+    import { toStore } from 'svelte/store';
     import { addToast, Button, Field, Label } from '~/lib/components';
     import {
         IconBacklog,
@@ -27,31 +28,35 @@
     const { workspaceId, issueId, canUpdate }: Props = $props();
     const { api } = useRuntime();
     const queryClient = useQueryClient();
-    const queryKey = ['workspace-status', { issueId }];
-    const query = createQuery<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> | null>({
-        queryKey,
-        queryFn: () => {
-            return pipe(
-                TE.fromPromise(() =>
-                    api.get(`issues/${issueId}`, {
-                        query: { select: 'Status.Id,Status.Value,Status.Icon' }
-                    })
-                )(),
-                TE.flatMap((a) =>
-                    a.ok
-                        ? TE.fromPromise(() =>
-                              a.json<{ status?: Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> }>()
-                          )()
-                        : TE.leftVoid
-                ),
-                TE.map(({ status }) => status),
-                TE.match(
-                    () => null,
-                    (r) => r ?? null
-                )
-            )();
-        }
-    });
+    const queryKey = $derived(['workspace-status', { issueId }]);
+    const query = createQuery<Pick<WorkspaceStatus, 'id' | 'value' | 'icon'> | null>(
+        toStore(() => ({
+            queryKey,
+            queryFn: () => {
+                return pipe(
+                    TE.fromPromise(() =>
+                        api.get(`issues/${issueId}`, {
+                            query: { select: 'Status.Id,Status.Value,Status.Icon' }
+                        })
+                    )(),
+                    TE.flatMap((a) =>
+                        a.ok
+                            ? TE.fromPromise(() =>
+                                  a.json<{
+                                      status?: Pick<WorkspaceStatus, 'id' | 'value' | 'icon'>;
+                                  }>()
+                              )()
+                            : TE.leftVoid
+                    ),
+                    TE.map(({ status }) => status),
+                    TE.match(
+                        () => null,
+                        (r) => r ?? null
+                    )
+                )();
+            }
+        }))
+    );
     const mutation = createMutation({
         mutationFn: ({ statusId }: { statusId: number }) =>
             api.patch(`issues/${issueId}`, { body: { patch: { statusId } } }),
@@ -72,7 +77,6 @@
             if (error || !data?.ok) {
                 if (context) {
                     queryClient.setQueryData<WorkspaceStatus>(queryKey, context.oldStatus);
-                    value = context.oldStatus ? context.oldStatus.id + '' : undefined;
                 }
                 addToast({
                     data: {
@@ -98,9 +102,7 @@
         canceled: IconCanceled,
         duplicated: IconDuplicated
     };
-    let value = $state.raw<string | undefined>(
-        $query.data == null ? undefined : $query.data.id + ''
-    );
+    const value = $derived($query.data ? $query.data.id + '' : undefined)
     const select = new Select.Builder({
         value: () => value,
         forceVisible: true,
@@ -112,7 +114,6 @@
             if (next && next !== value) {
                 $mutation.mutate({ statusId: Number(next) });
             }
-            value = next;
         }
     });
     const selectedStatus = $derived.by(() => {

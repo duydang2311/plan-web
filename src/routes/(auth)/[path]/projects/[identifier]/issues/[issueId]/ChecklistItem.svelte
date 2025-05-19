@@ -40,16 +40,16 @@
     <li
         data-completed={item.completed ? true : undefined}
         class={[
-            'group col-span-full grid grid-cols-subgrid items-center gap-4 transition duration-75 first:rounded-t-md last:rounded-b-md',
-            item.completed ? 'bg-primary-1/5' : !isEditing ? 'hover:bg-base-hover' : undefined,
-            isEditing ? 'py-1' : 'px-4 py-2'
+            'group col-span-full grid grid-cols-subgrid items-center gap-4 transition duration-75',
+            item.completed ? 'bg-positive-1/5 text-positive-1' : !isEditing ? 'hover:bg-base-hover' : undefined,
+            isEditing ? 'py-1 px-4' : 'px-4 py-2'
         ]}
     >
         {#if isEditing}
             <form
                 method="post"
                 action="?/patch_checklist_item"
-                class="flex w-full gap-2"
+                class="flex w-full gap-2 col-span-full"
                 use:enhance={(e) => {
                     return onEditSubmit(item, e);
                 }}
@@ -60,7 +60,7 @@
                     name="content"
                     value={item.content}
                     size="sm"
-                    class="w-full max-w-full grow rounded-none border-0 border-b bg-transparent p-0 shadow-none"
+                    class="w-full max-w-full grow rounded-none border-0 border-b bg-transparent p-0 shadow-none text-base-fg-2"
                 />
                 <Button
                     type="submit"
@@ -82,9 +82,9 @@
             </form>
         {:else}
             <Checkbox
-                variant="primary"
+                variant="positive"
                 class={[
-                    'data-[state=checked]:bg-primary-1 border-primary-border data-[state=checked]:text-primary-fg-1 size-4 shrink-0 border',
+                    'data-[state=checked]:bg-positive-1 border-positive-border data-[state=checked]:text-positive-fg-1 size-4.5 shrink-0 border rounded-full p-0.5',
                     !item.completed &&
                         'opacity-0 transition duration-75 focus-visible:opacity-100 group-hover:opacity-100'
                 ]}
@@ -114,17 +114,17 @@
     {@const completed = item.subIssue.status?.category === StatusCategory.Completed}
     <li
         class={[
-            'group col-span-full grid grid-cols-subgrid items-center gap-4 px-4 py-2 transition duration-75 first:rounded-t-md last:rounded-b-md',
-            completed ? 'bg-primary-1/5' : 'hover:bg-base-hover'
+            'group col-span-full grid grid-cols-subgrid items-center gap-4 px-4 py-2 transition duration-75',
+            completed ? 'bg-positive-1/5' : 'hover:bg-base-hover'
         ]}
     >
-        <span class="c-text-secondary" class:text-primary-1={completed} class:font-bold={completed}>
+        <span class="c-text-secondary" class:text-positive-1={completed} class:font-bold={completed}>
             {item.subIssue.status?.value ?? 'No status'}
         </span>
         <Link
             href="/{page.params.path}/projects/{item.subIssue.project.identifier}/issues/{item
                 .subIssue.orderNumber}"
-            class={['font-normal', completed ? 'line-through' : undefined]}
+            class={['font-normal', completed ? 'line-through text-positive-1' : undefined]}
         >
             {item.subIssue.title}
         </Link>

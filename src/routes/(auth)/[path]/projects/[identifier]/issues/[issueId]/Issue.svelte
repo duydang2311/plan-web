@@ -59,7 +59,7 @@
             </span>
         </h1>
     </InlineEdit>
-    <div class="transition-enforcement mt-6 max-w-full">
+    <div class="transition-enforcement mt-4 max-w-full border border-base-border-3 rounded-xl p-4 bg-base-1 dark:bg-base-3">
         {#if editing}
             <div>
                 <form
@@ -136,7 +136,7 @@
                 </form>
             </div>
         {:else}
-            <div class="prose max-w-full wrap-anywhere">
+            <div class="prose max-w-full overflow-auto wrap-anywhere">
                 {#if ref.value.description && ref.value.description !== '<p></p>'}
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                     {@html DOMPurify.sanitize(ref.value.description, {

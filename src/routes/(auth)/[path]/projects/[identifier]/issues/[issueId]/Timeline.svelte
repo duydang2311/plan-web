@@ -6,15 +6,16 @@
 
     const {
         issueId,
-        defaultStartTime,
-        defaultEndTime,
+        startTime: defaultStartTime,
+        endTime: defaultEndTime,
         zone
     }: {
         issueId: string;
-        defaultStartTime?: string;
-        defaultEndTime?: string;
+        startTime?: string;
+        endTime?: string;
         zone?: string;
     } = $props();
+
     let startTime = $state.raw<DateTime | undefined>(
         defaultStartTime ? DateTime.fromISO(defaultStartTime, { zone }).toLocal() : undefined
     );
@@ -23,6 +24,16 @@
     );
     let startPicker = $state.raw<DateTimePicker>();
     let endPicker = $state.raw<DateTimePicker>();
+
+    watch(() => [defaultStartTime, zone])(() => {
+        startTime = defaultStartTime
+            ? DateTime.fromISO(defaultStartTime, { zone }).toLocal()
+            : undefined;
+    });
+
+    watch(() => [defaultEndTime, zone])(() => {
+        endTime = defaultEndTime ? DateTime.fromISO(defaultEndTime, { zone }).toLocal() : undefined;
+    });
 
     watch(() => [startTime])(() => {
         if (startTime == null || endTime == null) {

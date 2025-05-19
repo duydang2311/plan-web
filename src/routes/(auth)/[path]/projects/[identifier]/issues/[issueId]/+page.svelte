@@ -83,7 +83,7 @@
                         />
                     </div>
                     <div>
-                        <h2 class="text-h6 font-medium">Activity</h2>
+                        <h2 class="text-h4 font-medium">Activity</h2>
                         <div class="mt-4">
                             <Audits
                                 ref={auditListRef}
@@ -164,12 +164,12 @@
                                     issueId={data.page.issue.id}
                                     canUpdate={can.update}
                                 />
-                                <Priority issueId={data.page.issue.id} canUpdate={can.update} />
+                                <Priority ref={issueRef} issueId={data.page.issue.id} canUpdate={can.update} />
                             </div>
                             <Timeline
                                 issueId={data.page.issue.id}
-                                defaultStartTime={data.page.issue.startTime}
-                                defaultEndTime={data.page.issue.endTime}
+                                startTime={data.page.issue.startTime}
+                                endTime={data.page.issue.endTime}
                                 zone={data.page.issue.timelineZone}
                             />
                         </div>

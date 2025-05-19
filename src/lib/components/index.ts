@@ -4,6 +4,7 @@ export { default as Await } from './Await.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';
 export { default as Button } from './Button.svelte';
+export { default as CircularProgressBar } from './CircularProgressBar.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as DatatablePagination } from './DatatablePagination.svelte';
 export { default as DialogBuilder, type DialogProps } from './DialogBuilder.svelte';
