@@ -52,8 +52,6 @@
                     onDismiss?.();
                 }
             },
-            class: 'group',
-            unstyled: true,
             duration: durationMs
         });
     };
@@ -107,11 +105,13 @@
 </script>
 
 <Toaster
-    onmouseenter={() => {
+    toastOptions={{ class: 'group', unstyled: true }}
+    visibleToasts={5}
+    onpointerenter={() => {
         mouseover = true;
         stop();
     }}
-    onmouseleave={() => {
+    onpointerleave={() => {
         mouseover = false;
         start();
     }}
