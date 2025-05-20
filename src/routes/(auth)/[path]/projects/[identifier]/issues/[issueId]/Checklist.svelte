@@ -234,10 +234,10 @@
         generateLoading.set();
         const postAttempt = await attempt
             .promise(() =>
-                api.post('internal/generate-checklist-todos', {
+                api.post('internals/generate-checklist-todos', {
                     body: {
                         title: issue.title,
-                        description: issue.description,
+                        description: issue.description
                     }
                 })
             )(errorCodes.fromFetch)

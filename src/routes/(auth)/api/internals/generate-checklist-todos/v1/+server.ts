@@ -10,7 +10,7 @@ Make sure the checklist is in the same language as the provided title and descri
 Don't include numbering or ordering.
 Title: ${json.title}.` + (json.description ? ` Description: ${json.description}` : '').trim();
 
-    return fetch(
+    const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`,
         {
             method: 'POST',
@@ -36,4 +36,13 @@ Title: ${json.title}.` + (json.description ? ` Description: ${json.description}`
             })
         }
     );
+
+    const headers = new Headers(response.headers);
+    headers.delete('content-encoding');
+    headers.delete('content-length');
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+    });
 };
