@@ -58,7 +58,7 @@ export const createAssigneeListQuery = (f: () => { issueId: string }) => {
                     const response = await QueryResponse.HTTP(() =>
                         api.get(`issues/${issueId}/assignees`, {
                             query: {
-                                select: 'User.Id,User.Email,User.Profile.DisplayName,User.Profile.Image'
+                                select: 'User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image'
                             }
                         })
                     );

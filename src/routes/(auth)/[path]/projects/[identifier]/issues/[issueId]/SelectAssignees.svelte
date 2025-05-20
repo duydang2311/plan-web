@@ -1,10 +1,7 @@
 <script lang="ts">
-    import { Resize } from '@cloudinary/url-gen/actions';
-    import { Avatar, IconButton, Label } from '~/lib/components';
+    import { Avatar, IconButton, Label, OptionalLink } from '~/lib/components';
     import { IconSettingsOutline } from '~/lib/components/icons';
     import Popover from '~/lib/components/popover';
-    import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { imageFromAsset } from '~/lib/utils/cloudinary';
     import SelectAssigneesOptions from './SelectAssigneesOptions.svelte';
     import { createAssigneeListQuery } from './utils.client';
 
@@ -15,7 +12,6 @@
     }
 
     const { workspaceId, issueId, canAssign }: Props = $props();
-    const { cloudinary } = useRuntime();
     const assigneeListQuery = createAssigneeListQuery(() => ({ issueId }));
     const popover = new Popover.Builder({
         forceVisible: true,
@@ -74,18 +70,22 @@
         <ul class="space-y-2">
             {#each $assigneeListQuery.data.items as { user } (user.id)}
                 {@const displayName = user.profile?.displayName ?? user.profile?.name ?? user.email}
-                <li class="flex items-center gap-2">
-                    <Avatar
-                        alt="User {displayName}"
-                        seed={user.profile?.name ?? user.email}
-                        src={imageFromAsset(cloudinary)(user.profile?.image)
-                            ?.resize(Resize.fill(64))
-                            .toURL()}
-                        class="size-avatar-sm"
-                    />
-                    <div class="ellipsis font-bold">
-                        {displayName}
-                    </div>
+                <li>
+                    <OptionalLink
+                        href={user.profile ? `/profiles/${user.profile.name}` : undefined}
+                    >
+                        <div class="flex items-center gap-2">
+                            <Avatar
+                                {user}
+                                size={64}
+                                alt="User {displayName}"
+                                class="size-avatar-sm"
+                            />
+                            <div class="ellipsis font-bold">
+                                {displayName}
+                            </div>
+                        </div>
+                    </OptionalLink>
                 </li>
             {/each}
         </ul>
