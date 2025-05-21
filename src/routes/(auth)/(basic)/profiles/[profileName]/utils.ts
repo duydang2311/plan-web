@@ -13,7 +13,12 @@ export const decodeCreateProfile = (formData: FormData) => {
         obj['bio'] = bio;
     }
 
-    if (formData.has('image.publicId')) {
+    if (
+        formData.has('image.publicId') &&
+        formData.has('image.resourceType') &&
+        formData.has('image.format') &&
+        formData.has('image.version')
+    ) {
         obj['image'] = {
             publicId: formData.get('image.publicId'),
             resourceType: formData.get('image.resourceType'),

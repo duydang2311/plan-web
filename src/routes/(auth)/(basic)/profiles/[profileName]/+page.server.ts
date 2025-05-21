@@ -61,7 +61,7 @@ export const load: PageServerLoad = async ({
 };
 
 export const actions: Actions = {
-    'create-profile': ({ request, locals: { runtime } }) => {
+    create_profile: ({ request, locals: { runtime } }) => {
         return Effect.gen(function* () {
             const formData = yield* ActionResponse.FormData(() => request.formData());
             const validation = yield* ActionResponse.Validation(

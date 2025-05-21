@@ -1,10 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { pipe } from '@baetheus/fun/fn';
-    import { useQueryClient } from '@tanstack/svelte-query';
     import { writable } from 'svelte/store';
     import {
-        addToast,
         Avatar,
         Button,
         Errors,
@@ -12,19 +9,28 @@
         IconButton,
         Input,
         Label,
-        TextArea
+        LoadingMonitor,
+        TextArea,
+        toast
     } from '~/lib/components';
-    import { IconMinus, IconPlus, IconUploadOutline } from '~/lib/components/icons';
+    import {
+        IconCheck,
+        IconMinus,
+        IconPlus,
+        IconUploadOutline,
+        IconXMark
+    } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { errorCodes } from '~/lib/models/errors';
     import { createForm, formValidator, type HelperField } from '~/lib/utils/form.svelte';
-    import { TE } from '~/lib/utils/functional';
+    import { createLoading } from '~/lib/utils/runes.svelte';
+    import { attempt } from '~/lib/utils/try';
     import CropDialog from './CropDialog.svelte';
     import ProfileImageFileField from './ProfileImageFileField.svelte';
     import { validateCreateProfile } from './utils';
 
-    const { queryKey, userId }: { queryKey: unknown[]; userId: string } = $props();
+    const { userId }: { userId: string } = $props();
     const { api } = useRuntime();
-    const queryClient = useQueryClient();
     let imageFile = $state<File | Blob | null>(null);
     let imageFileInfo = $state<{ name: string; bytes: number } | null>(null);
     let cropDialogOpen = writable(false);
@@ -38,38 +44,34 @@
         bio: form.createField({ name: 'bio' })
     });
     const socialLinks = $state<HelperField[]>([]);
+    const loading = createLoading();
 
     const upload = async (file: File | Blob) => {
-        const either = await pipe(
-            TE.fromPromise(() => api.get('users/profiles/signed-upload'))(),
-            TE.flatMap((a) =>
-                a.ok
-                    ? TE.fromPromise(() =>
-                          a.json<{
-                              url: string;
-                              timestamp: number;
-                              publicId: string;
-                              apiKey: string;
-                              transformation: string;
-                              signature: string;
-                              notificationUrl: string;
-                          }>()
-                      )()
-                    : TE.leftVoid
-            )
-        )();
-
-        if (either.tag === 'Left') {
-            addToast({
-                data: {
-                    title: 'Profile image failed to upload',
-                    description: errorDescription1
-                }
-            });
-            return;
+        const createSignedUploadAttempt = await attempt.promise(() =>
+            api.get('users/profiles/signed-upload')
+        )(errorCodes.fromFetch);
+        if (createSignedUploadAttempt.failed || !createSignedUploadAttempt.data.ok) {
+            return createSignedUploadAttempt.failed
+                ? createSignedUploadAttempt
+                : attempt.fail(createSignedUploadAttempt.data.status + '');
         }
 
-        const { url, ...body } = either.right;
+        const signedUploadJsonAttempt = await attempt.promise(() =>
+            createSignedUploadAttempt.data.json<{
+                url: string;
+                timestamp: number;
+                publicId: string;
+                apiKey: string;
+                transformation: string;
+                signature: string;
+                notificationUrl: string;
+            }>()
+        )(errorCodes.fromJson);
+        if (signedUploadJsonAttempt.failed) {
+            return signedUploadJsonAttempt;
+        }
+
+        const { url, ...body } = signedUploadJsonAttempt.data;
         const formData = new FormData();
         formData.set('timestamp', body.timestamp + '');
         formData.set('public_id', body.publicId);
@@ -79,59 +81,32 @@
         formData.set('notification_url', body.notificationUrl);
         formData.set('file', file);
 
-        const uploadEither = await pipe(
-            TE.fromPromise(() => fetch(url, { method: 'post', body: formData }))(),
-            TE.flatMap((a) =>
-                a.ok
-                    ? TE.fromPromise(() =>
-                          a.json<{
-                              resource_type: string;
-                              format: string;
-                              public_id: string;
-                              version: number;
-                          }>()
-                      )()
-                    : TE.leftVoid
-            )
-        )();
-        if (uploadEither.tag === 'Left') {
-            addToast({
-                data: {
-                    title: 'Profile image failed to upload',
-                    description: errorDescription2
-                }
-            });
-            return;
+        const uploadAttempt = await attempt.promise(() =>
+            fetch(url, { method: 'post', body: formData })
+        )(errorCodes.fromFetch);
+        if (uploadAttempt.failed || !uploadAttempt.data.ok) {
+            return uploadAttempt.failed
+                ? uploadAttempt
+                : attempt.fail(uploadAttempt.data.status + '');
         }
 
-        addToast({
-            data: {
-                title: 'Profile image uploaded',
-                description: 'It often takes us a few seconds to update your profile image.'
-            }
-        });
+        const uploadJsonAttempt = await attempt.promise(() =>
+            uploadAttempt.data.json<{
+                resource_type: string;
+                format: string;
+                public_id: string;
+                version: number;
+            }>()
+        )(errorCodes.fromJson);
+        if (uploadJsonAttempt.failed) {
+            return uploadJsonAttempt;
+        }
+
+        return attempt.ok(uploadJsonAttempt.data);
     };
 </script>
 
-{#snippet errorDescription(text: string)}
-    <p>{text}</p>
-    <p class="text-base-fg-ghost mt-2 text-sm">
-        If the problem still persists, please try again without a profile image.
-    </p>
-{/snippet}
-
-{#snippet errorDescription1()}
-    {@render errorDescription('We could not request a profile image upload from the server.')}
-{/snippet}
-
-{#snippet errorDescription2()}
-    {@render errorDescription('An error occurred while uploading your profile image.')}
-{/snippet}
-
-<main class="lg:max-w-paragraph-lg mx-auto w-full grow content-center">
-    <p class="text-h6 text-base-fg-ghost mb-12 text-center">
-        It seems like you don't have a profile yet!
-    </p>
+<div class="max-w-paragraph-lg mx-auto w-full grow content-center p-4">
     <div class="mx-auto flex w-fit items-center gap-8">
         <Avatar
             alt=""
@@ -146,7 +121,7 @@
     </div>
     <form
         method="post"
-        action="?/create-profile"
+        action="?/create_profile"
         enctype="multipart/form-data"
         class="mt-8 space-y-8"
         use:form
@@ -157,13 +132,31 @@
                 return;
             }
 
+            loading.set();
             if (imageFile) {
-                upload(imageFile);
+                const uploadAttempt = await upload(imageFile);
+                if (uploadAttempt.failed) {
+                    toast({
+                        type: 'negative',
+                        body: 'Something went wrong while uploading your profile image.',
+                        footer: `Error code: ${uploadAttempt.error}.`
+                    });
+                    e.cancel();
+                    return;
+                }
+                toast({
+                    type: 'positive',
+                    body: 'Profile image uploaded successfully.'
+                });
+                e.formData.set('image.publicId', uploadAttempt.data.public_id);
+                e.formData.set('image.resourceType', uploadAttempt.data.resource_type);
+                e.formData.set('image.format', uploadAttempt.data.format);
+                e.formData.set('image.version', uploadAttempt.data.version.toString());
             }
 
             return async ({ update }) => {
-                await update({ reset: true, invalidateAll: false });
-                await queryClient.invalidateQueries({ queryKey });
+                loading.unset();
+                await update();
             };
         }}
     >
@@ -303,8 +296,21 @@
             </fieldset>
         </fieldset>
         <div class="flex justify-end gap-4">
-            <Button type="reset" variant="base" outline class="w-fit">Reset</Button>
-            <Button type="submit" variant="primary" outline class="w-fit">Create</Button>
+            <Button type="reset" variant="base" outline class="flex w-fit items-center gap-2">
+                <IconXMark />
+                Reset
+            </Button>
+            <Button
+                type="submit"
+                variant="primary"
+                class="flex w-fit items-center gap-2"
+                disabled={loading.immediate}
+            >
+                <LoadingMonitor {loading} class="size-5">
+                    <IconCheck />
+                </LoadingMonitor>
+                Create
+            </Button>
         </div>
     </form>
-</main>
+</div>
