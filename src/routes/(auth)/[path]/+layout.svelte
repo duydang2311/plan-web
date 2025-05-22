@@ -56,7 +56,7 @@
     <div class={['overflow-hidden transition-[max-width]', collapsed ? 'max-w-0' : 'max-w-60']}>
         <aside
             class={[
-                'flex min-h-full flex-col items-stretch space-y-4 overflow-auto py-2 pr-2 text-sm'
+                'flex min-h-full flex-col items-stretch space-y-4 overflow-auto py-2 pr-2 text-[0.9285rem]'
             ]}
         >
             <div class="text-primary-1 flex select-none items-baseline justify-center gap-1">
@@ -67,7 +67,7 @@
                 <Input placeholder="Search..." class="py-1 pl-8 pr-12" />
                 <IconSearch class="text-base-fg-5 absolute left-2 top-1/2 -translate-y-1/2" />
                 <div
-                    class="text-base-fg-1 bg-base-5 absolute right-2 top-1/2 flex -translate-y-1/2 select-none items-center gap-0 rounded-sm px-1 text-sm"
+                    class="text-base-fg-1 bg-base-5 absolute right-2 top-1/2 flex -translate-y-1/2 select-none items-center gap-0 rounded-sm px-1"
                 >
                     <IconKeyCommandOutline />
                     <span class="font-display">K</span>
@@ -146,7 +146,7 @@
                     href="/profiles/me"
                     variant="base"
                     filled={false}
-                    class="flex items-center gap-2 px-2 text-sm font-medium"
+                    class="flex items-center gap-2 px-2 font-medium"
                 >
                     <Avatar
                         src={imageFromAsset(cloudinary)(data.user.profile?.image)

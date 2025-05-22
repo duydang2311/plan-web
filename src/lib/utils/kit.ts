@@ -9,6 +9,7 @@ import {
 } from './problem_details';
 import { attempt, type Attempt, type Failure, type Success } from './try';
 import { type ValidateFail, type ValidateOk, type ValidationResult } from './validation';
+import { mapMaybePromise } from './promise';
 
 export function invalidateSome(...hrefs: string[]) {
     return invalidate((url) => {
@@ -239,6 +240,11 @@ const actionError = <TStatus extends number>(
 });
 
 export const ActionAttempt = {
+    Action: <A, E extends ActionError>(f: () => MaybePromise<Attempt<A, E>>) => {
+        return mapMaybePromise(f())((a) => {
+            return a.ok ? a.data : ActionAttempt.Failure(a);
+        });
+    },
     HTTP: async (f: () => Promise<Response>): Promise<Attempt<Response, ActionError>> => {
         const tryFetch = await attempt.promise(() => f())(actionErrors.fromHttp);
         if (tryFetch.failed) {
@@ -265,6 +271,13 @@ export const ActionAttempt = {
         attempt.promise(() => f())(actionErrors.fromFormData),
     Validation: (validation: ValidateFail) => {
         return fail(400, { errors: validation.errors });
+    },
+    Validate: <T>(f: () => ValidationResult<T>) => {
+        const validation = f();
+        if (validation.ok) {
+            return attempt.ok(validation.data);
+        }
+        return attempt.fail(actionError(400, validation.errors));
     },
     JSON: async <T>(f: () => Promise<T>) => attempt.promise(() => f())(actionErrors.fromJson),
     Failure: <E extends ActionError>(attempt: Failure<E>) => {

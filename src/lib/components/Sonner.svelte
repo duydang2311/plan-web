@@ -43,7 +43,7 @@
         onDismiss,
         ...props
     }: ToastProps<THeader, TBody, TFooter>) => {
-        const id = __toast(SonnerToast as unknown as Parameters<typeof __toast>[0], {
+        return __toast(SonnerToast as unknown as Parameters<typeof __toast>[0], {
             componentProps: {
                 ...props,
                 durationMs,

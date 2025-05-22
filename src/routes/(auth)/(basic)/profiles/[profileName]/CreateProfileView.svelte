@@ -48,7 +48,7 @@
 
     const upload = async (file: File | Blob) => {
         const createSignedUploadAttempt = await attempt.promise(() =>
-            api.get('users/profiles/signed-upload')
+            api.post('users/profiles/signed-upload')
         )(errorCodes.fromFetch);
         if (createSignedUploadAttempt.failed || !createSignedUploadAttempt.data.ok) {
             return createSignedUploadAttempt.failed

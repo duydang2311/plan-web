@@ -5,19 +5,19 @@
     border-radius: var(--radius-sm);
     padding: --spacing(0.5);
     transition:
-        transform 120ms ease-in-out,
-        color 75ms ease-in-out,
-        background-color 75ms 50ms ease-in-out,
-        box-shadow 75ms ease-in-out;
+        transform 120ms var(--default-transition-timing-function),
+        color 75ms var(--default-transition-timing-function),
+        background-color 75ms 50ms var(--default-transition-timing-function),
+        box-shadow 75ms var(--default-transition-timing-function);
 
     @apply ring-0;
 
     &:where(:not(:disabled):hover) {
         transition:
-            transform 120ms ease-in-out,
-            color 75ms ease-in-out,
-            background-color 75ms ease-in-out,
-            box-shadow 75ms 50ms ease-in-out;
+            transform 120ms var(--default-transition-timing-function),
+            color 75ms var(--default-transition-timing-function),
+            background-color 75ms var(--default-transition-timing-function),
+            box-shadow 75ms 50ms var(--default-transition-timing-function);
         @apply ring-1;
     }
 

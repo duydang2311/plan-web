@@ -48,7 +48,7 @@
 }
 
 @theme inline {
-    --default-transition-timing-function: var(--cubic-in-out);
+    --default-transition-timing-function: ease;
     --default-transition-duration: 75ms;
     --text-title: var(--text-h5);
     --container-paragraph-sm: var(--container-sm);

@@ -12,8 +12,8 @@ export interface Loading {
 }
 
 export interface Ref<T> {
-    get value(): T | undefined;
-    set value(value: T | undefined);
+    get value(): T;
+    set value(value: T);
 }
 
 export interface AsyncRef<T> extends Ref<T> {
@@ -151,48 +151,53 @@ export const createUiStatus = () => {
     return uiStatus;
 };
 
-export const createRef = Object.assign(
-    <T>(f: T | (() => T)): Ref<NonNullable<T>> => {
-        return new SvelteRef(f) as Ref<NonNullable<T>>;
-    },
-    {
-        async: <T>(initialValue?: T): AsyncRef<NonNullable<T>> => {
-            return new SvelteAsyncRef(initialValue) as AsyncRef<NonNullable<T>>;
-        },
-        maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<NonNullable<T>> => {
-            const initialValue = f();
-            if (!isPromiseLike(initialValue)) {
-                const ref = new SvelteAsyncRef(initialValue);
-                $effect.pre(() => {
-                    unwrapMaybePromise(f())((b) => {
-                        untrack(() => {
-                            ref.value = b;
-                        });
-                    });
-                });
-                return ref as AsyncRef<NonNullable<T>>;
-            }
+function __createRef<T>(valueOrFn: T | (() => T)): Ref<T>;
+function __createRef<T>(): Ref<T | undefined>;
+function __createRef<T>(valueOrFn?: T | (() => T)) {
+    return new SvelteRef(valueOrFn);
+}
 
-            const ref = new SvelteAsyncRef<T>();
-            ref.loading.set();
-            unwrapMaybePromise(initialValue)((a) => {
-                ref.value = a;
-                ref.loading.unset();
-            });
+function __createAsyncRef<T>(value: T): AsyncRef<T>;
+function __createAsyncRef<T>(): AsyncRef<T | undefined>;
+function __createAsyncRef<T>(value?: T) {
+    return new SvelteAsyncRef(value);
+}
+
+export const createRef = Object.assign(__createRef, {
+    async: __createAsyncRef,
+    maybePromise: <T>(f: () => MaybePromise<T>): AsyncRef<T> => {
+        const initialValue = f();
+        if (!isPromiseLike(initialValue)) {
+            const ref = new SvelteAsyncRef(initialValue);
             $effect.pre(() => {
-                const a = f();
-                untrack(() => {
-                    ref.loading.set();
-                    unwrapMaybePromise(a)((b) => {
+                unwrapMaybePromise(f())((b) => {
+                    untrack(() => {
                         ref.value = b;
-                        ref.loading.unset();
                     });
                 });
             });
             return ref as AsyncRef<NonNullable<T>>;
         }
+
+        const ref = new SvelteAsyncRef<T>();
+        ref.loading.set();
+        unwrapMaybePromise(initialValue)((a) => {
+            ref.value = a;
+            ref.loading.unset();
+        });
+        $effect.pre(() => {
+            const a = f();
+            untrack(() => {
+                ref.loading.set();
+                unwrapMaybePromise(a)((b) => {
+                    ref.value = b;
+                    ref.loading.unset();
+                });
+            });
+        });
+        return ref as AsyncRef<NonNullable<T>>;
     }
-);
+});
 
 export const createDirty = () => {
     return new Dirty();
@@ -239,9 +244,9 @@ class SvelteLoading {
     }
 }
 
-class SvelteRef<T> implements Ref<T> {
-    value = $state.raw<T>();
-    constructor(f: T | (() => T)) {
+class SvelteRef<T> implements Ref<T | undefined> {
+    value = $state.raw<T | undefined>();
+    constructor(f?: T | (() => T)) {
         if (f instanceof Function) {
             const a = f();
             this.value = a;
@@ -257,8 +262,8 @@ class SvelteRef<T> implements Ref<T> {
     }
 }
 
-class SvelteAsyncRef<T> implements AsyncRef<T> {
-    value = $state.raw<T>();
+class SvelteAsyncRef<T> implements AsyncRef<T | undefined> {
+    value = $state.raw<T | undefined>();
     #loading = createLoading();
 
     constructor(initialValue?: T) {

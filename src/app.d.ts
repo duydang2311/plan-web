@@ -1,10 +1,9 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { Effect, Exit } from 'effect';
+import type { Effect, Exit, Context } from 'effect';
 import type { Layer } from 'effect/Layer';
 import type { SvelteComponent } from 'svelte';
 import 'unplugin-icons/types/svelte';
-import type { Api } from './lib/api/server';
 import type { Asset } from './lib/models/asset';
 import type { ApiClient } from './lib/services/api_client.server';
 import type { Cloudinary } from './lib/services/cloudinary.server';
@@ -61,7 +60,7 @@ declare global {
                     image?: Asset;
                 };
             };
-            api: Api;
+            api: Context.Tag.Service<HttpClient>;
         }
         interface PageData {
             routes?: (

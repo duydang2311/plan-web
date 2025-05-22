@@ -3,13 +3,18 @@
     import type { SubmitFunction } from '@sveltejs/kit';
     import clsx from 'clsx';
     import { type Snippet } from 'svelte';
-    import type { HTMLInputAttributes, SVGAttributes } from 'svelte/elements';
+    import type {
+        HTMLInputAttributes,
+        HTMLTextareaAttributes,
+        SVGAttributes
+    } from 'svelte/elements';
     import { IconButton } from '.';
     import { watch } from '../utils/runes.svelte';
     import { IconCheck, IconEditOutline, IconXMark } from './icons';
     import Input from './Input.svelte';
 
     let {
+        as,
         editing = $bindable(false),
         name,
         action,
@@ -17,17 +22,22 @@
         onSubmit,
         inputProps,
         iconProps,
-        children
+        children,
+        textAreaProps
     }: {
         editing?: boolean;
         name: string;
         action: string;
         value: string;
         onSubmit: SubmitFunction;
-        inputProps?: Omit<HTMLInputAttributes, 'size'>;
         iconProps?: SVGAttributes<SVGElement>;
         children: Snippet;
-    } = $props();
+    } & OneOf<
+        { as: 'textarea'; textAreaProps?: HTMLTextareaAttributes },
+        {
+            inputProps?: Omit<HTMLInputAttributes, 'size'>;
+        }
+    > = $props();
 
     const { class: inputClass, ...inputRestProps } = $derived(inputProps ?? {});
     const { class: iconClass, ...iconRestProps } = $derived(iconProps ?? {});
@@ -62,31 +72,56 @@
         }}
         class="relative flex items-center gap-2"
     >
-        <Input
-            type="text"
-            {name}
-            {value}
-            class={clsx(
-                'rounded-none border-0 border-b bg-transparent p-0 pr-16 focus:ring-0',
-                inputClass
-            )}
-            onkeydown={(e) => {
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                } else if (e.key === 'Enter') {
-                    e.stopPropagation();
-                }
-            }}
-            onkeyup={(e) => {
-                if (e.key === 'Escape') {
-                    editing = false;
-                }
-            }}
-            action={(node) => {
-                node.focus();
-            }}
-            {...inputRestProps}
-        />
+        {#if as === 'textarea'}
+            <textarea
+                {name}
+                {value}
+                class={clsx(
+                    'rounded-none border-0 border-b bg-transparent p-0 pr-16 focus:ring-0',
+                    inputClass
+                )}
+                onkeydown={(e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                        e.stopPropagation();
+                    }
+                }}
+                onkeyup={(e) => {
+                    if (e.key === 'Escape') {
+                        editing = false;
+                    }
+                }}
+                {@attach (node) => node.focus()}
+                {...textAreaProps}
+            ></textarea>
+        {:else}
+            <Input
+                type="text"
+                {name}
+                {value}
+                class={clsx(
+                    'rounded-none border-0 border-b bg-transparent p-0 pr-16 focus:ring-0',
+                    inputClass
+                )}
+                onkeydown={(e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                        e.stopPropagation();
+                    }
+                }}
+                onkeyup={(e) => {
+                    if (e.key === 'Escape') {
+                        editing = false;
+                    }
+                }}
+                action={(node) => {
+                    node.focus();
+                }}
+                {...inputRestProps}
+            />
+        {/if}
         <div class="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-2">
             <IconButton
                 type="button"

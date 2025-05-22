@@ -11,6 +11,14 @@ export interface UserProfile {
     name: string;
     displayName: string;
     image: Partial<Asset>;
+    bio?: string;
+    socialLinks?: UserSocialLink[];
+}
+
+export interface UserSocialLink {
+    id: number;
+    userId: string;
+    url: string;
 }
 
 export interface UserPreset {
@@ -34,4 +42,14 @@ export interface UserPreset {
             image?: Partial<Asset>;
         };
     };
+}
+
+export interface UserProfileSignedUpload {
+    timestamp: string;
+    transformation: string;
+    publicId: string;
+    notificationUrl: string;
+    url: string;
+    apiKey: string;
+    signature: string;
 }
