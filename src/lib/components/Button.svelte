@@ -5,7 +5,7 @@
     import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
     type Props = (
-        | ({ as: 'link' } & HTMLAnchorAttributes)
+        | ({ as: 'link' } & HTMLAnchorAttributes & { disabled?: boolean })
         | ({ as?: never } & HTMLButtonAttributes)
     ) & {
         variant?: 'base' | 'primary' | 'negative' | 'positive';
@@ -35,7 +35,7 @@
     <a
         {...props}
         class={clsx(
-            'block c-button',
+            'c-button block',
             `c-button--${variant}`,
             filled && 'c-button--filled',
             outline && 'c-button--outline',
@@ -43,6 +43,7 @@
             size && 'c-button--sm',
             props.class
         )}
+        aria-disabled={props.disabled ? true : undefined}
         {...useMelt ?? {}}
         use:meltAction
         use:action

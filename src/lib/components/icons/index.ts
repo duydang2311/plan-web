@@ -53,6 +53,7 @@ export { default as IconH4 } from '~icons/lucide/heading-4';
 export { default as IconH5 } from '~icons/lucide/heading-5';
 export { default as IconH6 } from '~icons/lucide/heading-6';
 export { default as IconItalic } from '~icons/lucide/italic';
+export { default as IconLogin } from '~icons/lucide/log-in';
 export { default as IconPanelLeftClose } from '~icons/lucide/panel-left-close';
 export { default as IconPanelLeftOpen } from '~icons/lucide/panel-left-open';
 export { default as IconPanelRightClose } from '~icons/lucide/panel-right-close';

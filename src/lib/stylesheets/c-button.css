@@ -8,7 +8,7 @@
     --_fg-disabled: var(--color-base-fg-disabled);
     --_shadow: none;
     --_border: var(--color-base-border-2);
-    --_border-disabled: var(--color-base-border-2);
+    --_border-disabled: var(--color-base-border-3);
 
     &:where(.c-button--filled) {
         --_bg: var(--color-base-2);
@@ -88,7 +88,7 @@
         text-align: left;
     }
 
-    &:where(:not(:disabled)) {
+    &:where(:not(:disabled), :not([aria-disabled])) {
         &:where(.c-button--outline) {
             border: 1px solid var(--_border);
         }
@@ -108,7 +108,7 @@
         }
     }
 
-    &:where(:disabled) {
+    &:where(:disabled, [aria-disabled]) {
         color: var(--_fg-disabled);
         background-color: var(--_bg-disabled);
         &:where(.c-button--outline) {
