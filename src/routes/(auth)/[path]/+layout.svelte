@@ -61,7 +61,7 @@
         >
             <div class="text-primary-1 flex select-none items-baseline justify-center gap-1">
                 <Logo class="h-4 w-auto" />
-                <p class="font-display text-h2 font-black leading-none tracking-tight">coop</p>
+                <p class="font-display text-h2 font-black leading-none tracking-tight">konekt</p>
             </div>
             <div class="relative">
                 <Input placeholder="Search..." class="py-1 pl-8 pr-12" />

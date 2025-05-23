@@ -28,9 +28,11 @@
 @import '~/lib/stylesheets/c-tab.css' layer(components);
 
 @theme {
-    --font-display: InterVariable, var(--font-sans);
+    --font-display: 'Plus Jakarta Sans', var(--font-sans);
     --font-body: InterVariable, var(--font-sans);
-    --font-mono: 'DM Mono', InterVariable, var(--font-sans);
+    --font-mono:
+        'DM Mono', monaco, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
+        'DejaVu Sans Mono', monospace;
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
     --text-p: 1rem;
@@ -102,7 +104,6 @@
 
     body {
         font-size: var(--text-p);
-        overflow: hidden;
     }
 
     h6 {

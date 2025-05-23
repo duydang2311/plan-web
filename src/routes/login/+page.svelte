@@ -52,7 +52,7 @@
     <div class="mx-auto w-full">
         <LogoType class="mx-auto text-primary-1" />
         <h1 class="mt-8 text-center capitalize">Sign in</h1>
-        <p class="text-center mb-8 mx-auto c-label">Welcome back to coop! Let's get things done.</p>
+        <p class="text-center mb-8 mx-auto c-label">Welcome back to konekt! Let's get things done.</p>
         <div class="mx-auto max-w-[40ch]">
             <form
                 method="post"
