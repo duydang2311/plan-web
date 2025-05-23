@@ -33,6 +33,7 @@
     <div class="flex gap-4">
         <OptionalLink
             href={audit.user.profile ? `/profiles/${audit.user.profile.name}` : undefined}
+            class="shrink-0"
         >
             <Avatar
                 seed={audit.user.email}
