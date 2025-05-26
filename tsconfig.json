@@ -9,7 +9,7 @@
         "checkJs": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
+        "resolveJsonModule": false,
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,

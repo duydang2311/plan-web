@@ -61,5 +61,17 @@ export const errorCodes = {
             return 'syntax_error';
         }
         return 'parse_error';
+    },
+    fromFormData: (e: unknown) => {
+        if (e instanceof TypeError) {
+            if (e.message.includes('already been consumed')) {
+                return 'formdata_body_used';
+            } else if (e.message.includes('Invalid form data')) {
+                return 'formdata_invalid';
+            } else {
+                return 'formdata_type_error';
+            }
+        }
+        return 'formdata_unknown';
     }
 } as const;
