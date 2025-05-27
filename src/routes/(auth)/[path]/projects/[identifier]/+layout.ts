@@ -3,6 +3,8 @@ import {
     IconHomeSolid,
     IconIssues,
     IconIssuesOutline,
+    IconMilestone,
+    IconMilestoneOutline,
     IconUsers,
     IconUsersSolid
 } from '~/lib/components/icons';
@@ -38,6 +40,12 @@ export const load: LayoutLoad = async ({ parent, params, data }) => {
                                 href: `/${params.path}/projects/${params.identifier}/members`,
                                 icon: IconUsers,
                                 activeIcon: IconUsersSolid
+                            },
+                            {
+                                label: 'Milestones',
+                                href: `/${params.path}/projects/${params.identifier}/milestones`,
+                                icon: IconMilestoneOutline,
+                                activeIcon: IconMilestone
                             }
                         ]
                     }

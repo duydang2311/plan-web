@@ -9,9 +9,7 @@
         $props();
 
     const popover = new Popover.Builder({
-        floatingConfig: {
-            sameWidth: true
-        }
+        forceVisible: true
     });
 </script>
 

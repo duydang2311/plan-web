@@ -48,7 +48,7 @@
             {#if typeof header === 'function'}
                 {@render header(headerProps)}
             {:else}
-                <h2 class="text-h6">
+                <h2 class="text-h6 font-semibold">
                     {header}
                 </h2>
             {/if}

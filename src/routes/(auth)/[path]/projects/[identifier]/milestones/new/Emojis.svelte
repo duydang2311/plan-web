@@ -4,7 +4,7 @@
     import twemoji from '@twemoji/api';
     import Fuse, { type FuseResult } from 'fuse.js';
     import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-    import { Input, Tabs } from '~/lib/components';
+    import { IconButton, Input, Tabs } from '~/lib/components';
     import { QueryResponse } from '~/lib/utils/query';
     import { watch } from '~/lib/utils/runes.svelte';
     import Emoji from './Emoji.svelte';
@@ -75,6 +75,7 @@
         orientation: 'horizontal'
     });
     const tabIds = $derived($query.data ? Object.keys($query.data) : []);
+    const commonEmojis = ['🏁', '🚀', '🎯', '✅', '🔧', '📅', '📈', '💡', '📝', '🔔'];
 
     watch.pre(() => $query.data)(() => {
         if ($query.data && tabs.value === 'empty') {
@@ -87,9 +88,9 @@
     <div
         data-emoji-unicode={unicode}
         {title}
+        class="min-h-10 min-w-10"
         class:invisible={!intersected.has(unicode)}
         {@attach attachObserver(observer)}
-        class="min-h-10 min-w-10"
     >
         <Emoji html={parsedHtml.get(unicode)} {unicode} {onClick} selected={emoji === unicode} />
     </div>
@@ -116,6 +117,7 @@
         {#each tabIds as id (id)}
             <Tabs.Trigger
                 {...tabs.getTrigger(id)}
+                type="button"
                 title={id}
                 class="p-1"
                 style="--_bg-selected: var(--color-base-selected);"
@@ -128,9 +130,6 @@
             </Tabs.Trigger>
         {/each}
     </Tabs>
-    {#if tabs.value !== 'empty'}
-        <p class="font-display c-text-secondary mb-2 mt-2 px-2 font-medium">{tabs.value}</p>
-    {/if}
     <div
         class="mt-2 max-h-96 overflow-auto p-2"
         {@attach (node) => {
@@ -170,9 +169,24 @@
             <div>Loading...</div>
         {:else if $query.error}
             <div>Something went wrong while loading emojis: {$query.error.message}.</div>
-        {:else if $query.data}
-            {#each tabIds as id}
+        {:else if $query.data && $query.data[tabs.value]}
+            <div>
+                <p class="font-display c-text-secondary mb-2 font-medium">Common used</p>
+                <div class="flex flex-wrap gap-2 *:w-fit">
+                    {#each commonEmojis as commonEmoji (commonEmoji)}
+                        <IconButton type="button" variant="base" data-emoji-selected={emoji === commonEmoji ? '' : undefined} class="p-1 data-[emoji-selected]:not-hover:not-active:bg-base-selected" onclick={() => onChange(commonEmoji)}>
+                            <div class="size-8">
+                                {@html twemoji.parse(commonEmoji)}
+                            </div>
+                        </IconButton>
+                    {/each}
+                </div>
+            </div>
+            {#each tabIds as id (id)}
                 <div {...tabs.getContent(id)}>
+                    <h2 class="font-display c-text-secondary mb-2 mt-2 font-medium">
+                        {id}
+                    </h2>
                     <div class="grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
                         {#each Object.values($query.data[id]) as emoji}
                             {@render emojiSnippet(emoji.unicode, emoji.shortNames[0])}

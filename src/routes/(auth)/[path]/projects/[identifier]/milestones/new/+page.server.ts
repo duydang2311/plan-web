@@ -22,6 +22,7 @@ export const actions: Actions = {
         const postAttempt = await ActionAttempt.HTTP(() =>
             locals.api.post('milestones', {
                 body: {
+                    projectId: validation.data.projectId,
                     title: validation.data.title,
                     description: validation.data.description,
                     emoji: validation.data.emoji,
@@ -33,6 +34,6 @@ export const actions: Actions = {
             return ActionAttempt.Failure(postAttempt);
         }
 
-        return redirect(303, `${params.path}/projects/${params.identifier}/milestones`);
+        return redirect(303, `/${params.path}/projects/${params.identifier}/milestones`);
     }
 };

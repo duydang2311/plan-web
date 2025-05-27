@@ -7,7 +7,9 @@
     import { enhance } from '$app/forms';
     import { validateCreateMilestone } from './utils';
     import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
+    import type { PageProps } from './$types';
 
+    const { data }: PageProps = $props();
     const form = createForm({
         validator: formValidator(validateCreateMilestone)
     });
@@ -67,6 +69,7 @@
                     if (e.result.type === 'failure') {
                         toast({
                             type: 'negative',
+                            header: 'Milestone creation failed',
                             body: 'Something went wrong while creating the milestone.',
                             footer: stringifyActionFailureErrors(
                                 e.result.data!.errors as Record<string, string[]>
@@ -75,14 +78,15 @@
                     } else if (e.result.type === 'redirect') {
                         toast({
                             type: 'positive',
-                            body: 'Milestone created successfully.',
-                            footer: 'You can now view and manage your milestone.'
+                            header: 'Milestone created successfully',
+                            body: 'You can now view and manage your milestone.'
                         });
                     }
                     await e.update();
                 };
             }}
         >
+            <input type="hidden" name="projectId" value={data.project.id} />
             <Field>
                 <Label for={fields.title.state.name}>Title</Label>
                 <Input

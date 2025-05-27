@@ -75,11 +75,11 @@
             }
             status = 'submitting';
             return async ({ update }) => {
-                status = null;
                 await update();
                 await queryClient.invalidateQueries({
                     queryKey: ['projects', { workspaceId: data.workspace.id }]
                 });
+                status = null;
             };
         }}
     >

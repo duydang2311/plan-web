@@ -84,6 +84,8 @@ export { default as IconIssuesOutline, default as IconResourcesOutline } from '~
 export { default as IconIssues, default as IconResources } from '~icons/ph/files-fill';
 export { default as IconHome } from '~icons/ph/house-bold';
 export { default as IconHomeSolid } from '~icons/ph/house-fill';
+export { default as IconMilestoneOutline } from '~icons/ph/signpost';
+export { default as IconMilestone } from '~icons/ph/signpost-fill';
 export { default as IconTextAlignCenter } from '~icons/ph/text-align-center';
 export { default as IconTextAlignJustify } from '~icons/ph/text-align-justify';
 export { default as IconTextAlignLeft } from '~icons/ph/text-align-left';
