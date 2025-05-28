@@ -1,13 +1,14 @@
 <script lang="ts">
+    import { enhance } from '$app/forms';
     import { RadioGroup } from 'melt/builders';
     import { Button, Errors, Field, Input, Label, Main, toast } from '~/lib/components';
     import { IconCheck, IconXMark } from '~/lib/components/icons';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
-    import EmojiSelectField from './EmojiSelectField.svelte';
-    import { enhance } from '$app/forms';
-    import { validateCreateMilestone } from './utils';
     import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
     import type { PageProps } from './$types';
+    import EmojiSelectField from './EmojiSelectField.svelte';
+    import StatusSelectField from './StatusSelectField.svelte';
+    import { validateCreateMilestone } from './utils';
 
     const { data }: PageProps = $props();
     const form = createForm({
@@ -99,23 +100,7 @@
                 />
                 <Errors errors={fields.title.state.errors} />
             </Field>
-            <Field>
-                <Label for={fields.description.state.name}>Description (optional)</Label>
-                <Input
-                    type="text"
-                    action={fields.description}
-                    name={fields.description.state.name}
-                    bind:value={fields.description.state.value}
-                    placeholder="Enter milestone description"
-                />
-            </Field>
-            <div class="flex flex-wrap gap-4 *:flex-1 *:basis-16">
-                <EmojiSelectField
-                    {emoji}
-                    onEmojiChange={(a) => {
-                        emoji = a;
-                    }}
-                />
+            <div class="flex flex-wrap gap-4 *:flex-1 *:basis-60">
                 <Field {...colorGroup.root}>
                     <input {...colorGroup.hiddenInput} name="color" value={colorGroup.value} />
                     <Label {...colorGroup.label}>Color</Label>
@@ -130,7 +115,26 @@
                         {/each}
                     </div>
                 </Field>
+                <div class="flex flex-col gap-4">
+                    <EmojiSelectField
+                        {emoji}
+                        onEmojiChange={(a) => {
+                            emoji = a;
+                        }}
+                    />
+                    <StatusSelectField projectId={data.project.id} />
+                </div>
             </div>
+            <Field>
+                <Label for={fields.description.state.name}>Description (optional)</Label>
+                <Input
+                    type="text"
+                    action={fields.description}
+                    name={fields.description.state.name}
+                    bind:value={fields.description.state.value}
+                    placeholder="Enter milestone description"
+                />
+            </Field>
             <div class="flex gap-2 *:w-fit">
                 <Button type="reset" variant="base" outline class="flex items-center gap-2">
                     <IconXMark />

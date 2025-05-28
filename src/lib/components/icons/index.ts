@@ -35,6 +35,7 @@ export { default as IconSearch } from '~icons/heroicons/magnifying-glass-16-soli
 export { default as IconMinus } from '~icons/heroicons/minus-16-solid';
 export { default as IconSendOutline } from '~icons/heroicons/paper-airplane';
 export { default as IconSend } from '~icons/heroicons/paper-airplane-16-solid';
+export { default as IconPause } from '~icons/heroicons/pause-16-solid';
 export { default as IconEdit } from '~icons/heroicons/pencil-16-solid';
 export { default as IconPlus } from '~icons/heroicons/plus-16-solid';
 export { default as IconUsers } from '~icons/heroicons/user-group';

@@ -23,14 +23,14 @@
         outline
         class="flex items-center justify-between gap-4 px-2 text-left"
     >
-        <div class="size-5">
+        <div class="size-6">
             {@html twemoji.parse(emoji)}
         </div>
         <IconChevronUpDown />
     </Button>
-    {#if popover.open}
-        <Popover {...popover.content} class="p-0">
-            <Emojis {emoji} onChange={onEmojiChange} />
-        </Popover>
-    {/if}
 </Field>
+{#if popover.open}
+    <Popover {...popover.content} class="p-0">
+        <Emojis {emoji} onChange={onEmojiChange} />
+    </Popover>
+{/if}

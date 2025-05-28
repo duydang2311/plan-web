@@ -7,7 +7,7 @@ import type { HttpClient } from '../services/http_client';
 import type { Hub } from '../services/hub.client';
 import { type Realtime } from '../services/realtime.client';
 
-interface Runtime {
+export interface ClientRuntime {
     readonly api: Context.Tag.Service<HttpClient>;
     readonly realtime: Realtime;
     readonly cloudinary: Cloudinary;
@@ -15,14 +15,16 @@ interface Runtime {
     readonly hub: Hub;
 }
 
-export function setRuntime(value: Record<keyof Runtime, () => Runtime[keyof Runtime]>) {
+export function setRuntime(
+    value: Record<keyof ClientRuntime, () => ClientRuntime[keyof ClientRuntime]>
+) {
     const lazy = {};
     for (const k in value) {
         defineLazyProperty(lazy, k, value[k as keyof typeof value]);
     }
-    return setContext('runtime', lazy as Runtime);
+    return setContext('runtime', lazy as ClientRuntime);
 }
 
 export function useRuntime() {
-    return getContext('runtime') as Runtime;
+    return getContext('runtime') as ClientRuntime;
 }
