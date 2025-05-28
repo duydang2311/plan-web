@@ -1,10 +1,3 @@
-import {
-    IconCanceled,
-    IconDone,
-    IconInProgress,
-    IconPause,
-    IconTodo
-} from '../components/icons';
 import type { Project } from './project';
 
 export interface Milestone {
@@ -43,10 +36,3 @@ export enum MilestoneStatusCategory {
     Paused = 5
 }
 
-export const milestoneStatusIcons = Object.freeze({
-    'not-started': IconTodo,
-    'in-progress': IconInProgress,
-    completed: IconDone,
-    canceled: IconCanceled,
-    paused: IconPause
-});

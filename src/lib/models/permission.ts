@@ -71,4 +71,19 @@ export const permissions = {
     readTeamIssue: 'team-issue:read',
     updateTeamIssue: 'team-issue:update',
     deleteTeamIssue: 'team-issue:delete',
+
+    createChecklistItem: 'checklist-items:create',
+    readChecklistItem: 'checklist-items:read',
+    updateChecklistItem: 'checklist-items:update',
+    deleteChecklistItem: 'checklist-items:delete',
+
+    createMilestone: 'milestone:create',
+    readMilestone: 'milestone:read',
+    updateMilestone: 'milestone:update',
+    deleteMilestone: 'milestone:delete',
+
+    createMilestoneStatus: 'milestone-status:create',
+    readMilestoneStatus: 'milestone-status:read',
+    updateMilestoneStatus: 'milestone-status:update',
+    deleteMilestoneStatus: 'milestone-status:delete'
 } as const;

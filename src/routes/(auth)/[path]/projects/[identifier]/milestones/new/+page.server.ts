@@ -1,9 +1,7 @@
-import { attempt } from '~/lib/utils/try';
-import type { Actions } from './$types';
-import { errorCodes } from '~/lib/models/errors';
-import { ActionAttempt } from '~/lib/utils/kit';
-import { decodeCreateMilestone, validateCreateMilestone } from './utils';
 import { redirect } from '@sveltejs/kit';
+import { ActionAttempt } from '~/lib/utils/kit';
+import type { Actions } from './$types';
+import { decodeCreateMilestone, validateCreateMilestone } from './utils';
 
 export const actions: Actions = {
     default: async ({ request, locals, params }) => {
@@ -26,7 +24,8 @@ export const actions: Actions = {
                     title: validation.data.title,
                     description: validation.data.description,
                     emoji: validation.data.emoji,
-                    color: validation.data.color
+                    color: validation.data.color,
+                    statusId: validation.data.statusId
                 }
             })
         );

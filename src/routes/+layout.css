@@ -215,6 +215,10 @@
     min-height: 40rem;
 }
 
+@utility font-h-bold {
+    font-weight: 600;
+}
+
 [data-sonner-toaster] {
     font-family: var(--font-body);
 }
@@ -255,6 +259,7 @@
     background: var(--_gradient) var(--color-base-1);
     mix-blend-mode: var(--_gradient-blend-mode);
 }
+
 .noise {
     --_noise-texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'><defs><filter id='n' x='0' y='0' width='100%' height='100%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.3' numOctaves='3' stitchTiles='stitch' result='t'/><feColorMatrix type='saturate' values='0' in='t' result='g'/><feComponentTransfer in='g' result='a'><feFuncA type='linear' slope='0.5'/></feComponentTransfer></filter></defs><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     --_noise-size: 8vmin;

@@ -49,7 +49,7 @@
 
 <Main>
     <div class="max-w-paragraph-lg mx-auto">
-        <h1 class="capitalize">Create milestone</h1>
+        <h1 class="font-h-bold capitalize">Create milestone</h1>
         <p class="c-text-secondary">Add a new milestone to track your project progress.</p>
         <form
             method="post"

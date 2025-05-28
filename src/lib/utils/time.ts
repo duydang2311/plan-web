@@ -32,3 +32,5 @@ export const formatTimeUi = (dateTime: string | DateTime) => {
     }
     return dateTime.toLocaleString(DateTime.DATETIME_MED);
 };
+
+export const formatDateTimeUi = formatTimeUi;

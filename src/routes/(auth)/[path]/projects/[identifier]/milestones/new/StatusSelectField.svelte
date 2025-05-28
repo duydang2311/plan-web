@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Button, Field, Label } from '~/lib/components';
+    import { getMilestoneStatusIcon } from '~/lib/components/icons/utils';
     import Select from '~/lib/components/select';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { milestoneStatusIcons } from '~/lib/models/milestone';
     import Statuses from './Statuses.svelte';
     import { createStatusListQuery } from './utils.client';
 
@@ -16,13 +16,6 @@
     });
     const { api } = useRuntime();
     const query = createStatusListQuery(api)(projectId);
-
-    const getStatusIcon = (icon: string | undefined) => {
-        if (icon && icon in milestoneStatusIcons) {
-            return milestoneStatusIcons[icon as keyof typeof milestoneStatusIcons];
-        }
-        return undefined;
-    };
 </script>
 
 <Field>
@@ -38,7 +31,7 @@
         {#if value}
             {@const status = $query.data?.items.find((s) => s.id === value)}
             {#if status}
-                {@const Icon = getStatusIcon(status.icon)}
+                {@const Icon = getMilestoneStatusIcon(status.icon)}
                 <div class="flex items-center gap-2">
                     {#if Icon}
                         <Icon />
@@ -58,7 +51,7 @@
             {#snippet children(statusList)}
                 <div class="grid grid-cols-[auto_1fr]">
                     {#each statusList.items as status (status.id)}
-                        {@const Icon = getStatusIcon(status.icon)}
+                        {@const Icon = getMilestoneStatusIcon(status.icon)}
                         <Select.Option
                             {...select.getOption(status.id)}
                             class="col-span-full grid grid-cols-subgrid gap-2"
