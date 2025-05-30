@@ -44,6 +44,7 @@ export { default as IconUserPlus } from '~icons/heroicons/user-plus-16-solid';
 export { default as IconXMark } from '~icons/heroicons/x-mark-16-solid';
 export { default as IconBold } from '~icons/lucide/bold';
 export { default as IconCalendarRange } from '~icons/lucide/calendar-range';
+export { default as IconCalendar } from '~icons/lucide/calendar';
 export { default as IconColumns } from '~icons/lucide/columns-3';
 export { default as IconMenu } from '~icons/lucide/ellipsis';
 export { default as IconDraggable } from '~icons/lucide/grip-vertical';
@@ -93,4 +94,3 @@ export { default as IconTextAlignLeft } from '~icons/ph/text-align-left';
 export { default as IconTextAlignRight } from '~icons/ph/text-align-right';
 export { default as IconPriorityUrgent } from '~icons/ph/warning-fill';
 export { default as IconCanceled, default as IconDuplicated } from '~icons/ph/x-circle';
-

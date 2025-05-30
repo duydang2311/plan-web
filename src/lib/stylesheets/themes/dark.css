@@ -87,4 +87,6 @@
     --color-status-completed: oklch(76.87% 0.2 142.29);
 
     --color-status-canceled: oklch(70.6% 0.2 22.39);
+
+    --color-status-paused: oklch(68.81% 0.1485 70.49);
 }

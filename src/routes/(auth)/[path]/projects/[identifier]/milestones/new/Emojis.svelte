@@ -174,7 +174,13 @@
                 <p class="font-display c-text-secondary mb-2 font-medium">Common used</p>
                 <div class="flex flex-wrap gap-2 *:w-fit">
                     {#each commonEmojis as commonEmoji (commonEmoji)}
-                        <IconButton type="button" variant="base" data-emoji-selected={emoji === commonEmoji ? '' : undefined} class="p-1 data-[emoji-selected]:not-hover:not-active:bg-base-selected" onclick={() => onChange(commonEmoji)}>
+                        <IconButton
+                            type="button"
+                            variant="base"
+                            data-emoji-selected={emoji === commonEmoji ? '' : undefined}
+                            class="data-[emoji-selected]:not-hover:not-active:bg-base-selected p-1"
+                            onclick={() => onChange(commonEmoji)}
+                        >
                             <div class="size-8">
                                 {@html twemoji.parse(commonEmoji)}
                             </div>
@@ -182,18 +188,30 @@
                     {/each}
                 </div>
             </div>
-            {#each tabIds as id (id)}
-                <div {...tabs.getContent(id)}>
+            {#if $query.data[tabs.value]}
+                <div {...tabs.getContent(tabs.value)}>
                     <h2 class="font-display c-text-secondary mb-2 mt-2 font-medium">
-                        {id}
+                        {tabs.value}
                     </h2>
                     <div class="grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
-                        {#each Object.values($query.data[id]) as emoji}
+                        {#each Object.values($query.data[tabs.value]) as emoji (emoji.unicode)}
                             {@render emojiSnippet(emoji.unicode, emoji.shortNames[0])}
                         {/each}
                     </div>
                 </div>
-            {/each}
+            {/if}
+            <!-- {#each tabIds as id (id)}
+                <div {...tabs.getContent(id)} class:hidden={tabs.value !== id}>
+                    <h2 class="font-display c-text-secondary mb-2 mt-2 font-medium">
+                        {id}
+                    </h2>
+                    <div class="grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
+                        {#each Object.values($query.data[id]) as emoji (emoji.unicode)}
+                            {@render emojiSnippet(emoji.unicode, emoji.shortNames[0])}
+                        {/each}
+                    </div>
+                </div>
+            {/each} -->
         {/if}
     </div>
 </div>

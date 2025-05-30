@@ -9,6 +9,7 @@
     import EmojiSelectField from './EmojiSelectField.svelte';
     import StatusSelectField from './StatusSelectField.svelte';
     import { validateCreateMilestone } from './utils';
+    import { milestoneColors } from '~/lib/features/milestones/utils';
 
     const { data }: PageProps = $props();
     const form = createForm({
@@ -18,30 +19,8 @@
         title: form.createField({ name: 'title' }),
         description: form.createField({ name: 'description' })
     };
-    const colors = [
-        'oklch(0.72 0.18 10)',
-        'oklch(0.73 0.18 30)',
-        'oklch(0.75 0.17 50)',
-        'oklch(0.76 0.18 70)',
-        'oklch(0.75 0.20 95)',
-        'oklch(0.74 0.20 120)',
-        'oklch(0.73 0.20 145)',
-        'oklch(0.72 0.21 170)',
-        'oklch(0.71 0.20 195)',
-        'oklch(0.70 0.19 220)',
-        'oklch(0.68 0.18 245)',
-        'oklch(0.67 0.18 270)',
-        'oklch(0.68 0.19 290)',
-        'oklch(0.70 0.18 310)',
-        'oklch(0.72 0.17 330)',
-        'oklch(0.73 0.17 350)',
-        'oklch(0.66 0.09 250)',
-        'oklch(0.70 0.08 110)',
-        'oklch(0.72 0.10 40)',
-        'oklch(0.68 0.07 20)'
-    ];
     const colorGroup = new RadioGroup({
-        value: colors[0],
+        value: milestoneColors[0],
         orientation: 'horizontal'
     });
     let emoji = $state.raw('🐵');
@@ -56,7 +35,7 @@
             class="mt-8 space-y-4"
             onreset={() => {
                 emoji = '🐵';
-                colorGroup.value = colors[0];
+                colorGroup.value = milestoneColors[0];
             }}
             use:form
             use:enhance={(e) => {
@@ -105,7 +84,7 @@
                     <input {...colorGroup.hiddenInput} name="color" value={colorGroup.value} />
                     <Label {...colorGroup.label}>Color</Label>
                     <div class="flex flex-wrap gap-2">
-                        {#each colors as color (color)}
+                        {#each milestoneColors as color (color)}
                             {@const item = colorGroup.getItem(color)}
                             <div
                                 {...item.attrs}

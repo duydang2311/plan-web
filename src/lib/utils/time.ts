@@ -33,4 +33,22 @@ export const formatTimeUi = (dateTime: string | DateTime) => {
     return dateTime.toLocaleString(DateTime.DATETIME_MED);
 };
 
+export const formatDateUi = (dateTime: string | DateTime) => {
+    if (typeof dateTime === 'string') {
+        dateTime = DateTime.fromISO(dateTime);
+    }
+
+    const now = DateTime.now();
+    if (dateTime.hasSame(now, 'day')) {
+        return `Today`;
+    }
+    if (dateTime.hasSame(now.minus({ days: 1 }), 'day')) {
+        return `Yesterday`;
+    }
+    if (dateTime.hasSame(now.plus({ days: 1 }), 'day')) {
+        return `Tomorrow`;
+    }
+    return dateTime.toLocaleString(DateTime.DATE_MED);
+};
+
 export const formatDateTimeUi = formatTimeUi;

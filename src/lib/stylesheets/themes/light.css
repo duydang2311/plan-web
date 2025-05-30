@@ -89,4 +89,6 @@
 
     --color-status-canceled: oklch(52.44% 0.16 22.18);
     --color-status-canceled-border: oklch(43.07% 0.1897 22.17);
+
+    --color-status-paused: oklch(51.07% 0.1103 70.49);
 }

@@ -6,11 +6,11 @@ export interface Milestone {
     id: string;
     projectId: string;
     endTime: string;
+    endTimeZone?: string;
     title: string;
     emoji: string;
     color: string;
     description?: string;
-    previewDescription?: string;
     statusId?: number;
     status?: MilestoneStatus;
 }
@@ -20,7 +20,7 @@ export interface MilestoneStatus {
     category: MilestoneStatusCategory;
     rank: string;
     value: string;
-    color: string;
+    color?: string;
     icon?: string;
     description?: string;
     projectId: string;
