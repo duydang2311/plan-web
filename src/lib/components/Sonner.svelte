@@ -1,7 +1,8 @@
 <script lang="ts" module>
+    import { onMount, type Snippet } from 'svelte';
     import { toast as __toast, Toaster } from 'svelte-sonner';
+    import { on } from 'svelte/events';
     import SonnerToast from './SonnerToast.svelte';
-    import type { Snippet } from 'svelte';
 
     export type ToastProps<THeader, TBody, TFooter> = (
         | { header?: never; headerProps?: never }
@@ -60,6 +61,7 @@
     let id = 0;
     let frame = 0;
     let mouseover = false;
+    let paused = false;
 
     export const add = (state: ToastState) => {
         states.set(++id, state);
@@ -80,7 +82,9 @@
             if (v.progress === 1) {
                 continue;
             }
-            v.progress = Math.min(v.progress + (timestamp - v.now) / v.durationMs, 1);
+            if (!paused) {
+                v.progress = Math.min(v.progress + (timestamp - v.now) / v.durationMs, 1);
+            }
             v.now = timestamp;
         }
         frame = requestAnimationFrame(render);
@@ -102,6 +106,18 @@
             frame = 0;
         }
     };
+</script>
+
+<script lang="ts">
+    onMount(() => {
+        return on(document, 'visibilitychange', () => {
+            if (document.hidden) {
+                paused = true;
+            } else {
+                paused = false;
+            }
+        });
+    });
 </script>
 
 <Toaster
