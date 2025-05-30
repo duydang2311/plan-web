@@ -29,6 +29,7 @@ export { default as IconOptionsOutline } from '~icons/heroicons/ellipsis-horizon
 export { default as IconEnvelopeOutline } from '~icons/heroicons/envelope';
 export { default as IconEnvelope } from '~icons/heroicons/envelope-16-solid';
 export { default as IconFailure } from '~icons/heroicons/exclamation-circle-16-solid';
+export { default as IconViewOutline } from '~icons/heroicons/eye';
 export { default as IconLink } from '~icons/heroicons/link-16-solid';
 export { default as IconUnlink } from '~icons/heroicons/link-slash-16-solid';
 export { default as IconSearch } from '~icons/heroicons/magnifying-glass-16-solid';
@@ -43,8 +44,8 @@ export { default as IconUsersSolid } from '~icons/heroicons/user-group-16-solid'
 export { default as IconUserPlus } from '~icons/heroicons/user-plus-16-solid';
 export { default as IconXMark } from '~icons/heroicons/x-mark-16-solid';
 export { default as IconBold } from '~icons/lucide/bold';
-export { default as IconCalendarRange } from '~icons/lucide/calendar-range';
 export { default as IconCalendar } from '~icons/lucide/calendar';
+export { default as IconCalendarRange } from '~icons/lucide/calendar-range';
 export { default as IconColumns } from '~icons/lucide/columns-3';
 export { default as IconMenu } from '~icons/lucide/ellipsis';
 export { default as IconDraggable } from '~icons/lucide/grip-vertical';

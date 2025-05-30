@@ -15,7 +15,13 @@ export type OnTitleSubmit = (
     id: string,
     ...args: Parameters<SubmitFunction>
 ) => ReturnType<SubmitFunction>;
+
 export type OnDescriptionSubmit = (
+    id: string,
+    ...args: Parameters<SubmitFunction>
+) => ReturnType<SubmitFunction>;
+
+export type OnDeleteSubmit = (
     id: string,
     ...args: Parameters<SubmitFunction>
 ) => ReturnType<SubmitFunction>;

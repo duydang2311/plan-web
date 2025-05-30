@@ -23,7 +23,7 @@
 ></Button>
 {#if popover.open}
     <Popover {...popover.content}>
-        <ul class="max-w-paragraph-sm grid grid-cols-[repeat(auto-fit,minmax(2rem,1fr))] gap-1">
+        <ul class="max-w-48 grid grid-cols-[repeat(auto-fit,minmax(2rem,1fr))] gap-1">
             {#each milestoneColors as color (color)}
                 <li class="flex aspect-square p-0">
                     <button

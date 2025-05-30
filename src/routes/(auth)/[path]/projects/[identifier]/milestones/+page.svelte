@@ -20,7 +20,12 @@
     import EndTime from './EndTime.svelte';
     import Status from './Status.svelte';
     import Title from './Title.svelte';
-    import type { LocalMilestoneStatus, OnDescriptionSubmit, OnTitleSubmit } from './types';
+    import type {
+        LocalMilestoneStatus,
+        OnDeleteSubmit,
+        OnDescriptionSubmit,
+        OnTitleSubmit
+    } from './types';
     import {
         decodeUpdateDescription,
         decodeUpdateTitle,
@@ -451,7 +456,9 @@
                 type: 'negative',
                 header: 'Color update failed',
                 body: 'Something went wrong while updating the color.',
-                footer: patchAttempt.failed ? patchAttempt.error : patchAttempt.data.status.toString()
+                footer: patchAttempt.failed
+                    ? patchAttempt.error
+                    : patchAttempt.data.status.toString()
             });
             getMilestonesRef.value = old;
             return;
@@ -463,6 +470,61 @@
             body: 'Color updated successfully.'
         });
         await invalidateAll();
+    };
+
+    const onDeleteSubmit: OnDeleteSubmit = (id, e) => {
+        if (!getMilestonesRef.value?.ok) {
+            e.cancel();
+            toast({
+                type: 'negative',
+                header: 'Milestone delete failed',
+                body: 'Milestone data is not available.'
+            });
+            return;
+        }
+
+        const milestone = getMilestonesRef.value.data.items.find((m) => m.id === id);
+        if (!milestone) {
+            e.cancel();
+            toast({
+                type: 'negative',
+                header: 'Milestone delete failed',
+                body: 'Milestone not found.'
+            });
+            return;
+        }
+
+        const old = getMilestonesRef.value;
+        if (old?.ok) {
+            getMilestonesRef.value = attempt.ok(
+                paginatedList({
+                    items: old.data.items.filter((a) => a.id !== id),
+                    totalCount: old.data.totalCount - 1
+                })
+            );
+        }
+        return async (e) => {
+            if (e.result.type === 'failure') {
+                toast({
+                    type: 'negative',
+                    header: 'Milestone delete failed',
+                    body: 'Something went wrong while updating the title.',
+                    footer: e.result.data?.errors
+                        ? stringifyActionFailureErrors(e.result.data.errors)
+                        : (undefined as never)
+                });
+                getMilestonesRef.value = old;
+            } else if (e.result.type === 'success') {
+                toast({
+                    type: 'positive',
+                    header: 'Milestone deleted',
+                    body: deleteSuccess,
+                    bodyProps: milestone.title
+                });
+            }
+
+            await e.update();
+        };
     };
 </script>
 
@@ -476,6 +538,10 @@
 
 {#snippet statusSuccess(status: string)}
     New status: <strong>{status}</strong>.
+{/snippet}
+
+{#snippet deleteSuccess(title: string)}
+    Milestone <strong>{title}</strong> deleted successfully.
 {/snippet}
 
 <Main>
@@ -530,7 +596,7 @@
                                         onSubmit={onTitleSubmit}
                                     />
                                 </div>
-                                <ActionMenu />
+                                <ActionMenu id={milestone.id} canDelete={can.delete} {onDeleteSubmit} />
                             </div>
                             <Description
                                 id={milestone.id}

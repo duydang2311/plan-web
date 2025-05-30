@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { IconEditOutline } from '~/lib/components/icons';
     import { createInlineEdit } from '~/lib/runes/inline_edit.svelte';
     import type { OnDescriptionSubmit } from './types';
 
@@ -44,14 +45,15 @@
             ></textarea>
         </form>
     {:else}
-        <div {@attach inlineEdit.root}>
-            {#if description && description.length > 0}
-                <p class="c-text-secondary">
+        <div {@attach inlineEdit.root} class="group">
+            <p class="c-text-secondary">
+                {#if description && description.length > 0}
                     {description}
-                </p>
-            {:else}
-                <p class="c-text-secondary">No description provided.</p>
-            {/if}
+                {:else}
+                    No description provided.
+                {/if}
+                <IconEditOutline class="text-base-fg-ghost ml-[0.25ch] hidden group-hover:inline" />
+            </p>
         </div>
     {/if}
 </div>

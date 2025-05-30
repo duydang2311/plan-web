@@ -4,10 +4,12 @@ import { ActionAttempt, LoadAttempt } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import type { Actions, PageServerLoad } from './$types';
 import {
+    decodeDeleteMilestone,
     decodeUpdateDescription,
     decodeUpdateTitle,
+    validateDeleteMilestone,
     validateUpdateDescription,
-    validateUpdateTitle,
+    validateUpdateTitle
 } from './utils';
 import type { LocalMilestone } from './types';
 
@@ -81,7 +83,6 @@ export const actions: Actions = {
             return ActionAttempt.Failure(validateAttempt);
         }
 
-        console.log('validateAttempt', validateAttempt.data);
         const patchAttempt = await ActionAttempt.HTTP(() =>
             locals.api.patch(`milestones/${validateAttempt.data.id}`, {
                 body: {
@@ -90,6 +91,26 @@ export const actions: Actions = {
                     }
                 }
             })
+        );
+        if (patchAttempt.failed) {
+            return ActionAttempt.Failure(patchAttempt);
+        }
+    },
+    delete_milestone: async ({ request, locals }) => {
+        const formDataAttempt = await ActionAttempt.FormData(() => request.formData());
+        if (formDataAttempt.failed) {
+            return ActionAttempt.Failure(formDataAttempt);
+        }
+
+        const validateAttempt = ActionAttempt.Validate(() =>
+            validateDeleteMilestone(decodeDeleteMilestone(formDataAttempt.data))
+        );
+        if (validateAttempt.failed) {
+            return ActionAttempt.Failure(validateAttempt);
+        }
+
+        const patchAttempt = await ActionAttempt.HTTP(() =>
+            locals.api.delete(`milestones/${validateAttempt.data.id}`)
         );
         if (patchAttempt.failed) {
             return ActionAttempt.Failure(patchAttempt);

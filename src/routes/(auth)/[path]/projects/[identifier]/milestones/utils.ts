@@ -44,3 +44,18 @@ export const validateUpdateDescription = validator(
         stripLeadingSlash: true
     }
 );
+
+export const decodeDeleteMilestone = (data: FormData) => {
+    return {
+        id: data.get('id')
+    };
+};
+
+export const validateDeleteMilestone = validator(
+    Type.Object({
+        id: Type.String()
+    }),
+    {
+        stripLeadingSlash: true
+    }
+);
