@@ -1,12 +1,13 @@
 import { createQuery } from '@tanstack/svelte-query';
 import { Editor } from '@tiptap/core';
 import { toStore } from 'svelte/store';
-import { useRuntime } from '~/lib/contexts/runtime.client';
+import { useRuntime, type ClientRuntime } from '~/lib/contexts/runtime.client';
 import type { PaginatedList } from '~/lib/models/paginatedList';
 import type { Team } from '~/lib/models/team';
 import type { UserPreset } from '~/lib/models/user';
 import { QueryResponse } from '~/lib/utils/query';
 import { extend, validator } from '~/lib/utils/validation';
+import type { LocalMilestone } from './types';
 
 export type LocalIssueAssignee = {
     user: UserPreset['basicProfile'];
@@ -96,3 +97,29 @@ export const createAssignedTeamListQuery = (f: () => { issueId: string }) => {
         })
     );
 };
+
+export const createMilestoneListQuery =
+    (api: ClientRuntime['api']) => (f: () => { projectId: string }) => {
+        return createQuery(
+            toStore(() => {
+                const { projectId } = f();
+                return {
+                    queryKey: ['milestones', { projectId }],
+                    queryFn: async () => {
+                        const response = await QueryResponse.HTTP(() =>
+                            api.get('milestones', {
+                                query: {
+                                    projectId,
+                                    select: 'Id,Title,Emoji,Color,EndTime,EndTimeZone',
+                                    order: 'EndTime,-Id'
+                                }
+                            })
+                        );
+                        return await QueryResponse.JSON(() =>
+                            response.json<PaginatedList<LocalMilestone>>()
+                        );
+                    }
+                };
+            })
+        );
+    };

@@ -17,6 +17,7 @@ import { Type } from '~/lib/utils/typebox';
 import { queryParams } from '~/lib/utils/url';
 import { validator } from '~/lib/utils/validation';
 import type { Actions, PageServerLoad } from './$types';
+import type { LocalMilestone } from './types';
 import {
     createFetchIssueQuery,
     createIssueAuditListQuery,
@@ -49,6 +50,7 @@ export type LocalIssue = Pick<
 > & {
     author: Pick<User, 'email'> & { profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'> };
     status?: Pick<WorkspaceStatus, 'value'>;
+    milestone?: LocalMilestone;
 };
 
 export interface LocalComment {

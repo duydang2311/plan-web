@@ -1,12 +1,16 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import { Pane, PaneGroup, PaneResizer, type PaneAPI } from 'paneforge';
     import { onMount } from 'svelte';
-    import { IconButton } from '~/lib/components';
+    import { IconButton, toast } from '~/lib/components';
     import { IconPanelRightClose, IconPanelRightOpen } from '~/lib/components/icons';
+    import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { errorCodes } from '~/lib/models/errors';
     import { paginatedList } from '~/lib/models/paginatedList';
     import { permissions } from '~/lib/models/permission';
     import { mapMaybePromise } from '~/lib/utils/promise';
     import { createRef } from '~/lib/utils/runes.svelte';
+    import { attempt } from '~/lib/utils/try';
     import type { ActionData, PageData } from './$types';
     import type { LocalChecklistItem } from './+page.server';
     import AddComment from './AddComment.svelte';
@@ -15,13 +19,16 @@
     import DeleteButton from './DeleteButton.svelte';
     import EditButton from './EditButton.svelte';
     import Issue from './Issue.svelte';
+    import Milestone from './Milestone.svelte';
     import Priority from './Priority.svelte';
     import SelectAssignees from './SelectAssignees.svelte';
     import SelectTeam from './SelectTeam.svelte';
     import Status from './Status.svelte';
     import Timeline from './Timeline.svelte';
+    import type { LocalMilestone } from './types';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
+    const { api } = useRuntime();
     let editing = $state.raw(false);
     let scrollRef = $state.raw<HTMLElement>();
     const issueRef = createRef(() => data.page.issue);
@@ -54,6 +61,53 @@
             (getProjectPermissionsRef.value?.has(permissions.createTeamIssue) ?? false)
     });
 
+    const onMilestoneChange = async (milestone: LocalMilestone | undefined) => {
+        const old = issueRef.value;
+        issueRef.value = {
+            ...old,
+            milestone
+        };
+
+        const patchAttempt = await attempt.promise(() =>
+            api.patch(`issues/${old.id}`, {
+                body: {
+                    patch: {
+                        milestoneId: milestone?.id ?? null
+                    }
+                }
+            })
+        )(errorCodes.fromFetch);
+        if (patchAttempt.failed || !patchAttempt.data.ok) {
+            toast({
+                type: 'negative',
+                header: 'Milestone update failed',
+                body: 'Something went wrong while updating the milestone.',
+                footer: patchAttempt.failed
+                    ? patchAttempt.error
+                    : patchAttempt.data.status.toString()
+            });
+            issueRef.value = old;
+            return;
+        }
+
+        if (milestone) {
+            toast({
+                type: 'positive',
+                header: 'Milestone updated',
+                body: milestoneSuccess,
+                bodyProps: milestone.title
+            });
+        } else {
+            toast({
+                type: 'positive',
+                header: 'Milestone removed',
+                body: 'Milestone removed successfully.'
+            });
+        }
+
+        await invalidateAll();
+    };
+
     onMount(() => {
         const resizeObserver = new ResizeObserver(() => {
             auditsComponent?.invalidateScrollOffset();
@@ -66,6 +120,10 @@
         };
     });
 </script>
+
+{#snippet milestoneSuccess(title: string)}
+    New milestone: <strong>{title}</strong>.
+{/snippet}
 
 <main class="h-full">
     <PaneGroup direction="horizontal">
@@ -158,24 +216,29 @@
                         >
                             <IconPanelRightClose />
                         </IconButton>
-                        <div class="-mt-6 space-y-4">
-                            <div class="flex flex-wrap gap-x-2 gap-y-4 *:grow *:basis-60">
-                                <Status
-                                    workspaceId={data.workspace.id}
-                                    issueId={data.page.issue.id}
-                                    canUpdate={can.update}
-                                />
-                                <Priority
-                                    ref={issueRef}
-                                    issueId={data.page.issue.id}
-                                    canUpdate={can.update}
-                                />
-                            </div>
+                        <div
+                            class="-mt-6 grid grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] gap-4"
+                        >
+                            <Status
+                                workspaceId={data.workspace.id}
+                                issueId={data.page.issue.id}
+                                canUpdate={can.update}
+                            />
+                            <Priority
+                                ref={issueRef}
+                                issueId={data.page.issue.id}
+                                canUpdate={can.update}
+                            />
                             <Timeline
                                 issueId={data.page.issue.id}
                                 startTime={data.page.issue.startTime}
                                 endTime={data.page.issue.endTime}
                                 zone={data.page.issue.timelineZone}
+                            />
+                            <Milestone
+                                milestone={issueRef.value.milestone}
+                                projectId={data.project.id}
+                                onChange={onMilestoneChange}
                             />
                         </div>
                         <SelectAssignees

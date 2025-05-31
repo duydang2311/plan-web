@@ -56,58 +56,47 @@
     });
 </script>
 
+<DateTimePicker
+    bind:this={startPicker}
+    name="startTime"
+    label="Start time"
+    {issueId}
+    bind:value={startTime}
+    defaultTime={'08:00 AM'}
+    highlightDate={endTime}
+    isDateDisabled={(date) => {
+        if (endTime == null) {
+            return false;
+        }
+        return date.compare(new CalendarDate(endTime.year, endTime.month, endTime.day)) > 0;
+    }}
+/>
 <div>
-    <div class="flex flex-wrap gap-x-2 gap-y-4 *:grow *:basis-60">
-        <DateTimePicker
-            bind:this={startPicker}
-            name="startTime"
-            label="Start time"
-            {issueId}
-            bind:value={startTime}
-            defaultTime={'08:00 AM'}
-            highlightDate={endTime}
-            isDateDisabled={(date) => {
-                if (endTime == null) {
-                    return false;
-                }
-                return date.compare(new CalendarDate(endTime.year, endTime.month, endTime.day)) > 0;
-            }}
-        />
-        <DateTimePicker
-            bind:this={endPicker}
-            name="endTime"
-            label="End time"
-            {issueId}
-            bind:value={endTime}
-            defaultTime={'05:00 PM'}
-            highlightDate={startTime}
-            isDateDisabled={(date) => {
-                if (startTime == null) {
-                    return true;
-                }
-                return (
-                    date.compare(new CalendarDate(startTime.year, startTime.month, startTime.day)) <
-                    0
-                );
-            }}
-        />
-    </div>
-    {#if startTime && endTime}
-        {@const duration = endTime.diff(startTime, [
-            'months',
-            'days',
-            'hours',
-            'minutes',
-            'seconds'
-        ])}
-        {#if Math.abs(duration.shiftTo('seconds').seconds) > Number.EPSILON}
-            {@const format = Object.entries(duration.toObject())
-                .filter(([_, v]) => v > 0)
-                .map(([k, v]) => `${Math.floor(v)} ${k}`)
-                .join(', ')}
-            <p class="c-text-secondary text-base-fg-5 mt-1 px-2">
-                Task duration: {format}.
-            </p>
-        {/if}
+<DateTimePicker
+    bind:this={endPicker}
+    name="endTime"
+    label="End time"
+    {issueId}
+    bind:value={endTime}
+    defaultTime={'05:00 PM'}
+    highlightDate={startTime}
+    isDateDisabled={(date) => {
+        if (startTime == null) {
+            return true;
+        }
+        return date.compare(new CalendarDate(startTime.year, startTime.month, startTime.day)) < 0;
+    }}
+/>
+{#if startTime && endTime}
+    {@const duration = endTime.diff(startTime, ['months', 'days', 'hours', 'minutes', 'seconds'])}
+    {#if Math.abs(duration.shiftTo('seconds').seconds) > Number.EPSILON}
+        {@const format = Object.entries(duration.toObject())
+            .filter(([_, v]) => v > 0)
+            .map(([k, v]) => `${Math.floor(v)} ${k}`)
+            .join(', ')}
+        <p class="c-text-secondary text-base-fg-5 mt-0.5">
+            Task duration: {format}.
+        </p>
     {/if}
+{/if}
 </div>
