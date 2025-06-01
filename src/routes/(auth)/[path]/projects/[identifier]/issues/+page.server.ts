@@ -1,6 +1,7 @@
 import { D } from '@mobily/ts-belt';
 import { Effect, Exit, pipe } from 'effect';
 import type { Issue } from '~/lib/models/issue';
+import type { Milestone } from '~/lib/models/milestone';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
 import type { UserPreset } from '~/lib/models/user';
@@ -10,12 +11,21 @@ import { maybeStream } from '~/lib/utils/promise';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
 
+export type LocalMilestone = Pick<Milestone, 'id' | 'title' | 'emoji' | 'color'>;
+
 export type LocalIssue = Pick<
     Issue,
-    'createdTime' | 'updatedTime' | 'id' | 'orderNumber' | 'title' | 'priority' | 'previewDescription'
+    | 'createdTime'
+    | 'updatedTime'
+    | 'id'
+    | 'orderNumber'
+    | 'title'
+    | 'priority'
+    | 'previewDescription'
 > & {
     project: { identifier: string };
-    status?: { value: string; rank: string };
+    status?: Pick<WorkspaceStatus, 'value' | 'color' | 'rank' | 'category'>;
+    milestone?: LocalMilestone;
 };
 
 export type LocalBoardIssue = Pick<
@@ -25,11 +35,16 @@ export type LocalBoardIssue = Pick<
     | 'id'
     | 'orderNumber'
     | 'title'
-    | 'statusId'
     | 'statusRank'
     | 'priority'
     | 'previewDescription'
-> & { author: UserPreset['email'] & UserPreset['profile'] };
+    | 'startTime'
+    | 'endTime'
+> & {
+    author: UserPreset['email'] & UserPreset['profile'];
+    status?: Pick<WorkspaceStatus, 'id' | 'value' | 'color' | 'rank' | 'category'>;
+    milestone?: LocalMilestone;
+};
 
 export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color' | 'category'>;
 

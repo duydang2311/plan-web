@@ -298,11 +298,11 @@
 
 <ImportChecklistTodosDialog {issueId} />
 
-<div class="border-base-border-3 rounded-xl border">
+<div class="border-base-border-3 rounded-lg border">
     <div
         class="border-b-base-border-3 dark:bg-base-3 flex items-center justify-between gap-4 border-b px-4 py-2"
     >
-        <h2 class="text-h4 font-medium">Checklist</h2>
+        <p>Checklist</p>
         {#if checklistRef.value != null && checklistRef.value.items.length > 0}
             {@const completedCount = checklistRef.value.items.filter((i) =>
                 i.kind === ChecklistItemKind.Todo
@@ -333,7 +333,7 @@
     {:else}
         <div>
             <ul
-                class="bg-base-1 grid max-h-96 grid-cols-[auto_1fr_auto] overflow-auto rounded-b-xl"
+                class="bg-base-1 grid max-h-96 grid-cols-[auto_1fr_auto] overflow-auto rounded-b-lg"
             >
                 {#each checklistRef.value.items as item (item.id ?? item.optimisticId)}
                     <ChecklistItem

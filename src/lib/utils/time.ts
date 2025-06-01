@@ -1,4 +1,4 @@
-import { DateTime, type DateTimeFormatOptions } from 'luxon';
+import { DateTime, type DateTimeFormatOptions, type ToRelativeOptions } from 'luxon';
 
 export const formatRelativeDateUi = (
     dateTime: DateTime,
@@ -13,6 +13,24 @@ export const formatRelativeDateUi = (
         return dateTime.toRelative();
     }
     return dateTime.toLocaleString(absoluteFormatOpts ?? DateTime.DATE_FULL);
+};
+
+export const formatRelativeDateTimeUi = (
+    dateTime: string | DateTime,
+    options?: ToRelativeOptions
+) => {
+    if (typeof dateTime === 'string') {
+        dateTime = DateTime.fromISO(dateTime);
+    }
+
+    const now = DateTime.now();
+    if (now.diff(dateTime, 'seconds').seconds <= 5) {
+        return 'just now';
+    }
+    if (now.diff(dateTime, 'minutes').minutes < 1) {
+        return 'less than a minute ago';
+    }
+    return dateTime.toRelative(options);
 };
 
 export const formatTimeUi = (dateTime: string | DateTime) => {

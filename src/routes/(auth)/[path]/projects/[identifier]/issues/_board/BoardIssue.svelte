@@ -22,11 +22,16 @@
     import { Avatar, Link, RelativeTime } from '~/lib/components';
     import { IconDraggable } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import { getPriorityLabel } from '~/lib/models/issue';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import type { LocalBoardIssue } from '../+page.server';
+    import Milestone from '../Milestone.svelte';
+    import Priority from '../Priority.svelte';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
+    import CreatedTime from '../CreatedTime.svelte';
+    import Timeline from '../Timeline.svelte';
+    import Status from '../Status.svelte';
+    import { IssuePriorities } from '~/lib/models/issue';
 
     interface Props {
         identifier: string;
@@ -106,44 +111,53 @@
 <div class="py-1" use:atlas={issue}>
     <div
         class={clsx(
-            'shadow-xs relative w-full cursor-grab rounded-md p-4 transition duration-75',
+            'shadow-xs relative w-full cursor-grab rounded-md p-4 transition',
             dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 dark:bg-base-2'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}
             <DropIndicator {edge} gap={8} radius={8} stroke={2} />
         {/if}
-        <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
-            <p class="text-sm leading-none">
-                <small>{identifier}-{issue.orderNumber}</small>
+        <div class="mb-2 flex items-center justify-between gap-2 text-sm">
+            <p class="c-text-secondary text-base-fg-5 leading-none">
+                {identifier}-{issue.orderNumber}
             </p>
-            <IconDraggable class="ml-auto h-4" />
+            <IconDraggable class="text-base-fg-5 ml-auto h-4" />
         </div>
-        <p class="font-semibold leading-none">
+        <p class="leading-none">
             <Link
                 href="/{page.params.path}/projects/{page.params
                     .identifier}/issues/{issue.orderNumber}"
-                class="text-base-fg-1"
+                class="text-base-fg-1 font-display font-semibold"
             >
                 {issue.title}
             </Link>
         </p>
-        {#if issue.previewDescription != null && issue.previewDescription.length > 0}
-            <p class="c-label mt-4 line-clamp-3 text-pretty">
-                {issue.previewDescription}
-            </p>
-        {/if}
-        <div class="mt-4 flex items-center justify-between gap-4 text-sm">
-            <div
-                class="bg-negative-1 text-negative-fg-1 border-negative-border rounded-full border px-2"
-            >
-                {getPriorityLabel(issue.priority)}
-            </div>
-            <span class="c-label">
-                <RelativeTime time={issue.createdTime} />
-            </span>
+        <div class="mt-2">
+            {#if issue.previewDescription == null || issue.previewDescription.length === 0}
+                <p class="c-text-secondary">No description provided.</p>
+            {:else}
+                <p class="c-text-secondary line-clamp-3 text-pretty">
+                    {issue.previewDescription}
+                </p>
+            {/if}
         </div>
-        <div class="border-t-base-border-3 mt-4 flex items-center gap-2 border-t pt-2">
+        <div class="mt-8 flex flex-wrap items-center gap-2 text-sm">
+            {#if issue.status}
+                <Status status={issue.status} />
+            {/if}
+            {#if issue.priority !== IssuePriorities.none}
+                <Priority priority={issue.priority} />
+            {/if}
+        </div>
+        <div class="text-base-fg-4 mt-2 grid grid-cols-[auto_1fr] gap-2 text-sm font-medium">
+            {#if issue.milestone}
+                <Milestone milestone={issue.milestone} />
+            {/if}
+            <Timeline startTime={issue.startTime} endTime={issue.endTime} />
+            <CreatedTime createdTime={issue.createdTime} />
+        </div>
+        <div class="border-t-base-border-3 -mx-4 mt-4 flex items-center gap-2 border-t px-4 pt-4">
             <Avatar
                 seed={issue.author.profile?.name ?? issue.author.email}
                 src={imageFromAsset(cloudinary)(issue.author.profile?.image)
@@ -154,8 +168,10 @@
             <div>
                 {#if issue.author.profile}
                     <p>{issue.author.profile.displayName}</p>
+                    <p class="c-text-secondary">{issue.author.profile.name}</p>
+                {:else}
+                    <p class="c-text-secondary">{issue.author.email}</p>
                 {/if}
-                <p class="c-label">{issue.author.email}</p>
             </div>
         </div>
     </div>

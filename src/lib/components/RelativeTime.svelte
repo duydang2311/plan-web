@@ -22,7 +22,7 @@
             if (ref.value) {
                 ref.value = {
                     ...ref.value,
-                    format: ref.value.time.toRelative() ?? 'N/A'
+                    format: formatRelativeDateTimeUi(ref.value.time) ?? 'N/A'
                 };
             }
         }
@@ -33,6 +33,7 @@
     import { DateTime, type ToRelativeOptions } from 'luxon';
     import { createRef, type Ref } from '../utils/runes.svelte';
     import { onMount } from 'svelte';
+    import { formatRelativeDateTimeUi } from '../utils/time';
 
     let { time, options }: { time: string | DateTime; options?: ToRelativeOptions } = $props();
     if (typeof time === 'string') {
@@ -40,7 +41,7 @@
     }
     const ref = createRef({
         time,
-        format: time.toRelative(options) ?? 'N/A'
+        format: formatRelativeDateTimeUi(time, options) ?? 'N/A'
     });
 
     onMount(() => {

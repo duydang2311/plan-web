@@ -91,4 +91,10 @@
     --color-status-canceled-border: oklch(43.07% 0.1897 22.17);
 
     --color-status-paused: oklch(51.07% 0.1103 70.49);
+
+    --color-priority-none: oklch(67.06% 0.0157 150.61);
+    --color-priority-low: oklch(65.36% 0.1739 151.43);
+    --color-priority-medium: oklch(68.08% 0.1515 66.06);
+    --color-priority-high: oklch(61.72% 0.1998 38.51);
+    --color-priority-urgent: oklch(62.8% 0.2577 29.23);
 }

@@ -2,23 +2,25 @@
     import { page } from '$app/state';
     import { Button, Main, Tabs } from '~/lib/components';
     import { IconColumns, IconPlus, IconRows } from '~/lib/components/icons';
+    import { paginatedList } from '~/lib/models/paginatedList';
+    import { permissions } from '~/lib/models/permission';
     import { createRef } from '~/lib/utils/runes.svelte';
     import { fluentSearchParams } from '~/lib/utils/url';
     import type { PageData } from './$types';
+    import type { LocalIssue, LocalWorkspaceStatus } from './+page.server';
     import TableLayout from './TableLayout.svelte';
     import BoardLayout from './_board/BoardLayout.svelte';
-    import { permissions } from '~/lib/models/permission';
 
     const { data }: { data: PageData } = $props();
     const createIssueHref = $derived(page.url.pathname + '/new');
     const tableIssueListRef = createRef.maybePromise(() =>
-        data.page.tag === 'table' ? data.page.issueList : null
+        data.page.tag === 'table' ? data.page.issueList : paginatedList<LocalIssue>()
     );
     const boardIssueListsRef = createRef.maybePromise(() =>
-        data.page.tag === 'board' ? data.page.issueLists : null
+        data.page.tag === 'board' ? data.page.issueLists : {}
     );
     const boardStatusListRef = createRef.maybePromise(() =>
-        data.page.tag === 'board' ? data.page.statusList : null
+        data.page.tag === 'board' ? data.page.statusList : paginatedList<LocalWorkspaceStatus>()
     );
     const tabsBuilder = new Tabs.Builder({
         value: page.url.searchParams.get('view') === 'board' ? 'board' : 'table'

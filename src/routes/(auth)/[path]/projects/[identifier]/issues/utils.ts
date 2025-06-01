@@ -21,7 +21,7 @@ export const createBoardQueryParams = (url: URL) => {
                 size: 20
             })
         ),
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription',
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StartTime,EndTime,StatusRank,Status.Id,Status.Color,Status.Category,Status.Value,Status.Rank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription,Milestone.Id,Milestone.Title,Milestone.Emoji,Milestone.Color',
         order: 'StatusRank,OrderNumber'
     };
 };
@@ -55,6 +55,6 @@ export const createIssueListQueryParams = ({
         page: rest.page ?? Number(url?.searchParams.get('page') ?? '1'),
         size: rest.size ?? Number(url?.searchParams.get('size') ?? '20'),
         order: rest.order ?? url?.searchParams.get('order') ?? 'OrderNumber',
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Value,Status.Rank,Priority,PreviewDescription'
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Category,Status.Color,Status.Value,Status.Rank,Priority,PreviewDescription,Milestone.Id,Milestone.Title,Milestone.Emoji,Milestone.Color'
     };
 };

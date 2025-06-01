@@ -1,14 +1,16 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { DateTime } from 'luxon';
     import { RelativeTime, Row, Table, Th, THead } from '~/lib/components';
     import Pagination3 from '~/lib/components/Pagination3.svelte';
     import ThSort3 from '~/lib/components/ThSort3.svelte';
-    import { getPriorityLabel, IssuePriorities, priorityIcons } from '~/lib/models/issue';
+    import { priorityIcons } from '~/lib/models/issue';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';
     import type { LocalIssue } from './+page.server';
+    import Milestone from './Milestone.svelte';
+    import Priority from './Priority.svelte';
+    import Status from './Status.svelte';
 
     const { issueListRef }: { issueListRef: AsyncRef<PaginatedList<LocalIssue>> } = $props();
     const pagination = createPagination({
@@ -19,10 +21,11 @@
 
 <div class="grid h-full grid-rows-[1fr_auto]">
     <div class="c-table--wrapper custom-scrollbar relative z-0 overflow-auto">
-        <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto]">
+        <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto_auto]">
             <THead class="z-10">
                 <Row class="py-2">
                     <Th class="col-span-2">Title</Th>
+                    <Th>Milestone</Th>
                     <ThSort3 name="status.rank">Status</ThSort3>
                     <ThSort3 name="priority">Priority</ThSort3>
                     <ThSort3 name="createdTime">Created</ThSort3>
@@ -33,23 +36,8 @@
                 {#if issueListRef.isInitialLoading}
                     {#each { length: 3 } as _}
                         <Row>
-                            <td>
-                                <div class="bg-base-3 h-5 w-16 animate-pulse"></div>
-                            </td>
-                            <td>
-                                <div class="bg-base-3 h-5 w-64 animate-pulse"></div>
-                            </td>
-                            <td>
-                                <div class="bg-base-3 h-5 w-24 animate-pulse"></div>
-                            </td>
-                            <td>
-                                <div class="bg-base-3 h-5 w-24 animate-pulse"></div>
-                            </td>
-                            <td>
-                                <div class="bg-base-3 h-5 w-32 animate-pulse"></div>
-                            </td>
-                            <td>
-                                <div class="bg-base-3 h-5 w-32 animate-pulse"></div>
+                            <td class="col-span-full">
+                                <div class="bg-base-3 h-5 w-full animate-pulse"></div>
                             </td>
                         </Row>
                     {/each}
@@ -59,7 +47,6 @@
                     </Row>
                 {:else}
                     {#each issueListRef.value.items as row}
-                        {@const IconPriority = priorityIcons[row.priority]}
                         <Row class="relative">
                             <td>
                                 <a
@@ -78,36 +65,35 @@
                                 <p>
                                     {row.title}
                                 </p>
-                                <p class="c-label line-clamp-1">
+                                <p class="c-text-secondary line-clamp-1">
                                     {row.previewDescription}
                                 </p>
                             </td>
                             <td>
-                                {#if row.status?.value}
-                                    {row.status.value}
+                                {#if row.milestone}
+                                    <div class="grid grid-cols-[auto_1fr] items-center">
+                                        <Milestone milestone={row.milestone} />
+                                    </div>
                                 {:else}
-                                    <span class="text-base-fg-ghost">N/A</span>
+                                    <span class="c-text-secondary text-base-fg-ghost">N/A</span>
                                 {/if}
                             </td>
-                            <td title={getPriorityLabel(row.priority)}>
-                                <IconPriority
-                                    class={row.priority == IssuePriorities.none
-                                        ? 'text-base-fg-ghost'
-                                        : undefined}
-                                />
+                            <td>
+                                {#if row.status}
+                                    <Status status={row.status} />
+                                {:else}
+                                    <span class="c-text-secondary text-base-fg-ghost">N/A</span>
+                                {/if}
                             </td>
-                            <td
-                                title={DateTime.fromISO(row.createdTime).toLocaleString(
-                                    DateTime.DATETIME_SHORT
-                                )}
-                            >
+                            <td>
+                                <div class="grid grid-cols-[auto_1fr] items-center">
+                                    <Priority priority={row.priority} />
+                                </div>
+                            </td>
+                            <td class="first-letter:uppercase">
                                 <RelativeTime time={row.createdTime} />
                             </td>
-                            <td
-                                title={DateTime.fromISO(row.updatedTime).toLocaleString(
-                                    DateTime.DATETIME_SHORT
-                                )}
-                            >
+                            <td class="first-letter:uppercase">
                                 <RelativeTime time={row.updatedTime} />
                             </td>
                         </Row>

@@ -13,7 +13,7 @@ export function toDraggableIssueData(issue: LocalBoardIssue) {
     return {
         type: 'issue',
         id: issue.id,
-        statusId: issue.statusId ?? -1,
+        statusId: issue.status?.id ?? -1,
         statusRank: issue.statusRank,
         title: issue.title,
         orderNumber: issue.orderNumber,

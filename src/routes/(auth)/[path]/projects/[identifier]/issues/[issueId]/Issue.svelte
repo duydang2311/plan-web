@@ -59,7 +59,7 @@
             </span>
         </h1>
     </InlineEdit>
-    <div class="transition-enforcement mt-4 max-w-full border border-base-border-3 rounded-xl p-4 bg-base-1 dark:bg-base-3">
+    <div class="transition-enforcement mt-4 max-w-full">
         {#if editing}
             <div>
                 <form
@@ -143,7 +143,7 @@
                         USE_PROFILES: { html: true }
                     })}
                 {:else}
-                    <small class="text-base-fg-ghost font-medium"><i>Not available.</i></small>
+                    <span class="c-text-secondary">Description not provided.</span>
                 {/if}
             </div>
         {/if}

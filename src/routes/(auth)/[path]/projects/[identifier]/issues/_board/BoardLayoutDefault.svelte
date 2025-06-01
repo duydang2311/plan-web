@@ -17,6 +17,8 @@
     import Board from './Board.svelte';
     import BoardSkeleton from './BoardSkeleton.svelte';
     import { validateDraggableIssueData } from './utils';
+    import { createBoardQueryParams } from '../utils';
+    import { page } from '$app/state';
 
     const {
         statusList,
@@ -87,7 +89,13 @@
                 [target.statusId]: paginatedList({
                     items: [
                         ...targetList.items,
-                        { ...sourceIssue, statusRank: target.statusRank, statusId: target.statusId }
+                        {
+                            ...sourceIssue,
+                            statusRank: target.statusRank,
+                            status: sourceIssue.status
+                                ? { ...sourceIssue.status, id: target.statusId }
+                                : undefined
+                        }
                     ].toSorted((a, b) => compareRank(a.statusRank, b.statusRank)),
                     totalCount: targetList.totalCount + 1
                 })
@@ -100,9 +108,10 @@
         )();
         if (tryPatch.tag === 'Left') {
             const sourceStatus =
-                sourceIssue.statusId == null
+                sourceIssue.status?.id == null
                     ? null
-                    : statusList.items.find((a) => a.id === sourceIssue.statusId!);
+                    : statusList.items.find((a) => a.id === sourceIssue.status!.id);
+            console.log(sourceStatus);
             const targetStatus =
                 target.statusId === -1
                     ? null
@@ -135,14 +144,13 @@
                     if (size == null || size < 20) {
                         size = 20;
                     }
+                    const params = createBoardQueryParams(page.url);
                     const response = await api.get('issues', {
                         query: {
+                            ...params,
                             projectId,
                             statusId: a === -1 ? null : a,
-                            nullStatusId: a === -1,
-                            size,
-                            select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StatusId,StatusRank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription',
-                            order: 'StatusRank,OrderNumber'
+                            nullStatusId: a === -1
                         }
                     });
                     return response.json<PaginatedList<LocalBoardIssue>>();
@@ -275,7 +283,7 @@
     to <strong>{to}</strong>.
 {/snippet}
 
-<div class="flex h-full overflow-x-auto px-4 overflow-y-hidden pb-1">
+<div class="flex h-full overflow-x-auto overflow-y-hidden px-4 pb-1">
     <ol
         class="grid auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
         class:animate-pulse={issueListsRef.loading.immediate}
@@ -307,7 +315,7 @@
         style="width: {preview.rect.width}px; {navigator.userAgent.includes('Windows')
             ? ' max-width: 280px; max-height: 280px;'
             : ''}"
-        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border px-4 opacity-100 p-4"
+        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border p-4 px-4 opacity-100"
     >
         <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
             <p class="text-sm leading-none">
@@ -318,6 +326,6 @@
         <p class="font-medium leading-none">
             {preview.data.title}
         </p>
-        <p class="line-clamp-3 mt-4">{preview.data.previewDescription}</p>
+        <p class="mt-4 line-clamp-3">{preview.data.previewDescription}</p>
     </div>
 {/if}

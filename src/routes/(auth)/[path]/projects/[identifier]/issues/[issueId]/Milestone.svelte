@@ -21,15 +21,15 @@
         forceVisible: true,
         value: () => milestone?.id,
         onValueChange: (a) => {
-            for(const value of a.values()) {
+            for (const value of a.values()) {
                 const milestone = $query.data?.items.find((m) => m.id === value);
                 if (milestone) {
-            onChange(milestone);
-            return;
+                    onChange(milestone);
+                    return;
                 }
             }
             onChange(undefined);
-        },
+        }
     });
     const query = createMilestoneListQuery(api)(() => ({ projectId }));
 </script>
@@ -43,14 +43,14 @@
         class="flex items-center justify-between gap-4 px-2"
     >
         {#if milestone}
-        <div class="flex items-center gap-2">
-            <div class="size-5">
-                {@html twemoji.parse(milestone.emoji)}
+            <div class="flex items-center gap-2">
+                <div class="size-5">
+                    {@html twemoji.parse(milestone.emoji)}
+                </div>
+                <span>{milestone.title}</span>
             </div>
-            <span>{milestone.title}</span>
-        </div>
         {:else}
-        <span>Select a milestone</span>
+            <span>Select a milestone</span>
         {/if}
         <Select.Icon />
     </Button>

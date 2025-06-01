@@ -95,7 +95,7 @@
 <li
     data-dragover={dragStatus != null ? true : undefined}
     class={clsx(
-        'flex w-full flex-col gap-2 rounded-lg border bg-red-500 py-4 transition',
+        'flex w-full flex-col gap-2 rounded-lg border py-4 transition',
         categoryClasses[status.category]
     )}
     use:atlas={{ id: status.id }}
@@ -105,7 +105,6 @@
             'text-p text-base-fg-2 px-4 font-medium tracking-tight',
             categoryTextClasses[status.category]
         ]}
-        class:opacity-40={status.id === -1}
     >
         {status.value}
     </h2>
