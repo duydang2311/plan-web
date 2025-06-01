@@ -98,13 +98,14 @@
         <Button
             variant="base"
             melt={trigger}
+            filled={false}
             class="dark:data-[custom-state=open]:bg-base-selected w-28 min-w-max leading-none"
             data-custom-state={$open ? 'open' : 'closed'}
         >
             {selectedOption?.buttonLabel ?? 'Paragraph'}
         </Button>
         {#if $open}
-            <div class="c-select--menu w-fit bg-base-5" use:melt={menu}>
+            <div class="c-select--menu w-fit" use:melt={menu}>
                 {#each options as o (o.value)}
                     {@const opt = option(o)}
                     <button

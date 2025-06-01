@@ -16,6 +16,7 @@
     <Button
         type="button"
         variant="base"
+        filled={false}
         {onclick}
         class={[
             'p-2',
