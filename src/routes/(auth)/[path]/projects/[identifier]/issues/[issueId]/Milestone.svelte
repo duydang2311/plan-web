@@ -22,9 +22,9 @@
         value: () => milestone?.id,
         onValueChange: (a) => {
             for (const value of a.values()) {
-                const milestone = $query.data?.items.find((m) => m.id === value);
-                if (milestone) {
-                    onChange(milestone);
+                const m = $query.data?.items.find((a) => a.id !== milestone?.id && a.id === value);
+                if (m) {
+                    onChange(m);
                     return;
                 }
             }
