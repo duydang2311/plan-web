@@ -158,11 +158,13 @@
     }
 
     .custom-scrollbar {
+        --_width: --spacing(1.5);
         --_border: var(--color-base-3);
         --_track: transparent;
         --_radius: 0px;
-        --_bg: color-mix(in oklch, var(--color-base-fg-2) 30%, var(--color-base-1));
+        --_bg: color-mix(in oklch, var(--color-base-fg-2) 20%, var(--color-base-1));
         &::-webkit-scrollbar {
+            width: var(--_width);
             border-radius: var(--_radius);
         }
         &::-webkit-scrollbar-track {
@@ -181,14 +183,14 @@
     }
 
     ::-webkit-scrollbar {
-        width: --spacing(2);
-        height: --spacing(2);
+        width: --spacing(1.5);
+        height: --spacing(1.5);
     }
 
     ::-webkit-scrollbar-thumb {
         border: --spacing(0.5) solid var(--color-base-1);
         border-radius: var(--radius-full);
-        background: color-mix(in oklch, var(--color-base-fg-2) 30%, var(--color-base-1));
+        background: color-mix(in oklch, var(--color-base-fg-2) 20%, var(--color-base-1));
     }
 
     .hidden-scrollbar {

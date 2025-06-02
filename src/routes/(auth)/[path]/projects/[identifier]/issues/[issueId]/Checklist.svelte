@@ -369,6 +369,7 @@
     type="button"
     variant="base"
     filled={false}
+    data-custom-state={popover.open ? 'open' : 'closed'}
     class="ml-auto mt-2 flex w-fit items-center gap-4 text-sm capitalize"
 >
     <IconPlus />
@@ -390,7 +391,7 @@
                     }}
                     disabled={generateLoading.immediate}
                 >
-                    <LoadingMonitor loading={generateLoading} class="size-5">
+                    <LoadingMonitor loading={generateLoading} class="size-4">
                         <IconSparkles />
                     </LoadingMonitor>
                     Generate checklist

@@ -128,7 +128,10 @@
 <main class="h-full">
     <PaneGroup direction="horizontal">
         <Pane defaultSize={(3 / 4) * 100}>
-            <div class="relative max-h-full flex-1 grow overflow-auto" bind:this={scrollRef}>
+            <div
+                class="custom-scrollbar relative max-h-full flex-1 grow overflow-auto"
+                bind:this={scrollRef}
+            >
                 <div class="flex min-h-full flex-col p-4 *:py-4 *:first:pt-0 *:last:pb-0">
                     <div bind:this={issueContainerRef}>
                         <Issue {form} ref={issueRef} bind:editing />

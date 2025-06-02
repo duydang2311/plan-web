@@ -25,9 +25,9 @@
             <THead class="z-10">
                 <Row class="py-2">
                     <Th class="col-span-2">Title</Th>
+                    <ThSort3 name="priority">Priority</ThSort3>
                     <Th>Milestone</Th>
                     <ThSort3 name="status.rank">Status</ThSort3>
-                    <ThSort3 name="priority">Priority</ThSort3>
                     <ThSort3 name="createdTime">Created</ThSort3>
                     <ThSort3 name="updatedTime" class="max-md:hidden">Updated</ThSort3>
                 </Row>
@@ -70,6 +70,11 @@
                                 </p>
                             </td>
                             <td>
+                                <div class="grid grid-cols-[auto_1fr] items-center">
+                                    <Priority priority={row.priority} />
+                                </div>
+                            </td>
+                            <td>
                                 {#if row.milestone}
                                     <div class="grid grid-cols-[auto_1fr] items-center">
                                         <Milestone milestone={row.milestone} />
@@ -84,11 +89,6 @@
                                 {:else}
                                     <span class="c-text-secondary text-base-fg-ghost">N/A</span>
                                 {/if}
-                            </td>
-                            <td>
-                                <div class="grid grid-cols-[auto_1fr] items-center">
-                                    <Priority priority={row.priority} />
-                                </div>
                             </td>
                             <td class="first-letter:uppercase">
                                 <RelativeTime time={row.createdTime} />
