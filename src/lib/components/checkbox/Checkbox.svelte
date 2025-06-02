@@ -61,7 +61,7 @@
                     gsap.set(node, {
                         strokeDasharray: (node as unknown as SVGPathElement).getTotalLength(),
                         strokeDashoffset: 0,
-                        oapcity: 1
+                        opacity: 1
                     });
                     return gsap.to(node, {
                         strokeDasharray: (node as unknown as SVGPathElement).getTotalLength(),
