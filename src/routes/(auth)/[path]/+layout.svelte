@@ -53,11 +53,10 @@
 <div
     class="min-w-screen bg-base-2 dark:bg-base-1 grid h-full min-h-screen w-full grid-cols-[auto_1fr] p-2"
 >
-    <div class={['overflow-hidden transition-[max-width]', collapsed ? 'max-w-0' : 'max-w-60']}>
+    <div class={['transition-[max-width]', collapsed ? 'max-w-0' : 'max-w-60']}>
         <aside
-            class={[
-                'flex min-h-full flex-col items-stretch space-y-4 overflow-auto py-2 pr-2 text-[0.9285rem]'
-            ]}
+            class='flex h-full max-h-[calc(100vh-1rem)] flex-col items-stretch space-y-4 custom-scrollbar overflow-auto py-2 pr-2 text-[0.9285rem]'
+            style="--_border: var(--color-base-2)"
         >
             <div class="text-primary-1 flex select-none items-baseline justify-center gap-1">
                 <Logo class="h-4 w-auto" />
