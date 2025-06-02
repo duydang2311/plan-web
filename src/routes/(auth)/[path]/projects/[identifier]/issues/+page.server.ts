@@ -4,7 +4,7 @@ import type { Issue } from '~/lib/models/issue';
 import type { Milestone } from '~/lib/models/milestone';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
-import type { UserPreset } from '~/lib/models/user';
+import type { User, UserPreset } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
@@ -26,6 +26,7 @@ export type LocalIssue = Pick<
     project: { identifier: string };
     status?: Pick<WorkspaceStatus, 'value' | 'color' | 'rank' | 'category'>;
     milestone?: LocalMilestone;
+    assignees: (Pick<User, 'email'> & UserPreset['profile'])[];
 };
 
 export type LocalBoardIssue = Pick<

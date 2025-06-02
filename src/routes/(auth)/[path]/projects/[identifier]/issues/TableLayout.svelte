@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { RelativeTime, Row, Table, Th, THead } from '~/lib/components';
+    import { Avatar, RelativeTime, Row, Table, Th, THead } from '~/lib/components';
     import Pagination3 from '~/lib/components/Pagination3.svelte';
     import ThSort3 from '~/lib/components/ThSort3.svelte';
     import { priorityIcons } from '~/lib/models/issue';
@@ -21,13 +21,14 @@
 
 <div class="grid h-full grid-rows-[1fr_auto]">
     <div class="c-table--wrapper custom-scrollbar relative z-0 overflow-auto">
-        <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto_auto]">
+        <Table class="grid-cols-[auto_1fr_auto_auto_auto_auto_auto_auto]">
             <THead class="z-10">
                 <Row class="py-2">
                     <Th class="col-span-2">Title</Th>
                     <ThSort3 name="priority">Priority</ThSort3>
                     <Th>Milestone</Th>
                     <ThSort3 name="status.rank">Status</ThSort3>
+                    <Th>Assignees</Th>
                     <ThSort3 name="createdTime">Created</ThSort3>
                     <ThSort3 name="updatedTime" class="max-md:hidden">Updated</ThSort3>
                 </Row>
@@ -70,31 +71,51 @@
                                 </p>
                             </td>
                             <td>
-                                <div class="grid grid-cols-[auto_1fr] items-center">
+                                <div class="isolate">
                                     <Priority priority={row.priority} />
                                 </div>
                             </td>
                             <td>
-                                {#if row.milestone}
-                                    <div class="grid grid-cols-[auto_1fr] items-center">
-                                        <Milestone milestone={row.milestone} />
-                                    </div>
-                                {:else}
-                                    <span class="c-text-secondary text-base-fg-ghost">N/A</span>
-                                {/if}
+                                <div class="isolate">
+                                    {#if row.milestone}
+                                        <div class="grid grid-cols-[auto_1fr] items-center">
+                                            <Milestone milestone={row.milestone} />
+                                        </div>
+                                    {:else}
+                                        <span class="c-text-secondary text-base-fg-ghost">N/A</span>
+                                    {/if}
+                                </div>
                             </td>
                             <td>
-                                {#if row.status}
-                                    <Status status={row.status} />
-                                {:else}
-                                    <span class="c-text-secondary text-base-fg-ghost">N/A</span>
-                                {/if}
+                                <div class="isolate">
+                                    {#if row.status}
+                                        <Status status={row.status} />
+                                    {:else}
+                                        <span class="c-text-secondary text-base-fg-ghost">N/A</span>
+                                    {/if}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="flex gap-0.5">
+                                    {#each row.assignees as assignee (assignee)}
+                                        <Avatar
+                                            title={assignee.profile?.displayName ?? assignee.email}
+                                            size={64}
+                                            user={assignee}
+                                            class="size-avatar-sm isolate"
+                                        />
+                                    {/each}
+                                </div>
                             </td>
                             <td class="first-letter:uppercase">
-                                <RelativeTime time={row.createdTime} />
+                                <div class="isolate">
+                                    <RelativeTime time={row.createdTime} />
+                                </div>
                             </td>
                             <td class="first-letter:uppercase">
-                                <RelativeTime time={row.updatedTime} />
+                                <div class="isolate">
+                                    <RelativeTime time={row.updatedTime} />
+                                </div>
                             </td>
                         </Row>
                     {/each}

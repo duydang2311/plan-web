@@ -55,6 +55,6 @@ export const createIssueListQueryParams = ({
         page: rest.page ?? Number(url?.searchParams.get('page') ?? '1'),
         size: rest.size ?? Number(url?.searchParams.get('size') ?? '20'),
         order: rest.order ?? url?.searchParams.get('order') ?? 'OrderNumber',
-        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Category,Status.Color,Status.Value,Status.Rank,Priority,PreviewDescription,Milestone.Id,Milestone.Title,Milestone.Emoji,Milestone.Color'
+        select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,Project.Identifier,Status.Category,Status.Color,Status.Value,Status.Rank,Priority,PreviewDescription,Milestone.Id,Milestone.Title,Milestone.Emoji,Milestone.Color,Assignees.Email,Assignees.Profile.Name,Assignees.Profile.DisplayName,Assignees.Profile.Image'
     };
 };

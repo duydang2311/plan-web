@@ -7,7 +7,7 @@
 </script>
 
 <div
-    class="bg-(--_bg) text-(--_text) rounded-full px-2"
+    class="bg-(--_bg) text-(--_text) rounded-full px-2 text-center text-nowrap"
     style="--_bg: color-mix(in oklch, {color} 10%, transparent); --_text: {color};"
 >
     <span>{status.value}</span>
