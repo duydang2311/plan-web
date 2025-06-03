@@ -19,19 +19,19 @@
     import type { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/types';
     import { Resize } from '@cloudinary/url-gen/actions';
     import clsx from 'clsx';
-    import { Avatar, Link, RelativeTime } from '~/lib/components';
+    import { Avatar, Link } from '~/lib/components';
     import { IconDraggable } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { IssuePriorities } from '~/lib/models/issue';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
     import type { LocalBoardIssue } from '../+page.server';
+    import CreatedTime from '../CreatedTime.svelte';
     import Milestone from '../Milestone.svelte';
     import Priority from '../Priority.svelte';
+    import Status from '../Status.svelte';
+    import Timeline from '../Timeline.svelte';
     import DropIndicator from './DropIndicator.svelte';
     import { toDraggableIssueData, validateDraggableIssueData } from './utils';
-    import CreatedTime from '../CreatedTime.svelte';
-    import Timeline from '../Timeline.svelte';
-    import Status from '../Status.svelte';
-    import { IssuePriorities } from '~/lib/models/issue';
 
     interface Props {
         identifier: string;
@@ -112,7 +112,7 @@
     <div
         class={clsx(
             'shadow-xs relative w-full cursor-grab rounded-md p-4 transition',
-            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 dark:bg-base-2'
+            dragStatus != null ? dragStatusClasses[dragStatus] : 'bg-base-1 dark:bg-base-3'
         )}
     >
         {#if edge != null && (edge === 'top' || edge === 'bottom')}

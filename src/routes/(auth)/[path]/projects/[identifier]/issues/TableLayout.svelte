@@ -3,7 +3,6 @@
     import { Avatar, RelativeTime, Row, Table, Th, THead } from '~/lib/components';
     import Pagination3 from '~/lib/components/Pagination3.svelte';
     import ThSort3 from '~/lib/components/ThSort3.svelte';
-    import { priorityIcons } from '~/lib/models/issue';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import { createPagination } from '~/lib/utils/table.svelte';

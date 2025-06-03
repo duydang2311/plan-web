@@ -285,14 +285,14 @@
 
 <div class="flex h-full overflow-x-auto overflow-y-hidden px-4 pb-1">
     <ol
-        class="grid auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
+        class="h-full grid auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
         class:animate-pulse={issueListsRef.loading.immediate}
     >
         {#each statusList.items as status (status.id)}
             {@const list = issueListsRef.value?.[status.id]}
             {#if status.id !== -1 || (list != null && list.totalCount > 0)}
                 <li class="min-h-0">
-                    <ol class="flex h-full">
+                    <ol class="h-full">
                         {#if list == null}
                             <BoardSkeleton />
                         {:else}
@@ -315,7 +315,7 @@
         style="width: {preview.rect.width}px; {navigator.userAgent.includes('Windows')
             ? ' max-width: 280px; max-height: 280px;'
             : ''}"
-        class="bg-base-1 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border p-4 px-4 opacity-100"
+        class="bg-base-1 dark:bg-base-3 text-base-fg-1 border-base-border-2 z-10 content-center rounded-md border p-4 px-4 opacity-100"
     >
         <div class="text-base-fg-ghost mb-2 flex items-center justify-between gap-1">
             <p class="text-sm leading-none">

@@ -12,17 +12,15 @@
         projectId,
         projectIdentifier
     }: {
-        statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus>>;
+        statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus> | null>;
         issueListsRef: AsyncRef<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
         projectId: string;
         projectIdentifier: string;
     } = $props();
 </script>
 
-{#if statusListRef.isInitialLoading}
+{#if statusListRef.isInitialLoading || statusListRef.value == null}
     <BoardLayoutSkeleton />
-{:else if statusListRef.value == null || statusListRef.value.items.length === 0}
-    <p class="c-label">No status found.</p>
 {:else}
     <BoardLayoutDefault
         statusList={{

@@ -1,12 +1,13 @@
 import { D } from '@mobily/ts-belt';
-import { Effect, Exit, pipe } from 'effect';
+import { Effect, Exit, pipe, type Context } from 'effect';
 import type { Issue } from '~/lib/models/issue';
 import type { Milestone } from '~/lib/models/milestone';
 import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
 import type { WorkspaceStatus } from '~/lib/models/status';
 import type { User, UserPreset } from '~/lib/models/user';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { LoadResponse } from '~/lib/utils/kit';
+import type { HttpClient } from '~/lib/services/http_client';
+import { LoadAttempt, LoadResponse } from '~/lib/utils/kit';
 import { maybeStream } from '~/lib/utils/promise';
 import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
@@ -91,6 +92,7 @@ const loadBoardLayout = async ({
     parent,
     url,
     isDataRequest,
+    locals,
     locals: { runtime }
 }: PageServerLoadEvent) => {
     const data = await parent();
@@ -99,49 +101,28 @@ const loadBoardLayout = async ({
         projectId: data.project.id
     };
 
-    const getStatusListExit = getWorkspaceStatusList(data.workspace.id).pipe(
-        runtime.runPromiseExit
-    );
+    const getStatusListAttempt = getWorkspaceStatusList(locals.api)(data.workspace.id);
 
     const getIssueListsExit = Effect.gen(function* () {
-        const statusesExit = yield* Effect.promise(() => getStatusListExit);
-        if (Exit.isFailure(statusesExit)) {
-            return yield* Effect.failCause(statusesExit.cause);
+        const attempt = yield* Effect.promise(() => getStatusListAttempt);
+        if (attempt.failed) {
+            return {};
         }
         return yield* getBoardIssueLists(
             query,
-            statusesExit.value.items.map((a) => a.id)
+            attempt.data.items.map((a) => a.id)
         );
     }).pipe(runtime.runPromiseExit);
-
-    if (isDataRequest) {
-        return {
-            page: {
-                tag: 'board' as const,
-                statusList: getStatusListExit.then((a) =>
-                    Exit.isSuccess(a) ? a.value : paginatedList<LocalWorkspaceStatus>()
-                ),
-                issueLists: getIssueListsExit.then((a) => (Exit.isSuccess(a) ? a.value : {}))
-            }
-        };
-    }
-
-    const [statusListExit, issueListExit] = await Promise.all([
-        maybeStream(
-            getStatusListExit.then((a) =>
-                Exit.isFailure(a) ? paginatedList<LocalWorkspaceStatus>() : a.value
-            )
-        )(isDataRequest),
-        maybeStream(getIssueListsExit.then((a) => (Exit.isFailure(a) ? {} : a.value)))(
-            isDataRequest
-        )
-    ]);
 
     return {
         page: {
             tag: 'board' as const,
-            statusList: statusListExit(),
-            issueLists: issueListExit()
+            statusList: (await maybeStream(getStatusListAttempt)(isDataRequest))(),
+            issueLists: (
+                await maybeStream(
+                    getIssueListsExit.then((a) => (Exit.isFailure(a) ? {} : a.value))
+                )(isDataRequest)
+            )()
         }
     };
 };
@@ -185,14 +166,15 @@ const getBoardIssueLists = (query: Record<string, unknown>, statusIds: number[])
         ).pipe(Effect.map((a) => D.fromPairs(a)));
     });
 
-const getWorkspaceStatusList = (workspaceId: string) =>
-    Effect.gen(function* () {
-        const api = yield* ApiClient;
-        const response = yield* LoadResponse.HTTP(
+const getWorkspaceStatusList =
+    (api: Context.Tag.Service<HttpClient>) => async (workspaceId: string) => {
+        const getAttempt = await LoadAttempt.HTTP(() =>
             api.get(`workspaces/${workspaceId}/statuses`, {
                 query: { select: 'Id,Value,Color,Rank,Category', order: 'Rank' }
             })
         );
-
-        return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalWorkspaceStatus>>());
-    });
+        if (getAttempt.failed) {
+            return getAttempt;
+        }
+        return LoadAttempt.JSON(() => getAttempt.data.json<PaginatedList<LocalWorkspaceStatus>>());
+    };

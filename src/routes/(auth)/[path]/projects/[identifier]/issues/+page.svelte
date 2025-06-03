@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { Button, Main, Tabs } from '~/lib/components';
-    import { IconColumns, IconPlus, IconRows } from '~/lib/components/icons';
+    import { IconColumns, IconGanttChartOutline, IconPlus, IconRows } from '~/lib/components/icons';
     import { paginatedList } from '~/lib/models/paginatedList';
     import { permissions } from '~/lib/models/permission';
     import { createRef } from '~/lib/utils/runes.svelte';
@@ -10,6 +10,7 @@
     import type { LocalIssue, LocalWorkspaceStatus } from './+page.server';
     import TableLayout from './TableLayout.svelte';
     import BoardLayout from './_board/BoardLayout.svelte';
+    import { mapMaybePromise } from '~/lib/utils/promise';
 
     const { data }: { data: PageData } = $props();
     const createIssueHref = $derived(page.url.pathname + '/new');
@@ -19,11 +20,22 @@
     const boardIssueListsRef = createRef.maybePromise(() =>
         data.page.tag === 'board' ? data.page.issueLists : {}
     );
-    const boardStatusListRef = createRef.maybePromise(() =>
-        data.page.tag === 'board' ? data.page.statusList : paginatedList<LocalWorkspaceStatus>()
-    );
+    const boardStatusListRef = createRef.maybePromise(() => {
+        if (data.page.tag === 'board') {
+            const page = data.page;
+            return mapMaybePromise(page.statusList)((a) =>
+                a.failed ? Promise.resolve(paginatedList<LocalWorkspaceStatus>()) : a.data
+            );
+        }
+        return null;
+    });
     const tabsBuilder = new Tabs.Builder({
-        value: page.url.searchParams.get('view') === 'board' ? 'board' : 'table'
+        value: () =>
+            page.url.searchParams.get('view') === 'board'
+                ? 'board'
+                : page.url.searchParams.get('view') === 'timeline'
+                  ? 'timeline'
+                  : 'table'
     });
     const getProjectPermissionsRef = createRef.maybePromise(() => data.getProjectPermissions);
     const can = $derived({
@@ -45,6 +57,7 @@
                     {...tabsBuilder.getTrigger('table')}
                     href="{page.url.pathname}{fluentSearchParams(page.url).delete('view')}"
                     class="c-tab--trigger flex items-center gap-2"
+                    data-sveltekit-preload-data="hover"
                     data-sveltekit-replacestate
                 >
                     <IconRows />
@@ -54,10 +67,21 @@
                     {...tabsBuilder.getTrigger('board')}
                     href="{page.url.pathname}{fluentSearchParams(page.url).set('view', 'board')}"
                     class="c-tab--trigger flex items-center gap-2"
+                    data-sveltekit-preload-data="hover"
                     data-sveltekit-replacestate
                 >
                     <IconColumns />
                     Board
+                </a>
+                <a
+                    {...tabsBuilder.getTrigger('timeline')}
+                    href="{page.url.pathname}{fluentSearchParams(page.url).set('view', 'timeline')}"
+                    class="c-tab--trigger flex items-center gap-2"
+                    data-sveltekit-preload-data="hover"
+                    data-sveltekit-replacestate
+                >
+                    <IconGanttChartOutline />
+                    Timeline
                 </a>
             </Tabs>
             {#if can.create}
@@ -73,17 +97,22 @@
             {/if}
         </div>
         <div class="-mx-4 overflow-hidden">
-            <div {...tabsBuilder.getContent('table')} class="h-full px-4">
-                <TableLayout issueListRef={tableIssueListRef} />
-            </div>
-            <div {...tabsBuilder.getContent('board')} class="h-full">
-                <BoardLayout
-                    statusListRef={boardStatusListRef}
-                    issueListsRef={boardIssueListsRef}
-                    projectId={data.project.id}
-                    projectIdentifier={data.project.identifier}
-                />
-            </div>
+            {#if data.page.tag === 'board'}
+                <div class="h-full">
+                    <BoardLayout
+                        statusListRef={boardStatusListRef}
+                        issueListsRef={boardIssueListsRef}
+                        projectId={data.project.id}
+                        projectIdentifier={data.project.identifier}
+                    />
+                </div>
+            {:else if data.page.tag === 'timeline'}
+                <div class="h-full">Gantt Chart</div>
+            {:else}
+                <div class="h-full px-4">
+                    <TableLayout issueListRef={tableIssueListRef} />
+                </div>
+            {/if}
         </div>
     </div>
 </Main>
