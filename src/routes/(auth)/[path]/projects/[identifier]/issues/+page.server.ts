@@ -13,6 +13,10 @@ import type { PageServerLoad, PageServerLoadEvent } from './$types';
 import { createBoardQueryParams, createIssueListQueryParams } from './utils';
 
 export type LocalMilestone = Pick<Milestone, 'id' | 'title' | 'emoji' | 'color'>;
+export type LocalTimelineMilestone = Pick<
+    Milestone,
+    'id' | 'endTime' | 'endTimeZone' | 'title' | 'emoji' | 'color'
+>;
 
 export type LocalIssue = Pick<
     Issue,
@@ -144,10 +148,14 @@ const loadTimelineLayout = async ({ parent, locals, isDataRequest }: PageServerL
     const timelineIssueListAttempt = await maybeStream(
         getTimelineIssueList(locals.api)(data.project.id)
     )(isDataRequest);
+    const timelineMilestoneListAttempt = await maybeStream(
+        getTimelineMilestoneList(locals.api)(data.project.id)
+    )(isDataRequest);
     return {
         page: {
             tag: 'timeline' as const,
-            issueList: timelineIssueListAttempt()
+            issueList: timelineIssueListAttempt(),
+            milestoneList: timelineMilestoneListAttempt()
         }
     };
 };
@@ -219,4 +227,23 @@ const getTimelineIssueList =
             return getAttempt;
         }
         return LoadAttempt.JSON(() => getAttempt.data.json<PaginatedList<LocalBoardIssue>>());
+    };
+
+const getTimelineMilestoneList =
+    (api: Context.Tag.Service<HttpClient>) => async (projectId: string) => {
+        const getAttempt = await LoadAttempt.HTTP(() =>
+            api.get('milestones', {
+                query: {
+                    projectId,
+                    select: 'Id,Title,Emoji,Color,EndTime,EndTimeZone',
+                    order: 'EndTime'
+                }
+            })
+        );
+        if (getAttempt.failed) {
+            return getAttempt;
+        }
+        return LoadAttempt.JSON(() =>
+            getAttempt.data.json<PaginatedList<LocalTimelineMilestone>>()
+        );
     };

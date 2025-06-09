@@ -31,7 +31,10 @@
         return null;
     });
     const timelineIssueListRef = createRef.maybePromise(() =>
-        data.page.tag === 'timeline' ? data.page.issueList : {}
+        data.page.tag === 'timeline' ? data.page.issueList : undefined
+    );
+    const timelineMilestoneListRef = createRef.maybePromise(() =>
+        data.page.tag === 'timeline' ? data.page.milestoneList : undefined
     );
     const tabsBuilder = new Tabs.Builder({
         value: () =>
@@ -112,7 +115,12 @@
                 </div>
             {:else if data.page.tag === 'timeline'}
                 <div class="h-full">
-                    <TimelineLayout workspacePath={page.params.path} projectIdentifier={data.project.identifier} issueListRef={timelineIssueListRef} />
+                    <TimelineLayout
+                        workspacePath={page.params.path}
+                        projectIdentifier={data.project.identifier}
+                        issueListRef={timelineIssueListRef}
+                        milestoneListRef={timelineMilestoneListRef}
+                    />
                 </div>
             {:else}
                 <div class="h-full px-4">

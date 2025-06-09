@@ -1,19 +1,23 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { parse, wcagContrast } from 'culori';
     import { DateTime } from 'luxon';
+    import type { IdType } from 'vis-timeline';
     import type { PaginatedList } from '~/lib/models/paginatedList';
-    import { watch, type AsyncRef } from '~/lib/utils/runes.svelte';
+    import { watch, type AsyncRef, type Ref } from '~/lib/utils/runes.svelte';
     import type { Attempt } from '~/lib/utils/try';
-    import type { LocalTimelineIssue } from '../+page.server';
+    import type { LocalTimelineIssue, LocalTimelineMilestone } from '../+page.server';
 
     const {
         workspacePath,
         projectIdentifier,
-        issueListRef
+        issueListRef,
+        milestoneListRef
     }: {
         workspacePath: string;
         projectIdentifier: string;
-        issueListRef: AsyncRef<Attempt<PaginatedList<LocalTimelineIssue>, unknown>>;
+        issueListRef: AsyncRef<Attempt<PaginatedList<LocalTimelineIssue>, unknown> | undefined>;
+        milestoneListRef: Ref<Attempt<PaginatedList<LocalTimelineMilestone>, unknown> | undefined>;
     } = $props();
 
     type VisModule = typeof import('vis-timeline/standalone');
@@ -29,7 +33,6 @@
     }
 
     watch(() => [issueListRef.value, timeline])(() => {
-        console.log(!issueListRef.value, issueListRef.value?.failed, !timeline);
         if (!issueListRef.value || issueListRef.value.failed || !timeline) {
             return;
         }
@@ -61,6 +64,59 @@
             }))
         );
     });
+
+    watch(() => [milestoneListRef.value, timeline])(() => {
+        if (!milestoneListRef.value || milestoneListRef.value.failed || !timeline) {
+            return;
+        }
+
+        const currentTimeline = timeline;
+        const ids: IdType[] = [];
+
+        for (const milestone of milestoneListRef.value.data.items) {
+            const id = currentTimeline.addCustomTime(
+                DateTime.fromISO(milestone.endTime, { zone: milestone.endTimeZone }).toJSDate(),
+                `m-${milestone.id}`
+            );
+            ids.push(id);
+            // @ts-ignore
+            currentTimeline.setCustomTimeMarker(milestone.title, id, false);
+            requestAnimationFrame(() => {
+                const el = document.querySelector(
+                    `.vis-custom-time.${id}`
+                ) as HTMLDivElement | null;
+                if (el) {
+                    el.removeChild(el.children[0]); // remove drag handle
+                }
+            });
+        }
+
+        const styleEl = document.createElement('style');
+        styleEl.textContent = milestoneListRef.value.data.items
+            .map(
+                (a) =>
+                    `.vis-custom-time.m-${a.id} { --_bg: ${a.color}; --_text: ${pickTextColor(a.color)}; }`
+            )
+            .join('\n');
+        document.head.appendChild(styleEl);
+
+        return () => {
+            for (const id of ids) {
+                currentTimeline.removeCustomTime(id);
+            }
+            document.head.removeChild(styleEl);
+        };
+    });
+
+    const pickTextColor = (color: string): string => {
+        const parsed = parse(color);
+        if (!parsed) {
+            return 'black';
+        }
+        const blackContrast = wcagContrast(parsed, 'black');
+        const whiteContrast = wcagContrast(parsed, 'white');
+        return blackContrast > whiteContrast ? 'black' : 'white';
+    };
 </script>
 
 <div
@@ -70,6 +126,7 @@
             timeline = new a.Timeline(node, [], {
                 height: '100%',
                 maxHeight: '100%',
+                showCurrentTime: true,
                 groupOrder: (a, b) => {
                     if (a.startTime == null && b.startTime == null) {
                         return 0;
@@ -128,16 +185,6 @@
                 background-color: var(--color-base-3) !important;
             }
         }
-
-        /* &.vis-selected {
-            background-color: color-mix(
-                in oklch,
-                var(--color-primary-1) 10%,
-                transparent
-            ) !important;
-            border-color: color-mix(in oklch, var(--color-primary-1) 60%, transparent) !important;
-            color: var(--color-primary-1) !important;
-        } */
     }
 
     :global(.vis-label, .vis-text, .vis-item) {
@@ -180,5 +227,18 @@
 
     :global(.vis-labelset .vis-label.vis-group-level-0 .vis-inner) {
         width: 100%;
+    }
+
+    :global(.vis-custom-time) {
+        cursor: default !important;
+    }
+
+    :global(.vis-custom-time) {
+        background-color: color-mix(in oklch, var(--_bg) 100%, transparent) !important;
+    }
+
+    :global(.vis-custom-time > .vis-custom-time-marker) {
+        color: var(--_text) !important;
+        font-weight: 500;
     }
 </style>
