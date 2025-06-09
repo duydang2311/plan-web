@@ -48,6 +48,11 @@ export type LocalBoardIssue = Pick<
     milestone?: LocalMilestone;
 };
 
+export type LocalTimelineIssue = Pick<
+    Issue,
+    'id' | 'title' | 'startTime' | 'endTime' | 'orderNumber' | 'timelineZone'
+>;
+
 export type LocalWorkspaceStatus = Pick<WorkspaceStatus, 'id' | 'value' | 'color' | 'category'>;
 
 export interface PageBoardData {
@@ -57,7 +62,14 @@ export interface PageBoardData {
 }
 
 export const load: PageServerLoad = (e) => {
-    return e.url.searchParams.get('view') === 'board' ? loadBoardLayout(e) : loadTableLayout(e);
+    switch (e.url.searchParams.get('view')) {
+        case 'board':
+            return loadBoardLayout(e);
+        case 'timeline':
+            return loadTimelineLayout(e);
+        default:
+            return loadTableLayout(e);
+    }
 };
 
 const loadTableLayout = async ({
@@ -127,6 +139,19 @@ const loadBoardLayout = async ({
     };
 };
 
+const loadTimelineLayout = async ({ parent, locals, isDataRequest }: PageServerLoadEvent) => {
+    const data = await parent();
+    const timelineIssueListAttempt = await maybeStream(
+        getTimelineIssueList(locals.api)(data.project.id)
+    )(isDataRequest);
+    return {
+        page: {
+            tag: 'timeline' as const,
+            issueList: timelineIssueListAttempt()
+        }
+    };
+};
+
 const getBoardIssueLists = (query: Record<string, unknown>, statusIds: number[]) =>
     Effect.gen(function* () {
         const api = yield* ApiClient;
@@ -177,4 +202,21 @@ const getWorkspaceStatusList =
             return getAttempt;
         }
         return LoadAttempt.JSON(() => getAttempt.data.json<PaginatedList<LocalWorkspaceStatus>>());
+    };
+
+const getTimelineIssueList =
+    (api: Context.Tag.Service<HttpClient>) => async (projectId: string) => {
+        const getAttempt = await LoadAttempt.HTTP(() =>
+            api.get('issues', {
+                query: {
+                    projectId,
+                    select: 'Id,Title,StartTime,EndTime,OrderNumber,TimelineZone',
+                    order: 'StartTime,OrderNumber'
+                }
+            })
+        );
+        if (getAttempt.failed) {
+            return getAttempt;
+        }
+        return LoadAttempt.JSON(() => getAttempt.data.json<PaginatedList<LocalBoardIssue>>());
     };

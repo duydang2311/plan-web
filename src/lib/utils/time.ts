@@ -1,4 +1,4 @@
-import { DateTime, type DateTimeFormatOptions, type ToRelativeOptions } from 'luxon';
+import { DateTime, Duration, type DateTimeFormatOptions, type ToRelativeOptions } from 'luxon';
 
 export const formatRelativeDateUi = (
     dateTime: DateTime,
@@ -16,11 +16,13 @@ export const formatRelativeDateUi = (
 };
 
 export const formatRelativeDateTimeUi = (
-    dateTime: string | DateTime,
+    dateTime: string | Date | DateTime,
     options?: ToRelativeOptions
 ) => {
     if (typeof dateTime === 'string') {
         dateTime = DateTime.fromISO(dateTime);
+    } else if (dateTime instanceof Date) {
+        dateTime = DateTime.fromJSDate(dateTime);
     }
 
     const now = DateTime.now();
@@ -33,9 +35,30 @@ export const formatRelativeDateTimeUi = (
     return dateTime.toRelative(options);
 };
 
-export const formatTimeUi = (dateTime: string | DateTime) => {
+export const formatDurationUi = (a: string | Date | DateTime, b: string | Date | DateTime) => {
+    if (typeof a === 'string') {
+        a = DateTime.fromISO(a);
+    } else if (a instanceof Date) {
+        a = DateTime.fromJSDate(a);
+    }
+
+    if (typeof b === 'string') {
+        b = DateTime.fromISO(b);
+    } else if (b instanceof Date) {
+        b = DateTime.fromJSDate(b);
+    }
+
+    return Object.entries(b.diff(a, ['months', 'days', 'hours', 'minutes', 'seconds']).toObject())
+        .filter(([_, v]) => v > 0)
+        .map(([k, v]) => `${Math.floor(v)} ${k}`)
+        .join(', ');
+};
+
+export const formatTimeUi = (dateTime: string | Date | DateTime) => {
     if (typeof dateTime === 'string') {
         dateTime = DateTime.fromISO(dateTime);
+    } else if (dateTime instanceof Date) {
+        dateTime = DateTime.fromJSDate(dateTime);
     }
 
     const now = DateTime.now();
@@ -51,9 +74,11 @@ export const formatTimeUi = (dateTime: string | DateTime) => {
     return dateTime.toLocaleString(DateTime.DATETIME_MED);
 };
 
-export const formatDateUi = (dateTime: string | DateTime) => {
+export const formatDateUi = (dateTime: string | Date | DateTime, format?: string) => {
     if (typeof dateTime === 'string') {
         dateTime = DateTime.fromISO(dateTime);
+    } else if (dateTime instanceof Date) {
+        dateTime = DateTime.fromJSDate(dateTime);
     }
 
     const now = DateTime.now();
@@ -66,7 +91,7 @@ export const formatDateUi = (dateTime: string | DateTime) => {
     if (dateTime.hasSame(now.plus({ days: 1 }), 'day')) {
         return `Tomorrow`;
     }
-    return dateTime.toLocaleString(DateTime.DATE_MED);
+    return format ? dateTime.toFormat(format) : dateTime.toLocaleString(DateTime.DATE_MED);
 };
 
 export const formatDateTimeUi = formatTimeUi;
