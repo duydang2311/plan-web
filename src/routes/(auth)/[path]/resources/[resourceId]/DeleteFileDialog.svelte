@@ -21,7 +21,7 @@
     }: {
         open: Writable<boolean>;
         resourceFile: ResourceFile | null;
-        fileListRef: Ref<PaginatedList<LocalResourceFile>>;
+        fileListRef: Ref<PaginatedList<LocalResourceFile> | undefined>;
         onSubmit: () => void;
     } = $props();
 

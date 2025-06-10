@@ -52,11 +52,16 @@
                     Review and import all the items from your generated checklist. You can make
                     adjustments before adding them to your task.
                 </p>
-                <form method="post" action="?/create_checklist_item_todo_batch" class="mt-8" use:enhance={(e) => {
-                    return async (e) => {
-                        await e.update();
-                    }
-                }}>
+                <form
+                    method="post"
+                    action="?/create_checklist_item_todo_batch"
+                    class="mt-8"
+                    use:enhance={() => {
+                        return async (e) => {
+                            await e.update();
+                        };
+                    }}
+                >
                     <input type="hidden" name="parentIssueId" value={issueId} />
                     <ul class="grid grid-cols-[auto_1fr] gap-2 space-y-1">
                         {#each todos! as todo, i (todo)}

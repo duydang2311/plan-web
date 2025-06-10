@@ -15,7 +15,7 @@
         scrollTop = $bindable(0)
     }: {
         userId: string;
-        ref: AsyncRef<PaginatedList<LocalUserNotification>>;
+        ref: AsyncRef<PaginatedList<LocalUserNotification> | undefined>;
         scrollTop?: number;
     } = $props();
     const { api } = useRuntime();

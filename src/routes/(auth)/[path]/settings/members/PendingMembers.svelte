@@ -23,7 +23,7 @@
         invitationListRef,
         canDelete
     }: {
-        invitationListRef: AsyncRef<PaginatedList<LocalWorkspaceInvitation>>;
+        invitationListRef: AsyncRef<PaginatedList<LocalWorkspaceInvitation> | undefined>;
         canDelete: boolean;
     } = $props();
     const { cloudinary } = useRuntime();

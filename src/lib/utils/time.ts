@@ -1,4 +1,4 @@
-import { DateTime, Duration, type DateTimeFormatOptions, type ToRelativeOptions } from 'luxon';
+import { DateTime, type DateTimeFormatOptions, type ToRelativeOptions } from 'luxon';
 
 export const formatRelativeDateUi = (
     dateTime: DateTime,

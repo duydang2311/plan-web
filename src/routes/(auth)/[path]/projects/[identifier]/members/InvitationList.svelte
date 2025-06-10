@@ -23,7 +23,8 @@
     const {
         ref,
         loading
-    }: { ref: Ref<PaginatedList<LocalProjectMemberInvitation>>; loading: Loading } = $props();
+    }: { ref: Ref<PaginatedList<LocalProjectMemberInvitation> | undefined>; loading: Loading } =
+        $props();
     const { cloudinary } = useRuntime();
     const pagination = createPagination({
         syncUrl: () => page.url,

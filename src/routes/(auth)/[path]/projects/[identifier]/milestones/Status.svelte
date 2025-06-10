@@ -93,8 +93,3 @@
         </Statuses>
     </Select>
 {/if}
-
-<style>
-    .status-trigger {
-    }
-</style>

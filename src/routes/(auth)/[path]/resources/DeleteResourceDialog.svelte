@@ -20,7 +20,7 @@
     }: {
         open: Writable<boolean>;
         workspaceResource: LocalWorkspaceResource | null;
-        resourceListRef: Ref<PaginatedList<LocalWorkspaceResource>>;
+        resourceListRef: Ref<PaginatedList<LocalWorkspaceResource> | undefined>;
         onSubmit: () => void;
     } = $props();
 

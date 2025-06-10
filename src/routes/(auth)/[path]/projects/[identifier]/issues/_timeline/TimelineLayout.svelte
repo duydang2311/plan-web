@@ -22,14 +22,10 @@
 
     type VisModule = typeof import('vis-timeline/standalone');
     let importVis: Promise<VisModule>;
-    let visModule: VisModule;
     let timeline = $state.raw<import('vis-timeline/standalone').Timeline>();
 
     if (browser) {
-        importVis = import('vis-timeline/standalone').then((a) => {
-            visModule = a;
-            return a;
-        });
+        importVis = import('vis-timeline/standalone');
     }
 
     watch(() => [issueListRef.value, timeline])(() => {

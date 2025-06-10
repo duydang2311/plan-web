@@ -18,7 +18,7 @@
         mapMaybePromise(data.getStatusList)((a) => (a.failed ? a.error : null))
     );
     const statusListRef = createRef.maybePromise(() =>
-        mapMaybePromise(data.getStatusList)((a) => (a.ok ? a.data : null))
+        mapMaybePromise(data.getStatusList)((a) => (a.ok ? a.data : undefined))
     );
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({

@@ -31,7 +31,7 @@
     const { cloudinary } = useRuntime();
     const getResourcesRef = createRef.maybePromise(() => data.getResources);
     const resourceListRef = createRef.maybePromise(() =>
-        mapMaybePromise(data.getResources)((a) => (a.ok ? a.data : null))
+        mapMaybePromise(data.getResources)((a) => (a.ok ? a.data : undefined))
     );
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
 

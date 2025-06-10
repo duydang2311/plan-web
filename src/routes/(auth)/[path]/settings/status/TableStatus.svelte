@@ -17,7 +17,7 @@
         statusListRef,
         canDelete,
         canUpdate
-    }: { statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus>>; canDelete: boolean; canUpdate: boolean } = $props();
+    }: { statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus> | undefined>; canDelete: boolean; canUpdate: boolean } = $props();
     const { api } = useRuntime();
     const mutation = createMutation({
         mutationFn: ({ statusId, rank }: { statusId: number; rank: number }) => {

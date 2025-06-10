@@ -26,7 +26,7 @@
         workspaceId,
         open
     }: {
-        statusListRef: Ref<PaginatedList<LocalWorkspaceStatus>>;
+        statusListRef: Ref<PaginatedList<LocalWorkspaceStatus> | undefined>;
         workspaceId: string;
         open: Writable<boolean>;
     } = $props();

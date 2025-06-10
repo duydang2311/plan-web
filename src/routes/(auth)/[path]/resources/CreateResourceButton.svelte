@@ -28,7 +28,7 @@
         user
     }: {
         workspaceId: string;
-        resourceListRef: Ref<PaginatedList<LocalWorkspaceResource>>;
+        resourceListRef: Ref<PaginatedList<LocalWorkspaceResource> | undefined>;
         user: UserPreset['basicProfile'];
     } = $props();
 

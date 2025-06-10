@@ -17,7 +17,7 @@
     }: {
         id: number;
         name: string;
-        ref: Ref<PaginatedList<LocalProjectMemberInvitation>>;
+        ref: Ref<PaginatedList<LocalProjectMemberInvitation> | undefined>;
     } = $props();
     const open = writable(false);
 </script>

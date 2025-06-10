@@ -42,7 +42,7 @@
     }: {
         workspaceId: string;
         open: Writable<boolean>;
-        invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation>>;
+        invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation> | undefined>;
     } = $props();
     const { api, cloudinary } = useRuntime();
     const comboboxOpen = writable(false);

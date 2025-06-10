@@ -21,6 +21,7 @@
     } = $props();
 
     const inlineEdit = createInlineEdit();
+    let formEl: HTMLFormElement | undefined;
 </script>
 
 {#if displayName != null && displayName.length > 0}
@@ -119,6 +120,12 @@
             <form
                 method="post"
                 action="?/update_displayName"
+                {@attach (e) => {
+                    formEl = e;
+                    return () => {
+                        formEl = undefined;
+                    }
+                }}
                 use:enhance={() => {
                     inlineEdit.editing = false;
                     return async (e) => {

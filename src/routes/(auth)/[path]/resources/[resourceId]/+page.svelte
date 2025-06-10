@@ -40,10 +40,10 @@
     const { api } = useRuntime();
     const getWorkspaceResourceRef = createRef.maybePromise(() => data.getWorkspaceResource);
     const resourceRef = createRef.maybePromise(() =>
-        mapMaybePromise(data.getWorkspaceResource)((a) => (a.ok ? a.data.resource : null))
+        mapMaybePromise(data.getWorkspaceResource)((a) => (a.ok ? a.data.resource : undefined))
     );
     const fileListRef = createRef.maybePromise(() =>
-        mapMaybePromise(data.getResourceFileList)((a) => (a.ok ? a.data : null))
+        mapMaybePromise(data.getResourceFileList)((a) => (a.ok ? a.data : undefined))
     );
     const workspacePermissionsRef = createRef.maybePromise(() => data.workspacePermissions);
     const can = $derived({

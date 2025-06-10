@@ -277,7 +277,7 @@
                             <div bind:this={loadMoreRef}></div>
                         {:else}
                             <div class="mt-6">
-                                {@render messageSnippet(message)}
+                                {@render messageSnippet(message as LocalChatMessage)}
                             </div>
                         {/if}
                     {/snippet}

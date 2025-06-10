@@ -19,7 +19,7 @@
     }: {
         workspaceId: string;
         resourceId: string;
-        fileListRef: Ref<PaginatedList<LocalResourceFile>>;
+        fileListRef: Ref<PaginatedList<LocalResourceFile> | undefined>;
     } = $props();
 
     const { api } = useRuntime();

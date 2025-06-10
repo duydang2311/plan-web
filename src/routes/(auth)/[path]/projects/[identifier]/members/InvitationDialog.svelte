@@ -29,7 +29,7 @@
         projectId,
         open
     }: {
-        ref: Ref<PaginatedList<LocalProjectMemberInvitation>>;
+        ref: Ref<PaginatedList<LocalProjectMemberInvitation> | undefined>;
         projectId: string;
         open: Writable<boolean>;
     } = $props();
@@ -93,7 +93,7 @@
                                         {
                                             createdTime: DateTime.now().toISO(),
                                             id: Math.random(),
-                                            role: { name: 'Member' },
+                                            role: { id: 0, name: 'Member' },
                                             user: {
                                                 email: $selected.value.email,
                                                 profile: $selected.value.profile

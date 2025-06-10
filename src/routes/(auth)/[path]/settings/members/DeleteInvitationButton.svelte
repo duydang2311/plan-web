@@ -12,7 +12,7 @@
     const {
         id,
         invitationListRef
-    }: { id: string; invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation>> } = $props();
+    }: { id: string; invitationListRef: Ref<PaginatedList<LocalWorkspaceInvitation> | undefined> } = $props();
 
     let open = $state.raw(false);
     const builder = new Popover.Builder({
