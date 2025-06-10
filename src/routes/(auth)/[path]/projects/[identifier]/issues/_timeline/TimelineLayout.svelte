@@ -83,7 +83,7 @@
             currentTimeline.setCustomTimeMarker(milestone.title, id, false);
             requestAnimationFrame(() => {
                 const el = document.querySelector(
-                    `.vis-custom-time.${id}`
+                    `.vis-custom-time.m-${id}`
                 ) as HTMLDivElement | null;
                 if (el) {
                     el.removeChild(el.children[0]); // remove drag handle
