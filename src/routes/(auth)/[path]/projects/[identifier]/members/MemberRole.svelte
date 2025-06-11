@@ -1,17 +1,16 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import { pipe } from '@baetheus/fun/fn';
-    import { melt, type SelectOption } from '@melt-ui/svelte';
     import { createQuery } from '@tanstack/svelte-query';
-    import { toStore, writable } from 'svelte/store';
-    import { Button, SelectBuilder, toast } from '~/lib/components';
+    import { toStore } from 'svelte/store';
+    import { Button, toast } from '~/lib/components';
     import { IconCheck, IconChevronUpDown } from '~/lib/components/icons';
+    import Select from '~/lib/components/select';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { HttpError } from '~/lib/models/errors';
-    import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
+    import { type PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
     import { QueryResponse } from '~/lib/utils/query';
-    import { select, tsap } from '~/lib/utils/transition';
 
     interface LocalRole {
         id: number;
@@ -33,25 +32,27 @@
                 const list = await QueryResponse.JSON(() =>
                     response.json<PaginatedList<LocalRole>>()
                 );
-                return paginatedList({
-                    items: list.items.map((a) => ({
-                        ...a,
-                        value: a.id,
-                        label: a.name
-                    })),
-                    totalCount: list.totalCount
-                });
+                return list;
             }
         }))
     );
-    const selected = writable<SelectOption<number>>({
-        value: defaultRole.id,
-        label: defaultRole.name
+    let value = $state.raw(defaultRole.id.toString());
+    const select = new Select.Builder({
+        forceVisible: true,
+        value: () => value,
+        onValueChange: (a) => {
+            if (a) {
+                patchRole(Number(a));
+                value = a;
+            }
+        }
     });
-    const open = writable(false);
+    const selected = $derived(
+        $query.data?.items.find((a) => a.id === Number(value)) ?? defaultRole
+    );
 
     const patchRole = async (roleId: number) => {
-        const old = $selected;
+        const old = value;
         const patch = await pipe(
             TE.fromPromise(
                 () =>
@@ -67,7 +68,7 @@
             TE.flatMap((a) => (a.ok ? TE.right(a) : TE.left(HttpError.from(a))))
         )();
         if (patch.tag === 'Left') {
-            $selected = old;
+            value = old;
             if (typeof patch.left === 'string') {
                 toast({
                     type: 'negative',
@@ -97,50 +98,36 @@
     </div>
 {/snippet}
 
-<SelectBuilder
-    options={{
-        selected,
-        open,
-        forceVisible: true,
-        onSelectedChange: ({ next }) => {
-            if (next) {
-                patchRole(next.value);
-            }
-            return next;
-        }
-    }}
+<Button
+    {...select.trigger}
+    variant="base"
+    size="sm"
+    filled={false}
+    class="flex w-40 min-w-fit items-center justify-between gap-2"
 >
-    {#snippet children({ trigger, menu, option, helpers: { isSelected } })}
-        <Button
-            variant="base"
-            size="sm"
-            melt={trigger}
-            class="flex w-40 min-w-fit items-center justify-between gap-2"
-        >
-            {$selected.label}
-            <IconChevronUpDown class="size-4" />
-        </Button>
-        {#if $open}
-            <div class="c-select--menu" use:melt={menu} in:tsap={select.in} out:tsap={select.out}>
-                {#if $query.isPending}
-                    {@render skeleton()}
-                {:else if $query.data == null || $query.data.items.length === 0}
-                    Empty
-                {:else}
-                    <ol>
-                        {#each $query.data.items as role (role.id)}
-                            {@const opt = option(role)}
-                            <li class="c-select--option" use:melt={opt}>
-                                {#if isSelected(role.value)}
-                                    <IconCheck class="c-select--check" />
-                                {/if}
-                                {role.label}
-                            </li>
-                        {/each}
-                    </ol>
-                {/if}
-            </div>
-            <ol></ol>
+    {selected.name}
+    <IconChevronUpDown class="size-4" />
+</Button>
+{#if select.open}
+    <Select {...select.content}>
+        {#if $query.isPending}
+            {@render skeleton()}
+        {:else if $query.data == null || $query.data.items.length === 0}
+            <span class="c-text-secondary"> No roles found. </span>
+        {:else}
+            <ol>
+                {#each $query.data.items as role (role.id)}
+                    {@const id = role.id + ''}
+                    <li>
+                        <Select.Option {...select.getOption(id)}>
+                            {#if select.isSelected(id)}
+                                <Select.Check />
+                            {/if}
+                            {role.name}
+                        </Select.Option>
+                    </li>
+                {/each}
+            </ol>
         {/if}
-    {/snippet}
-</SelectBuilder>
+    </Select>
+{/if}
