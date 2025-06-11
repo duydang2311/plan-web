@@ -24,6 +24,10 @@
     let formEl: HTMLFormElement | undefined;
 </script>
 
+{#snippet successToast(name: string)}
+        <span>New display name: <strong>{name}</strong>.</span>
+{/snippet}
+
 {#if displayName != null && displayName.length > 0}
     <div class="mt-4">
         {#if inlineEdit.editing}
@@ -34,13 +38,14 @@
                 use:enhance={(e) => {
                     inlineEdit.editing = false;
                     const old = getUserRef.value.ok && getUserRef.value;
+                    const displayName = e.formData.get('displayName') as string;
                     if (old) {
                         getUserRef.value = attempt.ok({
                             ...old.data,
                             profile: old.data.profile
                                 ? {
                                       ...old.data.profile,
-                                      displayName: e.formData.get('displayName') as string
+                                      displayName
                                   }
                                 : undefined
                         });
@@ -49,7 +54,9 @@
                         if (e.result.type === 'success') {
                             toast({
                                 type: 'positive',
-                                body: 'DisplayName updated successfully'
+                                header: 'Display name updated',
+                                body: successToast,
+                                bodyProps: displayName
                             });
                         } else if (e.result.type === 'failure') {
                             toast({
@@ -72,7 +79,7 @@
                     type="text"
                     name="displayName"
                     value={displayName}
-                    class="grow"
+                    class="grow font-bold"
                     {@attach inlineEdit.input}
                 />
                 <div class="flex justify-end gap-2 text-sm *:w-fit">
