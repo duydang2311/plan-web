@@ -48,7 +48,6 @@
     } = $props();
     let dragStatus = $state<'dragover' | null>(null);
     let draggingIssueId = $state.raw<string | null>(null);
-    let scrollEl = $state.raw<HTMLElement>();
 
     function atlas(node: HTMLElement, state: Pick<Status, 'id'>) {
         let cleanup: CleanupFn | undefined = undefined;
@@ -115,11 +114,9 @@
     >
         <div class="h-full overflow-hidden">
             <ol
-                bind:this={scrollEl}
                 class="custom-scrollbar max-h-full overflow-auto rounded-lg px-1"
             >
                 <Virtualizer
-                    scrollRef={scrollEl}
                     data={[...issueList.items, { id: 'load-more' } as const]}
                     getKey={(a) => a.id}
                 >
