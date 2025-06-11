@@ -21,44 +21,40 @@ const serverValidate = extend(validate, (input, { error }) => {
 });
 
 export const actions = {
-    default: async ({ request, locals: { appLive } }) => {
+    default: async ({ request, locals }) => {
         return pipe(
-            await Effect.runPromise(
-                Effect.gen(function* ($) {
-                    const formData = yield* Effect.promise(() => request.formData());
-                    const validation = serverValidate(decode(formData));
-                    if (!validation.ok) {
-                        return yield* Effect.fail(fail(400, { errors: validation.errors }));
-                    }
+            await Effect.gen(function* ($) {
+                const formData = yield* Effect.promise(() => request.formData());
+                const validation = serverValidate(decode(formData));
+                if (!validation.ok) {
+                    return yield* Effect.fail(fail(400, { errors: validation.errors }));
+                }
 
-                    return yield* Effect.either(
-                        $(
-                            signUpEffect(validation.data.email, validation.data.password),
-                            Effect.catchTag('ApiError', (e) =>
-                                Effect.fail(
-                                    fail(400, {
-                                        errors: { root: [e.code] }
-                                    })
-                                )
-                            ),
-                            Effect.catchTag('ValidationError', (e) =>
-                                Effect.fail(
-                                    fail(400, {
-                                        errors: e.errors
-                                    })
-                                )
-                            ),
-                            Effect.provide(appLive),
-                            Effect.retry({
-                                schedule: Schedule.addDelay(Schedule.recurs(3), () => '2 seconds'),
-                                while: (e) =>
-                                    'root' in e.data.errors &&
-                                    e.data.errors.root.includes('unknown')
-                            })
-                        )
-                    );
-                })
-            ),
+                return yield* Effect.either(
+                    $(
+                        signUpEffect(validation.data.email, validation.data.password),
+                        Effect.catchTag('ApiError', (e) =>
+                            Effect.fail(
+                                fail(400, {
+                                    errors: { root: [e.code] }
+                                })
+                            )
+                        ),
+                        Effect.catchTag('ValidationError', (e) =>
+                            Effect.fail(
+                                fail(400, {
+                                    errors: e.errors
+                                })
+                            )
+                        ),
+                        Effect.retry({
+                            schedule: Schedule.addDelay(Schedule.recurs(3), () => '2 seconds'),
+                            while: (e) =>
+                                'root' in e.data.errors && e.data.errors.root.includes('unknown')
+                        })
+                    )
+                );
+            }).pipe(locals.runtime.runPromise),
             Either.match({
                 onLeft: (l) => l,
                 onRight: (r) => ({ email: r })

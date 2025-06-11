@@ -51,6 +51,7 @@
     const errors = $derived(form?.errors ?? {}) as Record<string, string[]>;
 </script>
 
+{JSON.stringify(form)}
 <LandingLayout>
     <main class="mt-16 max-w-paragraph-lg mx-auto p-8">
             <div class="transition-enforcement overflow-hidden">
@@ -90,9 +91,9 @@
                                 }
 
                                 status = 'submitting';
-                                return async ({ update }) => {
+                                return async (e) => {
                                     status = null;
-                                    await update();
+                                    await e.update();
                                 };
                             }}
                         >
