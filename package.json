@@ -105,7 +105,8 @@
         "validator": "^13.15.15",
         "virtua": "^0.41.5",
         "vis-timeline": "^7.7.4",
-        "vite": "^6.3.5"
+        "vite": "^6.3.5",
+        "vite-plugin-devtools-json": "^0.2.0"
     },
     "private": true,
     "overrides": {
