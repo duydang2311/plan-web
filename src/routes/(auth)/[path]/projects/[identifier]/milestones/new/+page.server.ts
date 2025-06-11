@@ -22,6 +22,8 @@ export const actions: Actions = {
                 body: {
                     projectId: validation.data.projectId,
                     title: validation.data.title,
+                    endTime: validation.data.endTime,
+                    endTimeZone: validation.data.endTimeZone,
                     description: validation.data.description,
                     emoji: validation.data.emoji,
                     color: validation.data.color,

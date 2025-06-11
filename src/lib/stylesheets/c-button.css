@@ -106,6 +106,21 @@
         }
     }
 
+    &:where([aria-invalid]) {
+        border-color: color-mix(in srgb, var(--color-negative-1) 50%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 5%, transparent);
+
+        &:hover {
+            border-color: color-mix(in srgb, var(--color-negative-1) 90%, transparent);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 10%, transparent);
+        }
+
+        &:focus-visible {
+            border-color: var(--color-negative-1);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-negative-3) 20%, transparent);
+        }
+    }
+
     &:where(:disabled, [aria-disabled]) {
         color: var(--_fg-disabled);
         background-color: var(--_bg-disabled);

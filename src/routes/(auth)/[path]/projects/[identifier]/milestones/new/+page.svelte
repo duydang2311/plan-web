@@ -10,6 +10,7 @@
     import StatusSelectField from './StatusSelectField.svelte';
     import { validateCreateMilestone } from './utils';
     import { milestoneColors } from '~/lib/features/milestones/utils';
+    import EndDate from './EndDate.svelte';
 
     const { data }: PageProps = $props();
     const form = createForm({
@@ -17,7 +18,15 @@
     });
     const fields = {
         title: form.createField({ name: 'title' }),
-        description: form.createField({ name: 'description' })
+        description: form.createField({ name: 'description' }),
+        endTime: form.createField({
+            name: 'endTime',
+            validator: (state, props) => {
+                if (!state.value) {
+                    return props.error('required');
+                }
+            }
+        })
     };
     const colorGroup = new RadioGroup({
         value: milestoneColors[0],
@@ -79,6 +88,7 @@
                 />
                 <Errors errors={fields.title.state.errors} />
             </Field>
+            <EndDate field={fields.endTime} />
             <div class="flex flex-wrap gap-4 *:flex-1 *:basis-60">
                 <Field {...colorGroup.root}>
                     <input {...colorGroup.hiddenInput} name="color" value={colorGroup.value} />
