@@ -38,9 +38,9 @@
     );
     const tabsBuilder = new Tabs.Builder({
         value: () =>
-            page.url.searchParams.get('view') === 'board'
+            data.page.tag === 'board'
                 ? 'board'
-                : page.url.searchParams.get('view') === 'timeline'
+                : data.page.tag === 'timeline'
                   ? 'timeline'
                   : 'table'
     });
@@ -109,6 +109,7 @@
                     <BoardLayout
                         statusListRef={boardStatusListRef}
                         issueListsRef={boardIssueListsRef}
+                        issueLists={data.page.issueLists}
                         projectId={data.project.id}
                         projectIdentifier={data.project.identifier}
                     />

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/state';
     import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
     import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
     import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
@@ -9,16 +10,17 @@
     import { toast } from '~/lib/components';
     import { IconDraggable } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
+    import { errorCodes } from '~/lib/models/errors';
     import { paginatedList, type PaginatedList } from '~/lib/models/paginatedList';
     import { TE } from '~/lib/utils/functional';
     import { compareRank, getRank } from '~/lib/utils/ranking';
     import { type AsyncRef } from '~/lib/utils/runes.svelte';
+    import { attempt } from '~/lib/utils/try';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
+    import { createBoardQueryParams } from '../utils';
     import Board from './Board.svelte';
     import BoardSkeleton from './BoardSkeleton.svelte';
     import { validateDraggableIssueData } from './utils';
-    import { createBoardQueryParams } from '../utils';
-    import { page } from '$app/state';
 
     const {
         statusList,
@@ -37,6 +39,7 @@
         rect: DOMRect;
         data: Record<string, unknown>;
     } | null>(null);
+    const loadingMap = new Map<number, boolean>();
 
     const dragIssue = async ({
         issueId,
@@ -111,7 +114,6 @@
                 sourceIssue.status?.id == null
                     ? null
                     : statusList.items.find((a) => a.id === sourceIssue.status!.id);
-            console.log(sourceStatus);
             const targetStatus =
                 target.statusId === -1
                     ? null
@@ -275,6 +277,68 @@
             update
         };
     }
+
+    const onLoadMore = async (statusId: number) => {
+        if (loadingMap.has(statusId)) {
+            return;
+        }
+
+        loadingMap.set(statusId, true);
+        const issueList = issueListsRef.value?.[statusId];
+        if (!issueList) {
+            loadingMap.delete(statusId);
+            return;
+        }
+
+        const getAttempt = await attempt.promise(() =>
+            api.get('issues', {
+                query: {
+                    projectId,
+                    statusId: statusId === -1 ? null : statusId,
+                    nullStatusId: statusId === -1,
+                    select: 'CreatedTime,UpdatedTime,Id,OrderNumber,Title,StartTime,EndTime,StatusRank,Status.Id,Status.Color,Status.Category,Status.Value,Status.Rank,Priority,Author.Email,Author.Profile.Name,Author.Profile.DisplayName,Author.Profile.Image,PreviewDescription,Milestone.Id,Milestone.Title,Milestone.Emoji,Milestone.Color',
+                    order: 'StatusRank,OrderNumber',
+                    statusRankCursor: issueList.items.at(-1)?.statusRank ?? null
+                }
+            })
+        )(errorCodes.fromFetch);
+        if (getAttempt.failed || !getAttempt.data.ok) {
+            toast({
+                type: 'negative',
+                header: 'Failed to load more issues',
+                body: 'Something went wrong while fetching more issues from the server.',
+                footer: `Error code: ${getAttempt.failed ? getAttempt.error : getAttempt.data.status}.`
+            });
+            loadingMap.delete(statusId);
+            return;
+        }
+
+        const jsonAttempt = await attempt.promise(() =>
+            getAttempt.data.json<PaginatedList<LocalBoardIssue>>()
+        )(errorCodes.fromJson);
+        if (jsonAttempt.failed) {
+            toast({
+                type: 'negative',
+                header: 'Failed to load more issues',
+                body: 'Something went wrong while parsing issues.',
+                footer: `Error code: ${jsonAttempt.error}.`
+            });
+            loadingMap.delete(statusId);
+            return;
+        }
+
+        issueListsRef.value = {
+            ...issueListsRef.value,
+            [statusId]: paginatedList({
+                items: [...issueList.items, ...jsonAttempt.data.items],
+                totalCount: jsonAttempt.data.totalCount
+            })
+        };
+        // TODO: status rank collision can cause this bug
+        if (jsonAttempt.data.items.length > 0) {
+            loadingMap.delete(statusId);
+        }
+    };
 </script>
 
 {#snippet errorDescription({ title, from, to }: { title: string; from: string; to: string })}
@@ -285,7 +349,7 @@
 
 <div class="flex h-full overflow-x-auto overflow-y-hidden px-4 pb-1">
     <ol
-        class="h-full grid auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
+        class="grid h-full auto-cols-[minmax(24rem,1fr)] grid-flow-col gap-2"
         class:animate-pulse={issueListsRef.loading.immediate}
     >
         {#each statusList.items as status (status.id)}
@@ -301,6 +365,7 @@
                                 identifier={projectIdentifier}
                                 {projectId}
                                 {status}
+                                {onLoadMore}
                             />
                         {/if}
                     </ol>

@@ -1,10 +1,10 @@
 <script lang="ts">
     import { type PaginatedList } from '~/lib/models/paginatedList';
-    import type { AsyncRef } from '~/lib/utils/runes.svelte';
+    import { StatusCategory } from '~/lib/models/status';
+    import { type AsyncRef } from '~/lib/utils/runes.svelte';
     import type { LocalBoardIssue, LocalWorkspaceStatus } from '../+page.server';
     import BoardLayoutDefault from './BoardLayoutDefault.svelte';
     import BoardLayoutSkeleton from './BoardLayoutSkeleton.svelte';
-    import { StatusCategory } from '~/lib/models/status';
 
     const {
         statusListRef,
@@ -14,6 +14,7 @@
     }: {
         statusListRef: AsyncRef<PaginatedList<LocalWorkspaceStatus> | null>;
         issueListsRef: AsyncRef<Record<PropertyKey, PaginatedList<LocalBoardIssue>>>;
+        issueLists: any;
         projectId: string;
         projectIdentifier: string;
     } = $props();

@@ -32,19 +32,23 @@
     import type { LocalBoardIssue } from '../+page.server';
     import BoardIssue from './BoardIssue.svelte';
     import { validateDraggableIssueData } from './utils';
+    import { Virtualizer } from 'virtua/svelte';
 
     const {
         issueList,
         identifier,
-        status
+        status,
+        onLoadMore
     }: {
         issueList: PaginatedList<LocalBoardIssue>;
         identifier: string;
         projectId: string;
         status: Pick<WorkspaceStatus, 'id' | 'value' | 'category'>;
+        onLoadMore: (statusId: number) => void;
     } = $props();
     let dragStatus = $state<'dragover' | null>(null);
     let draggingIssueId = $state.raw<string | null>(null);
+    let scrollEl = $state.raw<HTMLElement>();
 
     function atlas(node: HTMLElement, state: Pick<Status, 'id'>) {
         let cleanup: CleanupFn | undefined = undefined;
@@ -92,7 +96,7 @@
     }
 </script>
 
-<div class="flex w-full flex-col gap-2 h-full">
+<div class="flex h-full w-full flex-col gap-2">
     <h2
         class={[
             'text-p text-base-fg-2 font-semibold tracking-tight',
@@ -104,38 +108,56 @@
     <li
         data-dragover={dragStatus != null ? true : undefined}
         class={clsx(
-            'flex w-full flex-1 grow flex-col rounded-lg border py-1 transition overflow-hidden',
+            'flex w-full flex-1 grow flex-col overflow-hidden rounded-lg border py-1 transition',
             categoryClasses[status.category]
         )}
         use:atlas={{ id: status.id }}
     >
         <div class="h-full overflow-hidden">
-            <ol class="custom-scrollbar max-h-full overflow-auto rounded-lg px-1">
-                {#each issueList.items.filter((a) => a.id !== draggingIssueId) as issue (issue.id)}
-                    <li
-                        in:tsap={(node, gsap) =>
-                            gsap.from(node, {
-                                overflow: 'hidden',
-                                height: 0,
-                                opacity: 0,
-                                scale: 0,
-                                duration: 0.15,
-                                clearProps: 'overflow,height,opacity,scale',
-                                ease: 'power2.out'
-                            })}
-                        out:tsap={(node, gsap) =>
-                            gsap.to(node, {
-                                overflow: 'hidden',
-                                height: 0,
-                                opacity: 0,
-                                scale: 0,
-                                duration: 0.15,
-                                ease: 'power2.in'
-                            })}
-                    >
-                        <BoardIssue {identifier} {issue} />
-                    </li>
-                {/each}
+            <ol
+                bind:this={scrollEl}
+                class="custom-scrollbar max-h-full overflow-auto rounded-lg px-1"
+            >
+                <Virtualizer
+                    scrollRef={scrollEl}
+                    data={[...issueList.items, { id: 'load-more' } as const]}
+                    getKey={(a) => a.id}
+                >
+                    {#snippet children(issue)}
+                        {#if issue.id === 'load-more'}
+                            <li
+                                {@attach () => {
+                                    if (issueList.items.length >= issueList.totalCount) {
+                                        return;
+                                    }
+                                    onLoadMore(status.id);
+                                }}
+                            ></li>
+                        {:else}
+                            {@const isDragging = issue.id === draggingIssueId}
+                            <li
+                                in:tsap={(node, gsap) =>
+                                    gsap.from(node, {
+                                        overflow: 'hidden',
+                                        opacity: 0,
+                                        scale: 0,
+                                        duration: 0.15,
+                                        clearProps: 'overflow,opacity,scale',
+                                        ease: 'power2.out'
+                                    })}
+                                class={isDragging
+                                    ? 'border-base-border-2 rounded-xl border-2 border-dashed'
+                                    : undefined}
+                            >
+                                <div
+                                    class={isDragging ? 'pointer-events-none invisible' : undefined}
+                                >
+                                    <BoardIssue {identifier} issue={issue as LocalBoardIssue} />
+                                </div>
+                            </li>
+                        {/if}
+                    {/snippet}
+                </Virtualizer>
             </ol>
         </div>
     </li>
