@@ -271,10 +271,10 @@
     }}
 >
     <div class="flex items-center justify-between gap-2">
-        <h2 class="capitalize">Create resource</h2>
+        <h2 class="capitalize font-h-bold">Create resource</h2>
         <IconResourcePlus class="text-base-fg-1 size-10" />
     </div>
-    <p class="c-label mb-4">
+    <p class="c-text-secondary mb-4">
         Create a new resource with docs and files to share within your workspace.
     </p>
     <input

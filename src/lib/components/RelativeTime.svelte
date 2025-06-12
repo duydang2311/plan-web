@@ -1,13 +1,19 @@
 <script lang="ts" module>
+    interface Item {
+        time: DateTime;
+        options?: ToRelativeOptions & { capitalize?: boolean };
+        format: string;
+    }
+
     let interval = 0;
-    const refs: Ref<{ time: DateTime; format: string }>[] = [];
-    export const add = (ref: Ref<{ time: DateTime; format: string }>) => {
+    const refs: Ref<Item>[] = [];
+    export const add = (ref: Ref<Item>) => {
         refs.push(ref);
         if (interval === 0) {
             interval = setInterval(update, 1000) as unknown as number;
         }
     };
-    export const remove = (ref: Ref<{ time: DateTime; format: string }>) => {
+    export const remove = (ref: Ref<Item>) => {
         const index = refs.findIndex((a) => a === ref);
         if (index !== -1) {
             refs.splice(index, 1);
@@ -22,7 +28,7 @@
             if (ref.value) {
                 ref.value = {
                     ...ref.value,
-                    format: formatRelativeDateTimeUi(ref.value.time) ?? 'N/A'
+                    format: formatRelativeDateTimeUi(ref.value.time, ref.value.options) ?? 'N/A'
                 };
             }
         }
@@ -31,17 +37,33 @@
 
 <script lang="ts">
     import { DateTime, type ToRelativeOptions } from 'luxon';
-    import { createRef, type Ref } from '../utils/runes.svelte';
     import { onMount } from 'svelte';
+    import { createRef, watch, type Ref } from '../utils/runes.svelte';
     import { formatRelativeDateTimeUi } from '../utils/time';
 
-    let { time, options }: { time: string | DateTime; options?: ToRelativeOptions } = $props();
+    let {
+        time,
+        options
+    }: { time: string | DateTime; options?: ToRelativeOptions & { capitalize?: boolean } } =
+        $props();
+
     if (typeof time === 'string') {
         time = DateTime.fromISO(time);
     }
+
     const ref = createRef({
         time,
+        options,
         format: formatRelativeDateTimeUi(time, options) ?? 'N/A'
+    });
+
+    watch.pre(() => time)(() => {
+        const normalized = typeof time === 'string' ? DateTime.fromISO(time) : time;
+        ref.value = {
+            time: normalized,
+            options,
+            format: formatRelativeDateTimeUi(normalized, options) ?? 'N/A'
+        };
     });
 
     onMount(() => {

@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import { type PaginatedList } from '~/lib/models/paginatedList';
 import type { Resource, ResourceFile } from '~/lib/models/resource';
 import type { UserPreset } from '~/lib/models/user';
@@ -96,7 +96,22 @@ export const actions: Actions = {
                 (yield* ApiClient).delete(`resource-files/${validation.data.id}`)
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
-    }
+    },
+    update_resource_document_content: async ({ request, locals: { runtime } }) => {
+        return Effect.gen(function* () {
+            const formData = yield* ActionResponse.FormData(() => request.formData());
+            const validation = yield* ActionResponse.Validation(
+                validateUpdateResourceDocumentContent(decodeUpdateResourceDocumentContent(formData))
+            );
+            yield* ActionResponse.HTTP(
+                (yield* ApiClient).patch(`workspace-resources/${validation.data.resourceId}`, {
+                    body: {
+                        patch: { documentContent: validation.data.content }
+                    }
+                })
+            );
+        }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
 };
 
 const decodeUpdateResourceName = (formData: FormData) => {
@@ -123,6 +138,21 @@ const decodeDeleteResourceFile = (formData: FormData) => {
 const validateDeleteResourceFile = validator(
     Type.Object({
         id: Type.String({ minLength: 1 })
+    }),
+    { stripLeadingSlash: true }
+);
+
+const decodeUpdateResourceDocumentContent = (formData: FormData) => {
+    return {
+        resourceId: formData.get('resourceId'),
+        content: formData.get('content')
+    };
+};
+
+const validateUpdateResourceDocumentContent = validator(
+    Type.Object({
+        resourceId: Type.String({ minLength: 1 }),
+        content: Type.Union([Type.String(), Type.Null()])
     }),
     { stripLeadingSlash: true }
 );

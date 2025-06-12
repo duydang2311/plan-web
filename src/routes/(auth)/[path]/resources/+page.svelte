@@ -82,7 +82,7 @@
     <div class="flex min-h-full flex-col overflow-hidden">
         <div class="mb-4 sm:flex sm:items-center sm:justify-between sm:gap-x-16 sm:gap-y-4">
             <div class="max-lg:mb-2">
-                <h1>Resources</h1>
+                <h1 class="font-h-bold">Resources</h1>
                 <p class="c-text-secondary text-pretty">
                     One place to access every file and document in your workspace — collaborate
                     effortlessly and stay productive.

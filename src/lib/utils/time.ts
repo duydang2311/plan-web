@@ -17,7 +17,7 @@ export const formatRelativeDateUi = (
 
 export const formatRelativeDateTimeUi = (
     dateTime: string | Date | DateTime,
-    options?: ToRelativeOptions
+    options?: ToRelativeOptions & { capitalize?: boolean }
 ) => {
     if (typeof dateTime === 'string') {
         dateTime = DateTime.fromISO(dateTime);
@@ -27,10 +27,10 @@ export const formatRelativeDateTimeUi = (
 
     const now = DateTime.now();
     if (now.diff(dateTime, 'seconds').seconds <= 5) {
-        return 'just now';
+        return `${options?.capitalize ? 'J' : 'j'}ust now`;
     }
     if (now.diff(dateTime, 'minutes').minutes < 1) {
-        return 'less than a minute ago';
+        return `${options?.capitalize ? 'L' : 'l'}ess than a minute ago`;
     }
     return dateTime.toRelative(options);
 };

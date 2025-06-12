@@ -14,12 +14,11 @@
     import { replaceState } from '$app/navigation';
     import { page } from '$app/state';
     import { omit } from '@baetheus/fun/record';
-    import DOMPurify from 'isomorphic-dompurify';
-    import { DateTime } from 'luxon';
     import { toStore } from 'svelte/store';
-    import { InlineEdit, Main, RelativeTime, toast } from '~/lib/components';
+    import { Main, RelativeTime, toast } from '~/lib/components';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { errorCodes } from '~/lib/models/errors';
+    import { permissions } from '~/lib/models/permission';
     import { formatFileSize } from '~/lib/utils/commons';
     import {
         stringifyActionFailureErrors,
@@ -27,13 +26,15 @@
     } from '~/lib/utils/kit.client';
     import { mapMaybePromise } from '~/lib/utils/promise';
     import { createRef, watch } from '~/lib/utils/runes.svelte';
+    import { formatDateUi } from '~/lib/utils/time';
     import { attempt } from '~/lib/utils/try';
     import type { PageData } from './$types';
     import type { LocalResourceFile } from './+page.server';
     import DeleteFileDialog from './DeleteFileDialog.svelte';
+    import Document from './Document.svelte';
     import FileUpload from './FileUpload.svelte';
     import MenuPopover from './MenuPopover.svelte';
-    import { permissions } from '~/lib/models/permission';
+    import Title from './Title.svelte';
 
     const { data }: { data: PageData } = $props();
 
@@ -52,6 +53,7 @@
                 workspacePermissionsRef.value?.has(permissions.deleteWorkspaceResourceFile)) ??
             false
     });
+    $inspect(fileListRef.value, data.getResourceFileList);
     let openDeleteFileDialog = $state.raw(false);
 
     const downloadFile = async (resourceFile: LocalResourceFile) => {
@@ -163,13 +165,8 @@
         {:else}
             {@const name = resourceRef.value.name}
             <section>
-                <InlineEdit
-                    name="name"
-                    value={name}
-                    action="?/update_resource_name"
-                    inputProps={{
-                        class: 'text-h1 font-bold text-base-fg-1'
-                    }}
+                <Title
+                    {name}
                     onSubmit={async (e) => {
                         const old = resourceRef.value;
                         if (!old) {
@@ -206,31 +203,64 @@
                                     )
                                 });
                                 resourceRef.value = old;
-                            } else {
-                                await update();
                             }
+                            await update();
                         };
                     }}
-                >
-                    <h1>{name}</h1>
-                </InlineEdit>
-                <p class="c-label">
-                    Created on {DateTime.fromISO(resourceRef.value.createdTime).toLocaleString()} • Last
-                    modified <RelativeTime time={resourceRef.value.updatedTime} />.
+                />
+                <p class="c-text-secondary">
+                    Created on {formatDateUi(resourceRef.value.createdTime)} • Last modified <RelativeTime
+                        time={resourceRef.value.updatedTime}
+                    />.
                 </p>
             </section>
-            {#if resourceRef.value.document}
-                <section class="mt-8">
-                    <h2>Documentation</h2>
-                    <div
-                        class="prose wrap-anywhere border-base-border-3 dark:bg-base-3 max-w-full rounded-lg border p-4"
-                    >
-                        {@html DOMPurify.sanitize(resourceRef.value.document.content, {
-                            USE_PROFILES: { html: true }
-                        })}
-                    </div>
-                </section>
-            {/if}
+            <Document
+                content={resourceRef.value.document?.content}
+                onSubmit={(e) => {
+                    const old = resourceRef.value;
+                    if (!old) {
+                        e.cancel();
+                        return;
+                    }
+
+                    const content = (e.formData.get('content') as string | null) ?? '';
+                    if (content == null || content.trim() === old.name) {
+                        e.cancel();
+                        return;
+                    }
+
+                    e.formData.set('resourceId', old.id);
+                    resourceRef.value = {
+                        ...old,
+                        document: {
+                            ...old.document,
+                            content,
+                            previewContent: content
+                        }
+                    };
+                    return async ({ result, update }) => {
+                        if (result.type === 'success') {
+                            toast({
+                                type: 'positive',
+                                // @ts-ignore
+                                body: successToast,
+                                bodyProps: content
+                            });
+                        } else if (result.type === 'failure') {
+                            const data = validateActionFailureData(result.data);
+                            toast({
+                                type: 'negative',
+                                body: 'An error occurred while updating the resource name.',
+                                footer: stringifyActionFailureErrors(
+                                    data.ok ? data.data.errors : data.errors
+                                )
+                            });
+                            resourceRef.value = old;
+                        }
+                        await update();
+                    };
+                }}
+            />
             <section class="mt-8">
                 <h2 class="mb-2">Files</h2>
                 <FileUpload
@@ -239,9 +269,7 @@
                     resourceId={resourceRef.value.id}
                 />
                 {#if fileListRef.value && fileListRef.value.items.length > 0}
-                    <ul
-                        class="grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4"
-                    >
+                    <ul class="grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4">
                         {#each fileListRef.value.items as file (file.key)}
                             <li>
                                 <div

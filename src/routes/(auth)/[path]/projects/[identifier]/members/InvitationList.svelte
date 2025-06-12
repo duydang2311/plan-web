@@ -6,6 +6,7 @@
         Avatar,
         OptionalLink,
         Pagination3,
+        RelativeTime,
         Row,
         Table,
         Th,
@@ -52,7 +53,7 @@
             <THead class="z-10">
                 <Row class="py-2">
                     <Th>User</Th>
-                    <ThSort3 name="createdTime">Invited date</ThSort3>
+                    <ThSort3 name="createdTime">Invited</ThSort3>
                     <Th class="col-span-2">Role</Th>
                 </Row>
             </THead>
@@ -63,7 +64,9 @@
                     {/each}
                 {:else if ref.value == null || ref.value.items.length === 0}
                     <Row>
-                        <td class="text-base-fg-ghost col-span-full text-sm">No entries found.</td>
+                        <td class="text-base-fg-ghost col-span-full text-sm"
+                            >No invitations found.</td
+                        >
                     </Row>
                 {:else}
                     {#each ref.value.items as item (item.id)}
@@ -97,8 +100,11 @@
                                     {/if}
                                 </OptionalLink>
                             </td>
-                            <td title={createdTime.toLocaleString(DateTime.DATETIME_MED)}>
-                                {createdTime.toRelative()}
+                            <td>
+                                <RelativeTime
+                                    time={DateTime.now()}
+                                    options={{ capitalize: true }}
+                                />
                             </td>
                             <td>
                                 {item.role.name}
