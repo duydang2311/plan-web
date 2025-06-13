@@ -4,10 +4,9 @@
     import { Button, Logo } from '~/lib/components';
     import { IconLogin } from '~/lib/components/icons';
 
-    const { children }: { children: Snippet } = $props();
+    const { children, topRight }: { children: Snippet; topRight?: Snippet } = $props();
 </script>
 
-<div>
     <nav class="container mx-auto px-6 py-6">
         <div class="flex items-center justify-between">
             <a href="/" class="flex items-center">
@@ -25,20 +24,23 @@
                 <a href="/" class="hover:text-base-fg-1 transition-colors">Pricing</a>
             </div>
             <div>
-                <Button
-                    as="link"
-                    href="/login"
-                    variant="base"
-                    outline
-                    class="flex items-center gap-2"
-                    disabled={page.url.pathname === '/login'}
-                >
-                    <IconLogin />
-                    Sign in
-                </Button>
+                {#if topRight}
+                    {@render topRight()}
+                {:else}
+                    <Button
+                        as="link"
+                        href="/login"
+                        variant="base"
+                        outline
+                        class="flex items-center gap-2"
+                        disabled={page.url.pathname === '/login'}
+                    >
+                        <IconLogin />
+                        Sign in
+                    </Button>
+                {/if}
             </div>
         </div>
     </nav>
     <div class="via-base-border-3 h-px bg-gradient-to-r from-transparent to-transparent"></div>
     {@render children()}
-</div>

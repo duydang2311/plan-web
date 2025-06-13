@@ -49,7 +49,7 @@
 </script>
 
 <LandingLayout>
-    <main class="mt-16 max-w-paragraph-lg mx-auto content-center p-8 h-full">
+    <main class="mt-16 max-w-paragraph-lg p-8 mx-auto">
         <h1 class="font-bold capitalize">Sign in</h1>
         <p class="c-text-secondary mb-8">
             Ready to dive in? Let’s get things done with <strong>konekt</strong>.

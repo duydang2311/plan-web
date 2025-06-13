@@ -8,7 +8,7 @@ import { ActionResponse, LoadResponse } from '~/lib/utils/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { decodeCreateProfile, validateCreateProfile } from './utils';
 
-export type RemoteUser = Pick<User, 'id' | 'profile'>;
+export type RemoteUser = Pick<User, 'id' | 'email' | 'profile'>;
 export type LocalUser = Omit<RemoteUser, 'profile'> & {
     profile?: {
         name: string;
@@ -26,19 +26,20 @@ export const load: PageServerLoad = async ({
         const promise = Effect.gen(function* () {
             const response = yield* LoadResponse.HTTP(
                 (yield* ApiClient).get(`users/${user.id}`, {
-                    query: { select: 'Profile.Name,Profile.DisplayName,Profile.Image' }
+                    query: { select: 'Email,Profile.Name,Profile.DisplayName,Profile.Image' }
                 })
             );
-            const { profile } = yield* LoadResponse.JSON(() =>
+            const { email, profile } = yield* LoadResponse.JSON(() =>
                 response.json<Omit<RemoteUser, 'id'>>()
             );
-            return yield* dataFromRemoteUser({ id: user.id, profile });
+            return yield* dataFromRemoteUser({ id: user.id, email, profile });
         }).pipe(
             Effect.orElseSucceed(() => null),
             runtime.runPromise
         );
 
         return {
+            localUser: user,
             user: isDataRequest ? promise : await promise
         };
     }
@@ -46,7 +47,7 @@ export const load: PageServerLoad = async ({
     const exit = await Effect.gen(function* () {
         const response = yield* LoadResponse.HTTP(
             (yield* ApiClient).get(`users/profile-name/${params.profileName}`, {
-                query: { select: 'Id,Profile.Name,Profile.DisplayName,Profile.Image' }
+                query: { select: 'Id,Email,Profile.Name,Profile.DisplayName,Profile.Image' }
             })
         );
         const user = yield* LoadResponse.JSON(() => response.json<RemoteUser>());
@@ -54,10 +55,14 @@ export const load: PageServerLoad = async ({
         return yield* dataFromRemoteUser(user);
     }).pipe(runtime.runPromiseExit);
 
-    return Exit.match(exit, {
-        onFailure: () => error(404, { code: 'profile_not_found', message: 'Profile not found' }),
-        onSuccess: (user) => ({ user })
-    });
+    return {
+        localUser: user,
+        user: Exit.match(exit, {
+            onFailure: () =>
+                error(404, { code: 'profile_not_found', message: 'Profile not found' }),
+            onSuccess: (user) => user
+        })
+    };
 };
 
 export const actions: Actions = {
@@ -80,6 +85,7 @@ export const actions: Actions = {
 
 const dataFromRemoteUser = ({
     id,
+    email,
     profile
 }: RemoteUser): Effect.Effect<LocalUser, never, Cloudinary> =>
     profile
@@ -90,10 +96,11 @@ const dataFromRemoteUser = ({
                   : undefined;
               return {
                   id,
+                  email,
                   profile: {
                       ...rest,
                       imageUrl
                   }
               };
           })
-        : Effect.succeed({ id });
+        : Effect.succeed({ id, email });

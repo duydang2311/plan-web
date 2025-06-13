@@ -49,6 +49,7 @@
 <img
     {...props}
     src={computedSrc}
+    alt={user?.profile?.displayName ?? user?.email ?? seed ?? undefined}
     class={clsx(
         'border-base-border-1 bg-base-1 aspect-square rounded-full border object-cover',
         props.class

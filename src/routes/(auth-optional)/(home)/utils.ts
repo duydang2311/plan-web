@@ -8,7 +8,7 @@ import type { Workspace } from '~/lib/models/workspace';
 import { QueryResponse } from '~/lib/utils/query';
 import { validator } from '~/lib/utils/validation';
 
-export type LocalUser = Pick<User, 'id'> & {
+export type LocalUser = Pick<User, 'id' | 'email'> & {
     profile?: Pick<UserProfile, 'name' | 'displayName' | 'image'>;
 };
 export type LocalWorkspace = Pick<
@@ -69,7 +69,7 @@ export const createWorkspaceListParams = (userId: string) =>
 
 export const createUserQueryParams = () => {
     return {
-        select: 'Id,Profile.Name,Profile.DisplayName,Profile.Image'
+        select: 'Id,Email,Profile.Name,Profile.DisplayName,Profile.Image'
     } as const;
 };
 
