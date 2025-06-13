@@ -102,7 +102,7 @@
                             </td>
                             <td>
                                 <RelativeTime
-                                    time={DateTime.now()}
+                                    time={createdTime}
                                     options={{ capitalize: true }}
                                 />
                             </td>
