@@ -1,13 +1,15 @@
 <script lang="ts">
+    import { enhance } from '$app/forms';
     import { Resize } from '@cloudinary/url-gen/actions';
     import { createQuery } from '@tanstack/svelte-query';
     import { toStore } from 'svelte/store';
-    import { Avatar, Input } from '~/lib/components';
-    import { IconSearch } from '~/lib/components/icons';
+    import { Avatar, IconButton, Input, toast } from '~/lib/components';
+    import { IconSearch, IconTrash } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import type { Asset } from '~/lib/models/asset';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { imageFromAsset } from '~/lib/utils/cloudinary';
+    import { stringifyActionFailureErrors } from '~/lib/utils/kit.client';
     import { QueryResponse } from '~/lib/utils/query';
 
     interface LocalUser {
@@ -21,22 +23,23 @@
     }
 
     const { userId }: { userId: string } = $props();
-    const { api, cloudinary } = useRuntime();
+    const { api, cloudinary, queryClient } = useRuntime();
     const params = $derived({
         userId,
         friendId: userId,
         select: 'CreatedTime,Friend.Id,Friend.Email,Friend.Profile.Name,Friend.Profile.DisplayName,Friend.Profile.Image,User.Id,User.Email,User.Profile.Name,User.Profile.DisplayName,User.Profile.Image',
         size: 5
     });
+    const queryKey = $derived([
+        'user-friends',
+        {
+            userId,
+            params
+        }
+    ]);
     const query = createQuery(
         toStore(() => ({
-            queryKey: [
-                'user-friends',
-                {
-                    userId,
-                    params
-                }
-            ],
+            queryKey,
             queryFn: async () => {
                 const response = await QueryResponse.HTTP(() =>
                     api.get(`user-friends`, {
@@ -93,6 +96,48 @@
                 {user.email}
             {/if}
         </span>
+        <form
+            method="post"
+            action="/actions?/delete_friend"
+            class="ml-auto"
+            use:enhance={() => {
+                const old = $query.data;
+                if (old) {
+                    queryClient.setQueryData(queryKey, {
+                        items: old.items.filter(
+                            (a) => a.user.id !== user.id && a.friend.id !== user.id
+                        ),
+                        totalCount: old.totalCount - 1
+                    });
+                }
+                return async (e) => {
+                    if (e.result.type === 'failure') {
+                        toast({
+                            type: 'negative',
+                            header: 'Failed to remove friend',
+                            body: `Something went wrong while removing ${user.profile?.displayName ?? user.email} from your friends list.`,
+                            footer: stringifyActionFailureErrors(
+                                e.result.data!.errors as Record<string, string[]>
+                            )
+                        });
+                        queryClient.setQueryData(queryKey, old);
+                    } else if (e.result.type === 'success') {
+                        toast({
+                            type: 'positive',
+                            header: 'Friend removed',
+                            body: `${user.profile?.displayName ?? user.email} removed successfully from your friends list.`
+                        });
+                    }
+                    await e.update();
+                };
+            }}
+        >
+            <input type="hidden" name="userId" value={userId} />
+            <input type="hidden" name="friendId" value={user.id} />
+            <IconButton type="submit" variant="negative">
+                <IconTrash />
+            </IconButton>
+        </form>
     </div>
 {/snippet}
 

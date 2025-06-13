@@ -90,7 +90,10 @@
                     if (e.result.type === 'failure') {
                         queryClient.setQueryData(queryKey, old);
                     }
-                    await queryClient.invalidateQueries({ queryKey });
+                    await queryClient.invalidateQueries({
+                        predicate: ({ queryKey }) =>
+                            queryKey[0] === 'user-friends' || queryKey[0] === 'user-friend-requests'
+                    });
                 };
             }}
         >

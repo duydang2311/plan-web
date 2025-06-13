@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import { ApiClient } from '~/lib/services/api_client.server';
-import { ActionResponse } from '~/lib/utils/kit';
+import { ActionAttempt, ActionResponse } from '~/lib/utils/kit';
 import { Type } from '~/lib/utils/typebox';
 import { validator } from '~/lib/utils/validation';
 import type { Actions } from './$types';
@@ -66,6 +66,22 @@ export const actions: Actions = {
                 })
             );
         }).pipe(Effect.catchAll(Effect.succeed), runtime.runPromise);
+    },
+    delete_friend: async ({ request, locals }) => {
+        const formDataAttempt = await ActionAttempt.FormData(() => request.formData())
+        if (formDataAttempt.failed) {
+            return ActionAttempt.Failure(formDataAttempt);
+        }
+
+        const validateAttempt = ActionAttempt.Validate(() => validateDeleteFriend(decodeDeleteFriend(formDataAttempt.data)));
+        if (validateAttempt.failed) {
+            return ActionAttempt.Failure(validateAttempt);
+        }
+
+        const deleteAttempt = await ActionAttempt.HTTP(() => locals.api.delete(`user-friends/${validateAttempt.data.userId}/${validateAttempt.data.friendId}`));
+        if (deleteAttempt.failed) {
+            return ActionAttempt.Failure(deleteAttempt);
+        }
     }
 };
 
@@ -99,6 +115,21 @@ const decodeCreateChat = (formData: FormData) => {
 const validateCreateChat = validator(
     Type.Object({
         memberIds: Type.Array(Type.String())
+    }),
+    { stripLeadingSlash: true }
+);
+
+const decodeDeleteFriend = (formData: FormData) => {
+    return {
+        userId: formData.get('userId'),
+        friendId: formData.get('friendId'),
+    };
+};
+
+const validateDeleteFriend = validator(
+    Type.Object({
+        userId: Type.String(),
+        friendId: Type.String()
     }),
     { stripLeadingSlash: true }
 );
