@@ -79,7 +79,7 @@
 
 <main class="mx-auto max-h-full max-w-screen-lg overflow-auto p-8">
     <div class="mb-8">
-        <h1 class="capitalize">Create issue</h1>
+        <h1 class="capitalize">Create task</h1>
         <p class="c-label">Turn your tasks into trackable issues and keep work flowing smoothly.</p>
     </div>
     <form

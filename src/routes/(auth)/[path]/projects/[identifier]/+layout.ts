@@ -30,7 +30,7 @@ export const load: LayoutLoad = async ({ parent, params, data }) => {
                                 activeIcon: IconHomeSolid
                             },
                             {
-                                label: 'Issues',
+                                label: 'Tasks',
                                 href: `/${params.path}/projects/${params.identifier}/issues`,
                                 icon: IconIssuesOutline,
                                 activeIcon: IconIssues

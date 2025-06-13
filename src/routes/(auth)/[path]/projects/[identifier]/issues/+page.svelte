@@ -53,7 +53,7 @@
 <Main>
     <div class="min-h-screen-sm grid h-full grid-rows-[auto_auto_1fr] gap-4">
         <div>
-            <h1>Issues</h1>
+            <h1>Tasks</h1>
             <p class="c-text-secondary text-pretty">
                 Create, track, and resolve tasks—keep your project aligned, focused and fast-moving.
             </p>

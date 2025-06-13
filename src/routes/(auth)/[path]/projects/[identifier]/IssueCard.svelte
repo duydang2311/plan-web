@@ -15,7 +15,7 @@
 
 <div class="border-base-border-3 dark:bg-base-3 shadow-xs flex-1 rounded-md border p-4">
     <div class="flex items-center justify-between gap-4">
-        <p class="font-medium">Issues</p>
+        <p class="font-medium">Tasks</p>
         <IconButton
             as="link"
             href="/{page.params.path}/projects/{page.params.identifier}/issues"

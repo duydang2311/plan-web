@@ -7,7 +7,7 @@ export const load: LayoutLoad = async ({ parent, params }) => {
             {
                 breadcrumb: true,
                 meta: {
-                    title: 'Issues',
+                    title: 'Tasks',
                     href: `/${params.path}/projects/${params.identifier}/issues`
                 }
             }

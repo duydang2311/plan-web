@@ -25,7 +25,7 @@
 
 <section class="mt-8">
     <div class="flex justify-between">
-        <h2>Issues</h2>
+        <h2>Tasks</h2>
         <Button
             as="link"
             href="/{page.params.path}/projects/{page.params.identifier}/issues"
