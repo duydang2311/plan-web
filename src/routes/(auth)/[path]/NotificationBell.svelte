@@ -1,14 +1,10 @@
 <script lang="ts">
-    import { offset } from '@floating-ui/core';
     import { DateTime } from 'luxon';
     import { Popover } from 'melt/builders';
     import { IconButton } from '~/lib/components';
     import { IconBellOutline } from '~/lib/components/icons';
     import { useRuntime } from '~/lib/contexts/runtime.client';
-    import {
-        notificationTypeNames,
-        notificationTypes
-    } from '~/lib/models/notification';
+    import { notificationTypeNames, notificationTypes } from '~/lib/models/notification';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { createRef, watch } from '~/lib/utils/runes.svelte';
     import { popover, tsap } from '~/lib/utils/transition';
@@ -28,29 +24,13 @@
         },
         forceVisible: true,
         floatingConfig: {
-            computePosition: {
-                placement: 'bottom',
-                middleware: [
-                    offset({
-                        mainAxis: 8
-                    }),
-                    {
-                        name: 'window-rightmost',
-                        fn: (state) => {
-                            return {
-                                x:
-                                    window.innerWidth >= 1024
-                                        ? window.innerWidth -
-                                          state.elements.floating.clientWidth -
-                                          16
-                                        : window.innerWidth -
-                                          state.elements.floating.clientWidth -
-                                          8,
-                                y: state.y
-                            };
-                        }
-                    }
-                ]
+            offset: {
+                mainAxis: 16
+            },
+            shift: {
+                padding: {
+                    right: 16
+                }
             }
         }
     });
@@ -90,9 +70,6 @@
     hub.on('new_notification', (data: NotificationEvent) => {
         if (!open) {
             ++unreadCount;
-        }
-        if (data.Type === notificationTypeNames[notificationTypes.projectCreated]) {
-            data.Type;
         }
         switch (data.Type) {
             case notificationTypeNames[notificationTypes.projectCreated]:

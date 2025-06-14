@@ -49,7 +49,6 @@
                     >()
                 );
             },
-            staleTime: 0
         }))
     );
 </script>

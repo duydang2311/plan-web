@@ -73,7 +73,7 @@
 {#snippet friend(user: LocalUser)}
     <div
         class={[
-            'relative flex items-center gap-2 p-2',
+            'relative flex items-center gap-2 p-2 z-0',
             user.profile ? 'hover:bg-base-hover active:bg-base-active rounded' : undefined
         ]}
     >
@@ -99,7 +99,7 @@
         <form
             method="post"
             action="/actions?/delete_friend"
-            class="ml-auto"
+            class="ml-auto z-10"
             use:enhance={() => {
                 const old = $query.data;
                 if (old) {

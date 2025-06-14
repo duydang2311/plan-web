@@ -139,18 +139,7 @@
                         totalCount: $query.data.totalCount
                     });
                 }
-                await queryClient.invalidateQueries({
-                    predicate: ({ queryKey }) => {
-                        return (
-                            queryKey[0] === 'user-friend-requests' ||
-                            (queryKey[0] === 'users' &&
-                                queryKey[1] != null &&
-                                typeof queryKey[1] === 'object' &&
-                                'tag' in queryKey[1] &&
-                                queryKey[1].tag === 'add-friend-view')
-                        );
-                    }
-                });
+                await queryClient.invalidateQueries({ queryKey });
             };
         }}
     >
