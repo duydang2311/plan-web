@@ -219,7 +219,8 @@ const getTimelineIssueList =
                 query: {
                     projectId,
                     select: 'Id,Title,StartTime,EndTime,OrderNumber,TimelineZone',
-                    order: 'StartTime,OrderNumber'
+                    order: 'StartTime,OrderNumber',
+                    size: 1000
                 }
             })
         );
