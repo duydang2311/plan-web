@@ -1,4 +1,20 @@
 import type { notificationTypes } from '~/lib/models/notification';
+import type { StatusCategory } from '~/lib/models/status';
+
+type LocalNotifiedIssue = {
+    orderNumber: number;
+    title: string;
+    project: {
+        identifier: string;
+        workspace: { path: string };
+    };
+};
+
+type LocalNotifiedWorkspaceStatus = {
+    color: string;
+    category: StatusCategory;
+    value: string;
+};
 
 export interface LocalUserNotification {
     id: number;
@@ -14,26 +30,12 @@ export interface LocalUserNotification {
           }
         | {
               type: (typeof notificationTypes)['issueCreated'];
-              data: {
-                  orderNumber: number;
-                  title: string;
-                  project: {
-                      identifier: string;
-                      workspace: { path: string };
-                  };
-              };
+              data: LocalNotifiedIssue;
           }
         | {
               type: (typeof notificationTypes)['issueCommentCreated'];
               data: {
-                  issue: {
-                      orderNumber: number;
-                      title: string;
-                      project: {
-                          identifier: string;
-                          workspace: { path: string };
-                      };
-                  };
+                  issue: LocalNotifiedIssue;
               };
           }
         | {
@@ -53,6 +55,14 @@ export interface LocalUserNotification {
                   workspace: {
                       name: string;
                   };
+              };
+          }
+        | {
+              type: (typeof notificationTypes)['issueStatusUpdated'];
+              data: {
+                  issue: LocalNotifiedIssue;
+                  oldStatus?: LocalNotifiedWorkspaceStatus;
+                  newStatus?: LocalNotifiedWorkspaceStatus;
               };
           };
 }

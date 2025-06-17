@@ -1,13 +1,12 @@
 <script lang="ts">
     import { DateTime } from 'luxon';
-    import { Popover } from 'melt/builders';
     import { IconButton } from '~/lib/components';
     import { IconBellOutline } from '~/lib/components/icons';
+    import Popover from '~/lib/components/popover';
     import { useRuntime } from '~/lib/contexts/runtime.client';
     import { notificationTypeNames, notificationTypes } from '~/lib/models/notification';
     import type { PaginatedList } from '~/lib/models/paginatedList';
     import { createRef, watch } from '~/lib/utils/runes.svelte';
-    import { popover, tsap } from '~/lib/utils/transition';
     import NotificationPopover from './NotificationPopover.svelte';
     import type { LocalUserNotification } from './utils';
 
@@ -17,7 +16,7 @@
     let unreadCount = $state.raw(0);
     let scrollTop = $state.raw(0);
     const ref = createRef.async<PaginatedList<LocalUserNotification>>();
-    const builder = new Popover({
+    const popover = new Popover.Builder({
         open: () => open,
         onOpenChange(value) {
             open = value;
@@ -175,7 +174,7 @@
 <IconButton
     type="button"
     variant={unreadCount === 0 ? 'base' : 'info'}
-    {...builder.trigger}
+    {...popover.trigger}
     data-custom-state={open ? 'open' : 'closed'}
     class="relative"
 >
@@ -188,13 +187,8 @@
         </div>
     {/if}
 </IconButton>
-{#if builder.open}
-    <div
-        {...builder.content}
-        in:tsap={popover.in}
-        out:tsap={popover.out}
-        class="c-popover--wrapper w-paragraph-sm max-w-screen"
-    >
+{#if popover.open}
+    <Popover {...popover.content} class="w-paragraph-sm p-0">
         <NotificationPopover {userId} {ref} bind:scrollTop />
-    </div>
+    </Popover>
 {/if}
