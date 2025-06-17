@@ -2,7 +2,7 @@
     import { page } from '$app/state';
     import { Resize } from '@cloudinary/url-gen/actions';
     import type { Snippet } from 'svelte';
-    import { Avatar, Button, IconButton, Input } from '~/lib/components';
+    import { Avatar, Button, IconButton, Input, ThemeSwitch } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import {
         IconChat,
@@ -190,6 +190,7 @@
                 <Breadcrumb />
             </div>
             <div class="flex items-center gap-2">
+                <ThemeSwitch />
                 {#if data.user}
                     <NotificationBell userId={data.user.id} />
                     <FriendsButton userId={data.user.id} />

@@ -42,6 +42,7 @@ export { default as TagsInputBuilder } from './TagsInputBuilder.svelte';
 export { default as TextArea } from './TextArea.svelte';
 export { default as Th } from './Th.svelte';
 export { default as THead } from './THead.svelte';
+export { default as ThemeSwitch } from './ThemeSwitch.svelte';
 export { default as ThSort } from './ThSort.svelte';
 export { default as ThSort2 } from './ThSort2.svelte';
 export { default as ThSort3 } from './ThSort3.svelte';

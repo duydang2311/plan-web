@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/state';
     import type { Snippet } from 'svelte';
-    import { Button, Logo } from '~/lib/components';
+    import { Button, Logo, ThemeSwitch } from '~/lib/components';
     import { IconLogin } from '~/lib/components/icons';
 
     const { children, topRight }: { children: Snippet; topRight?: Snippet } = $props();
@@ -23,7 +23,8 @@
             <a href="/" class="hover:text-base-fg-1 transition-colors">Templates</a>
             <a href="/" class="hover:text-base-fg-1 transition-colors">Pricing</a>
         </div>
-        <div>
+        <div class="flex items-center gap-4">
+            <ThemeSwitch />
             {#if topRight}
                 {@render topRight()}
             {:else}
