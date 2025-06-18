@@ -78,6 +78,18 @@ export const select: Record<'in' | 'out', TsapCallback> = {
 };
 
 export const dialog = {
+    overlayIn: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
+        gsap.from(node, {
+            opacity: 0,
+            duration: 0.1,
+            ...vars
+        }),
+    overlayOut: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
+        gsap.to(node, {
+            opacity: 0,
+            duration: 0.1,
+            ...vars
+        }),
     in: (vars?: gsap.TweenVars) => (node: Element, gsap: typeof __gsap) =>
         gsap.from(node, {
             opacity: 0,

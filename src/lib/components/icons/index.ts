@@ -50,6 +50,7 @@ export { default as IconCalendar } from '~icons/lucide/calendar';
 export { default as IconCalendarRange } from '~icons/lucide/calendar-range';
 export { default as IconColumns } from '~icons/lucide/columns-3';
 export { default as IconMenu } from '~icons/lucide/ellipsis';
+export { default as IconTaskOutline } from '~icons/lucide/file-text';
 export { default as IconDraggable } from '~icons/lucide/grip-vertical';
 export { default as IconH1 } from '~icons/lucide/heading-1';
 export { default as IconH2 } from '~icons/lucide/heading-2';

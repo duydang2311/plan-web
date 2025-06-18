@@ -50,7 +50,8 @@
                         query: search,
                         size: 5,
                         excludeChecklistItemParentIssueId: issueId,
-                        excludeIssueIds: [issueId]
+                        excludeIssueIds: [issueId],
+                        threshold: 0.1
                     }
                 })
             ).then((a) => a.json<PaginatedList<LocalSearchIssue>>());

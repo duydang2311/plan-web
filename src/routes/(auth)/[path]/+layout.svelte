@@ -2,7 +2,7 @@
     import { page } from '$app/state';
     import { Resize } from '@cloudinary/url-gen/actions';
     import type { Snippet } from 'svelte';
-    import { Avatar, Button, IconButton, Input, ThemeSwitch } from '~/lib/components';
+    import { Avatar, Button, IconButton, ThemeSwitch } from '~/lib/components';
     import Breadcrumb from '~/lib/components/Breadcrumb.svelte';
     import {
         IconChat,
@@ -11,14 +11,12 @@
         IconCircleDashedOutline,
         IconHome,
         IconHomeSolid,
-        IconKeyCommandOutline,
         IconPanelLeftClose,
         IconPanelLeftOpen,
         IconProject,
         IconProjectOutline,
         IconResources,
         IconResourcesOutline,
-        IconSearch,
         IconSettings,
         IconSettingsOutline,
         IconUsers,
@@ -32,6 +30,7 @@
     import FriendsButton from './FriendsButton.svelte';
     import Navigation from './Navigation.svelte';
     import NotificationBell from './NotificationBell.svelte';
+    import SearchWorkspaceItems from './SearchWorkspaceItems.svelte';
 
     const { children, data }: { children: Snippet; data: LayoutData } = $props();
     const { cloudinary } = useRuntime();
@@ -53,7 +52,7 @@
 <div
     class="min-w-screen bg-base-2 dark:bg-base-1 grid h-full min-h-screen w-full grid-cols-[auto_1fr] p-2"
 >
-    <div class={['transition-[max-width]', collapsed ? 'max-w-0' : 'max-w-60']}>
+    <div class={['transition-[max-width] w-60', collapsed ? 'max-w-0' : 'max-w-60']}>
         <aside
             class="custom-scrollbar flex h-full max-h-[calc(100vh-1rem)] flex-col items-stretch space-y-4 overflow-auto py-2 pr-2 text-[0.9285rem]"
             style="--_border: var(--color-base-2)"
@@ -62,16 +61,7 @@
                 <Logo class="h-4 w-auto" />
                 <p class="font-display text-h2 font-black leading-none tracking-tight">konekt</p>
             </div>
-            <div class="relative">
-                <Input placeholder="Search..." class="py-1 pl-8 pr-12" />
-                <IconSearch class="text-base-fg-5 absolute left-2 top-1/2 -translate-y-1/2" />
-                <div
-                    class="text-base-fg-1 bg-base-5 absolute right-2 top-1/2 flex -translate-y-1/2 select-none items-center gap-0 rounded-sm px-1"
-                >
-                    <IconKeyCommandOutline />
-                    <span class="font-display">K</span>
-                </div>
-            </div>
+            <SearchWorkspaceItems workspaceId={data.workspace.id} />
             <div class="flex grow flex-col gap-4">
                 <ul class="group font-medium">
                     <Navigation
