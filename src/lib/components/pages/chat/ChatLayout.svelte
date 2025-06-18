@@ -55,7 +55,7 @@
 {#snippet chatSnippet(chat: LocalChat)}
     {@const otherUser = chat.chatMembers.find((a) => a.member.id !== user.id)}
     {#if otherUser}
-        <li class="col-span-full grid grid-cols-subgrid">
+        <li>
             <Button
                 as="link"
                 href={buildChatHref(chat)}
@@ -65,7 +65,7 @@
                 }}
                 variant="base"
                 class={[
-                    'col-span-full grid grid-cols-subgrid items-center gap-2 px-2 text-left',
+                    'flex items-center gap-2 px-2 text-left',
                     selectedChatId === chat.id
                         ? 'not-hover:not-active:bg-base-selected text-base-fg-1 font-semibold'
                         : 'not-hover:not-active:bg-transparent font-normal'
@@ -80,11 +80,20 @@
                         alt={otherUser.member.profile?.displayName ?? otherUser.member.email}
                         class="size-avatar-sm"
                     />
-                    <div>
-                        <p class="font-display">
-                            {otherUser.member.profile?.displayName ?? otherUser.member.email}
-                        </p>
+                    <span class="font-display ellipsis">
+                        {otherUser.member.profile?.displayName ?? otherUser.member.email}
+                    </span>
+                {:else if chat.type === ChatTypes.Group}
+                    <div class="ml-2 flex items-center">
+                        {#each chat.chatMembers as member}
+                            <Avatar user={member.member} size={64} class="size-avatar-sm -ml-2" />
+                        {/each}
                     </div>
+                    <span class="ellipsis font-display">
+                        {chat.chatMembers
+                            .map((a) => a.member.profile?.displayName ?? a.member.email)
+                            .join(', ')}
+                    </span>
                 {/if}
             </Button>
         </li>
@@ -92,7 +101,7 @@
 {/snippet}
 
 <div class="divide-base-border-2 grid h-full grid-cols-[auto_1fr] divide-x">
-    <div class="w-paragraph-sm grid grid-rows-[auto_1fr] overflow-hidden dark:bg-base-3">
+    <div class="w-paragraph-sm dark:bg-base-3 grid grid-rows-[auto_1fr] overflow-hidden">
         <div class="border-b-base-border-3 flex gap-2 border-b">
             <div class="relative grow">
                 <Input
@@ -112,7 +121,7 @@
             {:else if chatListRef.value == null || chatListRef.value.items.length === 0}
                 <span class="c-label">No chats found.</span>
             {:else}
-                <ol class="grid grid-cols-[auto_1fr] gap-1">
+                <ol class="flex flex-col gap-1">
                     {#each chatListRef.value.items as chat}
                         {@render chatSnippet(chat)}
                     {/each}
