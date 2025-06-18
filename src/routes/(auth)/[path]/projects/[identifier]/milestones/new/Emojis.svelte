@@ -104,7 +104,7 @@
             searchResults = undefined;
             searchEmoji.cancel();
         } else {
-            searchEmoji.invoke(e.currentTarget.value);
+            searchEmoji.schedule(e.currentTarget.value);
         }
     }}
     class="rounded-none border-0 border-b"

@@ -1,7 +1,15 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import { Button, Main, Tabs } from '~/lib/components';
-    import { IconColumns, IconGanttChartOutline, IconPlus, IconRows } from '~/lib/components/icons';
+    import { makeControlledDebounce } from '@mobily/ts-belt/Function';
+    import { Button, Input, Main, Tabs } from '~/lib/components';
+    import {
+        IconColumns,
+        IconGanttChartOutline,
+        IconPlus,
+        IconRows,
+        IconSearch
+    } from '~/lib/components/icons';
     import { paginatedList } from '~/lib/models/paginatedList';
     import { permissions } from '~/lib/models/permission';
     import { mapMaybePromise } from '~/lib/utils/promise';
@@ -48,6 +56,26 @@
     const can = $derived({
         create: getProjectPermissionsRef.value?.has(permissions.createIssue) ?? false
     });
+    const updateSearch = makeControlledDebounce(
+        (value: string) => {
+            const searchParams = fluentSearchParams(page.url);
+            if (value.length === 0) {
+                searchParams.delete('q');
+            } else {
+                searchParams.set('q', value);
+            }
+            goto(`${page.url.pathname}${searchParams.toString()}`, {
+                replaceState: true,
+                keepFocus: true,
+                noScroll: true,
+                invalidateAll: true
+            });
+        },
+        {
+            leading: true,
+            delay: 250
+        }
+    );
 </script>
 
 <Main>
@@ -58,45 +86,71 @@
                 Create, track, and resolve tasks—keep your project aligned, focused and fast-moving.
             </p>
         </div>
-        <div class="flex justify-between gap-x-2 gap-y-2">
-            <Tabs {...tabsBuilder.triggerList} class="*:px-4 sm:w-fit">
-                <a
-                    {...tabsBuilder.getTrigger('table')}
-                    href="{page.url.pathname}{fluentSearchParams(page.url).delete('view')}"
-                    class="c-tab--trigger flex items-center gap-2"
-                    data-sveltekit-preload-data="hover"
-                    data-sveltekit-replacestate
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex gap-2">
+                <div class="relative">
+                    <IconSearch class="text-base-fg-5 absolute left-2 top-1/2 -translate-y-1/2" />
+                    <Input
+                        type="text"
+                        placeholder="Search tasks..."
+                        class="h-full w-fit pl-8"
+                        value={page.url.searchParams.get('q') ?? ''}
+                        oninput={(e) => {
+                            updateSearch.schedule(e.currentTarget.value);
+                        }}
+                    />
+                </div>
+                <Tabs
+                    {...tabsBuilder.triggerList}
+                    class="border-base-border-3 gap-0 border p-0 *:rounded-none *:px-4 *:first:rounded-l-md *:last:rounded-r-md sm:w-fit bg-transparent"
                 >
-                    <IconRows />
-                    Table
-                </a>
-                <a
-                    {...tabsBuilder.getTrigger('board')}
-                    href="{page.url.pathname}{fluentSearchParams(page.url).set('view', 'board')}"
-                    class="c-tab--trigger flex items-center gap-2"
-                    data-sveltekit-preload-data="hover"
-                    data-sveltekit-replacestate
-                >
-                    <IconColumns />
-                    Board
-                </a>
-                <a
-                    {...tabsBuilder.getTrigger('timeline')}
-                    href="{page.url.pathname}{fluentSearchParams(page.url).set('view', 'timeline')}"
-                    class="c-tab--trigger flex items-center gap-2"
-                    data-sveltekit-preload-data="hover"
-                    data-sveltekit-replacestate
-                >
-                    <IconGanttChartOutline />
-                    Timeline
-                </a>
-            </Tabs>
+                    <a
+                        {...tabsBuilder.getTrigger('table')}
+                        href="{page.url.pathname}{fluentSearchParams(page.url).delete('view')}"
+                        class="c-tab--trigger flex items-center gap-2"
+                        style="--_bg-selected: var(--color-base-selected);"
+                        data-sveltekit-preload-data="hover"
+                        data-sveltekit-replacestate
+                    >
+                        <IconRows />
+                        Table
+                    </a>
+                    <a
+                        {...tabsBuilder.getTrigger('board')}
+                        href="{page.url.pathname}{fluentSearchParams(page.url).set(
+                            'view',
+                            'board'
+                        )}"
+                        class="c-tab--trigger flex items-center gap-2"
+                        style="--_bg-selected: var(--color-base-selected);"
+                        data-sveltekit-preload-data="hover"
+                        data-sveltekit-replacestate
+                    >
+                        <IconColumns />
+                        Board
+                    </a>
+                    <a
+                        {...tabsBuilder.getTrigger('timeline')}
+                        href="{page.url.pathname}{fluentSearchParams(page.url).set(
+                            'view',
+                            'timeline'
+                        )}"
+                        class="c-tab--trigger flex items-center gap-2"
+                        style="--_bg-selected: var(--color-base-selected);"
+                        data-sveltekit-preload-data="hover"
+                        data-sveltekit-replacestate
+                    >
+                        <IconGanttChartOutline />
+                        Timeline
+                    </a>
+                </Tabs>
+            </div>
             {#if can.create}
                 <Button
                     as="link"
                     href={createIssueHref}
                     variant="primary"
-                    class="flex w-fit items-center gap-2 capitalize max-sm:justify-center"
+                    class="flex w-fit items-center gap-2 text-nowrap capitalize max-sm:justify-center"
                 >
                     <IconPlus />
                     Create issue

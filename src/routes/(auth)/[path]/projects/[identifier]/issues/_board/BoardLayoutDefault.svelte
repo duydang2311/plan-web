@@ -131,6 +131,9 @@
             return;
         }
 
+        if (page.url.searchParams.has('q')) {
+            return;
+        }
         if (source.statusId === target.statusId) {
             refetch([source.statusId]);
         } else {

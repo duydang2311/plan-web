@@ -87,8 +87,21 @@ const loadTableLayout = async ({
         projectId: data.project.id,
         url
     });
+    const q = url.searchParams.get('q');
     const getIssueList = await Effect.gen(function* () {
-        const response = yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
+        const response = q
+            ? yield* LoadResponse.HTTP(
+                  (yield* ApiClient).get('issues/search', {
+                      query: {
+                          ...query,
+                          query: q,
+                          threshold: 0.1,
+                          size: 10,
+                          order: url.searchParams.get('order')
+                      }
+                  })
+              )
+            : yield* LoadResponse.HTTP((yield* ApiClient).get(`issues`, { query }));
         return yield* LoadResponse.JSON(() => response.json<PaginatedList<LocalIssue>>());
     }).pipe(
         Effect.orElseSucceed(() => paginatedList<LocalIssue>()),
@@ -116,6 +129,7 @@ const loadBoardLayout = async ({
         ...createBoardQueryParams(url),
         projectId: data.project.id
     };
+    const q = url.searchParams.get('q');
 
     const getStatusListAttempt = getWorkspaceStatusList(locals.api)(data.workspace.id);
 
@@ -123,6 +137,44 @@ const loadBoardLayout = async ({
         const attempt = yield* Effect.promise(() => getStatusListAttempt);
         if (attempt.failed) {
             return {};
+        }
+
+        if (q) {
+            const response = yield* LoadResponse.HTTP(
+                (yield* ApiClient).get('issues/search', {
+                    query: {
+                        ...query,
+                        query: q,
+                        threshold: 0.1,
+                        size: 10,
+                        order: null
+                    }
+                })
+            );
+            if (!response.ok) {
+                return {};
+            }
+            const data = yield* LoadResponse.JSON(() =>
+                response.json<PaginatedList<LocalBoardIssue>>()
+            );
+            const reduced = data.items.reduce(
+                (acc, cur) => {
+                    const key = cur.status == null ? -1 : cur.status.id;
+                    if (!acc[key]) {
+                        acc[key] = paginatedList<LocalBoardIssue>();
+                    }
+                    acc[key].items.push(cur);
+                    acc[key].totalCount = acc[key].totalCount + 1;
+                    return acc;
+                },
+                {} as Record<string, PaginatedList<LocalBoardIssue>>
+            );
+            for (const status of attempt.data.items) {
+                if (!reduced[status.id]) {
+                    reduced[status.id] = paginatedList<LocalBoardIssue>();
+                }
+            }
+            return reduced;
         }
         return yield* getBoardIssueLists(
             query,
