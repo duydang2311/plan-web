@@ -8,7 +8,7 @@
     import LandingLayout from '~/lib/components/layouts/LandingLayout.svelte';
     import Link from '~/lib/components/Link.svelte';
     import { createForm, formValidator } from '~/lib/utils/form.svelte';
-    import type { ActionData } from './$types';
+    import type { ActionData, PageData } from './$types';
     import { validate } from './utils';
 
     const errorMap = {
@@ -30,7 +30,7 @@
         }
     };
 
-    let { form }: { form: ActionData } = $props();
+    let { data, form }: { data: PageData; form: ActionData } = $props();
     let status = $state<'submitting' | null>(null);
     const helperForm = createForm({
         validator: formValidator(validate)
@@ -49,12 +49,19 @@
 </script>
 
 <LandingLayout>
-    <main class="mt-16 max-w-paragraph-lg p-8 mx-auto">
+    <main class="max-w-paragraph-lg mx-auto mt-16 p-8">
         <h1 class="font-bold capitalize">Sign in</h1>
-        <p class="c-text-secondary mb-8">
+        <p class="c-text-secondary">
             Ready to dive in? Let’s get things done with <strong>konekt</strong>.
         </p>
-        <div class="">
+        {#if data.flashVerified}
+            <div class="bg-positive-1/10 border-positive-1/10 mt-4 rounded border p-1">
+                <span class="text-positive-1 c-text-secondary">
+                    Your email address has been verified successfully. You can now sign in.
+                </span>
+            </div>
+        {/if}
+        <div class="mt-8">
             <form
                 method="post"
                 action="?/sign-in"

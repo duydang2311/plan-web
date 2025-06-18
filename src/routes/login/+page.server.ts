@@ -5,13 +5,22 @@ import crypto from 'node:crypto';
 import { ApiError, ValidationError } from '~/lib/models/errors';
 import { ApiClient } from '~/lib/services/api_client.server';
 import { flattenProblemDetails, validateProblemDetailsEffect } from '~/lib/utils/problem_details';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { decode, validate } from './utils';
 
 interface SignInResponse {
     sessionId: string;
     sessionMaxAge: number;
 }
+
+export const load: PageServerLoad = async ({ cookies }) => {
+    const flashVerified = cookies.get('flash_verified');
+    if (flashVerified) {
+        cookies.delete('flash_verified', { path: '/' });
+    }
+
+    return { flashVerified: flashVerified != null };
+};
 
 export const actions = {
     'sign-in': async ({ request, cookies, locals: { appLive } }) => {
