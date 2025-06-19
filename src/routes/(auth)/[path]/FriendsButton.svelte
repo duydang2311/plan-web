@@ -16,29 +16,13 @@
         },
         forceVisible: true,
         floatingConfig: {
-            computePosition: {
-                placement: 'bottom',
-                middleware: [
-                    offset({
-                        mainAxis: 8
-                    }),
-                    {
-                        name: 'window-rightmost',
-                        fn: (state) => {
-                            return {
-                                x:
-                                    window.innerWidth >= 1024
-                                        ? window.innerWidth -
-                                          state.elements.floating.clientWidth -
-                                          16
-                                        : window.innerWidth -
-                                          state.elements.floating.clientWidth -
-                                          8,
-                                y: state.y
-                            };
-                        }
-                    }
-                ]
+            offset: {
+                mainAxis: 16
+            },
+            shift: {
+                padding: {
+                    right: 16
+                }
             }
         }
     });

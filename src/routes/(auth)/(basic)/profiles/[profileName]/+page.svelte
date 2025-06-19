@@ -2,6 +2,7 @@
     import { Avatar } from '~/lib/components';
     import LandingLayout from '~/lib/components/layouts/LandingLayout.svelte';
     import { createRef } from '~/lib/utils/runes.svelte';
+    import FriendsButton from '~/routes/(auth)/[path]/FriendsButton.svelte';
     import NotificationBell from '~/routes/(auth)/[path]/NotificationBell.svelte';
     import type { PageProps } from './$types';
     import CreateProfileView from './CreateProfileView.svelte';
@@ -14,6 +15,7 @@
 <LandingLayout>
     {#snippet topRight()}
         <div class="flex items-center gap-4">
+            <FriendsButton userId={data.localUser.id} />
             <NotificationBell userId={data.localUser.id} />
             <a href="/profiles/me" aria-label="Go to your profile" class="flex items-center">
                 <Avatar user={data.localUser} size={64} class="size-avatar-md" />

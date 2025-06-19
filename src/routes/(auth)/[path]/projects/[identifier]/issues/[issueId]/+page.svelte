@@ -26,6 +26,7 @@
     import Status from './Status.svelte';
     import Timeline from './Timeline.svelte';
     import type { LocalMilestone } from './types';
+    import { createAssigneeListQuery } from './utils.client';
 
     const { data, form }: { data: PageData; form: ActionData } = $props();
     const { api } = useRuntime();
@@ -43,16 +44,18 @@
         )
     );
     const getProjectPermissionsRef = createRef.maybePromise(() => data.getProjectPermissions);
+    const assigneeListQuery = createAssigneeListQuery(() => ({ issueId: data.page.issue.id }));
     const can = $derived({
         update:
             issueRef.value?.authorId === data.user.id ||
-            (getProjectPermissionsRef.value?.has(permissions.updateIssue) ?? false),
+            (getProjectPermissionsRef.value?.has(permissions.updateIssue) ?? false) ||
+            ($assigneeListQuery.data?.items.some((a) => a.user.id === data.user.id) ?? false),
         delete:
             issueRef.value?.authorId === data.user.id ||
             (getProjectPermissionsRef.value?.has(permissions.deleteIssue) ?? false),
         comment:
             issueRef.value?.authorId === data.user.id ||
-            (getProjectPermissionsRef.value?.has(permissions.commentIssue) ?? false),
+            (getProjectPermissionsRef.value?.has(permissions.createIssueAuditComment) ?? false),
         assignUser:
             issueRef.value?.authorId === data.user.id ||
             (getProjectPermissionsRef.value?.has(permissions.createIssueAssignee) ?? false),

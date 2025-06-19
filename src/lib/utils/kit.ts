@@ -318,6 +318,7 @@ interface LoadAttemptHelpers {
     >;
     JSON: <T>(f: () => Promise<T>) => Promise<Attempt<T, LoadError>>;
     Assert: <A, E extends LoadError>(attempt: Attempt<A, E>) => asserts attempt is Success<A>;
+    Failure: typeof loadError;
 }
 
 export const LoadAttempt: LoadAttemptHelpers = {
@@ -342,5 +343,6 @@ export const LoadAttempt: LoadAttemptHelpers = {
                 message: data.message ?? 'Something went wrong while processing your request.'
             });
         }
-    }
+    },
+    Failure: loadError
 } as const;

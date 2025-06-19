@@ -1,11 +1,12 @@
 <script lang="ts">
     import { Avatar, Button } from '~/lib/components';
+    import { IconPlus } from '~/lib/components/icons';
     import LandingLayout from '~/lib/components/layouts/LandingLayout.svelte';
+    import FriendsButton from '~/routes/(auth)/[path]/FriendsButton.svelte';
+    import NotificationBell from '~/routes/(auth)/[path]/NotificationBell.svelte';
     import TeamInvitations from './TeamInvitations.svelte';
     import WorkspaceList from './WorkspaceList.svelte';
     import { createUserQuery } from './utils';
-    import NotificationBell from '~/routes/(auth)/[path]/NotificationBell.svelte';
-    import { IconPlus } from '~/lib/components/icons';
 
     const { userId }: { userId: string } = $props();
     const query = createUserQuery(() => ({ userId }));
@@ -14,6 +15,7 @@
 <LandingLayout>
     {#snippet topRight()}
         <div class="flex items-center gap-4">
+            <FriendsButton {userId} />
             <NotificationBell {userId} />
             {#if $query.data}
                 <a href="/profiles/me" aria-label="Go to your profile" class="flex items-center">
@@ -39,7 +41,7 @@
                     as="link"
                     href="/new"
                     variant="primary"
-                    class="flex w-fit items-center gap-2 capitalize"
+                    class="flex w-fit items-center gap-2 capitalize text-nowrap"
                 >
                     <IconPlus />
                     <span>Create workspace</span>
