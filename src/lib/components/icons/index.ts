@@ -60,6 +60,7 @@ export { default as IconH5 } from '~icons/lucide/heading-5';
 export { default as IconH6 } from '~icons/lucide/heading-6';
 export { default as IconItalic } from '~icons/lucide/italic';
 export { default as IconLogin } from '~icons/lucide/log-in';
+export { default as IconSignOutOutline } from '~icons/lucide/log-out';
 export { default as IconMonitor } from '~icons/lucide/monitor';
 export { default as IconMoon } from '~icons/lucide/moon';
 export { default as IconPanelLeftClose } from '~icons/lucide/panel-left-close';

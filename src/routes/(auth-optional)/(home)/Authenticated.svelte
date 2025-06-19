@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Avatar, Button } from '~/lib/components';
-    import { IconPlus } from '~/lib/components/icons';
+    import { Avatar, Button, IconButton } from '~/lib/components';
+    import { IconPlus, IconSignOutOutline } from '~/lib/components/icons';
     import LandingLayout from '~/lib/components/layouts/LandingLayout.svelte';
     import FriendsButton from '~/routes/(auth)/[path]/FriendsButton.svelte';
     import NotificationBell from '~/routes/(auth)/[path]/NotificationBell.svelte';
@@ -17,6 +17,9 @@
         <div class="flex items-center gap-4">
             <FriendsButton {userId} />
             <NotificationBell {userId} />
+            <IconButton data-sveltekit-reload as="link" href="/sign-out" variant="base" title="Sign out">
+                <IconSignOutOutline />
+            </IconButton>
             {#if $query.data}
                 <a href="/profiles/me" aria-label="Go to your profile" class="flex items-center">
                     <Avatar user={$query.data} size={64} class="size-avatar-md" />
@@ -41,7 +44,7 @@
                     as="link"
                     href="/new"
                     variant="primary"
-                    class="flex w-fit items-center gap-2 capitalize text-nowrap"
+                    class="flex w-fit items-center gap-2 text-nowrap capitalize"
                 >
                     <IconPlus />
                     <span>Create workspace</span>

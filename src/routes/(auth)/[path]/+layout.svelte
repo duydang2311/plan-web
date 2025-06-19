@@ -19,6 +19,7 @@
         IconResourcesOutline,
         IconSettings,
         IconSettingsOutline,
+        IconSignOutOutline,
         IconUsers,
         IconUsersSolid
     } from '~/lib/components/icons';
@@ -126,6 +127,12 @@
                                 icon: IconChatOutline,
                                 activeIcon: IconChat,
                                 label: 'Chat'
+                            },
+                            {
+                                href: `/sign-out`,
+                                icon: IconSignOutOutline,
+                                activeIcon: IconSignOutOutline,
+                                label: 'Sign out'
                             }
                         ]}
                     />

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Avatar } from '~/lib/components';
+    import { Avatar, IconButton } from '~/lib/components';
     import LandingLayout from '~/lib/components/layouts/LandingLayout.svelte';
     import { createRef } from '~/lib/utils/runes.svelte';
     import FriendsButton from '~/routes/(auth)/[path]/FriendsButton.svelte';
@@ -7,6 +7,7 @@
     import type { PageProps } from './$types';
     import CreateProfileView from './CreateProfileView.svelte';
     import ProfileView from './ProfileView.svelte';
+    import { IconSignOutOutline } from '~/lib/components/icons';
 
     const { data }: PageProps = $props();
     const userRef = createRef.maybePromise(() => data.user);
@@ -17,6 +18,15 @@
         <div class="flex items-center gap-4">
             <FriendsButton userId={data.localUser.id} />
             <NotificationBell userId={data.localUser.id} />
+            <IconButton
+                data-sveltekit-reload
+                as="link"
+                href="/sign-out"
+                variant="base"
+                title="Sign out"
+            >
+                <IconSignOutOutline />
+            </IconButton>
             <a href="/profiles/me" aria-label="Go to your profile" class="flex items-center">
                 <Avatar user={data.localUser} size={64} class="size-avatar-md" />
             </a>
