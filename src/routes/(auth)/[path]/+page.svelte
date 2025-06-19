@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { page } from '$app/state';
+    import { Main } from '~/lib/components';
+    import { IconProjectOutline, IconResourcesOutline } from '~/lib/components/icons';
     import { createRef } from '~/lib/utils/runes.svelte';
     import type { PageProps } from './$types';
-    import { Main } from '~/lib/components';
 
     const { data }: PageProps = $props();
     const getAnalyticsRef = createRef.maybePromise(() => data.getAnalytics);
@@ -24,5 +26,21 @@
         {@render card('Active tasks', analytics?.activeIssues ?? 0)}
         {@render card('Total members', analytics?.totalMembers ?? 0)}
         {@render card('Due this week', analytics?.issuesDueThisWeek ?? 0)}
+    </div>
+    <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(32rem,1fr))] gap-4">
+        <a
+            href="/{page.params.path}/projects"
+            class="bg-base-1 border-base-border-3 flex h-40 content-center items-center justify-center gap-8 rounded-lg border p-4 shadow-xs"
+        >
+            <h2 class="font-h-bold">View projects</h2>
+            <IconProjectOutline class="size-12" />
+        </a>
+        <a
+            href="/{page.params.path}/resources"
+            class="bg-base-1 border-base-border-3 flex h-40 content-center items-center justify-center gap-8 rounded-lg border p-4 shadow-xs"
+        >
+            <h2 class="font-h-bold">View resources</h2>
+            <IconResourcesOutline class="size-12" />
+        </a>
     </div>
 </Main>
